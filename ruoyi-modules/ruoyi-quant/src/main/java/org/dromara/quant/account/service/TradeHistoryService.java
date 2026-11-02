@@ -78,14 +78,14 @@ public class TradeHistoryService {
         }
         var result = TradeHistoryAssembler.assemble(fills.stream().map(f -> new TradeHistoryAssembler.Fill(f.getId(), f.getCredentialId(), f.getSymbol(), f.getSide(),
             f.getPositionSide(), f.getOperationType(), f.getReduceOnly(), f.getQuantity(), f.getPrice(), f.getCommission(), f.getRealizedPnl(), f.getTradeTime(),
-            f.getLeverageSnapshot(), f.getPriceTickSizeSnapshot(), f.getPostFillWalletBalance(), f.getPostFillBalanceAt(), f.getCurrentPriceTickSize(), f.getExchangeTradeId())).toList(), names);
+            f.getLeverageSnapshot(), f.getPriceTickSizeSnapshot(), f.getPostFillWalletBalance(), f.getPostFillBalanceAt(), f.getCurrentPriceTickSize(), f.getExchangeTradeId(),
+            f.getExchangeOrderId())).toList(), names);
         var rows = result.rows().stream().filter(row -> {
             Instant opened = Instant.parse((String) row.get("openedAt"));
             return (start == null || !opened.isBefore(start)) && (end == null || opened.isBefore(end));
         }).toList();
-        int inferredCount = (int) rows.stream().filter(row -> "INFERRED".equals(row.get("reconstructionSource"))).count();
         long offset = (long) (pageNum - 1) * pageSize;
         int first = (int) Math.min(offset, rows.size());
-        return new TradeHistoryPageVo(rows.subList(first, Math.min(first + pageSize, rows.size())), rows.size(), result.incompleteCount(), inferredCount);
+        return new TradeHistoryPageVo(rows.subList(first, Math.min(first + pageSize, rows.size())), rows.size(), result.incompleteCount());
     }
 }

@@ -26,7 +26,7 @@ public final class TradeHistoryAssembler {
             if (incomplete.contains(scope)) {
                 continue;
             }
-            Classification classification = classify(fill, active, scope);
+            Classification classification = classify(fill);
             String direction = classification == null ? null : classification.direction();
             boolean open = classification != null && classification.open();
             if (direction == null || fill.tradeTime() == null || !positive(fill.quantity()) || !positive(fill.price())) {
@@ -45,8 +45,10 @@ public final class TradeHistoryAssembler {
                     active.put(key, cycle);
                     cycles.add(cycle);
                 }
-                cycle.inferred |= classification.inferred();
                 cycle.openQty = cycle.openQty.add(fill.quantity());
+                cycle.openingFillCount++;
+                if (fill.exchangeOrderId() != null) cycle.openingOrderIds.add(String.valueOf(fill.exchangeOrderId()));
+                if (fill.exchangeTradeId() != null) cycle.openingTradeIds.add(String.valueOf(fill.exchangeTradeId()));
                 cycle.openValue = cycle.openValue.add(fill.quantity().multiply(fill.price()));
                 cycle.remaining = cycle.remaining.add(fill.quantity());
                 BigDecimal tickSize = positive(fill.priceTickSize()) ? fill.priceTickSize() : fill.currentPriceTickSize();
@@ -65,8 +67,10 @@ public final class TradeHistoryAssembler {
                     incomplete.add(scope);
                     continue;
                 }
-                cycle.inferred |= classification.inferred();
-                cycle.closeQty = cycle.closeQty.add(fill.quantity());
+                    cycle.closeQty = cycle.closeQty.add(fill.quantity());
+                cycle.closingFillCount++;
+                if (fill.exchangeOrderId() != null) cycle.closingOrderIds.add(String.valueOf(fill.exchangeOrderId()));
+                if (fill.exchangeTradeId() != null) cycle.closingTradeIds.add(String.valueOf(fill.exchangeTradeId()));
                 cycle.closeValue = cycle.closeValue.add(fill.quantity().multiply(fill.price()));
                 cycle.remaining = cycle.remaining.subtract(fill.quantity());
                 cycle.pnl = addKnown(cycle.pnl, fill.realizedPnl());
@@ -83,45 +87,23 @@ public final class TradeHistoryAssembler {
         }
         List<Map<String, Object>> rows =
             cycles.stream().filter(c -> !incomplete.contains(c.scope)).sorted(Comparator.comparing((Cycle c) -> c.openedAt).thenComparing(c -> c.id).reversed()).map(c -> c.row(accountNames)).toList();
-        return new Result(rows, incomplete.size(), (int) rows.stream().filter(row -> "INFERRED".equals(row.get("reconstructionSource"))).count());
+        return new Result(rows, incomplete.size());
     }
 
-    private static Classification classify(Fill fill, Map<String, Cycle> active, String scope) {
+    private static Classification classify(Fill fill) {
         String direction = direction(fill);
-        boolean sourceKnown = "LONG".equals(fill.positionSide()) || "SHORT".equals(fill.positionSide())
-            || "OPEN".equals(fill.operationType()) || "CLOSE".equals(fill.operationType()) || fill.reduceOnly() != null;
+        if (direction == null || (!"BUY".equals(fill.side()) && !"SELL".equals(fill.side()))) return null;
         Boolean open = null;
-        if ("OPEN".equals(fill.operationType())) {
-            open = true;
-        } else if ("CLOSE".equals(fill.operationType()) || Boolean.TRUE.equals(fill.reduceOnly())) {
-            open = false;
-        } else if ("BOTH".equalsIgnoreCase(fill.positionSide()) && fill.reduceOnly() != null) {
-            open = !fill.reduceOnly();
-        } else if (direction != null && ("BUY".equals(fill.side()) || "SELL".equals(fill.side()))) {
+        if ("OPEN".equals(fill.operationType())) open = true;
+        else if ("CLOSE".equals(fill.operationType()) || Boolean.TRUE.equals(fill.reduceOnly())) open = false;
+        else if ("BOTH".equalsIgnoreCase(fill.positionSide()) && fill.reduceOnly() != null) open = !fill.reduceOnly();
+        else if ("LONG".equals(fill.positionSide()) || "SHORT".equals(fill.positionSide())) {
             open = ("LONG".equals(direction) ? "BUY" : "SELL").equals(fill.side());
         }
-        if (sourceKnown && direction != null && open != null) {
-            boolean expectedOpenSide = ("LONG".equals(direction) ? "BUY" : "SELL").equals(fill.side());
-            boolean expectedCloseSide = !expectedOpenSide;
-            if ((open && !expectedOpenSide) || (!open && !expectedCloseSide)) {
-                return null;
-            }
-            return new Classification(direction, open, false);
-        }
-
-        if (!"BUY".equals(fill.side()) && !"SELL".equals(fill.side())) {
-            return null;
-        }
-        List<Cycle> openCycles = active.values().stream().filter(cycle -> cycle.scope.equals(scope) && cycle.remaining.signum() > 0).toList();
-        if (openCycles.size() > 1) {
-            return null;
-        }
-        if (openCycles.isEmpty()) {
-            return new Classification("BUY".equals(fill.side()) ? "LONG" : "SHORT", true, true);
-        }
-        Cycle cycle = openCycles.getFirst();
-        boolean openingSide = ("LONG".equals(cycle.direction) ? "BUY" : "SELL").equals(fill.side());
-        return new Classification(cycle.direction, openingSide, true);
+        if (open == null) return null;
+        boolean expectedOpenSide = ("LONG".equals(direction) ? "BUY" : "SELL").equals(fill.side());
+        if ((open && !expectedOpenSide) || (!open && expectedOpenSide)) return null;
+        return new Classification(direction, open);
     }
 
     private static String direction(Fill fill) {
@@ -163,7 +145,13 @@ public final class TradeHistoryAssembler {
      */
     public record Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
                        BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime, Integer leverage, BigDecimal priceTickSize, BigDecimal postFillWalletBalance,
-                       LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize, Long exchangeTradeId) {
+                       LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize, Long exchangeTradeId, Long exchangeOrderId) {
+        public Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
+                    BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime, Integer leverage, BigDecimal priceTickSize, BigDecimal postFillWalletBalance,
+                    LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize, Long exchangeTradeId) {
+            this(id, credentialId, symbol, side, positionSide, operationType, reduceOnly, quantity, price, commission, realizedPnl, tradeTime, leverage, priceTickSize,
+                postFillWalletBalance, postFillBalanceAt, currentPriceTickSize, exchangeTradeId, null);
+        }
         public Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
                     BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime, Integer leverage, BigDecimal priceTickSize, BigDecimal postFillWalletBalance,
                     LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize) {
@@ -177,17 +165,13 @@ public final class TradeHistoryAssembler {
         }
     }
 
-    private record Classification(String direction, boolean open, boolean inferred) {
+    private record Classification(String direction, boolean open) {
     }
 
     /**
      * 周期汇总结果及无法可靠归组的记录数。
      */
-    public record Result(List<Map<String, Object>> rows, int incompleteCount, int inferredCount) {
-        public Result(List<Map<String, Object>> rows, int incompleteCount) {
-            this(rows, incompleteCount, 0);
-        }
-    }
+    public record Result(List<Map<String, Object>> rows, int incompleteCount) {
 
     private static final class Cycle {
         private final Long id;
@@ -196,11 +180,13 @@ public final class TradeHistoryAssembler {
         private final String direction;
         private final String scope;
         private final LocalDateTime openedAt;
-        private boolean inferred;
         private LocalDateTime closedAt;
         private BigDecimal openQty = BigDecimal.ZERO, openValue = BigDecimal.ZERO, remaining = BigDecimal.ZERO;
         private BigDecimal closeQty = BigDecimal.ZERO, closeValue = BigDecimal.ZERO;
         private BigDecimal pnl = BigDecimal.ZERO, fee = BigDecimal.ZERO;
+        private int openingFillCount, closingFillCount;
+        private final Set<String> openingOrderIds = new LinkedHashSet<>(), closingOrderIds = new LinkedHashSet<>();
+        private final Set<String> openingTradeIds = new LinkedHashSet<>(), closingTradeIds = new LinkedHashSet<>();
         private Integer leverage;
         private Integer priceScale;
         private BigDecimal openingBalance, closingBalance;
@@ -222,7 +208,15 @@ public final class TradeHistoryAssembler {
             row.put("accountName", names.get(credentialId));
             row.put("symbol", symbol);
             row.put("direction", direction);
-            row.put("reconstructionSource", inferred ? "INFERRED" : "EXCHANGE");
+            row.put("openingQuantity", decimal(openQty));
+            row.put("closingQuantity", decimal(closeQty));
+            row.put("remainingQuantity", decimal(remaining));
+            row.put("openingFillCount", openingFillCount);
+            row.put("closingFillCount", closingFillCount);
+            row.put("openingOrderIds", List.copyOf(openingOrderIds));
+            row.put("closingOrderIds", List.copyOf(closingOrderIds));
+            row.put("openingTradeIds", List.copyOf(openingTradeIds));
+            row.put("closingTradeIds", List.copyOf(closingTradeIds));
             Integer displayScale = priceScale;
             row.put("entryPrice", price(openValue.divide(openQty, 18, RoundingMode.HALF_UP), displayScale));
             row.put("openingNotional", decimal(openValue));

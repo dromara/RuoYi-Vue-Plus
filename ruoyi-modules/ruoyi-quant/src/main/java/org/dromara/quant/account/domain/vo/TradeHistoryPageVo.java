@@ -20,16 +20,8 @@ public class TradeHistoryPageVo extends PageResult<Map<String, Object>> {
      */
     private final int incompleteCount;
 
-    /** Number of returned trade cycles reconstructed from source-less legacy fills. */
-    private final int inferredCount;
-
     public TradeHistoryPageVo(List<Map<String, Object>> rows, long total, int incompleteCount) {
-        this(rows, total, incompleteCount, 0);
-    }
-
-    public TradeHistoryPageVo(List<Map<String, Object>> rows, long total, int incompleteCount, int inferredCount) {
         super(rows, total);
         this.incompleteCount = incompleteCount;
-        this.inferredCount = inferredCount;
     }
 }

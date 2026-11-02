@@ -105,14 +105,13 @@ class TradeHistoryAssemblerTest {
     }
 
     @Test
-    void infersLegacyOpeningButKeepsAnUnmatchedCloseIncomplete() {
-        var result = TradeHistoryAssembler.assemble(List.of(fill(1, 10, "BTCUSDT", "SELL", "LONG", "CLOSE", "1", "100", "0", "0"), fill(2, 10, "PUMPUSDT", "BUY", null, null, "1"
-            , "1", "0", "0")), Map.of());
-        assertEquals(1, result.rows().size());
-        assertEquals("INFERRED", result.rows().getFirst().get("reconstructionSource"));
-        assertEquals("OPEN", result.rows().getFirst().get("status"));
-        assertEquals(1, result.incompleteCount());
-        assertEquals(1, result.inferredCount());
+    void excludesLegacyFillsWithoutConfirmedDirectionAndOperation() {
+        var result = TradeHistoryAssembler.assemble(List.of(
+            fill(1, 10, "BTCUSDT", "SELL", "LONG", "CLOSE", "1", "100", "0", "0"),
+            fill(2, 10, "PUMPUSDT", "BUY", null, null, "1", "1", "0", "0")
+        ), Map.of());
+        assertTrue(result.rows().isEmpty());
+        assertEquals(2, result.incompleteCount());
     }
 
     @Test
@@ -133,31 +132,24 @@ class TradeHistoryAssemblerTest {
     }
 
     @Test
-    void infersLegacyCyclesFromFlatAndMarksThemAsInferred() {
+    void excludesFlatOneWayFillsWithoutExchangeOrderFacts() {
         var result = TradeHistoryAssembler.assemble(List.of(
             fill(1, 10, "ZROUSDT", "SELL", null, null, "3", "100", "0", "0"),
             fill(2, 10, "ZROUSDT", "BUY", null, null, "1", "90", "0", "1"),
             fill(3, 10, "ZROUSDT", "BUY", null, null, "2", "80", "0", "2"),
             fill(4, 10, "ZROUSDT", "BUY", null, null, "2", "70", "0", "0")
         ), Map.of());
-
-        assertEquals(2, result.rows().size());
-        var shortCycle = result.rows().stream().filter(row -> "SHORT".equals(row.get("direction"))).findFirst().orElseThrow();
-        var openLongCycle = result.rows().stream().filter(row -> "LONG".equals(row.get("direction"))).findFirst().orElseThrow();
-        assertEquals("CLOSED", shortCycle.get("status"));
-        assertEquals("INFERRED", shortCycle.get("reconstructionSource"));
-        assertEquals("OPEN", openLongCycle.get("status"));
-        assertEquals("INFERRED", openLongCycle.get("reconstructionSource"));
+        assertTrue(result.rows().isEmpty());
+        assertEquals(1, result.incompleteCount());
     }
 
     @Test
-    void keepsExchangeSourcedCyclesDistinctFromInferredCycles() {
+    void keepsCyclesBuiltFromConfirmedExchangeFacts() {
         var result = TradeHistoryAssembler.assemble(List.of(
             fill(1, 10, "BTCUSDT", "BUY", "LONG", "OPEN", "1", "100", "0", "0"),
             fill(2, 10, "BTCUSDT", "SELL", "LONG", "CLOSE", "1", "110", "0", "10")
         ), Map.of());
-
-        assertEquals("EXCHANGE", result.rows().getFirst().get("reconstructionSource"));
+        assertFalse(result.rows().getFirst().containsKey("reconstructionSource"));
     }
 
     @Test
@@ -169,6 +161,24 @@ class TradeHistoryAssemblerTest {
 
         assertTrue(result.rows().isEmpty());
         assertEquals(1, result.incompleteCount());
+    }
+
+    @Test
+    void groupsExchangeOrderAndTradeIdsWithTheirOpeningAndClosingFills() {
+        LocalDateTime time = LocalDateTime.of(2026, 10, 9, 1, 0);
+        var result = TradeHistoryAssembler.assemble(List.of(
+            new TradeHistoryAssembler.Fill(1L, 10L, "BTCUSDT", "BUY", "LONG", "OPEN", false, BigDecimal.ONE, new BigDecimal("100"),
+                BigDecimal.ZERO, BigDecimal.ZERO, time, null, null, null, null, null, 101L, 201L),
+            new TradeHistoryAssembler.Fill(2L, 10L, "BTCUSDT", "SELL", "LONG", "CLOSE", true, BigDecimal.ONE, new BigDecimal("110"),
+                BigDecimal.ZERO, BigDecimal.TEN, time.plusMinutes(1), null, null, null, null, null, 102L, 202L)
+        ), Map.of());
+        var row = result.rows().getFirst();
+        assertEquals(List.of("201"), row.get("openingOrderIds"));
+        assertEquals(List.of("202"), row.get("closingOrderIds"));
+        assertEquals(List.of("101"), row.get("openingTradeIds"));
+        assertEquals(List.of("102"), row.get("closingTradeIds"));
+        assertEquals(1, row.get("openingFillCount"));
+        assertEquals(1, row.get("closingFillCount"));
     }
 
     @Test
