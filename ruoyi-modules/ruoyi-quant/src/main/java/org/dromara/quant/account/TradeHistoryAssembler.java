@@ -67,7 +67,7 @@ public final class TradeHistoryAssembler {
                     incomplete.add(scope);
                     continue;
                 }
-                    cycle.closeQty = cycle.closeQty.add(fill.quantity());
+                cycle.closeQty = cycle.closeQty.add(fill.quantity());
                 cycle.closingFillCount++;
                 if (fill.exchangeOrderId() != null) cycle.closingOrderIds.add(String.valueOf(fill.exchangeOrderId()));
                 if (fill.exchangeTradeId() != null) cycle.closingTradeIds.add(String.valueOf(fill.exchangeTradeId()));
@@ -172,6 +172,7 @@ public final class TradeHistoryAssembler {
      * 周期汇总结果及无法可靠归组的记录数。
      */
     public record Result(List<Map<String, Object>> rows, int incompleteCount) {
+    }
 
     private static final class Cycle {
         private final Long id;
