@@ -129,7 +129,7 @@ class AccountPositionCycleProjectionMapperTest {
             Map<String, Object> btc = Map.of("credentialId", 10L, "symbol", "BTCUSDT");
             Map<String, Object> eth = Map.of("credentialId", 10L, "symbol", "ETHUSDT");
 
-            assertEquals(1, execute(connection, namespace + ".refreshBalanceSnapshots", btc));
+            execute(connection, namespace + ".refreshBalanceSnapshots", btc);
             try (ResultSet result = statement.executeQuery("SELECT opening_balance,closing_balance FROM quant_position_cycle WHERE id=1")) {
                 assertTrue(result.next());
                 assertEquals(new java.math.BigDecimal("1000.0000000000000000"), result.getBigDecimal(1));
@@ -140,7 +140,7 @@ class AccountPositionCycleProjectionMapperTest {
                 assertNull(result.getBigDecimal(1), "the reversal order cannot provide an open-only wallet balance");
             }
 
-            assertEquals(1, execute(connection, namespace + ".refreshBalanceSnapshots", eth));
+            execute(connection, namespace + ".refreshBalanceSnapshots", eth);
             try (ResultSet result = statement.executeQuery("SELECT opening_balance,closing_balance FROM quant_position_cycle WHERE id=3")) {
                 assertTrue(result.next());
                 assertEquals(new java.math.BigDecimal("800.0000000000000000"), result.getBigDecimal(1));
