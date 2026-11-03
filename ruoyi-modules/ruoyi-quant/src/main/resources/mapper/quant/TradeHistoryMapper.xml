@@ -92,7 +92,10 @@
                 MIN(operation_type) AS operation_type,
                 CASE WHEN COUNT(DISTINCT operation_type) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_execution_record
-            WHERE operation_type IN ('OPEN', 'CLOSE') AND exchange_order_id IS NOT NULL
+            WHERE credential_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                <if test="symbol != null">AND symbol = #{symbol}</if>
+                AND operation_type IN ('OPEN', 'CLOSE') AND exchange_order_id IS NOT NULL
             GROUP BY credential_id, symbol, exchange_order_id
         ) e ON e.credential_id = t.credential_id
             AND e.symbol = t.symbol AND e.exchange_order_id = t.exchange_order_id
@@ -106,7 +109,10 @@
                     OR COUNT(DISTINCT exchange_side) <> 1
                     OR COUNT(DISTINCT client_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_strategy_order_intent
-            WHERE exchange_order_id IS NOT NULL
+            WHERE credential_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                <if test="symbol != null">AND symbol = #{symbol}</if>
+                AND exchange_order_id IS NOT NULL
             GROUP BY credential_id, symbol, exchange_order_id
         ) soi ON soi.credential_id = t.credential_id
             AND soi.symbol = t.symbol AND soi.exchange_order_id = t.exchange_order_id
@@ -120,7 +126,10 @@
                     OR COUNT(DISTINCT exchange_side) <> 1
                     OR COUNT(DISTINCT exchange_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_strategy_order_intent
-            WHERE client_order_id IS NOT NULL
+            WHERE credential_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                <if test="symbol != null">AND symbol = #{symbol}</if>
+                AND client_order_id IS NOT NULL
             GROUP BY credential_id, symbol, client_order_id
         ) soi_client_role ON soi_client_role.credential_id = t.credential_id
             AND soi_client_role.symbol = t.symbol AND soi_client_role.client_order_id = o.client_order_id
@@ -130,7 +139,10 @@
                 CASE WHEN COUNT(DISTINCT operation_type) <> 1
                     OR COUNT(DISTINCT client_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_order_dispatch_ticket
-            WHERE operation_type IN ('OPEN', 'CLOSE')
+            WHERE credential_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                <if test="symbol != null">AND symbol = #{symbol}</if>
+                AND operation_type IN ('OPEN', 'CLOSE')
                 AND dispatch_status IN ('ACKED', 'RECOVERED')
                 AND exchange_order_id IS NOT NULL
             GROUP BY credential_id, symbol, exchange_order_id
@@ -142,7 +154,10 @@
                 CASE WHEN COUNT(DISTINCT operation_type) <> 1
                     OR COUNT(DISTINCT exchange_order_id) > 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_order_dispatch_ticket
-            WHERE operation_type IN ('OPEN', 'CLOSE')
+            WHERE credential_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                <if test="symbol != null">AND symbol = #{symbol}</if>
+                AND operation_type IN ('OPEN', 'CLOSE')
                 AND dispatch_status IN ('ACKED', 'RECOVERED')
                 AND client_order_id IS NOT NULL
             GROUP BY credential_id, symbol, client_order_id
@@ -163,7 +178,10 @@
             JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
                 AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
                 AND d.client_order_id = p.client_order_id
-            WHERE p.operation_type IN ('OPEN', 'CLOSE')
+            WHERE p.credential_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                <if test="symbol != null">AND p.symbol = #{symbol}</if>
+                AND p.operation_type IN ('OPEN', 'CLOSE')
                 AND d.operation_type IN ('OPEN', 'CLOSE')
                 AND d.dispatch_status IN ('ACKED', 'RECOVERED')
                 AND d.exchange_order_id IS NOT NULL
@@ -185,7 +203,10 @@
             JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
                 AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
                 AND d.client_order_id = p.client_order_id
-            WHERE p.operation_type IN ('OPEN', 'CLOSE')
+            WHERE p.credential_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                <if test="symbol != null">AND p.symbol = #{symbol}</if>
+                AND p.operation_type IN ('OPEN', 'CLOSE')
                 AND d.operation_type IN ('OPEN', 'CLOSE')
                 AND d.dispatch_status IN ('ACKED', 'RECOVERED')
                 AND d.client_order_id IS NOT NULL
