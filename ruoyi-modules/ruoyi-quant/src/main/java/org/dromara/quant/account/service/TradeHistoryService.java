@@ -247,6 +247,9 @@ public class TradeHistoryService {
         if (fills.size() > 20000) {
             throw new ServiceException("成交账本超过单次汇总上限，请选择客户及交易对后查询，避免截断持仓链");
         }
+        if (fills.isEmpty()) {
+            log.info("开平仓记录没有找到本地成交 credentialCount={} symbol={}", ids.size(), normalizedSymbol);
+        }
         recoverMissingOrderFacts(ids, fills, normalizedSymbol);
         fills = ids.isEmpty() ? List.of() : historyMapper.selectFills(ids, normalizedSymbol);
         if (fills.size() > 20000) {
