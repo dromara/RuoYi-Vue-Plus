@@ -43,7 +43,8 @@ WHERE credential_id=#{credentialId}
       OR quantity IS NULL OR quantity<=0
       OR price IS NULL OR price<=0
       OR commission IS NULL OR commission<0
-      OR commission_asset IS NULL OR UPPER(TRIM(commission_asset)) NOT REGEXP '^[A-Z0-9]{2,20}      OR trade_time IS NULL
+      OR commission_asset IS NULL OR UPPER(TRIM(commission_asset)) NOT REGEXP '^[A-Z0-9]{2,20}$'
+      OR trade_time IS NULL
   )
 ]]></select>
 
