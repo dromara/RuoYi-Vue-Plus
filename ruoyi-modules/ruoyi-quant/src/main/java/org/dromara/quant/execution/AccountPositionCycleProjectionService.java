@@ -121,9 +121,6 @@ public class AccountPositionCycleProjectionService {
             }
         }
 
-        List<AccountPositionCycleFill> unprojected = mapper.selectUnprojectedFills(credentialId, normalizedSymbol);
-        Map<String, List<AccountPositionCycleFill>> pendingByScope = groupByScope(unprojected);
-
         for (String scope : scopes) {
             if (!validScope(scope)) {
                 for (String knownScope : scopes) {
@@ -174,7 +171,11 @@ public class AccountPositionCycleProjectionService {
                 continue;
             }
 
-            List<AccountPositionCycleFill> pending = pendingByScope.getOrDefault(scope, List.of());
+            // Read the delta only after acquiring this position-side row lock. A worker
+            // that waited for another node must not replay its stale pre-lock fill list.
+            List<AccountPositionCycleFill> pending = mapper.selectUnprojectedFills(credentialId, normalizedSymbol).stream()
+                .filter(fill -> scope.equals(normalizePositionSide(fill.getPositionSide())))
+                .toList();
             if (pending.isEmpty()) {
                 continue;
             }
