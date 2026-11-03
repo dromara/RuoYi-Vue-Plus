@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.quant.execution.AccountPositionCycleProjectionMapper">
+    <select id="selectPositionSides" resultType="string" timeout="3"><![CDATA[
+SELECT DISTINCT COALESCE(NULLIF(UPPER(TRIM(o.position_side)),''),'UNKNOWN')
+FROM quant_trade t
+LEFT JOIN quant_order o
+  ON o.credential_id=t.credential_id
+ AND o.symbol=t.symbol
+ AND o.exchange_order_id=t.exchange_order_id
+WHERE t.credential_id=#{credentialId} AND t.symbol=#{symbol}
+]]></select>
+
     <select id="selectAllFills" resultType="org.dromara.quant.account.domain.vo.AccountPositionCycleFill" timeout="10"><![CDATA[
 SELECT t.id, t.credential_id, t.symbol, t.exchange_trade_id, t.exchange_order_id,
        t.side, o.position_side, t.quantity, t.price, t.commission,
