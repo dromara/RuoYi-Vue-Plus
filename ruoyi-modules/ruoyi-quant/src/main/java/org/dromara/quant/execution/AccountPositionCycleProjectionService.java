@@ -149,6 +149,15 @@ public class AccountPositionCycleProjectionService {
             LocalDateTime projectedThrough = localTime(state.get("projected_through"));
             boolean incomplete = Boolean.TRUE.equals(state.get("incomplete")) || number(state.get("incomplete")) == 1;
             List<AccountPositionCycleFill> sorted = sorted(pending);
+            boolean lateFill = sorted.stream().anyMatch(fill ->
+                lastTradeTime != null && compare(fill.getTradeTime(), fill.getExchangeTradeId(), lastTradeTime, lastTradeId) <= 0
+                    || projectedThrough != null && (lastTradeTime == null || projectedThrough.isAfter(lastTradeTime))
+                        && !fill.getTradeTime().isAfter(projectedThrough));
+            if (lateFill) {
+                mapper.updateState(credentialId, normalizedSymbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
+                    projectedThrough, INCOMPLETE, true, "检测到晚到的历史成交，必须按完整历史重建该持仓周期");
+                continue;
+            }
             try {
                 preflight(scope, quantity, activeCycleId != null, sorted);
             } catch (IllegalStateException ex) {
@@ -157,13 +166,6 @@ public class AccountPositionCycleProjectionService {
                 continue;
             }
             for (AccountPositionCycleFill fill : sorted) {
-                if (projectedThrough != null && !fill.getTradeTime().isAfter(projectedThrough)
-                    || lastTradeTime != null && compare(fill.getTradeTime(), fill.getExchangeTradeId(), lastTradeTime, lastTradeId) <= 0) {
-                    markIncomplete(credentialId, normalizedSymbol, scope, "检测到晚到的历史成交，必须按完整历史重建该持仓周期");
-                    activeCycleId = null;
-                    status = INCOMPLETE;
-                    break;
-                }
                 ProjectionResult next = applyFill(credentialId, normalizedSymbol, scope, quantity, activeCycleId, fill);
                 quantity = next.quantity();
                 activeCycleId = next.activeCycleId();
@@ -234,28 +236,27 @@ public class AccountPositionCycleProjectionService {
         }
         LocalDateTime lastTradeTime = null;
         Long lastTradeId = null;
-            for (AccountPositionCycleFill fill : beforeSnapshot) {
-                ProjectionResult next = applyFill(credentialId, symbol, scope, quantity, activeCycleId, fill);
-                quantity = next.quantity();
-                activeCycleId = next.activeCycleId();
-                lastTradeTime = fill.getTradeTime();
-                lastTradeId = fill.getExchangeTradeId();
-            }
-            for (AccountPositionCycleFill fill : afterSnapshot) {
-                ProjectionResult next = applyFill(credentialId, symbol, scope, quantity, activeCycleId, fill);
-                quantity = next.quantity();
-                activeCycleId = next.activeCycleId();
-                lastTradeTime = fill.getTradeTime();
-                lastTradeId = fill.getExchangeTradeId();
-            }
-            LocalDateTime projectedThrough = LocalDateTime.ofInstant(readCompleted, ZoneOffset.UTC);
-            if (lastTradeTime != null && lastTradeTime.isAfter(projectedThrough)) {
-                projectedThrough = lastTradeTime;
-            }
-            if (mapper.updateState(credentialId, symbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
-                projectedThrough, READY, incomplete, incomplete ? "初始成交历史之前存在未能确定开仓时间与成本的持仓" : null) != 1) {
-                throw new IllegalStateException("账户持仓周期初始化状态写入失败");
-            }
+        for (AccountPositionCycleFill fill : beforeSnapshot) {
+            ProjectionResult next = applyFill(credentialId, symbol, scope, quantity, activeCycleId, fill);
+            quantity = next.quantity();
+            activeCycleId = next.activeCycleId();
+            lastTradeTime = fill.getTradeTime();
+            lastTradeId = fill.getExchangeTradeId();
+        }
+        for (AccountPositionCycleFill fill : afterSnapshot) {
+            ProjectionResult next = applyFill(credentialId, symbol, scope, quantity, activeCycleId, fill);
+            quantity = next.quantity();
+            activeCycleId = next.activeCycleId();
+            lastTradeTime = fill.getTradeTime();
+            lastTradeId = fill.getExchangeTradeId();
+        }
+        LocalDateTime projectedThrough = LocalDateTime.ofInstant(readCompleted, ZoneOffset.UTC);
+        if (lastTradeTime != null && lastTradeTime.isAfter(projectedThrough)) {
+            projectedThrough = lastTradeTime;
+        }
+        if (mapper.updateState(credentialId, symbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
+            projectedThrough, READY, incomplete, incomplete ? "初始成交历史之前存在未能确定开仓时间与成本的持仓" : null) != 1) {
+            throw new IllegalStateException("账户持仓周期初始化状态写入失败");
         }
     }
 
