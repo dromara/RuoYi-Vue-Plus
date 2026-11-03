@@ -130,9 +130,10 @@ SELECT id, credential_id AS credentialId, symbol, cycle_key AS positionCycleKey,
        remaining_quantity AS remainingQuantity, opening_notional AS openingNotional,
        closing_notional AS closingNotional, realized_pnl AS realizedPnl,
        opening_fill_count AS openingFillCount, closing_fill_count AS closingFillCount,
-       leverage_snapshot AS leverage, opening_balance AS openingBalance,
-       opening_balance_at AS openingBalanceAt, opened_at AS openedAt,
-       closed_at AS closedAt, status, baseline_unknown AS baselineUnknown
+       leverage_snapshot AS leverage, price_tick_size_snapshot AS priceTickSizeSnapshot,
+       opening_balance AS openingBalance, opening_balance_at AS openingBalanceAt,
+       closing_balance AS closingBalance, closing_balance_at AS closingBalanceAt,
+       opened_at AS openedAt, closed_at AS closedAt, status, baseline_unknown AS baselineUnknown
 FROM quant_position_cycle
 WHERE credential_id IN
 <foreach collection="credentialIds" item="credentialId" open="(" separator="," close=")">
