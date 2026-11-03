@@ -166,7 +166,17 @@ public class AccountPositionCycleProjectionService {
                 status = INITIALIZING;
             }
             if (!READY.equals(status)) {
-                initialize(credentialId, normalizedSymbol, scope, scopeFills, currentPositions.get(scope),
+                // Initialization/rebuild also reads the complete source ledger after the
+                // state lock, so a second node cannot initialize from a stale pre-lock fill set.
+                List<AccountPositionCycleFill> replayFills = mapper.selectAllFills(credentialId, normalizedSymbol).stream()
+                    .filter(fill -> scope.equals(normalizePositionSide(fill.getPositionSide())))
+                    .toList();
+                if (replayFills.stream().anyMatch(fill -> !validFill(fill))) {
+                    mapper.updateState(credentialId, normalizedSymbol, scope, ZERO, null, null, null, null,
+                        INCOMPLETE, true, "历史成交事实尚不完整，暂停账户持仓周期重建");
+                    continue;
+                }
+                initialize(credentialId, normalizedSymbol, scope, replayFills, currentPositions.get(scope),
                     positionReadStartedAt, positionReadCompletedAt);
                 continue;
             }
