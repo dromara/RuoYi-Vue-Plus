@@ -65,13 +65,16 @@ public class AccountPositionCycleProjectionService {
         for (ExchangeGateway.PositionSnapshot position : symbolPositions) {
             scopes.add(normalizePositionSide(position.side()));
         }
+        List<String> blockedSymbols = mapper.selectProjectionBlockedSymbols(credentialId, normalizedSymbol);
         if (scopes.isEmpty()) {
-            if (!mapper.selectProjectionBlockedSymbols(credentialId, normalizedSymbol).isEmpty()) {
+            if (!blockedSymbols.isEmpty()) {
                 markIncomplete(credentialId, normalizedSymbol, "UNKNOWN", "存在原始成交事实冲突或资金字段不完整");
+            } else {
+                mapper.deleteState(credentialId, normalizedSymbol, "UNKNOWN");
             }
             return;
         }
-        if (!mapper.selectProjectionBlockedSymbols(credentialId, normalizedSymbol).isEmpty()) {
+        if (!blockedSymbols.isEmpty()) {
             boolean marked = false;
             for (String scope : scopes) {
                 if (validScope(scope)) {
@@ -83,6 +86,9 @@ public class AccountPositionCycleProjectionService {
                 markIncomplete(credentialId, normalizedSymbol, "UNKNOWN", "存在原始成交事实冲突或资金字段不完整");
             }
             return;
+        }
+        if (!scopes.contains("UNKNOWN")) {
+            mapper.deleteState(credentialId, normalizedSymbol, "UNKNOWN");
         }
 
         if (hasMixedPositionModes(scopes)) {
