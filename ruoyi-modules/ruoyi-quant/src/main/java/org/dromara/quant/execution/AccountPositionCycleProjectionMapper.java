@@ -65,6 +65,10 @@ public interface AccountPositionCycleProjectionMapper {
 
     long countIncompleteScopes(@Param("credentialIds") List<Long> credentialIds, @Param("symbol") String symbol);
 
+    int deleteCycleAllocationsByScope(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
+
+    int deleteCyclesByScope(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
+
     List<Map<String, Object>> selectCycleAllocations(@Param("cycleIds") List<Long> cycleIds);
 
     List<Map<String, Object>> selectCycleFeeTotals(@Param("cycleIds") List<Long> cycleIds);
