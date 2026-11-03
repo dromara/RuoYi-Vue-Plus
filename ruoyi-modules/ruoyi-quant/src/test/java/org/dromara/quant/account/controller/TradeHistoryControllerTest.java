@@ -10,6 +10,8 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.quant.account.domain.vo.TradeHistoryFill;
 import org.dromara.quant.account.mapper.TradeHistoryMapper;
 import org.dromara.quant.account.service.TradeHistoryService;
+import org.dromara.quant.exchange.ExchangeGateway;
+import org.dromara.quant.execution.OrderLedgerService;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.credential.mapper.QuantCredentialMapper;
 import org.junit.jupiter.api.Tag;
@@ -43,6 +45,10 @@ class TradeHistoryControllerTest {
         return result;
     }
 
+    private TradeHistoryService service(QuantCredentialMapper credentials, TradeHistoryMapper history) {
+        return new TradeHistoryService(credentials, history, mock(ExchangeGateway.class), mock(OrderLedgerService.class));
+    }
+
     private TradeHistoryFill fill(long id, String symbol) {
         var f = new TradeHistoryFill();
         f.setId(id);
@@ -64,7 +70,7 @@ class TradeHistoryControllerTest {
         var credentials = mock(QuantCredentialMapper.class);
         var history = mock(TradeHistoryMapper.class);
         when(credentials.selectList(any())).thenReturn(List.of(credential()));
-        var controller = new TradeHistoryController(new TradeHistoryService(credentials, history));
+        var controller = new TradeHistoryController(service(credentials, history));
         try (var login = mockStatic(LoginHelper.class)) {
             login.when(LoginHelper::getUserId).thenReturn(1L);
             assertThrows(ServiceException.class, () -> controller.page(new PageQuery(), 11L, null, null, null));
@@ -83,7 +89,7 @@ class TradeHistoryControllerTest {
         query.setPageSize(1);
         try (var login = mockStatic(LoginHelper.class)) {
             login.when(LoginHelper::getUserId).thenReturn(1L);
-            var result = new TradeHistoryController(new TradeHistoryService(credentials, history)).page(query, 10L, null, "2026-10-09", "2026-10-09").getData();
+            var result = new TradeHistoryController(service(credentials, history)).page(query, 10L, null, "2026-10-09", "2026-10-09").getData();
             assertEquals(2, result.getTotal());
             var rows = (List<?>) result.getRows();
             assertEquals(1, rows.size());
@@ -98,7 +104,7 @@ class TradeHistoryControllerTest {
         when(credentials.selectList(any())).thenReturn(List.of());
         try (var login = mockStatic(LoginHelper.class)) {
             login.when(LoginHelper::getUserId).thenReturn(1L);
-            var result = new TradeHistoryController(new TradeHistoryService(credentials, history)).page(new PageQuery(), null, null, null, null).getData();
+            var result = new TradeHistoryController(service(credentials, history)).page(new PageQuery(), null, null, null, null).getData();
             assertEquals(0, result.getTotal());
             verifyNoInteractions(history);
         }
@@ -110,7 +116,7 @@ class TradeHistoryControllerTest {
         var history = mock(TradeHistoryMapper.class);
         when(credentials.selectList(any())).thenReturn(List.of(credential()));
         when(history.selectFills(any(), any())).thenReturn(List.of(fill(1, "BTCUSDT"), fill(1, "BTCUSDT")));
-        var controller = new TradeHistoryController(new TradeHistoryService(credentials, history));
+        var controller = new TradeHistoryController(service(credentials, history));
         try (var login = mockStatic(LoginHelper.class)) {
             login.when(LoginHelper::getUserId).thenReturn(1L);
             assertThrows(ServiceException.class, () -> controller.page(new PageQuery(), 10L, null, "wrong", null));
@@ -127,7 +133,7 @@ class TradeHistoryControllerTest {
         when(history.selectFills(eq(List.of(10L)), eq("BTCUSDT"))).thenReturn(Collections.nCopies(20001, fill(1, "BTCUSDT")));
         try (var login = mockStatic(LoginHelper.class)) {
             login.when(LoginHelper::getUserId).thenReturn(1L);
-            assertThrows(ServiceException.class, () -> new TradeHistoryController(new TradeHistoryService(credentials, history)).page(new PageQuery(), 10L, " btcusdt ", null,
+            assertThrows(ServiceException.class, () -> new TradeHistoryController(service(credentials, history)).page(new PageQuery(), 10L, " btcusdt ", null,
                 null));
         }
     }
@@ -146,13 +152,12 @@ class TradeHistoryControllerTest {
     }
 
     @Test
-    void providesAnIndependentReadOnlyServiceAndStablePageContract() throws Exception {
+    void keepsExchangeRecoveryOutsideDatabaseTransactionAndStablePageContract() throws Exception {
         Class<?> service = Class.forName("org.dromara.quant.account.service.TradeHistoryService");
         assertNotNull(service.getAnnotation(org.springframework.stereotype.Service.class));
         var transaction =
             service.getMethod("page", PageQuery.class, Long.class, String.class, String.class, String.class).getAnnotation(org.springframework.transaction.annotation.Transactional.class);
-        assertNotNull(transaction);
-        assertTrue(transaction.readOnly());
+        assertNull(transaction, "Binance REST recovery must not run inside a database transaction");
         var method = TradeHistoryController.class.getMethod("page", PageQuery.class, Long.class, String.class, String.class, String.class);
         assertTrue(method.getGenericReturnType().getTypeName().contains("TradeHistoryPageVo"));
     }
@@ -164,7 +169,7 @@ class TradeHistoryControllerTest {
         when(credentials.selectList(any())).thenReturn(List.of());
         try (var login = mockStatic(LoginHelper.class)) {
             login.when(LoginHelper::getUserId).thenReturn(7L);
-            new TradeHistoryService(credentials, history).page(new PageQuery(), null, null, null, null);
+            service(credentials, history).page(new PageQuery(), null, null, null, null);
         }
         var captor = org.mockito.ArgumentCaptor.forClass(com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper.class);
         verify(credentials).selectList(captor.capture());
@@ -180,7 +185,7 @@ class TradeHistoryControllerTest {
         var history = mock(TradeHistoryMapper.class);
         try (var login = mockStatic(LoginHelper.class)) {
             login.when(LoginHelper::getUserId).thenReturn(null);
-            assertThrows(ServiceException.class, () -> new TradeHistoryService(credentials, history).page(new PageQuery(), null, null, null, null));
+            assertThrows(ServiceException.class, () -> service(credentials, history).page(new PageQuery(), null, null, null, null));
         }
         verifyNoInteractions(credentials, history);
     }
