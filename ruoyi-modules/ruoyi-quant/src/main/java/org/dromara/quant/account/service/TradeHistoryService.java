@@ -107,6 +107,7 @@ public class TradeHistoryService {
         BigDecimal closingNotional = decimal(cycle.get("closingNotional"));
         LocalDateTime openedAt = localTime(cycle.get("openedAt"));
         LocalDateTime closedAt = localTime(cycle.get("closedAt"));
+        boolean baselineUnknown = Boolean.TRUE.equals(cycle.get("baselineUnknown")) || intValue(cycle.get("baselineUnknown")) == 1;
 
         Set<String> openingOrderIds = new LinkedHashSet<>();
         Set<String> closingOrderIds = new LinkedHashSet<>();
@@ -142,10 +143,10 @@ public class TradeHistoryService {
         row.put("closingOrderIds", List.copyOf(closingOrderIds));
         row.put("openingTradeIds", List.copyOf(openingTradeIds));
         row.put("closingTradeIds", List.copyOf(closingTradeIds));
-        row.put("entryPrice", openingNotional == null || openingQuantity.signum() == 0
+        row.put("entryPrice", baselineUnknown || openingNotional == null || openingQuantity.signum() == 0
             ? null : decimalText(openingNotional.divide(openingQuantity, 18, RoundingMode.HALF_UP)));
-        row.put("openingNotional", decimalText(openingNotional));
-        row.put("leverage", cycle.get("leverage"));
+        row.put("openingNotional", baselineUnknown ? null : decimalText(openingNotional));
+        row.put("leverage", baselineUnknown ? null : cycle.get("leverage"));
         row.put("openingBalance", fixedDecimal(nullableDecimal(cycle.get("openingBalance")), 4));
         row.put("openingBalanceAt", timestamp(localTime(cycle.get("openingBalanceAt"))));
         row.put("openedAt", timestamp(openedAt));
@@ -160,7 +161,7 @@ public class TradeHistoryService {
         row.put("commissionAsset", fees.size() == 1 ? fees.keySet().iterator().next() : null);
         row.put("closedAt", timestamp(closedAt));
         row.put("status", string(cycle.get("status")));
-        row.put("baselineUnknown", Boolean.TRUE.equals(cycle.get("baselineUnknown")) || intValue(cycle.get("baselineUnknown")) == 1);
+        row.put("baselineUnknown", baselineUnknown);
         return row;
     }
 
