@@ -48,7 +48,7 @@ public class AccountPositionCycleProjectionService {
                         Instant positionReadStartedAt, Instant positionReadCompletedAt) {
         if (credentialId == null || credentialId <= 0 || symbol == null || symbol.isBlank()
             || positionReadStartedAt == null || positionReadCompletedAt == null
-            || !positionReadStartedAt.isBefore(positionReadCompletedAt)) {
+            || positionReadCompletedAt.isBefore(positionReadStartedAt)) {
             throw new IllegalArgumentException("账户成交周期投影缺少有效账户、交易对或持仓快照边界");
         }
         String normalizedSymbol = symbol.trim().toUpperCase(Locale.ROOT);
@@ -66,6 +66,22 @@ public class AccountPositionCycleProjectionService {
             scopes.add(normalizePositionSide(position.side()));
         }
         if (scopes.isEmpty()) {
+            if (!mapper.selectProjectionBlockedSymbols(credentialId, normalizedSymbol).isEmpty()) {
+                markIncomplete(credentialId, normalizedSymbol, "UNKNOWN", "存在原始成交事实冲突或资金字段不完整");
+            }
+            return;
+        }
+        if (!mapper.selectProjectionBlockedSymbols(credentialId, normalizedSymbol).isEmpty()) {
+            boolean marked = false;
+            for (String scope : scopes) {
+                if (validScope(scope)) {
+                    markIncomplete(credentialId, normalizedSymbol, scope, "存在原始成交事实冲突或资金字段不完整");
+                    marked = true;
+                }
+            }
+            if (!marked) {
+                markIncomplete(credentialId, normalizedSymbol, "UNKNOWN", "存在原始成交事实冲突或资金字段不完整");
+            }
             return;
         }
 
@@ -292,6 +308,9 @@ public class AccountPositionCycleProjectionService {
                 throw new IllegalStateException("活动持仓周期记录不存在");
             }
             boolean baselineUnknown = number(cycle.get("baseline_unknown")) == 1;
+            if (!transition.closingDirection().equalsIgnoreCase(string(cycle.get("direction")))) {
+                throw new IllegalStateException("平仓成交方向与活动持仓周期方向冲突");
+            }
             boolean closed = remaining.signum() == 0;
             String nextStatus = closed ? (baselineUnknown ? "CLOSED_INCOMPLETE" : "CLOSED")
                 : (baselineUnknown ? "OPENING_UNKNOWN" : "OPEN");
@@ -314,7 +333,7 @@ public class AccountPositionCycleProjectionService {
             BigDecimal openFee = commission.subtract(closeQuantity.signum() > 0
                 ? splitFee(commission, closeQuantity, fill.getQuantity()) : ZERO);
             BigDecimal openNotional = openQuantity.multiply(fill.getPrice());
-            if (activeCycleId == null && currentQuantity.signum() != 0) {
+            if (activeCycleId == null && currentQuantity.signum() != 0 && closeQuantity.signum() == 0) {
                 throw new IllegalStateException("存在未归属的活动持仓周期，禁止自动创建重叠周期");
             }
             if (activeCycleId == null) {
@@ -323,6 +342,10 @@ public class AccountPositionCycleProjectionService {
                         ? null : fill.getPostFillWalletBalance(),
                     crossedBalanceUnavailable(closeQuantity, openQuantity) ? null : fill.getPostFillBalanceAt());
             } else {
+                Map<String, Object> activeCycle = mapper.selectCycleState(activeCycleId);
+                if (activeCycle == null || !transition.openingDirection().equalsIgnoreCase(string(activeCycle.get("direction")))) {
+                    throw new IllegalStateException("加仓成交方向与活动持仓周期方向冲突");
+                }
                 if (mapper.updateOpenCycle(activeCycleId, openQuantity, openNotional, fill.getLeverageSnapshot(),
                     fill.getPriceTickSizeSnapshot(), ZERO.equals(closeQuantity) ? fill.getPostFillWalletBalance() : null,
                     ZERO.equals(closeQuantity) ? fill.getPostFillBalanceAt() : null) != 1) {
