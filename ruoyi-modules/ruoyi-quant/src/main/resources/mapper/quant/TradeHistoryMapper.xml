@@ -1,13 +1,209 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.quant.account.mapper.TradeHistoryMapper">
+    <select id="selectFills" resultType="org.dromara.quant.account.domain.vo.TradeHistoryFill" timeout="10">
+        SELECT t.*,
+            COALESCE(soi.position_side, soi_client_role.position_side, pre_dispatch_role.position_side,
+                pre_dispatch_client_role.position_side, NULLIF(o.position_side, 'BOTH'), o.position_side) AS position_side,
+            o.reduce_only,
+            COALESCE(soi.fill_role, soi_client_role.fill_role, pre_dispatch_role.operation_type,
+                pre_dispatch_client_role.operation_type, dispatch_role.operation_type,
+                dispatch_client_role.operation_type, e.operation_type) AS operation_type,
+            NULL AS position_cycle_key,
+            CASE WHEN
+                COALESCE(e.source_conflict, 0) = 1
+                OR COALESCE(soi.source_conflict, 0) = 1
+                OR COALESCE(soi_client_role.source_conflict, 0) = 1
+                OR COALESCE(dispatch_role.source_conflict, 0) = 1
+                OR COALESCE(dispatch_client_role.source_conflict, 0) = 1
+                OR COALESCE(pre_dispatch_role.source_conflict, 0) = 1
+                OR COALESCE(pre_dispatch_client_role.source_conflict, 0) = 1
+                OR (e.operation_type IS NOT NULL AND
+                    e.operation_type <> COALESCE(soi.fill_role, soi_client_role.fill_role,
+                        pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type,
+                        dispatch_role.operation_type, dispatch_client_role.operation_type, e.operation_type))
+                OR (soi.fill_role IS NOT NULL AND
+                    soi.fill_role <> COALESCE(soi.fill_role, soi_client_role.fill_role,
+                        pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type,
+                        dispatch_role.operation_type, dispatch_client_role.operation_type, e.operation_type))
+                OR (soi_client_role.fill_role IS NOT NULL AND
+                    soi_client_role.fill_role <> COALESCE(soi.fill_role, soi_client_role.fill_role,
+                        pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type,
+                        dispatch_role.operation_type, dispatch_client_role.operation_type, e.operation_type))
+                OR (pre_dispatch_role.operation_type IS NOT NULL AND
+                    pre_dispatch_role.operation_type <> COALESCE(soi.fill_role, soi_client_role.fill_role,
+                        pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type,
+                        dispatch_role.operation_type, dispatch_client_role.operation_type, e.operation_type))
+                OR (pre_dispatch_client_role.operation_type IS NOT NULL AND
+                    pre_dispatch_client_role.operation_type <> COALESCE(soi.fill_role, soi_client_role.fill_role,
+                        pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type,
+                        dispatch_role.operation_type, dispatch_client_role.operation_type, e.operation_type))
+                OR (dispatch_role.operation_type IS NOT NULL AND
+                    dispatch_role.operation_type <> COALESCE(soi.fill_role, soi_client_role.fill_role,
+                        pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type,
+                        dispatch_role.operation_type, dispatch_client_role.operation_type, e.operation_type))
+                OR (dispatch_client_role.operation_type IS NOT NULL AND
+                    dispatch_client_role.operation_type <> COALESCE(soi.fill_role, soi_client_role.fill_role,
+                        pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type,
+                        dispatch_role.operation_type, dispatch_client_role.operation_type, e.operation_type))
+                OR (soi.position_side IS NOT NULL AND
+                    soi.position_side <> COALESCE(soi.position_side, soi_client_role.position_side,
+                        pre_dispatch_role.position_side, pre_dispatch_client_role.position_side,
+                        NULLIF(o.position_side, 'BOTH'), o.position_side))
+                OR (soi_client_role.position_side IS NOT NULL AND
+                    soi_client_role.position_side <> COALESCE(soi.position_side, soi_client_role.position_side,
+                        pre_dispatch_role.position_side, pre_dispatch_client_role.position_side,
+                        NULLIF(o.position_side, 'BOTH'), o.position_side))
+                OR (pre_dispatch_role.position_side IS NOT NULL AND
+                    pre_dispatch_role.position_side <> COALESCE(soi.position_side, soi_client_role.position_side,
+                        pre_dispatch_role.position_side, pre_dispatch_client_role.position_side,
+                        NULLIF(o.position_side, 'BOTH'), o.position_side))
+                OR (pre_dispatch_client_role.position_side IS NOT NULL AND
+                    pre_dispatch_client_role.position_side <> COALESCE(soi.position_side, soi_client_role.position_side,
+                        pre_dispatch_role.position_side, pre_dispatch_client_role.position_side,
+                        NULLIF(o.position_side, 'BOTH'), o.position_side))
+                OR (o.position_side IN ('LONG', 'SHORT') AND
+                    o.position_side <> COALESCE(soi.position_side, soi_client_role.position_side,
+                        pre_dispatch_role.position_side, pre_dispatch_client_role.position_side, o.position_side))
+                OR (soi.exchange_side IS NOT NULL AND soi.exchange_side <> t.side)
+                OR (soi_client_role.exchange_side IS NOT NULL AND soi_client_role.exchange_side <> t.side)
+                OR (pre_dispatch_role.exchange_side IS NOT NULL AND pre_dispatch_role.exchange_side <> t.side)
+                OR (pre_dispatch_client_role.exchange_side IS NOT NULL AND pre_dispatch_client_role.exchange_side <> t.side)
+                OR (o.side IS NOT NULL AND o.side <> t.side)
+                THEN 1 ELSE 0 END AS position_cycle_conflict,
+            o.leverage_snapshot,
+            o.price_tick_size_snapshot,
+            o.post_fill_wallet_balance,
+            o.post_fill_balance_at,
+            qs.price_tick_size AS current_price_tick_size
+        FROM (
+            SELECT *
+            FROM quant_trade
+            WHERE credential_id IN
+            <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+            <if test="symbol != null">AND symbol = #{symbol}</if>
+            ORDER BY trade_time, exchange_trade_id, id
+            LIMIT 20001
+        ) t
+        LEFT JOIN quant_order o ON o.credential_id = t.credential_id
+            AND o.symbol = t.symbol AND o.exchange_order_id = t.exchange_order_id
+        LEFT JOIN (
+            SELECT credential_id, symbol, exchange_order_id,
+                MIN(operation_type) AS operation_type,
+                CASE WHEN COUNT(DISTINCT operation_type) <> 1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_execution_record
+            WHERE operation_type IN ('OPEN', 'CLOSE') AND exchange_order_id IS NOT NULL
+            GROUP BY credential_id, symbol, exchange_order_id
+        ) e ON e.credential_id = t.credential_id
+            AND e.symbol = t.symbol AND e.exchange_order_id = t.exchange_order_id
+        LEFT JOIN (
+            SELECT credential_id, symbol, exchange_order_id,
+                MIN(position_side) AS position_side,
+                MIN(fill_role) AS fill_role,
+                MIN(exchange_side) AS exchange_side,
+                CASE WHEN COUNT(DISTINCT position_side) <> 1
+                    OR COUNT(DISTINCT fill_role) <> 1
+                    OR COUNT(DISTINCT exchange_side) <> 1
+                    OR COUNT(DISTINCT client_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_strategy_order_intent
+            WHERE exchange_order_id IS NOT NULL
+            GROUP BY credential_id, symbol, exchange_order_id
+        ) soi ON soi.credential_id = t.credential_id
+            AND soi.symbol = t.symbol AND soi.exchange_order_id = t.exchange_order_id
+        LEFT JOIN (
+            SELECT credential_id, symbol, client_order_id,
+                MIN(position_side) AS position_side,
+                MIN(fill_role) AS fill_role,
+                MIN(exchange_side) AS exchange_side,
+                CASE WHEN COUNT(DISTINCT position_side) <> 1
+                    OR COUNT(DISTINCT fill_role) <> 1
+                    OR COUNT(DISTINCT exchange_side) <> 1
+                    OR COUNT(DISTINCT exchange_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_strategy_order_intent
+            WHERE client_order_id IS NOT NULL
+            GROUP BY credential_id, symbol, client_order_id
+        ) soi_client_role ON soi_client_role.credential_id = t.credential_id
+            AND soi_client_role.symbol = t.symbol AND soi_client_role.client_order_id = o.client_order_id
+        LEFT JOIN (
+            SELECT credential_id, symbol, exchange_order_id,
+                MIN(operation_type) AS operation_type,
+                CASE WHEN COUNT(DISTINCT operation_type) <> 1
+                    OR COUNT(DISTINCT client_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_order_dispatch_ticket
+            WHERE operation_type IN ('OPEN', 'CLOSE')
+                AND dispatch_status IN ('ACKED', 'RECOVERED')
+                AND exchange_order_id IS NOT NULL
+            GROUP BY credential_id, symbol, exchange_order_id
+        ) dispatch_role ON dispatch_role.credential_id = t.credential_id
+            AND dispatch_role.symbol = t.symbol AND dispatch_role.exchange_order_id = t.exchange_order_id
+        LEFT JOIN (
+            SELECT credential_id, symbol, client_order_id,
+                MIN(operation_type) AS operation_type,
+                CASE WHEN COUNT(DISTINCT operation_type) <> 1
+                    OR COUNT(DISTINCT exchange_order_id) > 1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_order_dispatch_ticket
+            WHERE operation_type IN ('OPEN', 'CLOSE')
+                AND dispatch_status IN ('ACKED', 'RECOVERED')
+                AND client_order_id IS NOT NULL
+            GROUP BY credential_id, symbol, client_order_id
+        ) dispatch_client_role ON dispatch_client_role.credential_id = t.credential_id
+            AND dispatch_client_role.symbol = t.symbol AND dispatch_client_role.client_order_id = o.client_order_id
+        LEFT JOIN (
+            SELECT p.credential_id, p.symbol, d.exchange_order_id,
+                MIN(p.operation_type) AS operation_type,
+                MIN(p.position_side) AS position_side,
+                MIN(p.exchange_side) AS exchange_side,
+                CASE WHEN COUNT(DISTINCT p.operation_type) <> 1
+                    OR COUNT(DISTINCT p.position_side) <> 1
+                    OR COUNT(DISTINCT p.exchange_side) <> 1
+                    OR COUNT(DISTINCT d.operation_type) <> 1
+                    OR MIN(p.operation_type) <> MIN(d.operation_type)
+                    OR COUNT(DISTINCT p.client_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_strategy_pre_dispatch_intent p
+            JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
+                AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
+                AND d.client_order_id = p.client_order_id
+            WHERE p.operation_type IN ('OPEN', 'CLOSE')
+                AND d.operation_type IN ('OPEN', 'CLOSE')
+                AND d.dispatch_status IN ('ACKED', 'RECOVERED')
+                AND d.exchange_order_id IS NOT NULL
+            GROUP BY p.credential_id, p.symbol, d.exchange_order_id
+        ) pre_dispatch_role ON pre_dispatch_role.credential_id = t.credential_id
+            AND pre_dispatch_role.symbol = t.symbol AND pre_dispatch_role.exchange_order_id = t.exchange_order_id
+        LEFT JOIN (
+            SELECT p.credential_id, p.symbol, p.client_order_id,
+                MIN(p.operation_type) AS operation_type,
+                MIN(p.position_side) AS position_side,
+                MIN(p.exchange_side) AS exchange_side,
+                CASE WHEN COUNT(DISTINCT p.operation_type) <> 1
+                    OR COUNT(DISTINCT p.position_side) <> 1
+                    OR COUNT(DISTINCT p.exchange_side) <> 1
+                    OR COUNT(DISTINCT d.operation_type) <> 1
+                    OR MIN(p.operation_type) <> MIN(d.operation_type)
+                    OR COUNT(DISTINCT d.exchange_order_id) > 1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_strategy_pre_dispatch_intent p
+            JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
+                AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
+                AND d.client_order_id = p.client_order_id
+            WHERE p.operation_type IN ('OPEN', 'CLOSE')
+                AND d.operation_type IN ('OPEN', 'CLOSE')
+                AND d.dispatch_status IN ('ACKED', 'RECOVERED')
+                AND d.client_order_id IS NOT NULL
+            GROUP BY p.credential_id, p.symbol, p.client_order_id
+        ) pre_dispatch_client_role ON pre_dispatch_client_role.credential_id = t.credential_id
+            AND pre_dispatch_client_role.symbol = t.symbol AND pre_dispatch_client_role.client_order_id = o.client_order_id
+        LEFT JOIN quant_symbol qs ON qs.symbol = t.symbol
+        ORDER BY t.trade_time, t.exchange_trade_id, t.id
+        LIMIT 20001
+    </select>
+
     <select id="selectOrderIdsMissingOrderFacts" resultType="java.lang.Long" timeout="3">
         SELECT DISTINCT t.exchange_order_id
         FROM quant_trade t
-        LEFT JOIN quant_order o ON o.credential_id=t.credential_id
-            AND o.symbol=t.symbol AND o.exchange_order_id=t.exchange_order_id
-        WHERE t.credential_id=#{credentialId}
-          AND t.symbol=#{symbol}
+        LEFT JOIN quant_order o ON o.credential_id = t.credential_id
+            AND o.symbol = t.symbol AND o.exchange_order_id = t.exchange_order_id
+        WHERE t.credential_id = #{credentialId}
+          AND t.symbol = #{symbol}
           AND t.exchange_order_id IS NOT NULL
           AND (
               o.id IS NULL
