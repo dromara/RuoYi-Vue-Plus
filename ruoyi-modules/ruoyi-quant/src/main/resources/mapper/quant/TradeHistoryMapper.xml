@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.quant.account.mapper.TradeHistoryMapper">
     <select id="selectFills" resultType="org.dromara.quant.account.domain.vo.TradeHistoryFill">
-        SELECT t.*, COALESCE(o.position_side, soi.position_side) AS position_side, o.reduce_only,
+        SELECT t.*, COALESCE(o.position_side, soi.position_side, pre_dispatch_role.position_side) AS position_side, o.reduce_only,
         COALESCE(e.operation_type, soi.fill_role, dispatch_role.operation_type, pre_dispatch_role.operation_type) AS operation_type,
         o.leverage_snapshot, o.price_tick_size_snapshot, o.post_fill_wallet_balance, o.post_fill_balance_at,
         qs.price_tick_size AS current_price_tick_size
@@ -40,11 +40,12 @@
         ) dispatch_role ON dispatch_role.credential_id = t.credential_id
             AND dispatch_role.symbol = t.symbol AND dispatch_role.exchange_order_id = t.exchange_order_id
         LEFT JOIN (
-            SELECT credential_id, symbol, client_order_id, MIN(operation_type) AS operation_type
+            SELECT credential_id, symbol, client_order_id, MIN(operation_type) AS operation_type,
+                MIN(position_side) AS position_side
             FROM quant_strategy_pre_dispatch_intent
             WHERE operation_type IN ('OPEN', 'CLOSE') AND client_order_id IS NOT NULL
             GROUP BY credential_id, symbol, client_order_id
-            HAVING COUNT(DISTINCT operation_type) = 1
+            HAVING COUNT(DISTINCT operation_type) = 1 AND COUNT(DISTINCT position_side) = 1
         ) pre_dispatch_role ON pre_dispatch_role.credential_id = t.credential_id
             AND pre_dispatch_role.symbol = t.symbol AND pre_dispatch_role.client_order_id = o.client_order_id
         LEFT JOIN quant_symbol qs ON qs.symbol = t.symbol
