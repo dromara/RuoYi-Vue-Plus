@@ -36,6 +36,19 @@ public class TradeHistoryMapperTest {
         return configuration.getMappedStatement(TradeHistoryMapper.class.getName() + ".selectFills").getBoundSql(parameters).getSql();
     }
 
+    private String missingOrderSql(long credentialId, String symbol, int limit) throws Exception {
+        var parameters = new java.util.HashMap<String, Object>();
+        parameters.put("credentialId", credentialId);
+        parameters.put("symbol", symbol);
+        parameters.put("limit", limit);
+        var configuration = new Configuration();
+        String resource = "mapper/quant/TradeHistoryMapper.xml";
+        try (InputStream input = org.apache.ibatis.io.Resources.getResourceAsStream(resource)) {
+            new org.apache.ibatis.builder.xml.XMLMapperBuilder(input, configuration, resource, configuration.getSqlFragments()).parse();
+        }
+        return configuration.getMappedStatement(TradeHistoryMapper.class.getName() + ".selectOrderIdsMissingOrderFacts").getBoundSql(parameters).getSql();
+    }
+
     private Connection database() throws Exception {
         var connection = DriverManager.getConnection("jdbc:h2:mem:" + UUID.randomUUID() + ";MODE=MySQL");
         try (var statement = connection.createStatement()) {
@@ -115,6 +128,25 @@ public class TradeHistoryMapperTest {
                     assertTrue(result.next());
                     assertEquals("CLOSE", result.getString("operation_type"));
                     assertEquals("SHORT", result.getString("position_side"));
+                }
+            }
+        }
+    }
+
+    @Test
+    void requestsRecoveryWhenExchangeClientOrderIdIsOnlySyntheticPlaceholder() throws Exception {
+        try (var connection = database(); var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO quant_trade VALUES (1,10,'BTCUSDT',101,'2026-10-10 00:00:00')");
+            statement.execute("INSERT INTO quant_order (id,credential_id,symbol,exchange_order_id,client_order_id,position_side,reduce_only) " +
+                "VALUES (1,10,'BTCUSDT',101,'EXCHANGE:101','BOTH',FALSE)");
+            try (var prepared = connection.prepareStatement(missingOrderSql(10L, "BTCUSDT", 100))) {
+                prepared.setLong(1, 10L);
+                prepared.setString(2, "BTCUSDT");
+                prepared.setInt(3, 100);
+                try (var result = prepared.executeQuery()) {
+                    assertTrue(result.next());
+                    assertEquals(101L, result.getLong(1));
+                    assertFalse(result.next());
                 }
             }
         }
