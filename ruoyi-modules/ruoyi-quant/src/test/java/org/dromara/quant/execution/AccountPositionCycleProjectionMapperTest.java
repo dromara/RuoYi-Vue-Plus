@@ -72,10 +72,12 @@ class AccountPositionCycleProjectionMapperTest {
         try (Connection connection = database(); var statement = connection.createStatement()) {
             statement.execute("INSERT INTO quant_strategy_fill_journal VALUES " +
                 "(1,10,'BTCUSDT',101,NULL,'BUY',1,100,NULL,NULL,NULL,'2026-11-03 00:00:00','WAITING_ORDER')," +
-                "(2,10,'ETHUSDT',102,202,'BUY',1,100,0.01,'USDT',0,'2026-11-03 00:00:00','WAITING_ORDER')");
+                "(2,10,'ETHUSDT',102,202,'BUY',1,100,0.01,'USDT',0,'2026-11-03 00:00:00','WAITING_ORDER')," +
+                "(3,10,'XRPUSDT',103,203,'SELL',1,100,0.01,'USDT!',0,'2026-11-03 00:00:01','WAITING_ORDER')");
 
             assertEquals(List.of("BTCUSDT"), blockedSymbols(connection, 10L, "BTCUSDT"));
             assertTrue(blockedSymbols(connection, 10L, "ETHUSDT").isEmpty());
+            assertEquals(List.of("XRPUSDT"), blockedSymbols(connection, 10L, "XRPUSDT"));
         }
     }
 
