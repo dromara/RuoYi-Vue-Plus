@@ -10,5 +10,10 @@ import java.util.List;
  */
 public interface TradeHistoryMapper {
 
+    /**
+     * 按成交账本读取完整成交链，并关联实际订单和执行归因事实。
+     */
+    List<TradeHistoryFill> selectFills(@Param("ids") List<Long> ids, @Param("symbol") String symbol);
+
     List<Long> selectOrderIdsMissingOrderFacts(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("limit") int limit);
 }
