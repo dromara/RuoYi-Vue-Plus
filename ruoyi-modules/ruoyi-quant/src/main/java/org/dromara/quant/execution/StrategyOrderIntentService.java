@@ -11,12 +11,13 @@ import java.util.Map;
 
 /**
  * Durable attribution of a proven exchange-accepted strategy order.
- * Never infers the position role from BUY/SELL or from mutable order state.
- * Only unambiguous LONG/SHORT orders may be recorded. BOTH, unknown mode,
- * missing identifiers, and conflicting replays fail closed.
+ * Never infers position ownership from BUY/SELL or mutable order state.
+ * Exchange BOTH is accepted only when the exact immutable pre-dispatch record
+ * supplies its logical LONG/SHORT side and persisted position-cycle key.
+ * Missing identifiers, missing cycle identity, and conflicting replays fail closed.
  * <p>
  * This operation must run after Binance acceptance plus local order-ledger
- * persistence. Schema V09 must be migrated before enabling this writer.
+ * persistence. Schema V09 and the position-cycle migration are prerequisites.
  */
 @Service
 @RequiredArgsConstructor
