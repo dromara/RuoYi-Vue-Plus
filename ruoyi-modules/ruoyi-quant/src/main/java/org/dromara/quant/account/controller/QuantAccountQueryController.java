@@ -117,7 +117,7 @@ public class QuantAccountQueryController {
 
     /** 按客户、交易对、方向和状态分页查询本地订单，并返回关联成交数。 */
     @SaCheckPermission("quant:order:list")
-    @GetMapping("/order/page")
+    @GetMapping({"/order/page", "/order/ledger/page"})
     public R<PageResult<Map<String, Object>>> orderPage(@RequestParam(required = false) Long credentialId,
                                                         @RequestParam(required = false) String symbol,
                                                         @RequestParam(required = false) String side,
