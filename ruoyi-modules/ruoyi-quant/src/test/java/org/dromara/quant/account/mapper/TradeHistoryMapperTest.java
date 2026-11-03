@@ -45,7 +45,7 @@ public class TradeHistoryMapperTest {
             statement.execute("CREATE TABLE quant_symbol (symbol VARCHAR(32), price_tick_size DECIMAL(32,16))");
             statement.execute("CREATE TABLE quant_execution_record (id BIGINT PRIMARY KEY, credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, operation_type " +
                 "VARCHAR(20))");
-            statement.execute("CREATE TABLE quant_strategy_order_intent (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, position_side VARCHAR(10), fill_role VARCHAR(20))");
+            statement.execute("CREATE TABLE quant_strategy_order_intent (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, position_side VARCHAR(10), fill_role VARCHAR(20), client_order_id VARCHAR(64))");
             statement.execute("CREATE TABLE quant_order_dispatch_ticket (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, operation_type VARCHAR(20), dispatch_status VARCHAR(20), idempotency_key VARCHAR(64), client_order_id VARCHAR(64))");
             statement.execute("CREATE TABLE quant_strategy_pre_dispatch_intent (credential_id BIGINT, symbol VARCHAR(32), client_order_id VARCHAR(64), operation_type VARCHAR(20), idempotency_key VARCHAR(64), position_side VARCHAR(10))");
             statement.execute("CREATE INDEX idx_order_history ON quant_order(credential_id, symbol, exchange_order_id)");
@@ -63,6 +63,29 @@ public class TradeHistoryMapperTest {
                 "VALUES (1,10,'BTCUSDT',101,'QCLIENT101','BOTH',FALSE)");
             statement.execute("INSERT INTO quant_order_dispatch_ticket (credential_id,symbol,exchange_order_id,operation_type,dispatch_status,idempotency_key,client_order_id) " +
                 "VALUES (10,'BTCUSDT',101,'OPEN','ACKED','IDEMP101','QCLIENT101')");
+            statement.execute("INSERT INTO quant_strategy_pre_dispatch_intent (credential_id,symbol,client_order_id,operation_type,idempotency_key,position_side) " +
+                "VALUES (10,'BTCUSDT','QCLIENT101','OPEN','IDEMP101','BOTH')");
+            try (var prepared = connection.prepareStatement(sql(List.of(10L), "BTCUSDT"))) {
+                prepared.setLong(1, 10L);
+                prepared.setString(2, "BTCUSDT");
+                try (var result = prepared.executeQuery()) {
+                    assertTrue(result.next());
+                    assertEquals("OPEN", result.getString("operation_type"));
+                    assertEquals("BOTH", result.getString("position_side"));
+                    assertFalse(result.next());
+                }
+            }
+        }
+    }
+
+    @Test
+    void restoresOneWayRoleByExactClientOrderIdWhenDispatchTicketLacksExchangeOrderId() throws Exception {
+        try (var connection = database(); var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO quant_trade VALUES (1,10,'BTCUSDT',101,'2026-10-10 00:00:00')");
+            statement.execute("INSERT INTO quant_order (id,credential_id,symbol,exchange_order_id,client_order_id,position_side,reduce_only) " +
+                "VALUES (1,10,'BTCUSDT',101,'QCLIENT101','BOTH',FALSE)");
+            statement.execute("INSERT INTO quant_order_dispatch_ticket (credential_id,symbol,exchange_order_id,operation_type,dispatch_status,idempotency_key,client_order_id) " +
+                "VALUES (10,'BTCUSDT',NULL,'OPEN','ACKED','IDEMP101','QCLIENT101')");
             statement.execute("INSERT INTO quant_strategy_pre_dispatch_intent (credential_id,symbol,client_order_id,operation_type,idempotency_key,position_side) " +
                 "VALUES (10,'BTCUSDT','QCLIENT101','OPEN','IDEMP101','BOTH')");
             try (var prepared = connection.prepareStatement(sql(List.of(10L), "BTCUSDT"))) {
