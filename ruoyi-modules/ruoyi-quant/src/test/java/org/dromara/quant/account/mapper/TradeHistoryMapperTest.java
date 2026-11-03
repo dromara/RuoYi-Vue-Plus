@@ -119,6 +119,22 @@ class TradeHistoryMapperTest {
     }
 
     @Test
+    void restoresOneWayOrderRoleByExactClientOrderIdWhenTicketHasNoExchangeOrderId() throws Exception {
+        try (Connection connection = database(); var statement = connection.createStatement()) {
+            insertTrade(connection, 1, 10, "SELL", 106);
+            statement.execute("INSERT INTO quant_order VALUES (1,10,'BTCUSDT',106,'QCLIENT106','SELL','BOTH','0',5,0.01,1000,'2026-10-10 00:00:01')");
+            statement.execute("INSERT INTO quant_order_dispatch_ticket VALUES (1,10,'BTCUSDT','IDEMP106','OPEN','QCLIENT106','ACKED',NULL)");
+            statement.execute("INSERT INTO quant_strategy_pre_dispatch_intent VALUES (10,'BTCUSDT','IDEMP106','QCLIENT106','OPEN','SHORT','SELL')");
+
+            List<Map<String, Object>> rows = query(connection, List.of(10L), null);
+            assertEquals(1, rows.size());
+            assertEquals("SHORT", rows.getFirst().get("position_side"));
+            assertEquals("OPEN", rows.getFirst().get("operation_type"));
+            assertFalse((Boolean) rows.getFirst().get("position_cycle_conflict"));
+        }
+    }
+
+    @Test
     void restoresHedgeDirectionAndCloseRoleFromAcceptedStrategyIntent() throws Exception {
         try (Connection connection = database(); var statement = connection.createStatement()) {
             insertTrade(connection, 1, 10, "SELL", 102);
