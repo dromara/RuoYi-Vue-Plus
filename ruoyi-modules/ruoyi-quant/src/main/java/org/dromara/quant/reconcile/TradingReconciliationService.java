@@ -13,6 +13,7 @@ import org.dromara.quant.exchange.ExchangeGateway;
 import org.dromara.quant.exchange.ExchangeMarketPort;
 import org.dromara.quant.execution.StrictBinanceTradeCollector;
 import org.dromara.quant.execution.StrategyFillJournalService;
+import org.dromara.quant.execution.AccountPositionCycleProjectionService;
 import org.dromara.quant.finance.domain.QuantFinancialEvent;
 import org.dromara.quant.finance.domain.vo.QuantFinancialEventVo;
 import org.dromara.quant.finance.mapper.QuantFinancialEventMapper;
@@ -109,6 +110,7 @@ public class TradingReconciliationService {
     private final StrictBinanceTradeCollector tradeCollector;
     private final org.dromara.quant.execution.StrictBinanceIncomeCollector incomeCollector;
     private final StrategyFillJournalService fillJournal;
+    private final AccountPositionCycleProjectionService accountPositionCycleProjectionService;
     private final StrategyFillSyncCursorMapper fillSyncCursors;
     private final StrategyFillSyncCursorService fillSyncCursorService;
     private final FinancialEventSyncCursorMapper incomeSyncCursors;
@@ -130,7 +132,9 @@ public class TradingReconciliationService {
                                         QuantOrderMapper orderMapper, QuantTradeMapper tradeMapper, QuantProtectionOrderMapper protectionOrderMapper,
                                         QuantFinancialEventMapper financialEventMapper, QuantReconcileRecordMapper reconcileMapper, ReconciliationFailureRecorder failureRecorder
         , StrategyPositionStateService strategyPositionStateService, PlatformTransactionManager transactionManager, StrictBinanceTradeCollector tradeCollector,
-                                        org.dromara.quant.execution.StrictBinanceIncomeCollector incomeCollector, StrategyFillJournalService fillJournal, StrategyFillSyncCursorMapper fillSyncCursors, StrategyFillSyncCursorService fillSyncCursorService,
+                                        org.dromara.quant.execution.StrictBinanceIncomeCollector incomeCollector, StrategyFillJournalService fillJournal,
+                                        AccountPositionCycleProjectionService accountPositionCycleProjectionService,
+                                        StrategyFillSyncCursorMapper fillSyncCursors, StrategyFillSyncCursorService fillSyncCursorService,
                                         FinancialEventSyncCursorMapper incomeSyncCursors, FinancialEventSyncCursorService incomeSyncCursorService) {
         this.gateway = gateway;
         this.accountSnapshotMapper = accountSnapshotMapper;
@@ -145,6 +149,7 @@ public class TradingReconciliationService {
         this.tradeCollector = tradeCollector;
         this.incomeCollector = incomeCollector;
         this.fillJournal = fillJournal;
+        this.accountPositionCycleProjectionService = accountPositionCycleProjectionService;
         this.fillSyncCursors = fillSyncCursors;
         this.fillSyncCursorService = fillSyncCursorService;
         this.incomeSyncCursors = incomeSyncCursors;
@@ -538,9 +543,12 @@ public class TradingReconciliationService {
             // a failing history endpoint must not keep already-closed Binance
             // positions counted as open indefinitely.
             var account = java.util.Objects.requireNonNull(gateway.queryAccount(exchangeCredential), "Binance account snapshot missing");
+            Instant positionReadStartedAt = Instant.now();
             var positions = List.copyOf(java.util.Objects.requireNonNull(gateway.queryPositions(exchangeCredential, null), "Binance full position snapshot missing"));
+            Instant positionReadCompletedAt = Instant.now();
             commitPositionSnapshot(credential, account, positions, fetchStartedAt, positionGeneration, runtimeGeneration, "full-reconcile");
-            ExchangeFacts facts = collectExchangeFacts(credential, historyHours, exchangeCredential, account, positions);
+            ExchangeFacts facts = collectExchangeFacts(credential, historyHours, exchangeCredential, account, positions,
+                positionReadStartedAt, positionReadCompletedAt);
             transaction.executeWithoutResult(status -> applyExchangeFacts(credential, facts));
         } catch (SnapshotSupersededException ex) {
             // The account snapshot lost the generation fence to a newer private-stream fact.
@@ -573,7 +581,8 @@ public class TradingReconciliationService {
      * 收集并校验账户、持仓和成交事实，缺项时不写入部分同步结果。
      */
     private ExchangeFacts collectExchangeFacts(QuantCredential credential, int historyHours, ExchangeGateway.Credential c, ExchangeGateway.AccountSnapshot account,
-                                               List<ExchangeGateway.PositionSnapshot> positions) {
+                                               List<ExchangeGateway.PositionSnapshot> positions, Instant positionReadStartedAt,
+                                               Instant positionReadCompletedAt) {
         Instant now = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
         ExchangeGateway.TimeRange range = new ExchangeGateway.TimeRange(now.minus(Duration.ofHours(Math.max(1, historyHours))), now);
         var openOrders = List.copyOf(gateway.queryOrders(c, null));
@@ -628,7 +637,7 @@ public class TradingReconciliationService {
             : List.of();
         LocalDateTime incomeCursorEnd = LocalDateTime.ofInstant(incomeTo, ZoneOffset.UTC);
         return new ExchangeFacts(account, positions, openOrders, history, trades, fillCursorEnds, futureFillCursors, fillHistoryBacklogSymbols,
-            protections, income, incomeCursorEnd, incomeHistoryBacklog);
+            protections, income, incomeCursorEnd, incomeHistoryBacklog, positionReadStartedAt, positionReadCompletedAt);
     }
 
     /**
@@ -642,6 +651,8 @@ public class TradingReconciliationService {
         }
         for (var entry : facts.trades().entrySet()) {
             syncTrades(credential, entry.getValue());
+            accountPositionCycleProjectionService.project(credential.getId(), entry.getKey(), facts.positions(),
+                facts.positionReadStartedAt(), facts.positionReadCompletedAt());
         }
         for (var entry : facts.fillCursorEnds().entrySet()) {
             LocalDateTime cursorEnd = LocalDateTime.ofInstant(entry.getValue(), ZoneOffset.UTC);
@@ -890,6 +901,7 @@ public class TradingReconciliationService {
                 entity.setQuantity(s.quantity());
                 entity.setPrice(s.price());
                 entity.setCommission(s.commission());
+                entity.setCommissionAsset(normalizeCommissionAsset(s.commissionAsset()));
                 entity.setRealizedPnl(s.realizedPnl());
                 // Funding income is stored separately in quant_financial_event. Zero is only
                 // an initial display default; a replay must never erase a previously stored value.
@@ -911,7 +923,8 @@ public class TradingReconciliationService {
                     final boolean attributionChanged;
                     try {
                         assertImmutableTradeFacts(raced, s);
-                        attributionChanged = mergeStrategyAttribution(raced, sourceOrder);
+                        boolean changed = mergeStrategyAttribution(raced, sourceOrder);
+                        attributionChanged = mergeCommissionAsset(raced, s) || changed;
                     } catch (IllegalStateException conflict) {
                         if (!live) {
                             throw conflict;
@@ -931,7 +944,8 @@ public class TradingReconciliationService {
                 final boolean attributionChanged;
                 try {
                     assertImmutableTradeFacts(entity, s);
-                    attributionChanged = mergeStrategyAttribution(entity, sourceOrder);
+                    boolean changed = mergeStrategyAttribution(entity, sourceOrder);
+                    attributionChanged = mergeCommissionAsset(entity, s) || changed;
                 } catch (IllegalStateException conflict) {
                     if (!live) {
                         throw conflict;
@@ -969,6 +983,8 @@ public class TradingReconciliationService {
             || !sameDecimal(stored.getPrice(), incoming.price())
             || !sameDecimal(stored.getCommission(), incoming.commission())
             || !sameDecimal(stored.getRealizedPnl(), incoming.realizedPnl())
+            || stored.getCommissionAsset() != null && incoming.commissionAsset() != null
+                && !sameText(stored.getCommissionAsset(), incoming.commissionAsset())
             || !sameTradeTime(stored.getTradeTime(), incoming.time())) {
             throw new IllegalStateException("Persisted local trade conflicts with immutable Binance fill facts; refusing overwrite: symbol="
                 + incoming.symbol() + ", exchangeTradeId=" + incoming.tradeId() + ", exchangeOrderId=" + incoming.orderId());
@@ -997,6 +1013,19 @@ public class TradingReconciliationService {
             changed = true;
         }
         return changed;
+    }
+
+    private static boolean mergeCommissionAsset(QuantTrade trade, ExchangeGateway.TradeSnapshot incoming) {
+        String asset = normalizeCommissionAsset(incoming.commissionAsset());
+        if (trade.getCommissionAsset() == null && asset != null) {
+            trade.setCommissionAsset(asset);
+            return true;
+        }
+        return false;
+    }
+
+    private static String normalizeCommissionAsset(String asset) {
+        return asset == null || asset.isBlank() ? null : asset.trim().toUpperCase(Locale.ROOT);
     }
 
     private static boolean sameText(String left, String right) {
@@ -1232,7 +1261,8 @@ public class TradingReconciliationService {
                                  List<ExchangeGateway.OrderSnapshot> history, Map<String, List<ExchangeGateway.TradeSnapshot>> trades,
                                  Map<String, Instant> fillCursorEnds, Map<String, LocalDateTime> futureFillCursors, Set<String> fillHistoryBacklogSymbols,
                                  Map<String, List<ExchangeGateway.ProtectionOrderSnapshot>> protections,
-                                 List<ExchangeGateway.IncomeSnapshot> income, LocalDateTime incomeCursorEnd, boolean incomeHistoryBacklog) {
+                                 List<ExchangeGateway.IncomeSnapshot> income, LocalDateTime incomeCursorEnd, boolean incomeHistoryBacklog,
+                                 Instant positionReadStartedAt, Instant positionReadCompletedAt) {
     }
 
     private record CachedPositionSnapshot(long positionGeneration, long runtimeGeneration, Instant fetchedAt, List<ExchangeGateway.PositionSnapshot> positions) {
