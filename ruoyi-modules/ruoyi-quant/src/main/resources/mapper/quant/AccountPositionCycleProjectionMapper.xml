@@ -103,7 +103,7 @@ WHERE id=#{id} AND status IN ('OPEN','OPENING_UNKNOWN')
 ]]></update>
 
     <select id="selectCycleState" resultType="map" timeout="3"><![CDATA[
-SELECT baseline_unknown FROM quant_position_cycle WHERE id=#{id}
+SELECT baseline_unknown, direction FROM quant_position_cycle WHERE id=#{id}
 ]]></select>
 
     <update id="updateCloseCycle" timeout="3"><![CDATA[
@@ -131,7 +131,7 @@ VALUES
  #{realizedPnl},#{tradeTime},NOW(6))
 ]]></insert>
 
-    <select id="selectCycles" resultType="map" timeout="10"><![CDATA[
+    <select id="selectCycles" resultType="map" timeout="10">
 SELECT id, credential_id AS credentialId, symbol, cycle_key AS positionCycleKey,
        position_side AS positionSide, direction,
        opening_quantity AS openingQuantity, closing_quantity AS closingQuantity,
@@ -152,9 +152,9 @@ WHERE credential_id IN
 <if test="toUtc != null">AND opened_at IS NOT NULL AND opened_at&lt;#{toUtc}</if>
 ORDER BY COALESCE(opened_at,created_at) DESC,id DESC
 LIMIT #{limit} OFFSET #{offset}
-]]></select>
+</select>
 
-    <select id="countCycles" resultType="long" timeout="5"><![CDATA[
+    <select id="countCycles" resultType="long" timeout="5">
 SELECT COUNT(*)
 FROM quant_position_cycle
 WHERE credential_id IN
@@ -164,9 +164,9 @@ WHERE credential_id IN
 <if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
 <if test="fromUtc != null">AND opened_at IS NOT NULL AND opened_at&gt;=#{fromUtc}</if>
 <if test="toUtc != null">AND opened_at IS NOT NULL AND opened_at&lt;#{toUtc}</if>
-]]></select>
+</select>
 
-    <select id="countIncompleteScopes" resultType="long" timeout="5"><![CDATA[
+    <select id="countIncompleteScopes" resultType="long" timeout="5">
 SELECT COUNT(DISTINCT CONCAT(credential_id,':',symbol))
 FROM quant_position_cycle_state
 WHERE credential_id IN
@@ -175,9 +175,9 @@ WHERE credential_id IN
 </foreach>
   AND (status&lt;&gt;'READY' OR incomplete=1)
 <if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
-]]></select>
+</select>
 
-    <select id="selectCycleAllocations" resultType="map" timeout="5"><![CDATA[
+    <select id="selectCycleAllocations" resultType="map" timeout="5">
 SELECT position_cycle_id AS cycleId, allocation_role AS allocationRole,
        exchange_order_id AS exchangeOrderId, exchange_trade_id AS exchangeTradeId
 FROM quant_trade_cycle_allocation
@@ -186,9 +186,9 @@ WHERE position_cycle_id IN
     #{cycleId}
 </foreach>
 ORDER BY position_cycle_id,trade_time,exchange_trade_id
-]]></select>
+</select>
 
-    <select id="selectCycleFeeTotals" resultType="map" timeout="5"><![CDATA[
+    <select id="selectCycleFeeTotals" resultType="map" timeout="5">
 SELECT position_cycle_id AS cycleId,
        COALESCE(NULLIF(UPPER(TRIM(commission_asset)),''),'UNKNOWN') AS commissionAsset,
        SUM(commission) AS commission
@@ -199,5 +199,5 @@ WHERE position_cycle_id IN
 </foreach>
 GROUP BY position_cycle_id,COALESCE(NULLIF(UPPER(TRIM(commission_asset)),''),'UNKNOWN')
 ORDER BY position_cycle_id,commissionAsset
-]]></select>
+</select>
 </mapper>
