@@ -49,6 +49,11 @@ WHERE credential_id=#{credentialId}
   )
 ]]></select>
 
+    <delete id="deleteState" timeout="3"><![CDATA[
+DELETE FROM quant_position_cycle_state
+WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+]]></delete>
+
     <select id="selectUnprojectedFills" resultType="org.dromara.quant.account.domain.vo.AccountPositionCycleFill" timeout="10"><![CDATA[
 SELECT t.id, t.credential_id, t.symbol, t.exchange_trade_id, t.exchange_order_id,
        t.side, o.position_side, t.quantity, t.price, t.commission,
