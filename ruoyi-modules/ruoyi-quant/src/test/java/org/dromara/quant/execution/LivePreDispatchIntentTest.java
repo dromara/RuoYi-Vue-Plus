@@ -58,6 +58,33 @@ class LivePreDispatchIntentTest {
     }
 
     @Test
+    void presendIntentSelectsThePersistedCycleKeyForTheExactPendingExecution() throws Exception {
+        var parameters = new java.util.HashMap<String, Object>();
+        parameters.put("credentialId", 1L);
+        parameters.put("symbol", "BTCUSDT");
+        parameters.put("key", "dispatch-a");
+        parameters.put("clientOrderId", "cid-a");
+        parameters.put("strategyId", 2L);
+        parameters.put("instanceId", 3L);
+        parameters.put("operation", "OPEN");
+        parameters.put("positionSide", "LONG");
+        parameters.put("exchangeSide", "BUY");
+        parameters.put("epoch", 4L);
+        var configuration = new org.apache.ibatis.session.Configuration();
+        String resource = "mapper/quant/LiveOrderDispatchMapper.xml";
+        try (java.io.InputStream input = org.apache.ibatis.io.Resources.getResourceAsStream(resource)) {
+            new org.apache.ibatis.builder.xml.XMLMapperBuilder(input, configuration, resource, configuration.getSqlFragments()).parse();
+        }
+        String sql = configuration.getMappedStatement(LiveOrderDispatchMapper.class.getName() + ".insertPreDispatchIntent")
+            .getBoundSql(parameters).getSql().toLowerCase(java.util.Locale.ROOT);
+        assertTrue(sql.contains("s.position_cycle_key"));
+        assertTrue(sql.contains("s.pending_idempotency_key"));
+        assertTrue(sql.contains("quant_strategy_instance"));
+        assertTrue(sql.contains("quant_strategy_symbol"));
+        assertTrue(sql.contains("quant_symbol"));
+    }
+
+    @Test
     void contradictoryOpeningSideNeverAcquiresGuard() {
         assertThrows(IllegalArgumentException.class, () -> dispatcher.beginStrategy(1L, "BTCUSDT", "dispatch-a", "OPEN", "cid-a", 2L, 3L, 4L, "LONG", "SELL"));
         verifyNoInteractions(mapper);

@@ -31,11 +31,20 @@ VALUES (#{credentialId}, #{symbol}, #{key}, #{operation}, #{clientOrderId},
         #{instanceId}, #{epoch}, 'DISPATCHING', NOW(), NOW())]]></insert>
     <insert id="insertPreDispatchIntent" timeout="3"><![CDATA[INSERT INTO quant_strategy_pre_dispatch_intent
 (credential_id,symbol,idempotency_key,client_order_id,strategy_id,
- strategy_instance_id,operation_type,position_side,exchange_side,
+ strategy_instance_id,operation_type,position_side,exchange_side,position_cycle_key,
  lease_epoch,created_at)
-VALUES (#{credentialId},#{symbol},#{key},#{clientOrderId},#{strategyId},
-        #{instanceId},#{operation},#{positionSide},#{exchangeSide},
-        #{epoch},NOW(6))]]></insert>
+SELECT #{credentialId},#{symbol},#{key},#{clientOrderId},#{strategyId},
+       #{instanceId},#{operation},#{positionSide},#{exchangeSide},s.position_cycle_key,
+       #{epoch},NOW(6)
+FROM quant_strategy_position_state s
+JOIN quant_strategy_instance i ON i.id=s.instance_id AND i.credential_id=#{credentialId}
+JOIN quant_strategy_symbol ss ON ss.id=i.strategy_symbol_id
+JOIN quant_symbol q ON q.id=ss.symbol_id AND q.symbol=#{symbol}
+WHERE s.instance_id=#{instanceId}
+  AND s.position_cycle_key IS NOT NULL
+  AND s.direction=#{positionSide}
+  AND s.pending_idempotency_key=#{key}
+  AND s.status IN ('OPEN_PENDING','OPEN','EXIT_PENDING')]]></insert>
     <update id="acknowledge" timeout="3"><![CDATA[UPDATE quant_order_dispatch_ticket
 SET dispatch_status='ACKED', exchange_order_id=#{orderId}, updated_at=NOW()
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}

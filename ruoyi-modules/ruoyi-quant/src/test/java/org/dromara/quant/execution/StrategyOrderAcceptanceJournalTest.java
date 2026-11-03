@@ -35,12 +35,12 @@ class StrategyOrderAcceptanceJournalTest {
     }
 
     @Test
-    void oneWayOrderNeverInventsStrategyIntent() {
+    void oneWayOrderPersistsIntentFromImmutablePreDispatchRecord() {
         var order = new QuantOrder();
         order.setId(19L);
         when(ledger.upsert(any(), any(), any(), any(), any())).thenReturn(order);
         journal.persist(1L, 2L, 3L, "LIVE", "OPEN", request("BOTH"), result);
-        verifyNoInteractions(intents);
+        verify(intents).record(1L, 2L, 3L, "OPEN", request("BOTH"), result);
     }
 
     @Test

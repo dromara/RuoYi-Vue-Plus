@@ -26,27 +26,52 @@ class StrategyOrderIntentServiceTest {
         return new ExchangeGateway.OrderResult(77L, "cid-1", "NEW");
     }
 
-    @Test
-    void matchedHedgePositionAndExplicitOperationCanBeRecorded() {
-        when(mapper.insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString(), anyString())).thenReturn(1);
-        service.record(1L, 2L, 3L, "OPEN", request("BUY", "LONG", false), result());
-        verify(mapper).insert(1L, "BTCUSDT", 77L, 2L, 3L, "LONG", "OPEN", "BUY", "cid-1");
+    private Map<String, Object> preDispatch() {
+        return Map.of("credential_id", 1L, "symbol", "BTCUSDT", "strategy_id", 2L,
+            "strategy_instance_id", 3L, "operation_type", "OPEN", "position_side", "LONG",
+            "exchange_side", "BUY", "client_order_id", "cid-1", "position_cycle_key", "cycle-1");
     }
 
     @Test
-    void oneWayAndWrongCloseDirectionAreRejectedWithoutWrite() {
-        assertThrows(IllegalStateException.class, () -> service.record(1L, 2L, 3L, "OPEN", request("BUY", "BOTH", false), result()));
+    void matchedHedgePositionAndExplicitOperationCanBeRecorded() {
+        when(mapper.pendingByClient(1L, "BTCUSDT", "cid-1")).thenReturn(preDispatch());
+        when(mapper.insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(1);
+        service.record(1L, 2L, 3L, "OPEN", request("BUY", "LONG", false), result());
+        verify(mapper).insert(1L, "BTCUSDT", 77L, 2L, 3L, "LONG", "OPEN", "cycle-1", "BUY", "cid-1");
+    }
+
+    @Test
+    void oneWayBothUsesPersistedLogicalPositionSideAndCycleKey() {
+        when(mapper.pendingByClient(1L, "BTCUSDT", "cid-1")).thenReturn(preDispatch());
+        when(mapper.insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(1);
+        service.record(1L, 2L, 3L, "OPEN", request("BUY", "BOTH", false), result());
+        verify(mapper).insert(1L, "BTCUSDT", 77L, 2L, 3L, "LONG", "OPEN", "cycle-1", "BUY", "cid-1");
+    }
+
+    @Test
+    void wrongCloseDirectionIsRejectedWithoutAcceptedIntentWrite() {
+        when(mapper.pendingByClient(1L, "BTCUSDT", "cid-1")).thenReturn(preDispatch());
         assertThrows(IllegalStateException.class, () -> service.record(1L, 2L, 3L, "CLOSE", request("BUY", "LONG", true), result()));
-        assertThrows(IllegalStateException.class, () -> service.record(1L, 2L, 3L, "CLOSE", request("SELL", "LONG", false), result()));
-        verifyNoInteractions(mapper);
+        verify(mapper, never()).insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void missingCycleKeyCannotCreateAcceptedOrderIntent() {
+        when(mapper.pendingByClient(1L, "BTCUSDT", "cid-1")).thenReturn(Map.of(
+            "strategy_id", 2L, "strategy_instance_id", 3L, "symbol", "BTCUSDT",
+            "operation_type", "OPEN", "position_side", "LONG", "exchange_side", "BUY", "client_order_id", "cid-1"));
+        assertThrows(IllegalStateException.class, () -> service.record(1L, 2L, 3L, "OPEN", request("BUY", "LONG", false), result()));
+        verify(mapper, never()).insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
     void conflictingDuplicateFailsClosed() {
-        when(mapper.insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString(), anyString())).thenThrow(new DuplicateKeyException(
-            "collision"));
-        when(mapper.find(1L, "BTCUSDT", 77L)).thenReturn(Map.of("strategy_id", 2L, "strategy_instance_id", 4L, "fill_role", "OPEN", "position_side", "LONG", "exchange_side",
-            "BUY", "client_order_id", "cid-1"));
+        when(mapper.pendingByClient(1L, "BTCUSDT", "cid-1")).thenReturn(preDispatch());
+        when(mapper.insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString(), anyString(), anyString()))
+            .thenThrow(new DuplicateKeyException("collision"));
+        when(mapper.find(1L, "BTCUSDT", 77L)).thenReturn(Map.of("strategy_id", 2L, "strategy_instance_id", 3L,
+            "fill_role", "OPEN", "position_side", "LONG", "position_cycle_key", "other-cycle",
+            "exchange_side", "BUY", "client_order_id", "cid-1"));
         assertThrows(IllegalStateException.class, () -> service.record(1L, 2L, 3L, "OPEN", request("BUY", "LONG", false), result()));
     }
 }

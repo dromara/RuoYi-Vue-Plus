@@ -40,9 +40,10 @@ public class StrategyOrderAcceptanceJournal {
         if (order == null || order.getId() == null) {
             throw new IllegalStateException("Exchange order ledger was not persisted");
         }
-        if (strategyId != null && instanceId != null && "LIVE".equalsIgnoreCase(runMode) && java.util.Set.of("LONG", "SHORT").contains(request.positionSide() == null ? "" :
-            request.positionSide().toUpperCase(java.util.Locale.ROOT))) {
-            // This does not invent attribution for BOTH/one-way mode.
+        if (strategyId != null && instanceId != null && "LIVE".equalsIgnoreCase(runMode)
+            && java.util.Set.of("LONG", "SHORT", "BOTH").contains(request.positionSide() == null ? ""
+                : request.positionSide().toUpperCase(java.util.Locale.ROOT))) {
+            // BOTH is resolved from the immutable logical LONG/SHORT pre-dispatch intent.
             // A failure rolls the ledger back and keeps the dispatch guard held.
             intents.record(credentialId, strategyId, instanceId, operation, request, result);
         }

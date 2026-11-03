@@ -22,6 +22,7 @@ class LiveSchemaStartupGuardTest {
         when(mapper.entryGuardColumns()).thenReturn(List.of("quant_strategy_entry_guard|guard_type"));
         when(mapper.positionReturnRateColumns()).thenReturn(List.of());
         when(mapper.orderBalanceSnapshotColumns()).thenReturn(List.of());
+        when(mapper.positionCycleKeyColumns()).thenReturn(List.of());
         var error = assertThrows(IllegalStateException.class, guard::verify);
         assertTrue(error.getMessage().contains("quant_strategy_runtime_lease"));
         assertTrue(error.getMessage().contains("quant_execution_record|credential_id,idempotency_key"));
@@ -45,6 +46,8 @@ class LiveSchemaStartupGuardTest {
         assertTrue(error.getMessage().contains("V20261021_01__strategy_position_maximum_return_rate.sql"));
         assertTrue(error.getMessage().contains("post_fill_wallet_balance"));
         assertTrue(error.getMessage().contains("V20261027_02__quant_order_balance_snapshot.sql"));
+        assertTrue(error.getMessage().contains("position_cycle_key"));
+        assertTrue(error.getMessage().contains("V20261103_01__trade_history_position_cycle_key.sql"));
         assertTrue(!error.getMessage().contains("V20261016_01__close_candle_entry_guard.sql"));
     }
 
@@ -59,6 +62,8 @@ class LiveSchemaStartupGuardTest {
         when(mapper.positionReturnRateColumns()).thenReturn(List.of("maximum_return_rate"));
         when(mapper.orderBalanceSnapshotColumns()).thenReturn(List.of("leverage_snapshot", "price_tick_size_snapshot", "post_fill_wallet_balance",
             "post_fill_balance_at", "post_fill_balance_requested_at"));
+        when(mapper.positionCycleKeyColumns()).thenReturn(List.of(
+            "quant_strategy_pre_dispatch_intent|position_cycle_key", "quant_strategy_order_intent|position_cycle_key"));
         var ex = assertThrows(IllegalStateException.class, new LiveSchemaStartupGuard(mapper)::verify);
         assertTrue(ex.getMessage().contains("leaseEpochMissing=true"));
     }
@@ -73,6 +78,8 @@ class LiveSchemaStartupGuardTest {
         when(mapper.positionReturnRateColumns()).thenReturn(List.of("maximum_return_rate"));
         when(mapper.orderBalanceSnapshotColumns()).thenReturn(List.of("leverage_snapshot", "price_tick_size_snapshot", "post_fill_wallet_balance",
             "post_fill_balance_at", "post_fill_balance_requested_at"));
+        when(mapper.positionCycleKeyColumns()).thenReturn(List.of(
+            "quant_strategy_pre_dispatch_intent|position_cycle_key", "quant_strategy_order_intent|position_cycle_key"));
         var ex = assertThrows(IllegalStateException.class, new LiveSchemaStartupGuard(mapper)::verify);
         assertTrue(ex.getMessage().contains("entryGuardTypeMissing=true"));
         assertTrue(ex.getMessage().contains("V20261016_01__close_candle_entry_guard.sql"));

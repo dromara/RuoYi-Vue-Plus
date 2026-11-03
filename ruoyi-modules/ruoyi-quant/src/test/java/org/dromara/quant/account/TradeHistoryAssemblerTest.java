@@ -196,6 +196,75 @@ class TradeHistoryAssemblerTest {
         assertEquals(1, row.get("closingFillCount"));
     }
 
+    private TradeHistoryAssembler.Fill cycleFill(long id, String side, String operation, String quantity, String price, String cycleKey) {
+        LocalDateTime time = LocalDateTime.of(2026, 10, 9, 1, 0).plusSeconds(id);
+        boolean reduceOnly = "CLOSE".equals(operation);
+        return new TradeHistoryAssembler.Fill(id, 10L, "BTCUSDT", side, "LONG", operation, reduceOnly,
+            new BigDecimal(quantity), new BigDecimal(price), BigDecimal.ZERO, BigDecimal.ZERO, time,
+            null, null, null, null, null, id, id + 1000, false, cycleKey);
+    }
+
+    @Test
+    void separatesInterleavedPositionCyclesWithExplicitCycleKeys() {
+        var result = TradeHistoryAssembler.assemble(List.of(
+            cycleFill(1, "BUY", "OPEN", "1", "100", "cycle-a"),
+            cycleFill(2, "BUY", "OPEN", "2", "200", "cycle-b"),
+            cycleFill(3, "SELL", "CLOSE", "1", "110", "cycle-a"),
+            cycleFill(4, "SELL", "CLOSE", "1", "210", "cycle-b"),
+            cycleFill(5, "SELL", "CLOSE", "1", "220", "cycle-b")
+        ), Map.of());
+
+        assertEquals(2, result.rows().size());
+        Map<String, Map<String, Object>> byId = result.rows().stream()
+            .collect(java.util.stream.Collectors.toMap(row -> (String) row.get("id"), row -> row));
+        assertEquals("1", byId.get("1").get("openingQuantity"));
+        assertEquals("1", byId.get("1").get("closingQuantity"));
+        assertEquals("0", byId.get("1").get("remainingQuantity"));
+        assertEquals("CLOSED", byId.get("1").get("status"));
+        assertEquals("cycle-a", byId.get("1").get("positionCycleKey"));
+        assertEquals("2", byId.get("2").get("openingQuantity"));
+        assertEquals("2", byId.get("2").get("closingQuantity"));
+        assertEquals("0", byId.get("2").get("remainingQuantity"));
+        assertEquals("CLOSED", byId.get("2").get("status"));
+        assertEquals("cycle-b", byId.get("2").get("positionCycleKey"));
+    }
+
+    @Test
+    void excludesUnkeyedFillsFromAnExplicitlyKeyedCycleScope() {
+        var result = TradeHistoryAssembler.assemble(List.of(
+            cycleFill(1, "BUY", "OPEN", "1", "100", "cycle-a"),
+            fill(2, 10, "BTCUSDT", "SELL", "LONG", "CLOSE", "1", "110", "0", "10")
+        ), Map.of());
+
+        assertTrue(result.rows().isEmpty());
+        assertEquals(1, result.incompleteCount());
+    }
+
+    @Test
+    void doesNotReuseAClosedPositionCycleKey() {
+        var result = TradeHistoryAssembler.assemble(List.of(
+            cycleFill(1, "BUY", "OPEN", "1", "100", "cycle-a"),
+            cycleFill(2, "SELL", "CLOSE", "1", "110", "cycle-a"),
+            cycleFill(3, "BUY", "OPEN", "1", "120", "cycle-a")
+        ), Map.of());
+
+        assertEquals(1, result.rows().size());
+        assertEquals("CLOSED", result.rows().getFirst().get("status"));
+        assertEquals("110", result.rows().getFirst().get("closePrice"));
+        assertEquals(1, result.incompleteCount());
+    }
+
+    @Test
+    void excludesConflictingCycleIdentitySources() {
+        var result = TradeHistoryAssembler.assemble(List.of(
+            new TradeHistoryAssembler.Fill(1L, 10L, "BTCUSDT", "BUY", "LONG", "OPEN", false,
+                BigDecimal.ONE, new BigDecimal("100"), BigDecimal.ZERO, BigDecimal.ZERO,
+                LocalDateTime.of(2026, 10, 9, 1, 0), null, null, null, null, null, 100L, 200L, true, "cycle-a")
+        ), Map.of());
+        assertTrue(result.rows().isEmpty());
+        assertEquals(1, result.incompleteCount());
+    }
+
     @Test
     void doesNotInferOneWayOpeningFromReduceOnlyFalse() {
         LocalDateTime time = LocalDateTime.of(2026, 10, 9, 1, 0);

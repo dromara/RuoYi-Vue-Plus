@@ -13,6 +13,8 @@ public class TradeHistoryFill extends QuantTrade {
     private String positionSide;
     private Boolean reduceOnly;
     private String operationType;
+    private Boolean positionCycleConflict;
+    private String positionCycleKey;
     private Integer leverageSnapshot;
     private java.math.BigDecimal priceTickSizeSnapshot;
     private java.math.BigDecimal postFillWalletBalance;

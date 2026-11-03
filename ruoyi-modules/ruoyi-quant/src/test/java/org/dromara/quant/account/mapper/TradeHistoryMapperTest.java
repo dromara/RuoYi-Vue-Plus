@@ -58,9 +58,9 @@ public class TradeHistoryMapperTest {
             statement.execute("CREATE TABLE quant_symbol (symbol VARCHAR(32), price_tick_size DECIMAL(32,16))");
             statement.execute("CREATE TABLE quant_execution_record (id BIGINT PRIMARY KEY, credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, operation_type " +
                 "VARCHAR(20))");
-            statement.execute("CREATE TABLE quant_strategy_order_intent (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, position_side VARCHAR(10), fill_role VARCHAR(20), client_order_id VARCHAR(64))");
+            statement.execute("CREATE TABLE quant_strategy_order_intent (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, position_side VARCHAR(10), fill_role VARCHAR(20), position_cycle_key VARCHAR(36), client_order_id VARCHAR(64))");
             statement.execute("CREATE TABLE quant_order_dispatch_ticket (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, operation_type VARCHAR(20), dispatch_status VARCHAR(20), idempotency_key VARCHAR(64), client_order_id VARCHAR(64))");
-            statement.execute("CREATE TABLE quant_strategy_pre_dispatch_intent (credential_id BIGINT, symbol VARCHAR(32), client_order_id VARCHAR(64), operation_type VARCHAR(20), idempotency_key VARCHAR(64), position_side VARCHAR(10))");
+            statement.execute("CREATE TABLE quant_strategy_pre_dispatch_intent (credential_id BIGINT, symbol VARCHAR(32), client_order_id VARCHAR(64), operation_type VARCHAR(20), idempotency_key VARCHAR(64), position_side VARCHAR(10), position_cycle_key VARCHAR(36))");
             statement.execute("CREATE INDEX idx_order_history ON quant_order(credential_id, symbol, exchange_order_id)");
             statement.execute("CREATE INDEX idx_execution_history ON quant_execution_record(credential_id, symbol, exchange_order_id, operation_type)");
         }
@@ -120,7 +120,7 @@ public class TradeHistoryMapperTest {
             statement.execute("INSERT INTO quant_trade VALUES (1,10,'BTCUSDT',102,'2026-10-10 00:00:00')");
             statement.execute("INSERT INTO quant_order (id,credential_id,symbol,exchange_order_id,position_side,reduce_only) " +
                 "VALUES (1,10,'BTCUSDT',102,NULL,FALSE)");
-            statement.execute("INSERT INTO quant_strategy_order_intent VALUES (10,'BTCUSDT',102,'SHORT','CLOSE')");
+            statement.execute("INSERT INTO quant_strategy_order_intent (credential_id,symbol,exchange_order_id,position_side,fill_role) VALUES (10,'BTCUSDT',102,'SHORT','CLOSE')");
             try (var prepared = connection.prepareStatement(sql(List.of(10L), "BTCUSDT"))) {
                 prepared.setLong(1, 10L);
                 prepared.setString(2, "BTCUSDT");
@@ -128,6 +128,55 @@ public class TradeHistoryMapperTest {
                     assertTrue(result.next());
                     assertEquals("CLOSE", result.getString("operation_type"));
                     assertEquals("SHORT", result.getString("position_side"));
+                }
+            }
+        }
+    }
+
+    @Test
+    void loadsPositionCycleKeyFromImmutableAcceptedOrderIntent() throws Exception {
+        try (var connection = database(); var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO quant_trade VALUES (1,10,'BTCUSDT',103,'2026-10-10 00:00:00')");
+            statement.execute("INSERT INTO quant_order (id,credential_id,symbol,exchange_order_id,client_order_id,position_side,reduce_only) " +
+                "VALUES (1,10,'BTCUSDT',103,'QCLIENT103','BOTH',FALSE)");
+            statement.execute("INSERT INTO quant_strategy_order_intent " +
+                "(credential_id,symbol,exchange_order_id,position_side,fill_role,position_cycle_key,client_order_id) " +
+                "VALUES (10,'BTCUSDT',103,'LONG','OPEN','cycle-103','QCLIENT103')");
+            try (var prepared = connection.prepareStatement(sql(List.of(10L), "BTCUSDT"))) {
+                prepared.setLong(1, 10L);
+                prepared.setString(2, "BTCUSDT");
+                try (var result = prepared.executeQuery()) {
+                    assertTrue(result.next());
+                    assertEquals("cycle-103", result.getString("position_cycle_key"));
+                    assertFalse(result.getBoolean("position_cycle_conflict"));
+                    assertEquals("OPEN", result.getString("operation_type"));
+                }
+            }
+        }
+    }
+
+    @Test
+    void flagsCycleKeyConflictsBetweenAcceptedAndPreDispatchSources() throws Exception {
+        try (var connection = database(); var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO quant_trade VALUES (1,10,'BTCUSDT',104,'2026-10-10 00:00:00')");
+            statement.execute("INSERT INTO quant_order (id,credential_id,symbol,exchange_order_id,client_order_id,position_side,reduce_only) " +
+                "VALUES (1,10,'BTCUSDT',104,'QCLIENT104','BOTH',FALSE)");
+            statement.execute("INSERT INTO quant_strategy_order_intent " +
+                "(credential_id,symbol,exchange_order_id,position_side,fill_role,position_cycle_key,client_order_id) " +
+                "VALUES (10,'BTCUSDT',104,'LONG','OPEN','cycle-a','QCLIENT104')");
+            statement.execute("INSERT INTO quant_order_dispatch_ticket " +
+                "(credential_id,symbol,exchange_order_id,operation_type,dispatch_status,idempotency_key,client_order_id) " +
+                "VALUES (10,'BTCUSDT',104,'OPEN','ACKED','IDEMP104','QCLIENT104')");
+            statement.execute("INSERT INTO quant_strategy_pre_dispatch_intent " +
+                "(credential_id,symbol,client_order_id,operation_type,idempotency_key,position_side,position_cycle_key) " +
+                "VALUES (10,'BTCUSDT','QCLIENT104','OPEN','IDEMP104','LONG','cycle-b')");
+            try (var prepared = connection.prepareStatement(sql(List.of(10L), "BTCUSDT"))) {
+                prepared.setLong(1, 10L);
+                prepared.setString(2, "BTCUSDT");
+                try (var result = prepared.executeQuery()) {
+                    assertTrue(result.next());
+                    assertEquals("cycle-a", result.getString("position_cycle_key"));
+                    assertTrue(result.getBoolean("position_cycle_conflict"));
                 }
             }
         }
@@ -215,7 +264,7 @@ public class TradeHistoryMapperTest {
             statement.execute("INSERT INTO quant_execution_record SELECT id,credential_id,symbol,exchange_order_id,CASE WHEN MOD(id,3)=0 THEN 'CANCEL' WHEN MOD(id,2)=0 THEN " +
                 "'OPEN' ELSE 'CLOSE' END FROM quant_trade");
             for (String symbol : new String[]{null, "BTCUSDT"}) {
-                String original = "SELECT t.*, o.position_side, o.reduce_only, e.operation_type, o.leverage_snapshot, o.price_tick_size_snapshot, o.post_fill_wallet_balance, o.post_fill_balance_at, qs.price_tick_size AS current_price_tick_size FROM quant_trade t " + "LEFT JOIN quant_order o ON o.credential_id=t" +
+                String original = "SELECT t.*, o.position_side, o.reduce_only, e.operation_type, NULL AS position_cycle_key, 0 AS position_cycle_conflict, o.leverage_snapshot, o.price_tick_size_snapshot, o.post_fill_wallet_balance, o.post_fill_balance_at, qs.price_tick_size AS current_price_tick_size FROM quant_trade t " + "LEFT JOIN quant_order o ON o.credential_id=t" +
                     ".credential_id AND o.symbol=t.symbol AND o.exchange_order_id=t.exchange_order_id " + "LEFT JOIN quant_execution_record e ON e.credential_id=t.credential_id " +
                     "AND e.symbol=t.symbol AND e.exchange_order_id=t.exchange_order_id AND e.operation_type IN ('OPEN','CLOSE') LEFT JOIN quant_symbol qs ON qs.symbol=t.symbol " + "WHERE t.credential_id IN (?,?) " + (symbol == null ? "" : "AND t.symbol=? ") + "ORDER BY t.trade_time,t.id LIMIT 20001";
                 assertEquals(readRows(connection, original, symbol), readRows(connection, sql(List.of(10L, 11L), symbol), symbol));

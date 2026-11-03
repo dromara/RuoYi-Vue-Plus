@@ -18,6 +18,9 @@ public final class TradeHistoryAssembler {
      */
     public static Result assemble(List<Fill> fills, Map<Long, String> accountNames) {
         Map<String, Cycle> active = new HashMap<>();
+        Map<String, Cycle> activeByCycleKey = new HashMap<>();
+        Set<String> scopesWithCycleKeys = new HashSet<>();
+        Set<String> seenCycleKeys = new HashSet<>();
         List<Cycle> cycles = new ArrayList<>();
         Set<String> incomplete = new HashSet<>();
         // 调用方按成交时间、主键排序；不能在时间筛选后截断开仓链。
@@ -26,23 +29,49 @@ public final class TradeHistoryAssembler {
             if (incomplete.contains(scope)) {
                 continue;
             }
+            if (Boolean.TRUE.equals(fill.positionCycleConflict())) {
+                markIncomplete(scope, active, activeByCycleKey, cycles, incomplete);
+                continue;
+            }
+            boolean hasCycleKey = fill.positionCycleKey() != null && !fill.positionCycleKey().isBlank();
+            if (hasCycleKey) {
+                // 显式周期不能与仍未结束的旧式推断周期混合。
+                if (active.values().stream().anyMatch(cycle -> scope.equals(cycle.scope))) {
+                    markIncomplete(scope, active, activeByCycleKey, cycles, incomplete);
+                    continue;
+                }
+                scopesWithCycleKeys.add(scope);
+            } else if (scopesWithCycleKeys.contains(scope)) {
+                markIncomplete(scope, active, activeByCycleKey, cycles, incomplete);
+                continue;
+            }
             Classification classification = classify(fill);
             String direction = classification == null ? null : classification.direction();
             boolean open = classification != null && classification.open();
             if (direction == null || fill.tradeTime() == null || !positive(fill.quantity()) || !positive(fill.price())) {
-                markIncomplete(scope, active, cycles, incomplete);
+                markIncomplete(scope, active, activeByCycleKey, cycles, incomplete);
                 continue;
             }
             String key = scope + ":" + direction;
-            Cycle cycle = active.get(key);
+            String cycleIdentity = hasCycleKey ? scope + ":" + fill.positionCycleKey() : key;
+            Cycle cycle = hasCycleKey ? activeByCycleKey.get(cycleIdentity) : active.get(key);
             if (open) {
-                if (!("LONG".equals(direction) ? "BUY" : "SELL").equals(fill.side())) {
-                    markIncomplete(scope, active, cycles, incomplete);
+                if (!("LONG".equals(direction) ? "BUY" : "SELL").equals(fill.side())
+                    || cycle != null && !direction.equals(cycle.direction)) {
+                    markIncomplete(scope, active, activeByCycleKey, cycles, incomplete);
                     continue;
                 }
                 if (cycle == null) {
+                    if (hasCycleKey && !seenCycleKeys.add(cycleIdentity)) {
+                        markIncomplete(scope, active, activeByCycleKey, cycles, incomplete);
+                        continue;
+                    }
                     cycle = new Cycle(fill, direction, scope);
-                    active.put(key, cycle);
+                    if (hasCycleKey) {
+                        activeByCycleKey.put(cycleIdentity, cycle);
+                    } else {
+                        active.put(key, cycle);
+                    }
                     cycles.add(cycle);
                 }
                 cycle.openQty = cycle.openQty.add(fill.quantity());
@@ -63,8 +92,9 @@ public final class TradeHistoryAssembler {
                     cycle.openingBalanceAt = fill.postFillBalanceAt();
                 }
             } else {
-                if (cycle == null || fill.quantity().compareTo(cycle.remaining) > 0 || !("LONG".equals(direction) ? "SELL" : "BUY").equals(fill.side())) {
-                    markIncomplete(scope, active, cycles, incomplete);
+                if (cycle == null || !direction.equals(cycle.direction) || fill.quantity().compareTo(cycle.remaining) > 0
+                    || !("LONG".equals(direction) ? "SELL" : "BUY").equals(fill.side())) {
+                    markIncomplete(scope, active, activeByCycleKey, cycles, incomplete);
                     continue;
                 }
                 cycle.closeQty = cycle.closeQty.add(fill.quantity());
@@ -80,7 +110,11 @@ public final class TradeHistoryAssembler {
                 }
                 if (cycle.remaining.signum() == 0) {
                     cycle.closedAt = fill.tradeTime();
-                    active.remove(key);
+                    if (hasCycleKey) {
+                        activeByCycleKey.remove(cycleIdentity);
+                    } else {
+                        active.remove(key);
+                    }
                 }
             }
             cycle.fee = addKnown(cycle.fee, fill.commission());
@@ -90,11 +124,13 @@ public final class TradeHistoryAssembler {
         return new Result(rows, incomplete.size());
     }
 
-    private static void markIncomplete(String scope, Map<String, Cycle> active, List<Cycle> cycles, Set<String> incomplete) {
+    private static void markIncomplete(String scope, Map<String, Cycle> active, Map<String, Cycle> activeByCycleKey,
+                                        List<Cycle> cycles, Set<String> incomplete) {
         if (!incomplete.add(scope)) {
             return;
         }
         active.entrySet().removeIf(entry -> scope.equals(entry.getValue().scope));
+        activeByCycleKey.entrySet().removeIf(entry -> scope.equals(entry.getValue().scope));
         cycles.removeIf(cycle -> scope.equals(cycle.scope) && cycle.closedAt == null);
     }
 
@@ -152,23 +188,31 @@ public final class TradeHistoryAssembler {
      */
     public record Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
                        BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime, Integer leverage, BigDecimal priceTickSize, BigDecimal postFillWalletBalance,
-                       LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize, Long exchangeTradeId, Long exchangeOrderId) {
+                       LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize, Long exchangeTradeId, Long exchangeOrderId,
+                       Boolean positionCycleConflict, String positionCycleKey) {
+        public Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
+                    BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime, Integer leverage, BigDecimal priceTickSize, BigDecimal postFillWalletBalance,
+                    LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize, Long exchangeTradeId, Long exchangeOrderId) {
+            this(id, credentialId, symbol, side, positionSide, operationType, reduceOnly, quantity, price, commission, realizedPnl, tradeTime, leverage, priceTickSize,
+                postFillWalletBalance, postFillBalanceAt, currentPriceTickSize, exchangeTradeId, exchangeOrderId, null, null);
+        }
         public Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
                     BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime, Integer leverage, BigDecimal priceTickSize, BigDecimal postFillWalletBalance,
                     LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize, Long exchangeTradeId) {
             this(id, credentialId, symbol, side, positionSide, operationType, reduceOnly, quantity, price, commission, realizedPnl, tradeTime, leverage, priceTickSize,
-                postFillWalletBalance, postFillBalanceAt, currentPriceTickSize, exchangeTradeId, null);
+                postFillWalletBalance, postFillBalanceAt, currentPriceTickSize, exchangeTradeId, null, null, null);
         }
         public Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
                     BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime, Integer leverage, BigDecimal priceTickSize, BigDecimal postFillWalletBalance,
                     LocalDateTime postFillBalanceAt, BigDecimal currentPriceTickSize) {
             this(id, credentialId, symbol, side, positionSide, operationType, reduceOnly, quantity, price, commission, realizedPnl, tradeTime, leverage, priceTickSize,
-                postFillWalletBalance, postFillBalanceAt, currentPriceTickSize, null);
+                postFillWalletBalance, postFillBalanceAt, currentPriceTickSize, null, null, null, null);
         }
 
         public Fill(Long id, Long credentialId, String symbol, String side, String positionSide, String operationType, Boolean reduceOnly, BigDecimal quantity, BigDecimal price,
                     BigDecimal commission, BigDecimal realizedPnl, LocalDateTime tradeTime) {
-            this(id, credentialId, symbol, side, positionSide, operationType, reduceOnly, quantity, price, commission, realizedPnl, tradeTime, null, null, null, null, null, null);
+            this(id, credentialId, symbol, side, positionSide, operationType, reduceOnly, quantity, price, commission, realizedPnl, tradeTime,
+                null, null, null, null, null, null, null, null, null);
         }
     }
 
@@ -187,6 +231,7 @@ public final class TradeHistoryAssembler {
         private final String symbol;
         private final String direction;
         private final String scope;
+        private final String positionCycleKey;
         private final LocalDateTime openedAt;
         private LocalDateTime closedAt;
         private BigDecimal openQty = BigDecimal.ZERO, openValue = BigDecimal.ZERO, remaining = BigDecimal.ZERO;
@@ -206,6 +251,7 @@ public final class TradeHistoryAssembler {
             this.symbol = fill.symbol();
             this.direction = direction;
             this.scope = scope;
+            this.positionCycleKey = fill.positionCycleKey();
             this.openedAt = fill.tradeTime();
         }
 
@@ -216,6 +262,7 @@ public final class TradeHistoryAssembler {
             row.put("accountName", names.get(credentialId));
             row.put("symbol", symbol);
             row.put("direction", direction);
+            row.put("positionCycleKey", positionCycleKey);
             row.put("openingQuantity", decimal(openQty));
             row.put("closingQuantity", decimal(closeQty));
             row.put("remainingQuantity", decimal(remaining));

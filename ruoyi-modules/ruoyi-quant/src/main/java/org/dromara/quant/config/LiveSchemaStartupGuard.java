@@ -28,6 +28,8 @@ public class LiveSchemaStartupGuard implements ApplicationRunner {
 
     private static final Set<String> ORDER_BALANCE_SNAPSHOT_COLUMNS = Set.of("leverage_snapshot", "price_tick_size_snapshot",
         "post_fill_wallet_balance", "post_fill_balance_at", "post_fill_balance_requested_at");
+    private static final Set<String> POSITION_CYCLE_KEY_COLUMNS = Set.of(
+        "quant_strategy_pre_dispatch_intent|position_cycle_key", "quant_strategy_order_intent|position_cycle_key");
 
     private static final Set<String> UNIQUE = Set.of("quant_strategy_runtime_lease|credential_id,symbol", "quant_strategy_entry_guard|credential_id,symbol,kline_open_time",
         "quant_execution_record|credential_id,idempotency_key", "quant_open_capacity|credential_id,idempotency_key", "quant_strategy_position_state|instance_id",
@@ -56,8 +58,9 @@ public class LiveSchemaStartupGuard implements ApplicationRunner {
         List<String> protectionOwnerColumns = mapper.protectionOwnerColumns();
         List<String> positionReturnRateColumns = mapper.positionReturnRateColumns();
         List<String> orderBalanceSnapshotColumns = mapper.orderBalanceSnapshotColumns();
+        List<String> positionCycleKeyColumns = mapper.positionCycleKeyColumns();
         if (actualTables == null || actualUnique == null || leaseEpoch == null || entryGuardColumns == null
-            || positionReturnRateColumns == null || orderBalanceSnapshotColumns == null) {
+            || positionReturnRateColumns == null || orderBalanceSnapshotColumns == null || positionCycleKeyColumns == null) {
             throw new IllegalStateException("LIVE database metadata unavailable; refuse to enable real trading");
         }
         var missingTables = new java.util.TreeSet<>(TABLES);
@@ -70,8 +73,10 @@ public class LiveSchemaStartupGuard implements ApplicationRunner {
         boolean missingPositionReturnRate = !positionReturnRateColumns.contains("maximum_return_rate");
         var missingOrderBalanceSnapshotColumns = new java.util.TreeSet<>(ORDER_BALANCE_SNAPSHOT_COLUMNS);
         missingOrderBalanceSnapshotColumns.removeAll(orderBalanceSnapshotColumns);
+        var missingPositionCycleKeyColumns = new java.util.TreeSet<>(POSITION_CYCLE_KEY_COLUMNS);
+        missingPositionCycleKeyColumns.removeAll(positionCycleKeyColumns);
         if (!missingTables.isEmpty() || !missingUnique.isEmpty() || missingEpoch || missingEntryGuardType || missingProtectionOwner
-            || missingPositionReturnRate || !missingOrderBalanceSnapshotColumns.isEmpty()) {
+            || missingPositionReturnRate || !missingOrderBalanceSnapshotColumns.isEmpty() || !missingPositionCycleKeyColumns.isEmpty()) {
             List<String> requiredMigrations = new java.util.ArrayList<>();
             if (missingTables.contains("quant_strategy_fill_journal") || missingTables.contains("quant_strategy_fill_sync_cursor")
                 || missingUnique.contains("quant_strategy_fill_journal|credential_id,symbol,exchange_trade_id")
@@ -109,12 +114,16 @@ public class LiveSchemaStartupGuard implements ApplicationRunner {
             if (!missingOrderBalanceSnapshotColumns.isEmpty()) {
                 requiredMigrations.add("script/sql/quant/V20261027_02__quant_order_balance_snapshot.sql");
             }
+            if (!missingPositionCycleKeyColumns.isEmpty()) {
+                requiredMigrations.add("script/sql/quant/V20261103_01__trade_history_position_cycle_key.sql");
+            }
             String migrationHint = requiredMigrations.isEmpty()
                 ? "apply the migrations corresponding to the missing schema contracts"
                 : "apply required migration(s): " + String.join(", ", requiredMigrations);
             throw new IllegalStateException("LIVE schema preflight rejected startup; missing InnoDB tables=" + missingTables + ", missing unique-index contracts=" + missingUnique
                 + ", leaseEpochMissing=" + missingEpoch + ", entryGuardTypeMissing=" + missingEntryGuardType
                 + ", missingOrderBalanceSnapshotColumns=" + missingOrderBalanceSnapshotColumns
+                + ", missingPositionCycleKeyColumns=" + missingPositionCycleKeyColumns
                 + ". On the application's configured MySQL database, " + migrationHint + ", then restart; LIVE schema preflight does not auto-create trading tables.");
         }
     }

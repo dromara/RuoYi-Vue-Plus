@@ -14,13 +14,16 @@ public interface StrategyOrderIntentMapper {
     int insert(@Param("credentialId") long credentialId, @Param("symbol") String symbol,
                @Param("orderId") long orderId, @Param("strategyId") long strategyId,
                @Param("instanceId") long instanceId, @Param("positionSide") String positionSide,
-               @Param("role") String role, @Param("exchangeSide") String exchangeSide,
-               @Param("clientOrderId") String clientOrderId);
+               @Param("role") String role, @Param("positionCycleKey") String positionCycleKey,
+               @Param("exchangeSide") String exchangeSide, @Param("clientOrderId") String clientOrderId);
 
     Map<String, Object> find(@Param("credentialId") long credentialId,
                              @Param("symbol") String symbol, @Param("orderId") long orderId);
 
     Map<String, Object> pending(@Param("credentialId") long credentialId, @Param("key") String key);
+
+    Map<String, Object> pendingByClient(@Param("credentialId") long credentialId,
+                                        @Param("symbol") String symbol, @Param("clientOrderId") String clientOrderId);
 
     /**
      * Promote only the immutable pre-send fact after exact exchange identity is verified.

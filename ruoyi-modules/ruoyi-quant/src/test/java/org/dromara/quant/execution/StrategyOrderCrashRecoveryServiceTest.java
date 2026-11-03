@@ -39,7 +39,7 @@ class StrategyOrderCrashRecoveryServiceTest {
 
     private Map<String, Object> pending() {
         return Map.of("strategy_id", 2L, "strategy_instance_id", 3L, "symbol", "BTCUSDT", "client_order_id", "cid-a", "operation_type", "OPEN", "exchange_side", "BUY",
-            "position_side", "LONG");
+            "position_side", "LONG", "position_cycle_key", "cycle-1");
     }
 
     @Test

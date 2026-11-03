@@ -3,26 +3,33 @@
 <mapper namespace="org.dromara.quant.execution.StrategyOrderIntentMapper">
     <insert id="insert" timeout="3"><![CDATA[INSERT INTO quant_strategy_order_intent
   (credential_id,symbol,exchange_order_id,strategy_id,strategy_instance_id,
-   position_side,fill_role,exchange_side,client_order_id,created_at)
+   position_side,fill_role,position_cycle_key,exchange_side,client_order_id,created_at)
 VALUES (#{credentialId},#{symbol},#{orderId},#{strategyId},#{instanceId},
-        #{positionSide},#{role},#{exchangeSide},#{clientOrderId},NOW(6))]]></insert>
+        #{positionSide},#{role},#{positionCycleKey},#{exchangeSide},#{clientOrderId},NOW(6))]]></insert>
     <select id="find" resultType="map" timeout="3"><![CDATA[SELECT credential_id,symbol,exchange_order_id,strategy_id,strategy_instance_id,
-       position_side,fill_role,exchange_side,client_order_id
+       position_side,fill_role,position_cycle_key,exchange_side,client_order_id
 FROM quant_strategy_order_intent
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND exchange_order_id=#{orderId}]]></select>
     <select id="pending" resultType="map" timeout="3"><![CDATA[SELECT credential_id,symbol,idempotency_key,client_order_id,strategy_id,
-       strategy_instance_id,operation_type,position_side,exchange_side,lease_epoch
+       strategy_instance_id,operation_type,position_side,exchange_side,position_cycle_key,lease_epoch
 FROM quant_strategy_pre_dispatch_intent
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}]]></select>
+    <select id="pendingByClient" resultType="map" timeout="3"><![CDATA[
+SELECT credential_id,symbol,client_order_id,strategy_id,strategy_instance_id,
+       operation_type,position_side,exchange_side,position_cycle_key
+FROM quant_strategy_pre_dispatch_intent
+WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+  AND client_order_id=#{clientOrderId}]]></select>
     <insert id="promote" timeout="3"><![CDATA[INSERT INTO quant_strategy_order_intent
 (credential_id,symbol,exchange_order_id,strategy_id,strategy_instance_id,
- position_side,fill_role,exchange_side,client_order_id,created_at)
+ position_side,fill_role,position_cycle_key,exchange_side,client_order_id,created_at)
 SELECT credential_id,symbol,#{orderId},strategy_id,strategy_instance_id,
-       position_side,operation_type,exchange_side,client_order_id,NOW(6)
+       position_side,operation_type,position_cycle_key,exchange_side,client_order_id,NOW(6)
 FROM quant_strategy_pre_dispatch_intent
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND idempotency_key=#{key} AND client_order_id=#{clientOrderId}
+  AND position_cycle_key IS NOT NULL
   AND EXISTS (
     SELECT 1 FROM quant_order_dispatch_ticket t
     WHERE t.credential_id=#{credentialId}

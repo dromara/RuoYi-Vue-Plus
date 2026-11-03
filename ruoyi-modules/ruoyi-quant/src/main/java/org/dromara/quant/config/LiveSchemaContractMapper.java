@@ -23,4 +23,6 @@ public interface LiveSchemaContractMapper {
 
     List<String> orderBalanceSnapshotColumns();
 
+    List<String> positionCycleKeyColumns();
+
 }

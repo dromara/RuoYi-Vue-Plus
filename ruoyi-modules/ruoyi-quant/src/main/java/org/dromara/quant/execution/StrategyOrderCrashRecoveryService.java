@@ -41,7 +41,7 @@ public class StrategyOrderCrashRecoveryService {
         long credentialId = record.getCredentialId();
         String symbol = record.getSymbol().toUpperCase(Locale.ROOT);
         Map<String, Object> pre = intents.pending(credentialId, record.getIdempotencyKey());
-        if (pre == null || !sameId(pre.get("strategy_id"), record.getStrategyId()) || !sameId(pre.get("strategy_instance_id"), record.getStrategyInstanceId()) || !symbol.equals(pre.get("symbol")) || !record.getClientOrderId().equals(pre.get("client_order_id")) || !record.getOperationType().equals(pre.get("operation_type")) || !Objects.equals(exact.side(), pre.get("exchange_side")) || !java.util.Set.of("LONG", "SHORT").contains(pre.get("position_side"))) {
+        if (pre == null || !sameId(pre.get("strategy_id"), record.getStrategyId()) || !sameId(pre.get("strategy_instance_id"), record.getStrategyInstanceId()) || !symbol.equals(pre.get("symbol")) || !record.getClientOrderId().equals(pre.get("client_order_id")) || !record.getOperationType().equals(pre.get("operation_type")) || !Objects.equals(exact.side(), pre.get("exchange_side")) || !java.util.Set.of("LONG", "SHORT").contains(pre.get("position_side")) || !(pre.get("position_cycle_key") instanceof String cycleKey) || cycleKey.isBlank()) {
             throw new IllegalStateException("Immutable pre-send strategy intent missing or conflicting");
         }
         QuantOrder order = ledger.syncSnapshot(credentialId, exact);
@@ -54,7 +54,7 @@ public class StrategyOrderCrashRecoveryService {
             }
         } catch (DuplicateKeyException duplicate) {
             Map<String, Object> existing = intents.find(credentialId, symbol, exact.orderId());
-            if (existing == null || !sameId(existing.get("strategy_id"), record.getStrategyId()) || !sameId(existing.get("strategy_instance_id"), record.getStrategyInstanceId()) || !pre.get("position_side").equals(existing.get("position_side")) || !pre.get("operation_type").equals(existing.get("fill_role")) || !record.getClientOrderId().equals(existing.get("client_order_id")) || !exact.side().equals(existing.get("exchange_side"))) {
+            if (existing == null || !sameId(existing.get("strategy_id"), record.getStrategyId()) || !sameId(existing.get("strategy_instance_id"), record.getStrategyInstanceId()) || !pre.get("position_side").equals(existing.get("position_side")) || !pre.get("operation_type").equals(existing.get("fill_role")) || !cycleKey.equals(existing.get("position_cycle_key")) || !record.getClientOrderId().equals(existing.get("client_order_id")) || !exact.side().equals(existing.get("exchange_side"))) {
                 throw new IllegalStateException("Conflicting recovered strategy order intent", duplicate);
             }
         }

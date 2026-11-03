@@ -262,7 +262,7 @@ public class TradeHistoryService {
         var result = TradeHistoryAssembler.assemble(fills.stream().map(f -> new TradeHistoryAssembler.Fill(f.getId(), f.getCredentialId(), f.getSymbol(), f.getSide(),
             f.getPositionSide(), f.getOperationType(), f.getReduceOnly(), f.getQuantity(), f.getPrice(), f.getCommission(), f.getRealizedPnl(), f.getTradeTime(),
             f.getLeverageSnapshot(), f.getPriceTickSizeSnapshot(), f.getPostFillWalletBalance(), f.getPostFillBalanceAt(), f.getCurrentPriceTickSize(), f.getExchangeTradeId(),
-            f.getExchangeOrderId())).toList(), names);
+            f.getExchangeOrderId(), f.getPositionCycleConflict(), f.getPositionCycleKey())).toList(), names);
         var assembledRows = result.rows();
         var rows = assembledRows.stream().filter(row -> {
             Instant opened = Instant.parse((String) row.get("openedAt"));
