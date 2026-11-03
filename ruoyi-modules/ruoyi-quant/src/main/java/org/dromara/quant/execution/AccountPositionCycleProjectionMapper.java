@@ -14,6 +14,8 @@ import java.util.Map;
  */
 @Mapper
 public interface AccountPositionCycleProjectionMapper {
+    List<String> selectPositionSides(@Param("credentialId") Long credentialId, @Param("symbol") String symbol);
+
     List<AccountPositionCycleFill> selectAllFills(@Param("credentialId") Long credentialId, @Param("symbol") String symbol);
 
     List<AccountPositionCycleFill> selectUnprojectedFills(@Param("credentialId") Long credentialId, @Param("symbol") String symbol);
