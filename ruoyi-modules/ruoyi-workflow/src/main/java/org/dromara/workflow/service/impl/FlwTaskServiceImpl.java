@@ -148,8 +148,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (CollUtil.isEmpty(flowCopyList)) {
             return;
         }
-        WorkflowContext context = new WorkflowContext();
-        context.setHandler(LoginHelper.getUserIdStr());
+        WorkflowContext context = WorkflowContext.create(LoginHelper.getUserIdStr());
         context.setMessage("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getNickName));
         // 抄送留痕交给引擎：按「同一待办 + 同一人」幂等，抄送人挂在抄送历史主键上，办结后仍可补抄送。
         HisTask copyHis = taskService.copy(task.getId()
@@ -573,7 +572,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         List<FlowNode> nextFlowNodes = BeanUtil.copyToList(nextNodeList, FlowNode.class);
         //构建以下节点数据
         List<Task> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance
-            , definition, new WorkflowContext(), SkipType.PASS.getKey()));
+            , definition, WorkflowContext.create(), SkipType.PASS.getKey()));
         //办理人变量替换
         ExpressionUtil.evalVariable(buildNextTaskList, mergeVariable, null, false);
         Map<String, List<String>> map = StreamUtils.toMap(buildNextTaskList, Task::getNodeCode, Task::getPermissionList);

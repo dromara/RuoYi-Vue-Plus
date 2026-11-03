@@ -191,7 +191,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             throw new ServiceException("消息启动参数不能为空");
         }
         return FlowEngine.insService().startByMessage(request.getBusinessId(), request.getFlowCode(),
-            request.getEventName(), request.getPayload(), eventContext(request.getHandler())).getId();
+            request.getEventName(), request.getPayload(), WorkflowContext.create(request.getHandler())).getId();
     }
 
     /**
@@ -207,7 +207,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             throw new ServiceException("消息事件参数不能为空");
         }
         return FlowEngine.insService().triggerMessage(request.getInstanceId(), request.getEventName(),
-            request.getPayload(), eventContext(request.getHandler())).getId();
+            request.getPayload(), WorkflowContext.create(request.getHandler())).getId();
     }
 
     /**
@@ -225,7 +225,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         String businessId = StringUtils.isNotBlank(request.getBusinessId())
             ? request.getBusinessId().trim() : String.valueOf(IdWorker.getId());
         return FlowEngine.insService().startByTimer(businessId, request.getDefinitionId(),
-            request.getNodeCode(), request.getPayload(), eventContext(request.getHandler())).getId();
+            request.getNodeCode(), request.getPayload(), WorkflowContext.create(request.getHandler())).getId();
     }
 
     /**
@@ -256,15 +256,4 @@ public class WorkflowServiceImpl implements WorkflowService {
         return FlowEngine.taskService().throwError(taskId, errorCode, errorMessage);
     }
 
-    /**
-     * 构建事件上下文
-     *
-     * @param handler 操作人
-     * @return 事件上下文
-     */
-    private WorkflowContext eventContext(String handler) {
-        WorkflowContext context = new WorkflowContext();
-        context.setHandler(StringUtils.isNotBlank(handler) ? handler : FlowEngine.getFlowConfig().getSystemHandler());
-        return context;
-    }
 }
