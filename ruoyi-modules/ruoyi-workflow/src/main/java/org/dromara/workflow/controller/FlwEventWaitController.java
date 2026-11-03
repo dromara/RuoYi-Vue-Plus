@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * 定时任务（事件等待记录）控制器。
  * <p>数据来源为引擎事件等待表，默认只查定时类事件；消息类 / 错误类等待需显式放开事件类型范围。
- * 写操作只有一项：对定时启动任务手动补发一次实例——补发不读取、也不推进等待记录，
+ * 支持定时启动任务手动补发，以及已死事件等待记录复活；补发不推进等待记录，
  * 定时任务的下次触发时间不受影响。</p>
  *
  * @author may
@@ -91,5 +91,20 @@ public class FlwEventWaitController extends BaseController {
     @PostMapping("/trigger")
     public R<Long> trigger(@RequestBody FlowTimerTriggerBo bo) {
         return R.ok(flwEventWaitService.manualTrigger(bo));
+    }
+
+    /**
+     * 复活已死的事件等待记录，定时启动任务需通过重新发布或挂起后激活恢复。
+     *
+     * @param id 事件等待记录主键
+     * @return 操作结果
+     */
+    @SaCheckPermission("workflow:eventWait:trigger")
+    @Log(title = "事件等待记录复活", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PostMapping("/{id}/revive")
+    public R<Void> revive(@NotNull(message = "主键不能为空") @PathVariable Long id) {
+        flwEventWaitService.revive(id);
+        return R.ok();
     }
 }

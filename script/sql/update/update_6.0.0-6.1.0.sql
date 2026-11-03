@@ -76,8 +76,8 @@ INSERT INTO sys_dict_data VALUES (1761600000000000066, 11, '加签', 'add_signer
 INSERT INTO sys_dict_data VALUES (1761600000000000067, 12, '减签', 'remove_signer', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, sysdate(), NULL, NULL, '减签');
 
 -- 原来的 waiting / termination / transfer / depute / sign / sign_off / timeout 已随上面整组删除：
--- 前两个属实例维度（wf_business_status 有），其余属协作维度 cooperate_type（transfer / delegate /
--- add_signer / remove_signer），timeout 是 flow_event_wait 的状态，都不是任务状态。
+-- waiting 属实例维度；termination 也是终止归档留痕使用的编码，在下方 2.1.1 适配段补回。
+-- 协作动作使用 transfer / delegate / add_signer / remove_signer，timeout 不属于任务状态。
 -- take_back 目前没有写入方，是留给「拿回」功能的占位，别当冗余删掉。
 
 -- 5. 实例状态字典补 restart（引擎 FlowStatus 有，字典缺）
@@ -130,3 +130,16 @@ DELETE FROM sys_menu WHERE menu_id IN (1761400000000011901, 1761400000000011902,
 insert into sys_menu values (1761400000000011901, '定时任务', 1761400000000011630, 3, 'timer', 'workflow/timer/index', '', 'N', 'N', 'C', '0', '0', 'workflow:eventWait:list', 'time', '', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '定时任务与事件等待监控菜单');
 insert into sys_menu values (1761400000000011902, '定时任务查询', 1761400000000011901, 1, '#', '', '', 'N', 'Y', 'F', '0', '0', 'workflow:eventWait:query', '#', '', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
 insert into sys_menu values (1761400000000011903, '定时任务手动补发', 1761400000000011901, 2, '#', '', '', 'N', 'Y', 'F', '0', '0', 'workflow:eventWait:trigger', '#', '', '', 1761000000000000103, 1761100000000000001, sysdate(), null, null, '');
+
+-- 8. Warm-Flow 2.1.1 适配（无引擎表结构变更）
+--    已执行过本脚本 2.1.0 迁移的数据库只需执行本段，无需重跑前面的迁移。
+--    补充任务终止归档字典，执行后刷新字典缓存；恢复接口复用页面权限 workflow:eventWait:list。
+INSERT INTO sys_dict_data
+SELECT 1761600000000000068, 13, '已终止', 'termination', 'wf_task_status', '', 'danger', 'N', 1761000000000000103, 1761100000000000001, sysdate(), NULL, NULL, '终止归档留痕'
+WHERE NOT EXISTS (SELECT 1 FROM sys_dict_data WHERE dict_type = 'wf_task_status' AND dict_value = 'termination');
+
+-- 存量数据检查（仅查询，不自动改写审批历史）：2.1.0 可能把实例 waiting 写入待办状态。
+SELECT id, instance_id, node_code, flow_status FROM flow_task WHERE flow_status = 'waiting';
+-- 确认上述记录为待审批任务后，可在备份并暂停流程写入的维护窗口执行：
+-- UPDATE flow_task SET flow_status = 'pending' WHERE flow_status = 'waiting';
+-- 旧撤回历史 cancel 保留原值及字典，新撤回历史由引擎写 back；终止归档仍写 termination。

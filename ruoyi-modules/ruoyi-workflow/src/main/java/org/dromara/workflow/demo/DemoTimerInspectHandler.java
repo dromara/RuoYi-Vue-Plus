@@ -47,8 +47,7 @@ public class DemoTimerInspectHandler implements EventTaskHandler {
         if (isInspectTimerStart(wait)) {
             // 这里应该使用业务的id demo使用自动生成id 需要用户自行替换
             String businessId = String.valueOf(IdWorker.getId());
-            WorkflowContext context = new WorkflowContext();
-            context.setHandler(FlowEngine.getFlowConfig().getSystemHandler());
+            WorkflowContext context = WorkflowContext.create();
             FlowEngine.insService().startByTimer(businessId, wait.getDefinitionId(),
                 wait.getNodeCode(), null, context);
             log.info("定时启动示例已自动发起审批: businessId={}", businessId);

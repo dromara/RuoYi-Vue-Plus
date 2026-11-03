@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * 定时任务（事件等待记录）服务接口。
- * <p>数据来自引擎 flow_event_wait，页面提供查询、状态统计与定时启动任务的手动补发。
+ * <p>数据来自引擎 flow_event_wait，提供查询、状态统计、已死记录复活与定时启动任务的手动补发。
  * 手动补发只创建一次实例，不读取也不推进等待记录，定时任务的下次触发时间不受影响。</p>
  *
  * @author may
@@ -50,4 +50,11 @@ public interface IFlwEventWaitService {
      * @return 新建流程实例主键
      */
     Long manualTrigger(FlowTimerTriggerBo bo);
+
+    /**
+     * 复活已死的事件等待记录，状态与实例有效性由引擎校验。
+     *
+     * @param id 事件等待记录主键
+     */
+    void revive(Long id);
 }

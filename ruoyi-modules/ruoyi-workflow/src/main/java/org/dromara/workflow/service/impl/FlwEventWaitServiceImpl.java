@@ -16,6 +16,7 @@ import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.enums.EventType;
 import org.dromara.warm.flow.core.exception.FlowException;
 import org.dromara.warm.flow.core.utils.page.Page;
+import org.dromara.warm.flow.core.workflow.command.ReviveEventCommand;
 import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.bo.FlowEventWaitBo;
@@ -156,14 +157,30 @@ public class FlwEventWaitServiceImpl implements IFlwEventWaitService {
         String finalBusinessId = StringUtils.isNotBlank(bo.getBusinessId())
             ? bo.getBusinessId().trim()
             : String.valueOf(IdWorker.getId());
-        WorkflowContext context = new WorkflowContext();
-        context.setHandler(LoginHelper.getUserIdStr());
+        WorkflowContext context = WorkflowContext.create(LoginHelper.getUserIdStr());
         try {
             Instance instance = FlowEngine.insService().startByTimer(finalBusinessId, wait.getDefinitionId()
                 , wait.getNodeCode(), bo.getVariables(), context);
             return instance.getId();
         } catch (FlowException e) {
             log.warn("定时启动任务手动补发失败 waitId={} 原因={}", bo.getWaitId(), e.getMessage());
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    /**
+     * 复活已死的事件等待记录，复用引擎的状态校验、排期重算与乐观锁更新。
+     *
+     * @param id 事件等待记录主键
+     */
+    @Override
+    public void revive(Long id) {
+        ReviveEventCommand command = new ReviveEventCommand();
+        command.setEventWaitId(id);
+        try {
+            FlowEngine.workflow().reviveEvent(command);
+        } catch (FlowException e) {
+            log.warn("事件等待记录复活失败 waitId={} 原因={}", id, e.getMessage());
             throw new ServiceException(e.getMessage());
         }
     }
