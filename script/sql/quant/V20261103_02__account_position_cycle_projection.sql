@@ -26,6 +26,32 @@ BEGIN
             ADD COLUMN commission_asset varchar(20) NULL
                 COMMENT 'Binance 成交手续费资产；不同资产不得混合求和' AFTER commission;
     END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema=DATABASE() AND table_name='quant_trade'
+          AND index_name='uk_quant_trade_credential_symbol_trade'
+    ) THEN
+        ALTER TABLE quant_trade
+            ADD UNIQUE INDEX uk_quant_trade_credential_symbol_trade (credential_id,symbol,exchange_trade_id);
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema=DATABASE() AND table_name='quant_trade'
+          AND index_name='uk_quant_trade'
+    ) THEN
+        ALTER TABLE quant_trade DROP INDEX uk_quant_trade;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema=DATABASE() AND table_name='quant_order'
+          AND index_name='idx_quant_order_credential_symbol_exchange'
+    ) THEN
+        ALTER TABLE quant_order
+            ADD INDEX idx_quant_order_credential_symbol_exchange (credential_id,symbol,exchange_order_id);
+    END IF;
 END$
 
 CALL migrate_account_position_cycle_projection()$
