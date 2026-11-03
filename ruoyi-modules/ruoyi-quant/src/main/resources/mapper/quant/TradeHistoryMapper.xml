@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.quant.account.mapper.TradeHistoryMapper">
     <select id="selectFills" resultType="org.dromara.quant.account.domain.vo.TradeHistoryFill">
-        SELECT t.*, COALESCE(o.position_side, soi.position_side, pre_dispatch_role.position_side) AS position_side, o.reduce_only,
-        COALESCE(e.operation_type, soi.fill_role, dispatch_role.operation_type, pre_dispatch_role.operation_type) AS operation_type,
+        SELECT t.*, COALESCE(o.position_side, soi.position_side, soi_client_role.position_side, pre_dispatch_role.position_side, pre_dispatch_client_role.position_side) AS position_side, o.reduce_only,
+        COALESCE(e.operation_type, soi.fill_role, soi_client_role.fill_role, dispatch_role.operation_type, dispatch_client_role.operation_type, pre_dispatch_role.operation_type, pre_dispatch_client_role.operation_type) AS operation_type,
         o.leverage_snapshot, o.price_tick_size_snapshot, o.post_fill_wallet_balance, o.post_fill_balance_at,
         qs.price_tick_size AS current_price_tick_size
         FROM (
@@ -31,6 +31,15 @@
             HAVING COUNT(DISTINCT position_side) = 1 AND COUNT(DISTINCT fill_role) = 1
         ) soi ON soi.credential_id = t.credential_id AND soi.symbol = t.symbol AND soi.exchange_order_id = t.exchange_order_id
         LEFT JOIN (
+            SELECT credential_id, symbol, client_order_id, MIN(position_side) AS position_side, MIN(fill_role) AS fill_role
+            FROM quant_strategy_order_intent
+            WHERE client_order_id IS NOT NULL
+            GROUP BY credential_id, symbol, client_order_id
+            HAVING COUNT(DISTINCT position_side) = 1 AND COUNT(DISTINCT fill_role) = 1
+                AND COUNT(DISTINCT exchange_order_id) = 1
+        ) soi_client_role ON soi_client_role.credential_id = t.credential_id
+            AND soi_client_role.symbol = t.symbol AND soi_client_role.client_order_id = o.client_order_id
+        LEFT JOIN (
             SELECT credential_id, symbol, exchange_order_id, MIN(operation_type) AS operation_type
             FROM quant_order_dispatch_ticket
             WHERE operation_type IN ('OPEN', 'CLOSE') AND dispatch_status IN ('ACKED', 'RECOVERED')
@@ -39,6 +48,15 @@
             HAVING COUNT(DISTINCT operation_type) = 1
         ) dispatch_role ON dispatch_role.credential_id = t.credential_id
             AND dispatch_role.symbol = t.symbol AND dispatch_role.exchange_order_id = t.exchange_order_id
+        LEFT JOIN (
+            SELECT credential_id, symbol, client_order_id, MIN(operation_type) AS operation_type
+            FROM quant_order_dispatch_ticket
+            WHERE operation_type IN ('OPEN', 'CLOSE') AND dispatch_status IN ('ACKED', 'RECOVERED')
+                AND client_order_id IS NOT NULL
+            GROUP BY credential_id, symbol, client_order_id
+            HAVING COUNT(DISTINCT operation_type) = 1 AND COUNT(DISTINCT exchange_order_id) <= 1
+        ) dispatch_client_role ON dispatch_client_role.credential_id = t.credential_id
+            AND dispatch_client_role.symbol = t.symbol AND dispatch_client_role.client_order_id = o.client_order_id
         LEFT JOIN (
             SELECT p.credential_id, p.symbol, d.exchange_order_id,
                 MIN(p.operation_type) AS operation_type, MIN(p.position_side) AS position_side
@@ -57,6 +75,25 @@
                 AND MIN(p.operation_type) = MIN(d.operation_type)
         ) pre_dispatch_role ON pre_dispatch_role.credential_id = t.credential_id
             AND pre_dispatch_role.symbol = t.symbol AND pre_dispatch_role.exchange_order_id = t.exchange_order_id
+        LEFT JOIN (
+            SELECT p.credential_id, p.symbol, p.client_order_id,
+                MIN(p.operation_type) AS operation_type, MIN(p.position_side) AS position_side
+            FROM quant_strategy_pre_dispatch_intent p
+            JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
+                AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
+                AND d.client_order_id = p.client_order_id
+            WHERE p.operation_type IN ('OPEN', 'CLOSE')
+                AND d.operation_type IN ('OPEN', 'CLOSE')
+                AND d.dispatch_status IN ('ACKED', 'RECOVERED')
+                AND d.client_order_id IS NOT NULL
+            GROUP BY p.credential_id, p.symbol, p.client_order_id
+            HAVING COUNT(DISTINCT p.operation_type) = 1
+                AND COUNT(DISTINCT p.position_side) = 1
+                AND COUNT(DISTINCT d.operation_type) = 1
+                AND COUNT(DISTINCT d.exchange_order_id) <= 1
+                AND MIN(p.operation_type) = MIN(d.operation_type)
+        ) pre_dispatch_client_role ON pre_dispatch_client_role.credential_id = t.credential_id
+            AND pre_dispatch_client_role.symbol = t.symbol AND pre_dispatch_client_role.client_order_id = o.client_order_id
         LEFT JOIN quant_symbol qs ON qs.symbol = t.symbol
         ORDER BY t.trade_time, t.exchange_trade_id, t.id
         LIMIT 20001
