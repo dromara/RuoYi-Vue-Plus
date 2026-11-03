@@ -1063,7 +1063,9 @@ public class TradingReconciliationService {
                 if (snapshot == null || snapshot.walletBalance() == null) {
                     return;
                 }
-                orderMapper.savePostFillBalanceSnapshot(order.getId(), snapshot.walletBalance(), LocalDateTime.now(ZoneOffset.UTC));
+                if (orderMapper.savePostFillBalanceSnapshot(order.getId(), snapshot.walletBalance(), LocalDateTime.now(ZoneOffset.UTC)) == 1) {
+                    accountPositionCycleProjectionService.refreshBalanceSnapshots(credential.getId(), order.getSymbol());
+                }
             } catch (RuntimeException ex) {
                 // Balance is informational; an unavailable snapshot must never affect order or position handling.
                 log.debug("成交后账户余额核实失败 credentialId={} orderId={} errorType={}", credential.getId(), order.getId(), ex.getClass().getSimpleName());
