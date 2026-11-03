@@ -182,7 +182,7 @@ SET opening_balance=COALESCE(c.opening_balance,(
               WHERE other_role.credential_id=a.credential_id
                 AND other_role.symbol=a.symbol
                 AND other_role.exchange_order_id=a.exchange_order_id
-                AND other_role.allocation_role&lt;&gt;a.allocation_role
+                AND other_role.allocation_role<>a.allocation_role
           )
         LIMIT 1
     )),
@@ -211,7 +211,7 @@ SET opening_balance=COALESCE(c.opening_balance,(
               WHERE other_role.credential_id=a.credential_id
                 AND other_role.symbol=a.symbol
                 AND other_role.exchange_order_id=a.exchange_order_id
-                AND other_role.allocation_role&lt;&gt;a.allocation_role
+                AND other_role.allocation_role<>a.allocation_role
           )
         LIMIT 1
     )),
@@ -240,7 +240,7 @@ SET opening_balance=COALESCE(c.opening_balance,(
               WHERE other_role.credential_id=a.credential_id
                 AND other_role.symbol=a.symbol
                 AND other_role.exchange_order_id=a.exchange_order_id
-                AND other_role.allocation_role&lt;&gt;a.allocation_role
+                AND other_role.allocation_role<>a.allocation_role
           )
         LIMIT 1
     )),
@@ -269,11 +269,10 @@ SET opening_balance=COALESCE(c.opening_balance,(
               WHERE other_role.credential_id=a.credential_id
                 AND other_role.symbol=a.symbol
                 AND other_role.exchange_order_id=a.exchange_order_id
-                AND other_role.allocation_role&lt;&gt;a.allocation_role
+                AND other_role.allocation_role<>a.allocation_role
           )
         LIMIT 1
     )),
-    updated_at=NOW(6)
 WHERE c.credential_id=#{credentialId}
   AND c.symbol=#{symbol}
   AND (
