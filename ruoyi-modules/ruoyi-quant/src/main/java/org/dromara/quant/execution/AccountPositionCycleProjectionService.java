@@ -146,10 +146,19 @@ public class AccountPositionCycleProjectionService {
             Long activeCycleId = nullableLong(state.get("active_cycle_id"));
             LocalDateTime lastTradeTime = localTime(state.get("last_trade_time"));
             Long lastTradeId = nullableLong(state.get("last_exchange_trade_id"));
+            LocalDateTime projectedThrough = localTime(state.get("projected_through"));
             boolean incomplete = Boolean.TRUE.equals(state.get("incomplete")) || number(state.get("incomplete")) == 1;
             List<AccountPositionCycleFill> sorted = sorted(pending);
+            try {
+                preflight(scope, quantity, activeCycleId != null, sorted);
+            } catch (IllegalStateException ex) {
+                mapper.updateState(credentialId, normalizedSymbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
+                    projectedThrough, INCOMPLETE, true, safeReason(ex.getMessage()));
+                continue;
+            }
             for (AccountPositionCycleFill fill : sorted) {
-                if (lastTradeTime != null && compare(fill.getTradeTime(), fill.getExchangeTradeId(), lastTradeTime, lastTradeId) <= 0) {
+                if (projectedThrough != null && !fill.getTradeTime().isAfter(projectedThrough)
+                    || lastTradeTime != null && compare(fill.getTradeTime(), fill.getExchangeTradeId(), lastTradeTime, lastTradeId) <= 0) {
                     markIncomplete(credentialId, normalizedSymbol, scope, "检测到晚到的历史成交，必须按完整历史重建该持仓周期");
                     activeCycleId = null;
                     status = INCOMPLETE;
@@ -160,10 +169,11 @@ public class AccountPositionCycleProjectionService {
                 activeCycleId = next.activeCycleId();
                 lastTradeTime = fill.getTradeTime();
                 lastTradeId = fill.getExchangeTradeId();
+                projectedThrough = fill.getTradeTime();
             }
             if (READY.equals(status)) {
                 if (mapper.updateState(credentialId, normalizedSymbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
-                    READY, incomplete, incomplete ? "初始成交历史之前存在未能确定开仓时间与成本的持仓" : null) != 1) {
+                    projectedThrough, READY, incomplete, incomplete ? "初始成交历史之前存在未能确定开仓时间与成本的持仓" : null) != 1) {
                     throw new IllegalStateException("账户持仓周期状态更新失败");
                 }
             }
@@ -173,12 +183,14 @@ public class AccountPositionCycleProjectionService {
     private void initialize(Long credentialId, String symbol, String scope, List<AccountPositionCycleFill> fills,
                              ExchangeGateway.PositionSnapshot snapshot, Instant readStarted, Instant readCompleted) {
         List<AccountPositionCycleFill> sorted = sorted(fills);
+        Instant safeReadStart = readStarted.minusSeconds(1);
+        Instant safeReadEnd = readCompleted.plusSeconds(1);
         boolean fillDuringSnapshotRead = sorted.stream().anyMatch(fill -> {
             Instant time = fill.getTradeTime().toInstant(ZoneOffset.UTC);
-            return !time.isBefore(readStarted) && !time.isAfter(readCompleted);
+            return !time.isBefore(safeReadStart) && !time.isAfter(safeReadEnd);
         });
         if (fillDuringSnapshotRead) {
-            mapper.updateState(credentialId, symbol, scope, ZERO, null, null, null,
+            mapper.updateState(credentialId, symbol, scope, ZERO, null, null, null, null,
                 INITIALIZING, true, "持仓快照读取期间发生新成交，等待下一轮稳定快照后初始化");
             return;
         }
@@ -189,13 +201,13 @@ public class AccountPositionCycleProjectionService {
         List<AccountPositionCycleFill> afterSnapshot = new ArrayList<>();
         for (AccountPositionCycleFill fill : sorted) {
             Instant time = fill.getTradeTime().toInstant(ZoneOffset.UTC);
-            if (time.isBefore(readStarted)) {
+            if (time.isBefore(safeReadStart)) {
                 beforeSnapshot.add(fill);
                 historicalDelta = historicalDelta.add(signedDelta(scope, fill.getSide(), fill.getQuantity()));
-            } else if (time.isAfter(readCompleted)) {
+            } else if (time.isAfter(safeReadEnd)) {
                 afterSnapshot.add(fill);
             } else {
-                mapper.updateState(credentialId, symbol, scope, ZERO, null, null, null,
+                mapper.updateState(credentialId, symbol, scope, ZERO, null, null, null, null,
                     INITIALIZING, true, "持仓快照读取期间发生新成交，等待下一轮稳定快照后初始化");
                 return;
             }
@@ -203,19 +215,25 @@ public class AccountPositionCycleProjectionService {
 
         BigDecimal quantity = exchangeQuantity.subtract(historicalDelta);
         if (!"BOTH".equals(scope) && quantity.signum() < 0) {
-            mapper.updateState(credentialId, symbol, scope, ZERO, null, null, null,
+            mapper.updateState(credentialId, symbol, scope, ZERO, null, null, null, null,
                 INCOMPLETE, true, "对冲模式历史净成交超过快照数量，成交历史或订单方向不完整");
             return;
         }
 
         Long activeCycleId = null;
         boolean incomplete = quantity.signum() != 0;
+        try {
+            preflight(scope, quantity, incomplete, sorted);
+        } catch (IllegalStateException ex) {
+            mapper.updateState(credentialId, symbol, scope, quantity, null, null, null, null,
+                INCOMPLETE, true, safeReason(ex.getMessage()));
+            return;
+        }
         if (incomplete) {
-            activeCycleId = createBaselineCycle(credentialId, symbol, scope, quantity.abs());
+            activeCycleId = createBaselineCycle(credentialId, symbol, scope, quantity);
         }
         LocalDateTime lastTradeTime = null;
         Long lastTradeId = null;
-        try {
             for (AccountPositionCycleFill fill : beforeSnapshot) {
                 ProjectionResult next = applyFill(credentialId, symbol, scope, quantity, activeCycleId, fill);
                 quantity = next.quantity();
@@ -230,15 +248,14 @@ public class AccountPositionCycleProjectionService {
                 lastTradeTime = fill.getTradeTime();
                 lastTradeId = fill.getExchangeTradeId();
             }
+            LocalDateTime projectedThrough = LocalDateTime.ofInstant(readCompleted, ZoneOffset.UTC);
+            if (lastTradeTime != null && lastTradeTime.isAfter(projectedThrough)) {
+                projectedThrough = lastTradeTime;
+            }
             if (mapper.updateState(credentialId, symbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
-                READY, incomplete, incomplete ? "初始成交历史之前存在未能确定开仓时间与成本的持仓" : null) != 1) {
+                projectedThrough, READY, incomplete, incomplete ? "初始成交历史之前存在未能确定开仓时间与成本的持仓" : null) != 1) {
                 throw new IllegalStateException("账户持仓周期初始化状态写入失败");
             }
-        } catch (IllegalStateException ex) {
-            mapper.updateState(credentialId, symbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
-                INCOMPLETE, true, safeReason(ex.getMessage()));
-            log.warn("账户持仓周期初始化被隔离 credentialId={} symbol={} positionSide={} reason={}",
-                credentialId, symbol, scope, ex.getMessage());
         }
     }
 
@@ -286,6 +303,9 @@ public class AccountPositionCycleProjectionService {
             BigDecimal openFee = commission.subtract(closeQuantity.signum() > 0
                 ? splitFee(commission, closeQuantity, fill.getQuantity()) : ZERO);
             BigDecimal openNotional = openQuantity.multiply(fill.getPrice());
+            if (activeCycleId == null && currentQuantity.signum() != 0) {
+                throw new IllegalStateException("存在未归属的活动持仓周期，禁止自动创建重叠周期");
+            }
             if (activeCycleId == null) {
                 activeCycleId = createOpenCycle(credentialId, symbol, scope, transition.openingDirection(),
                     fill, openQuantity, openNotional, crossedBalanceUnavailable(closeQuantity, openQuantity)
@@ -303,13 +323,14 @@ public class AccountPositionCycleProjectionService {
         return new ProjectionResult(transition.nextQuantity(), activeCycleId);
     }
 
-    private Long createBaselineCycle(Long credentialId, String symbol, String scope, BigDecimal quantity) {
+    private Long createBaselineCycle(Long credentialId, String symbol, String scope, BigDecimal signedQuantity) {
         String direction = "BOTH".equals(scope)
-            ? (quantity.signum() >= 0 ? "LONG" : "SHORT")
+            ? (signedQuantity.signum() >= 0 ? "LONG" : "SHORT")
             : scope;
+        BigDecimal quantity = signedQuantity.abs();
         long id = IdWorker.getId();
         if (mapper.insertCycle(id, UUID.randomUUID().toString(), credentialId, symbol, scope, direction,
-            "OPENING_UNKNOWN", true, quantity, quantity, null, null, null, null, null, null) != 1) {
+            "OPENING_UNKNOWN", true, quantity, quantity, 0, null, null, null, null, null) != 1) {
             throw new IllegalStateException("初始未知持仓周期创建失败");
         }
         return id;
@@ -320,7 +341,7 @@ public class AccountPositionCycleProjectionService {
                                  BigDecimal balance, LocalDateTime balanceAt) {
         long id = IdWorker.getId();
         if (mapper.insertCycle(id, UUID.randomUUID().toString(), credentialId, symbol, scope, direction,
-            "OPEN", false, quantity, quantity, notional, fill.getTradeTime(), fill.getLeverageSnapshot(),
+            "OPEN", false, quantity, quantity, 1, notional, fill.getTradeTime(), fill.getLeverageSnapshot(),
             fill.getPriceTickSizeSnapshot(), balance, balanceAt) != 1) {
             throw new IllegalStateException("新持仓周期创建失败");
         }
@@ -343,7 +364,8 @@ public class AccountPositionCycleProjectionService {
         }
         mapper.updateState(credentialId, symbol, scope, decimal(state.get("signed_quantity")),
             nullableLong(state.get("active_cycle_id")), localTime(state.get("last_trade_time")),
-            nullableLong(state.get("last_exchange_trade_id")), INCOMPLETE, true, safeReason(reason));
+            nullableLong(state.get("last_exchange_trade_id")), localTime(state.get("projected_through")),
+            INCOMPLETE, true, safeReason(reason));
     }
 
     private static Map<String, List<AccountPositionCycleFill>> groupByScope(List<AccountPositionCycleFill> fills) {
@@ -399,6 +421,24 @@ public class AccountPositionCycleProjectionService {
             : ("LONG".equals(scope) && "BUY".equalsIgnoreCase(side))
                 || ("SHORT".equals(scope) && "SELL".equalsIgnoreCase(side));
         return increases ? quantity : quantity.negate();
+    }
+
+    private static void preflight(String scope, BigDecimal quantity, boolean activeCycle, List<AccountPositionCycleFill> fills) {
+        for (AccountPositionCycleFill fill : fills) {
+            if (quantity.signum() != 0 && !activeCycle) {
+                throw new IllegalStateException("非零账户仓位缺少活动周期记录");
+            }
+            var transition = AccountPositionCycleAccounting.apply(scope, fill.getSide().toUpperCase(Locale.ROOT),
+                quantity, fill.getQuantity());
+            if (transition.closingQuantity().signum() > 0 && !activeCycle) {
+                throw new IllegalStateException("成交需要平仓但没有可证明的活动周期");
+            }
+            if (transition.closingQuantity().signum() == 0 && fill.getRealizedPnl().signum() != 0) {
+                throw new IllegalStateException("成交已实现盈亏无法对应到平仓数量");
+            }
+            quantity = transition.nextQuantity();
+            activeCycle = quantity.signum() != 0;
+        }
     }
 
     private static BigDecimal splitFee(BigDecimal fee, BigDecimal part, BigDecimal total) {
