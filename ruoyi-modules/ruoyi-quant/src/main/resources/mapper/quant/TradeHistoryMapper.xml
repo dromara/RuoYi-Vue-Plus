@@ -137,7 +137,8 @@
             SELECT credential_id, symbol, exchange_order_id,
                 MIN(operation_type) AS operation_type,
                 CASE WHEN COUNT(DISTINCT operation_type) <> 1
-                    OR COUNT(DISTINCT client_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
+                    OR COUNT(DISTINCT client_order_id) <> 1
+                    OR COUNT(DISTINCT idempotency_key) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_order_dispatch_ticket
             WHERE credential_id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
@@ -152,7 +153,8 @@
             SELECT credential_id, symbol, client_order_id,
                 MIN(operation_type) AS operation_type,
                 CASE WHEN COUNT(DISTINCT operation_type) <> 1
-                    OR COUNT(DISTINCT exchange_order_id) > 1 THEN 1 ELSE 0 END AS source_conflict
+                    OR COUNT(DISTINCT exchange_order_id) > 1
+                    OR COUNT(DISTINCT idempotency_key) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_order_dispatch_ticket
             WHERE credential_id IN
                 <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
@@ -173,7 +175,8 @@
                     OR COUNT(DISTINCT p.exchange_side) <> 1
                     OR COUNT(DISTINCT d.operation_type) <> 1
                     OR MIN(p.operation_type) <> MIN(d.operation_type)
-                    OR COUNT(DISTINCT p.client_order_id) <> 1 THEN 1 ELSE 0 END AS source_conflict
+                    OR COUNT(DISTINCT p.client_order_id) <> 1
+                    OR COUNT(DISTINCT p.idempotency_key) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_strategy_pre_dispatch_intent p
             JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
                 AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
@@ -198,7 +201,8 @@
                     OR COUNT(DISTINCT p.exchange_side) <> 1
                     OR COUNT(DISTINCT d.operation_type) <> 1
                     OR MIN(p.operation_type) <> MIN(d.operation_type)
-                    OR COUNT(DISTINCT d.exchange_order_id) > 1 THEN 1 ELSE 0 END AS source_conflict
+                    OR COUNT(DISTINCT d.exchange_order_id) > 1
+                    OR COUNT(DISTINCT p.idempotency_key) <> 1 THEN 1 ELSE 0 END AS source_conflict
             FROM quant_strategy_pre_dispatch_intent p
             JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
                 AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
