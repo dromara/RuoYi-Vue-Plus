@@ -155,92 +155,130 @@ VALUES
  #{realizedPnl},#{tradeTime},NOW(6))
 ]]></insert>
 
-    <update id="refreshBalanceSnapshots" timeout="5"><![CDATA[
+        <update id="refreshBalanceSnapshots" timeout="5"><![CDATA[
 UPDATE quant_position_cycle c
-JOIN (
-    SELECT a.position_cycle_id,
-           MAX(CASE
-               WHEN current_cycle.baseline_unknown=0
-                AND a.allocation_role='OPEN'
-                AND a.exchange_trade_id=(
-                    SELECT first_open.exchange_trade_id
-                    FROM quant_trade_cycle_allocation first_open
-                    WHERE first_open.position_cycle_id=a.position_cycle_id
-                      AND first_open.allocation_role='OPEN'
-                    ORDER BY first_open.trade_time,first_open.exchange_trade_id
-                    LIMIT 1
-                )
-               THEN o.post_fill_wallet_balance
-           END) AS opening_balance,
-           MAX(CASE
-               WHEN current_cycle.status IN ('CLOSED','CLOSED_INCOMPLETE')
-                AND a.allocation_role='CLOSE'
-                AND a.exchange_trade_id=(
-                    SELECT last_close.exchange_trade_id
-                    FROM quant_trade_cycle_allocation last_close
-                    WHERE last_close.position_cycle_id=a.position_cycle_id
-                      AND last_close.allocation_role='CLOSE'
-                    ORDER BY last_close.trade_time DESC,last_close.exchange_trade_id DESC
-                    LIMIT 1
-                )
-               THEN o.post_fill_wallet_balance
-           END) AS closing_balance,
-           MAX(CASE
-               WHEN current_cycle.baseline_unknown=0
-                AND a.allocation_role='OPEN'
-                AND a.exchange_trade_id=(
-                    SELECT first_open.exchange_trade_id
-                    FROM quant_trade_cycle_allocation first_open
-                    WHERE first_open.position_cycle_id=a.position_cycle_id
-                      AND first_open.allocation_role='OPEN'
-                    ORDER BY first_open.trade_time,first_open.exchange_trade_id
-                    LIMIT 1
-                )
-               THEN o.post_fill_balance_at
-           END) AS opening_balance_at,
-           MAX(CASE
-               WHEN current_cycle.status IN ('CLOSED','CLOSED_INCOMPLETE')
-                AND a.allocation_role='CLOSE'
-                AND a.exchange_trade_id=(
-                    SELECT last_close.exchange_trade_id
-                    FROM quant_trade_cycle_allocation last_close
-                    WHERE last_close.position_cycle_id=a.position_cycle_id
-                      AND last_close.allocation_role='CLOSE'
-                    ORDER BY last_close.trade_time DESC,last_close.exchange_trade_id DESC
-                    LIMIT 1
-                )
-               THEN o.post_fill_balance_at
-           END) AS closing_balance_at
-    FROM quant_trade_cycle_allocation a
-    JOIN quant_position_cycle current_cycle ON current_cycle.id=a.position_cycle_id
-    JOIN quant_order o
-      ON o.credential_id=a.credential_id
-     AND o.symbol=a.symbol
-     AND o.exchange_order_id=a.exchange_order_id
-    WHERE a.credential_id=#{credentialId}
-      AND a.symbol=#{symbol}
-      AND o.post_fill_wallet_balance IS NOT NULL
-      AND o.post_fill_balance_at IS NOT NULL
-      AND NOT EXISTS (
-          SELECT 1
-          FROM quant_trade_cycle_allocation other_role
-          WHERE other_role.credential_id=a.credential_id
-            AND other_role.symbol=a.symbol
-            AND other_role.exchange_order_id=a.exchange_order_id
-            AND other_role.allocation_role&lt;&gt;a.allocation_role
-      )
-    GROUP BY a.position_cycle_id
-) balance_snapshot ON balance_snapshot.position_cycle_id=c.id
-SET c.opening_balance=COALESCE(c.opening_balance,balance_snapshot.opening_balance),
-    c.opening_balance_at=COALESCE(c.opening_balance_at,balance_snapshot.opening_balance_at),
-    c.closing_balance=COALESCE(c.closing_balance,balance_snapshot.closing_balance),
-    c.closing_balance_at=COALESCE(c.closing_balance_at,balance_snapshot.closing_balance_at),
-    c.updated_at=NOW(6)
+SET opening_balance=COALESCE(c.opening_balance,(
+        SELECT o.post_fill_wallet_balance
+        FROM quant_trade_cycle_allocation a
+        JOIN quant_order o
+          ON o.credential_id=a.credential_id
+         AND o.symbol=a.symbol
+         AND o.exchange_order_id=a.exchange_order_id
+        WHERE a.position_cycle_id=c.id
+          AND c.baseline_unknown=0
+          AND a.allocation_role='OPEN'
+          AND a.exchange_trade_id=(
+              SELECT first_open.exchange_trade_id
+              FROM quant_trade_cycle_allocation first_open
+              WHERE first_open.position_cycle_id=c.id
+                AND first_open.allocation_role='OPEN'
+              ORDER BY first_open.trade_time,first_open.exchange_trade_id
+              LIMIT 1
+          )
+          AND o.post_fill_wallet_balance IS NOT NULL
+          AND o.post_fill_balance_at IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM quant_trade_cycle_allocation other_role
+              WHERE other_role.credential_id=a.credential_id
+                AND other_role.symbol=a.symbol
+                AND other_role.exchange_order_id=a.exchange_order_id
+                AND other_role.allocation_role&lt;&gt;a.allocation_role
+          )
+        LIMIT 1
+    )),
+    opening_balance_at=COALESCE(c.opening_balance_at,(
+        SELECT o.post_fill_balance_at
+        FROM quant_trade_cycle_allocation a
+        JOIN quant_order o
+          ON o.credential_id=a.credential_id
+         AND o.symbol=a.symbol
+         AND o.exchange_order_id=a.exchange_order_id
+        WHERE a.position_cycle_id=c.id
+          AND c.baseline_unknown=0
+          AND a.allocation_role='OPEN'
+          AND a.exchange_trade_id=(
+              SELECT first_open.exchange_trade_id
+              FROM quant_trade_cycle_allocation first_open
+              WHERE first_open.position_cycle_id=c.id
+                AND first_open.allocation_role='OPEN'
+              ORDER BY first_open.trade_time,first_open.exchange_trade_id
+              LIMIT 1
+          )
+          AND o.post_fill_wallet_balance IS NOT NULL
+          AND o.post_fill_balance_at IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM quant_trade_cycle_allocation other_role
+              WHERE other_role.credential_id=a.credential_id
+                AND other_role.symbol=a.symbol
+                AND other_role.exchange_order_id=a.exchange_order_id
+                AND other_role.allocation_role&lt;&gt;a.allocation_role
+          )
+        LIMIT 1
+    )),
+    closing_balance=COALESCE(c.closing_balance,(
+        SELECT o.post_fill_wallet_balance
+        FROM quant_trade_cycle_allocation a
+        JOIN quant_order o
+          ON o.credential_id=a.credential_id
+         AND o.symbol=a.symbol
+         AND o.exchange_order_id=a.exchange_order_id
+        WHERE a.position_cycle_id=c.id
+          AND c.status IN ('CLOSED','CLOSED_INCOMPLETE')
+          AND a.allocation_role='CLOSE'
+          AND a.exchange_trade_id=(
+              SELECT last_close.exchange_trade_id
+              FROM quant_trade_cycle_allocation last_close
+              WHERE last_close.position_cycle_id=c.id
+                AND last_close.allocation_role='CLOSE'
+              ORDER BY last_close.trade_time DESC,last_close.exchange_trade_id DESC
+              LIMIT 1
+          )
+          AND o.post_fill_wallet_balance IS NOT NULL
+          AND o.post_fill_balance_at IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM quant_trade_cycle_allocation other_role
+              WHERE other_role.credential_id=a.credential_id
+                AND other_role.symbol=a.symbol
+                AND other_role.exchange_order_id=a.exchange_order_id
+                AND other_role.allocation_role&lt;&gt;a.allocation_role
+          )
+        LIMIT 1
+    )),
+    closing_balance_at=COALESCE(c.closing_balance_at,(
+        SELECT o.post_fill_balance_at
+        FROM quant_trade_cycle_allocation a
+        JOIN quant_order o
+          ON o.credential_id=a.credential_id
+         AND o.symbol=a.symbol
+         AND o.exchange_order_id=a.exchange_order_id
+        WHERE a.position_cycle_id=c.id
+          AND c.status IN ('CLOSED','CLOSED_INCOMPLETE')
+          AND a.allocation_role='CLOSE'
+          AND a.exchange_trade_id=(
+              SELECT last_close.exchange_trade_id
+              FROM quant_trade_cycle_allocation last_close
+              WHERE last_close.position_cycle_id=c.id
+                AND last_close.allocation_role='CLOSE'
+              ORDER BY last_close.trade_time DESC,last_close.exchange_trade_id DESC
+              LIMIT 1
+          )
+          AND o.post_fill_wallet_balance IS NOT NULL
+          AND o.post_fill_balance_at IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM quant_trade_cycle_allocation other_role
+              WHERE other_role.credential_id=a.credential_id
+                AND other_role.symbol=a.symbol
+                AND other_role.exchange_order_id=a.exchange_order_id
+                AND other_role.allocation_role&lt;&gt;a.allocation_role
+          )
+        LIMIT 1
+    )),
+    updated_at=NOW(6)
 WHERE c.credential_id=#{credentialId}
   AND c.symbol=#{symbol}
   AND (
-      (c.opening_balance IS NULL AND balance_snapshot.opening_balance IS NOT NULL)
-      OR (c.closing_balance IS NULL AND balance_snapshot.closing_balance IS NOT NULL)
+      c.opening_balance IS NULL
+      OR (c.status IN ('CLOSED','CLOSED_INCOMPLETE') AND c.closing_balance IS NULL)
   )
 ]]></update>
 
