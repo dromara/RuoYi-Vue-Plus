@@ -247,10 +247,19 @@ public class TradeHistoryService {
             f.getPositionSide(), f.getOperationType(), f.getReduceOnly(), f.getQuantity(), f.getPrice(), f.getCommission(), f.getRealizedPnl(), f.getTradeTime(),
             f.getLeverageSnapshot(), f.getPriceTickSizeSnapshot(), f.getPostFillWalletBalance(), f.getPostFillBalanceAt(), f.getCurrentPriceTickSize(), f.getExchangeTradeId(),
             f.getExchangeOrderId())).toList(), names);
-        var rows = result.rows().stream().filter(row -> {
+        var assembledRows = result.rows();
+        var rows = assembledRows.stream().filter(row -> {
             Instant opened = Instant.parse((String) row.get("openedAt"));
             return (start == null || !opened.isBefore(start)) && (end == null || opened.isBefore(end));
         }).toList();
+        if (rows.isEmpty() && !fills.isEmpty()) {
+            long missingPositionSide = fills.stream().filter(fill -> fill.getPositionSide() == null || fill.getPositionSide().isBlank()).count();
+            long missingOperationType = fills.stream().filter(fill -> fill.getOperationType() == null || fill.getOperationType().isBlank()).count();
+            long unresolvedOneWay = fills.stream().filter(fill -> !"LONG".equals(fill.getPositionSide()) && !"SHORT".equals(fill.getPositionSide())
+                && (fill.getOperationType() == null || fill.getOperationType().isBlank()) && !Boolean.TRUE.equals(fill.getReduceOnly())).count();
+            log.warn("开平仓记录没有可展示周期 credentialCount={} symbol={} fillCount={} assembledCycleCount={} incompleteCount={} missingPositionSide={} missingOperationType={} unresolvedOneWay={}",
+                ids.size(), normalizedSymbol, fills.size(), assembledRows.size(), result.incompleteCount(), missingPositionSide, missingOperationType, unresolvedOneWay);
+        }
         long offset = (long) (pageNum - 1) * pageSize;
         int first = (int) Math.min(offset, rows.size());
         return new TradeHistoryPageVo(rows.subList(first, Math.min(first + pageSize, rows.size())), rows.size(), result.incompleteCount());
