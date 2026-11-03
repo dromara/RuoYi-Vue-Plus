@@ -24,6 +24,8 @@ public interface AccountPositionCycleProjectionMapper {
 
     int deleteState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
 
+    int refreshBalanceSnapshots(@Param("credentialId") Long credentialId, @Param("symbol") String symbol);
+
     int ensureState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
 
     Map<String, Object> lockState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
