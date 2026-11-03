@@ -151,7 +151,16 @@ public class AccountPositionCycleProjectionService {
             }
             String status = string(state.get("status"));
             if (INCOMPLETE.equals(status)) {
-                continue;
+                // The projection is rebuildable from immutable exchange fills. Once the
+                // blocking source facts are complete, discard only this derived scope and
+                // replay its full history under the state-row lock.
+                mapper.deleteCycleAllocationsByScope(credentialId, normalizedSymbol, scope);
+                mapper.deleteCyclesByScope(credentialId, normalizedSymbol, scope);
+                if (mapper.updateState(credentialId, normalizedSymbol, scope, ZERO, null, null, null, null,
+                    INITIALIZING, false, null) != 1) {
+                    throw new IllegalStateException("账户持仓周期状态重置失败");
+                }
+                status = INITIALIZING;
             }
             if (!READY.equals(status)) {
                 initialize(credentialId, normalizedSymbol, scope, scopeFills, currentPositions.get(scope),
