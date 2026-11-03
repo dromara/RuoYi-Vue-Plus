@@ -2,26 +2,28 @@ package org.dromara.quant.account.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.quant.account.TradeHistoryAssembler;
+import org.dromara.quant.account.domain.vo.TradeHistoryFill;
 import org.dromara.quant.account.domain.vo.TradeHistoryPageVo;
+import org.dromara.quant.account.mapper.TradeHistoryMapper;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.credential.mapper.QuantCredentialMapper;
-import org.dromara.quant.execution.AccountPositionCycleProjectionMapper;
+import org.dromara.quant.exchange.ExchangeGateway;
+import org.dromara.quant.execution.OrderLedgerService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,17 +31,190 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 账户开平仓周期查询服务。所有周期、成交分配和手续费汇总均来自本地持久化投影。
- * GET 请求只执行权限校验及数据库分页，不调用 Binance，也不在请求中重建成交周期。
+ * 开平仓记录查询服务，仅读取本地账本及交易所历史普通订单用于补齐，不参与策略决策和交易所下单。
+ * 时间范围按北京时间的开仓日期筛选，完整成交周期汇总之后再分页。
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TradeHistoryService {
-    private static final ZoneId DISPLAY_ZONE = ZoneId.of("Asia/Shanghai");
+    private static final Duration ORDER_HISTORY_WINDOW = Duration.ofDays(6);
+    private static final Duration ORDER_CREATION_LOOKBACK = Duration.ofDays(7);
+    private static final Duration ORDER_UPDATE_LOOKAHEAD = Duration.ofMinutes(1);
+    private static final int MAX_MISSING_ORDER_IDS = 5000;
+    private static final int MAX_ORDER_HISTORY_REQUESTS = 15;
+    private static final int MAX_EXACT_ORDER_REQUESTS = 5;
+    private static final int ORDER_HISTORY_LIMIT = 1000;
 
     private final QuantCredentialMapper credentialMapper;
-    private final AccountPositionCycleProjectionMapper cycleMapper;
+    private final TradeHistoryMapper historyMapper;
+    private final ExchangeGateway exchangeGateway;
+    private final OrderLedgerService orderLedgerService;
 
+    /**
+     * 从 Binance 历史普通订单中补齐成交账本缺失的订单事实。
+     * 每次页面请求限制 REST 次数；网络请求在数据库事务之外执行。
+     */
+    private void recoverMissingOrderFacts(List<Long> credentialIds, List<TradeHistoryFill> fills, String requestedSymbol) {
+        if (credentialIds.isEmpty() || fills.isEmpty()) {
+            return;
+        }
+        int[] remainingRequests = {MAX_ORDER_HISTORY_REQUESTS};
+        int[] remainingExactRequests = {MAX_EXACT_ORDER_REQUESTS};
+        Instant retentionStart = Instant.now().atZone(ZoneOffset.UTC).minusMonths(3).toInstant();
+
+        for (Long credentialId : credentialIds) {
+            List<String> symbols = fills.stream()
+                .filter(fill -> credentialId.equals(fill.getCredentialId()))
+                .map(TradeHistoryFill::getSymbol)
+                .filter(value -> value != null && !value.isBlank())
+                .distinct()
+                .toList();
+            QuantCredential credential = null;
+            for (String currentSymbol : symbols) {
+                if (requestedSymbol != null && !requestedSymbol.equals(currentSymbol)) {
+                    continue;
+                }
+                List<Long> missingOrderIds = historyMapper.selectOrderIdsMissingOrderFacts(credentialId, currentSymbol, MAX_MISSING_ORDER_IDS);
+                if (missingOrderIds.isEmpty()) {
+                    continue;
+                }
+                log.info("开平仓记录发现缺失订单事实 credentialId={} symbol={} missingOrderCount={}",
+                    credentialId, currentSymbol, missingOrderIds.size());
+                if (credential == null) {
+                    credential = credentialMapper.selectById(credentialId);
+                }
+                if (credential == null || "PAPER".equalsIgnoreCase(credential.getRunMode())
+                    || credential.getApiKey() == null || credential.getApiKey().isBlank()
+                    || credential.getSecretKey() == null || credential.getSecretKey().isBlank()) {
+                    continue;
+                }
+
+                Set<Long> targetOrderIds = new HashSet<>(missingOrderIds);
+                Set<Long> recoveredOrderIds = new HashSet<>();
+                List<TradeHistoryFill> scopedFills = fills.stream()
+                    .filter(fill -> credentialId.equals(fill.getCredentialId()) && currentSymbol.equals(fill.getSymbol())
+                        && fill.getExchangeOrderId() != null && targetOrderIds.contains(fill.getExchangeOrderId())
+                        && fill.getTradeTime() != null)
+                    .toList();
+                if (scopedFills.isEmpty()) {
+                    continue;
+                }
+                Instant from = scopedFills.stream().map(fill -> fill.getTradeTime().toInstant(ZoneOffset.UTC)).min(Instant::compareTo)
+                    .orElseThrow().minus(ORDER_CREATION_LOOKBACK);
+                Instant to = scopedFills.stream().map(fill -> fill.getTradeTime().toInstant(ZoneOffset.UTC)).max(Instant::compareTo)
+                    .orElseThrow().plus(ORDER_UPDATE_LOOKAHEAD);
+                Instant now = Instant.now();
+                if (to.isAfter(now.plusMillis(1))) {
+                    to = now.plusMillis(1);
+                }
+                if (from.isBefore(retentionStart)) {
+                    from = retentionStart;
+                }
+                if (!from.isBefore(to)) {
+                    continue;
+                }
+
+                ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
+                    credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
+                for (Instant windowStart = from; windowStart.isBefore(to) && remainingRequests[0] > 0;) {
+                    Instant windowEnd = windowStart.plus(ORDER_HISTORY_WINDOW);
+                    if (windowEnd.isAfter(to)) {
+                        windowEnd = to;
+                    }
+                    try {
+                        recoverOrderHistoryRange(credentialId, currentSymbol, exchangeCredential, targetOrderIds, recoveredOrderIds,
+                            windowStart, windowEnd, 0, remainingRequests);
+                    } catch (RuntimeException ex) {
+                        log.warn("开平仓记录历史订单补齐失败 credentialId={} symbol={} errorType={}",
+                            credentialId, currentSymbol, ex.getClass().getSimpleName());
+                        break;
+                    }
+                    windowStart = windowEnd;
+                }
+                Set<Long> recentOrderIds = scopedFills.stream()
+                    .filter(fill -> !fill.getTradeTime().toInstant(ZoneOffset.UTC).isBefore(retentionStart))
+                    .map(TradeHistoryFill::getExchangeOrderId)
+                    .collect(Collectors.toSet());
+                for (Long orderId : missingOrderIds.stream().filter(recentOrderIds::contains).sorted(Comparator.reverseOrder()).toList()) {
+                    if (remainingExactRequests[0] <= 0) {
+                        break;
+                    }
+                    if (recoveredOrderIds.contains(orderId)) {
+                        continue;
+                    }
+                    remainingExactRequests[0]--;
+                    try {
+                        ExchangeGateway.OrderSnapshot snapshot = exchangeGateway.queryOrder(exchangeCredential, currentSymbol, orderId, null);
+                        if (snapshot != null && orderId.equals(snapshot.orderId()) && currentSymbol.equalsIgnoreCase(snapshot.symbol())) {
+                            orderLedgerService.syncHistoricalSnapshot(credentialId, currentSymbol, snapshot);
+                            if (snapshot.positionSide() != null && !snapshot.positionSide().isBlank() && snapshot.reduceOnly() != null) {
+                                recoveredOrderIds.add(orderId);
+                            }
+                        }
+                    } catch (RuntimeException ex) {
+                        log.warn("Binance 精确历史订单补齐失败 credentialId={} symbol={} orderId={} errorType={}",
+                            credentialId, currentSymbol, orderId, ex.getClass().getSimpleName());
+                    }
+                }
+                if (remainingRequests[0] <= 0 && remainingExactRequests[0] <= 0) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private void recoverOrderHistoryRange(Long credentialId, String symbol, ExchangeGateway.Credential credential,
+                                          Set<Long> targetOrderIds, Set<Long> recoveredOrderIds, Instant from, Instant to,
+                                          int depth, int[] remainingRequests) {
+        if (remainingRequests[0] <= 0 || !from.isBefore(to)) {
+            return;
+        }
+        remainingRequests[0]--;
+        List<ExchangeGateway.OrderSnapshot> snapshots = exchangeGateway.queryOrderHistory(
+            credential, symbol, new ExchangeGateway.TimeRange(from, to), (long) ORDER_HISTORY_LIMIT);
+        if (snapshots == null) {
+            return;
+        }
+        long matchedCount = snapshots.stream().filter(snapshot -> snapshot != null && snapshot.orderId() != null
+            && targetOrderIds.contains(snapshot.orderId())).count();
+        long completePositionFacts = snapshots.stream().filter(snapshot -> snapshot != null && snapshot.orderId() != null
+            && targetOrderIds.contains(snapshot.orderId()) && snapshot.positionSide() != null && !snapshot.positionSide().isBlank()
+            && snapshot.reduceOnly() != null).count();
+        log.info("开平仓记录历史订单查询完成 credentialId={} symbol={} returnedCount={} matchedCount={} completePositionFacts={}",
+            credentialId, symbol, snapshots.size(), matchedCount, completePositionFacts);
+        for (ExchangeGateway.OrderSnapshot snapshot : snapshots) {
+            if (snapshot == null || snapshot.orderId() == null || !targetOrderIds.contains(snapshot.orderId())) {
+                continue;
+            }
+            try {
+                orderLedgerService.syncHistoricalSnapshot(credentialId, symbol, snapshot);
+                if (snapshot.positionSide() != null && !snapshot.positionSide().isBlank() && snapshot.reduceOnly() != null) {
+                    recoveredOrderIds.add(snapshot.orderId());
+                }
+            } catch (RuntimeException ex) {
+                log.warn("历史订单事实写入冲突 credentialId={} symbol={} orderId={} errorType={}",
+                    credentialId, symbol, snapshot.orderId(), ex.getClass().getSimpleName());
+            }
+        }
+        if (snapshots.size() >= ORDER_HISTORY_LIMIT && depth < 8) {
+            long spanMillis = Duration.between(from, to).toMillis();
+            if (spanMillis > 1) {
+                Instant middle = from.plusMillis(spanMillis / 2);
+                recoverOrderHistoryRange(credentialId, symbol, credential, targetOrderIds, recoveredOrderIds, from, middle, depth + 1, remainingRequests);
+                recoverOrderHistoryRange(credentialId, symbol, credential, targetOrderIds, recoveredOrderIds, middle, to, depth + 1, remainingRequests);
+                return;
+            }
+            log.warn("Binance 历史订单查询达到单次上限且时间窗口无法继续拆分 credentialId={} symbol={}", credentialId, symbol);
+        }
+    }
+
+
+    /**
+     * 查询当前用户有权访问的账户开平仓周期。
+     *
+     * 先读取完整成交链并归组，再应用开仓日期筛选与分页，避免分页或日期范围截断持仓周期。
+     */
     public TradeHistoryPageVo page(PageQuery query, Long credentialId, String symbol, String from, String to) {
         Long userId = LoginHelper.getUserId();
         if (userId == null) {
@@ -48,206 +223,77 @@ public class TradeHistoryService {
         List<QuantCredential> credentials = credentialMapper.selectList(new LambdaQueryWrapper<QuantCredential>()
             .select(QuantCredential::getId, QuantCredential::getUserId, QuantCredential::getAccountName)
             .eq(!LoginHelper.isSuperAdmin(userId), QuantCredential::getUserId, userId));
-        Map<Long, String> accountNames = credentials.stream()
+        Map<Long, String> names = credentials.stream()
             .collect(Collectors.toMap(QuantCredential::getId, QuantCredential::getAccountName));
-        if (credentialId != null && !accountNames.containsKey(credentialId)) {
+        if (credentialId != null && !names.containsKey(credentialId)) {
             throw new ServiceException("无权访问该交易账户");
         }
-        List<Long> credentialIds = credentialId == null
-            ? credentials.stream().map(QuantCredential::getId).toList()
-            : List.of(credentialId);
-        if (credentialIds.isEmpty()) {
-            return new TradeHistoryPageVo(List.of(), 0, 0);
-        }
 
-        LocalDateTime start = boundary(from, false);
-        LocalDateTime end = boundary(to, true);
+        List<Long> credentialIds = credentialId == null ? new ArrayList<>(names.keySet()) : List.of(credentialId);
+        int pageNum = query.getPageNum() == null ? 1 : Math.max(1, query.getPageNum());
+        int pageSize = query.getPageSize() == null ? 10 : Math.min(100, Math.max(1, query.getPageSize()));
+        Instant start = boundary(from, false);
+        Instant end = boundary(to, true);
         if (start != null && end != null && !start.isBefore(end)) {
             throw new ServiceException("开始日期不能晚于结束日期");
         }
-        String normalizedSymbol = symbol == null || symbol.isBlank()
-            ? null : symbol.trim().toUpperCase(Locale.ROOT);
-        if (normalizedSymbol != null && !normalizedSymbol.matches("[A-Z0-9]{2,32}")) {
-            throw new ServiceException("交易对格式无效");
+        String normalizedSymbol = symbol == null || symbol.isBlank() ? null : symbol.trim().toUpperCase(Locale.ROOT);
+
+        List<TradeHistoryFill> fills = credentialIds.isEmpty() ? List.of() : historyMapper.selectFills(credentialIds, normalizedSymbol);
+        if (fills.size() > 20000) {
+            throw new ServiceException("成交账本超过单次汇总上限，请选择客户及交易对后查询，避免截断持仓链");
+        }
+        if (fills.isEmpty()) {
+            log.info("开平仓记录没有找到本地成交 credentialCount={} symbol={}", credentialIds.size(), normalizedSymbol);
         }
 
-        int pageNum = query.getPageNum() == null ? 1 : Math.max(1, query.getPageNum());
-        int pageSize = query.getPageSize() == null ? 10 : Math.min(100, Math.max(1, query.getPageSize()));
+        recoverMissingOrderFacts(credentialIds, fills, normalizedSymbol);
+        fills = credentialIds.isEmpty() ? List.of() : historyMapper.selectFills(credentialIds, normalizedSymbol);
+        if (fills.size() > 20000) {
+            throw new ServiceException("成交账本超过单次汇总上限，请选择客户及交易对后查询，避免截断持仓链");
+        }
+        // 一对多来源关联不能使用 DISTINCT 掩盖，否则同一成交可能被重复计入数量和手续费。
+        if (fills.stream().map(TradeHistoryFill::getId).distinct().count() != fills.size()) {
+            throw new ServiceException("成交来源关联重复，暂不能可靠汇总开平仓记录");
+        }
+
+        var result = TradeHistoryAssembler.assemble(fills.stream().map(fill -> new TradeHistoryAssembler.Fill(
+            fill.getId(), fill.getCredentialId(), fill.getSymbol(), fill.getSide(), fill.getPositionSide(), fill.getOperationType(),
+            fill.getReduceOnly(), fill.getQuantity(), fill.getPrice(), fill.getCommission(), fill.getRealizedPnl(), fill.getTradeTime(),
+            fill.getLeverageSnapshot(), fill.getPriceTickSizeSnapshot(), fill.getPostFillWalletBalance(), fill.getPostFillBalanceAt(),
+            fill.getCurrentPriceTickSize(), fill.getExchangeTradeId(), fill.getExchangeOrderId(), fill.getPositionCycleConflict(),
+            fill.getPositionCycleKey()
+        )).toList(), names);
+
+        List<Map<String, Object>> rows = result.rows().stream().filter(row -> {
+            Instant openedAt = Instant.parse((String) row.get("openedAt"));
+            return (start == null || !openedAt.isBefore(start)) && (end == null || openedAt.isBefore(end));
+        }).toList();
+        if (rows.isEmpty() && !fills.isEmpty()) {
+            long missingPositionSide = fills.stream()
+                .filter(fill -> fill.getPositionSide() == null || fill.getPositionSide().isBlank()).count();
+            long missingOperationType = fills.stream()
+                .filter(fill -> fill.getOperationType() == null || fill.getOperationType().isBlank()).count();
+            log.warn("开平仓记录没有可展示周期 credentialCount={} symbol={} fillCount={} assembledCycleCount={} incompleteCount={} missingPositionSide={} missingOperationType={}",
+                credentialIds.size(), normalizedSymbol, fills.size(), result.rows().size(), result.incompleteCount(),
+                missingPositionSide, missingOperationType);
+        }
+
         long offset = (long) (pageNum - 1) * pageSize;
-        long total = cycleMapper.countCycles(credentialIds, normalizedSymbol, start, end);
-        long incompleteCount = cycleMapper.countIncompleteScopes(credentialIds, normalizedSymbol);
-        if (total == 0) {
-            return new TradeHistoryPageVo(List.of(), 0, (int) Math.min(Integer.MAX_VALUE, incompleteCount));
-        }
-
-        List<Map<String, Object>> cycles = cycleMapper.selectCycles(credentialIds, normalizedSymbol, start, end, offset, pageSize);
-        if (cycles == null || cycles.isEmpty()) {
-            return new TradeHistoryPageVo(List.of(), total, (int) Math.min(Integer.MAX_VALUE, incompleteCount));
-        }
-        List<Long> cycleIds = cycles.stream().map(row -> longValue(row.get("id"))).filter(id -> id != null).toList();
-        Map<Long, List<Map<String, Object>>> allocations = groupByCycle(cycleMapper.selectCycleAllocations(cycleIds));
-        Map<Long, Map<String, BigDecimal>> fees = groupFees(cycleMapper.selectCycleFeeTotals(cycleIds));
-
-        List<Map<String, Object>> rows = new ArrayList<>(cycles.size());
-        for (Map<String, Object> cycle : cycles) {
-            Long id = longValue(cycle.get("id"));
-            rows.add(toRow(cycle, accountNames, allocations.getOrDefault(id, List.of()), fees.getOrDefault(id, Map.of())));
-        }
-        return new TradeHistoryPageVo(rows, total, (int) Math.min(Integer.MAX_VALUE, incompleteCount));
+        int first = (int) Math.min(offset, rows.size());
+        return new TradeHistoryPageVo(rows.subList(first, Math.min(first + pageSize, rows.size())),
+            rows.size(), result.incompleteCount());
     }
 
-    private static Map<String, Object> toRow(Map<String, Object> cycle, Map<Long, String> accountNames,
-                                               List<Map<String, Object>> allocations, Map<String, BigDecimal> fees) {
-        Long id = longValue(cycle.get("id"));
-        Long credentialId = longValue(cycle.get("credentialId"));
-        BigDecimal openingQuantity = decimal(cycle.get("openingQuantity"));
-        BigDecimal closingQuantity = decimal(cycle.get("closingQuantity"));
-        BigDecimal remainingQuantity = decimal(cycle.get("remainingQuantity"));
-        BigDecimal openingNotional = nullableDecimal(cycle.get("openingNotional"));
-        BigDecimal closingNotional = decimal(cycle.get("closingNotional"));
-        LocalDateTime openedAt = localTime(cycle.get("openedAt"));
-        LocalDateTime closedAt = localTime(cycle.get("closedAt"));
-        boolean baselineUnknown = Boolean.TRUE.equals(cycle.get("baselineUnknown")) || intValue(cycle.get("baselineUnknown")) == 1;
-
-        Set<String> openingOrderIds = new LinkedHashSet<>();
-        Set<String> closingOrderIds = new LinkedHashSet<>();
-        Set<String> openingTradeIds = new LinkedHashSet<>();
-        Set<String> closingTradeIds = new LinkedHashSet<>();
-        for (Map<String, Object> allocation : allocations) {
-            String role = string(allocation.get("allocationRole"));
-            String orderId = string(allocation.get("exchangeOrderId"));
-            String tradeId = string(allocation.get("exchangeTradeId"));
-            if ("OPEN".equalsIgnoreCase(role)) {
-                if (orderId != null) openingOrderIds.add(orderId);
-                if (tradeId != null) openingTradeIds.add(tradeId);
-            } else if ("CLOSE".equalsIgnoreCase(role)) {
-                if (orderId != null) closingOrderIds.add(orderId);
-                if (tradeId != null) closingTradeIds.add(tradeId);
-            }
-        }
-
-        Map<String, Object> row = new LinkedHashMap<>();
-        row.put("id", id == null ? null : id.toString());
-        row.put("credentialId", credentialId == null ? null : credentialId.toString());
-        row.put("accountName", accountNames.get(credentialId));
-        row.put("symbol", string(cycle.get("symbol")));
-        row.put("direction", string(cycle.get("direction")));
-        row.put("positionSide", string(cycle.get("positionSide")));
-        row.put("positionCycleKey", string(cycle.get("positionCycleKey")));
-        row.put("openingQuantity", decimalText(openingQuantity));
-        row.put("closingQuantity", decimalText(closingQuantity));
-        row.put("remainingQuantity", decimalText(remainingQuantity));
-        row.put("openingFillCount", intValue(cycle.get("openingFillCount")));
-        row.put("closingFillCount", intValue(cycle.get("closingFillCount")));
-        row.put("openingOrderIds", List.copyOf(openingOrderIds));
-        row.put("closingOrderIds", List.copyOf(closingOrderIds));
-        row.put("openingTradeIds", List.copyOf(openingTradeIds));
-        row.put("closingTradeIds", List.copyOf(closingTradeIds));
-        row.put("entryPrice", baselineUnknown || openingNotional == null || openingQuantity.signum() == 0
-            ? null : decimalText(openingNotional.divide(openingQuantity, 18, RoundingMode.HALF_UP)));
-        row.put("openingNotional", baselineUnknown ? null : decimalText(openingNotional));
-        row.put("leverage", baselineUnknown ? null : cycle.get("leverage"));
-        row.put("openingBalance", fixedDecimal(nullableDecimal(cycle.get("openingBalance")), 4));
-        row.put("openingBalanceAt", timestamp(localTime(cycle.get("openingBalanceAt"))));
-        row.put("openedAt", timestamp(openedAt));
-        row.put("closePrice", closingQuantity.signum() == 0
-            ? null : decimalText(closingNotional.divide(closingQuantity, 18, RoundingMode.HALF_UP)));
-        row.put("closingBalance", fixedDecimal(nullableDecimal(cycle.get("closingBalance")), 4));
-        row.put("closingBalanceAt", timestamp(localTime(cycle.get("closingBalanceAt"))));
-        row.put("realizedPnl", decimalText(decimal(cycle.get("realizedPnl"))));
-        row.put("commissionByAsset", fees.entrySet().stream().collect(Collectors.toMap(
-            Map.Entry::getKey, entry -> decimalText(entry.getValue()), (a, b) -> a, LinkedHashMap::new)));
-        row.put("commission", fees.size() == 1 ? decimalText(fees.values().iterator().next()) : null);
-        row.put("commissionAsset", fees.size() == 1 ? fees.keySet().iterator().next() : null);
-        row.put("closedAt", timestamp(closedAt));
-        row.put("status", string(cycle.get("status")));
-        row.put("baselineUnknown", baselineUnknown);
-        return row;
-    }
-
-    private static Map<Long, List<Map<String, Object>>> groupByCycle(List<Map<String, Object>> rows) {
-        Map<Long, List<Map<String, Object>>> result = new LinkedHashMap<>();
-        if (rows != null) {
-            for (Map<String, Object> row : rows) {
-                Long cycleId = longValue(row.get("cycleId"));
-                if (cycleId != null) {
-                    result.computeIfAbsent(cycleId, ignored -> new ArrayList<>()).add(row);
-                }
-            }
-        }
-        return result;
-    }
-
-    private static Map<Long, Map<String, BigDecimal>> groupFees(List<Map<String, Object>> rows) {
-        Map<Long, Map<String, BigDecimal>> result = new LinkedHashMap<>();
-        if (rows != null) {
-            for (Map<String, Object> row : rows) {
-                Long cycleId = longValue(row.get("cycleId"));
-                String asset = string(row.get("commissionAsset"));
-                if (cycleId != null && asset != null) {
-                    result.computeIfAbsent(cycleId, ignored -> new LinkedHashMap<>())
-                        .put(asset, decimal(row.get("commission")));
-                }
-            }
-        }
-        return result;
-    }
-
-    private static LocalDateTime boundary(String date, boolean nextDay) {
+    private static Instant boundary(String date, boolean nextDay) {
         if (date == null || date.isBlank()) {
             return null;
         }
         try {
             LocalDate parsed = LocalDate.parse(date);
-            return LocalDateTime.ofInstant((nextDay ? parsed.plusDays(1) : parsed).atStartOfDay(DISPLAY_ZONE).toInstant(), ZoneOffset.UTC);
+            return (nextDay ? parsed.plusDays(1) : parsed).atStartOfDay(ZoneId.of("Asia/Shanghai")).toInstant();
         } catch (java.time.DateTimeException ex) {
             throw new ServiceException("日期格式应为 yyyy-MM-dd");
         }
-    }
-
-    private static String timestamp(LocalDateTime value) {
-        return value == null ? null : value.toInstant(ZoneOffset.UTC).toString();
-    }
-
-    private static String fixedDecimal(BigDecimal value, int scale) {
-        return value == null ? null : value.setScale(scale, RoundingMode.HALF_UP).toPlainString();
-    }
-
-    private static String decimalText(BigDecimal value) {
-        return value == null ? null : value.stripTrailingZeros().toPlainString();
-    }
-
-    private static BigDecimal decimal(Object value) {
-        BigDecimal result = nullableDecimal(value);
-        return result == null ? BigDecimal.ZERO : result;
-    }
-
-    private static BigDecimal nullableDecimal(Object value) {
-        if (value instanceof BigDecimal decimal) return decimal;
-        if (value instanceof Number number) return new BigDecimal(number.toString());
-        if (value == null) return null;
-        return new BigDecimal(value.toString());
-    }
-
-    private static Long longValue(Object value) {
-        if (value instanceof Number number) return number.longValue();
-        if (value == null) return null;
-        return Long.parseLong(value.toString());
-    }
-
-    private static int intValue(Object value) {
-        if (value instanceof Number number) return number.intValue();
-        if (value == null) return 0;
-        return Integer.parseInt(value.toString());
-    }
-
-    private static LocalDateTime localTime(Object value) {
-        if (value instanceof LocalDateTime time) return time;
-        if (value instanceof Timestamp timestamp) return timestamp.toLocalDateTime();
-        return null;
-    }
-
-    private static String string(Object value) {
-        return value == null ? null : value.toString();
     }
 }

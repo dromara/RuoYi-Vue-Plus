@@ -61,10 +61,6 @@ public class QuantTrade {
      */
     private BigDecimal commission;
     /**
-     * 手续费资产，例如 USDT/BNB。不同资产不得混合求和。
-     */
-    private String commissionAsset;
-    /**
      * 资金费字段；完整资金费事实以 quant_financial_event 为准。
      */
     private BigDecimal fundingFee;

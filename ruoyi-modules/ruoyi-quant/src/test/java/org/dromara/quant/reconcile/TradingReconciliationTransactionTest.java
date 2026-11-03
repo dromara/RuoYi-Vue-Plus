@@ -5,7 +5,6 @@ import org.dromara.quant.account.mapper.QuantTradeMapper;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.exchange.ExchangeGateway;
 import org.dromara.quant.execution.StrictBinanceTradeCollector;
-import org.dromara.quant.execution.AccountPositionCycleProjectionService;
 import org.dromara.quant.execution.StrictBinanceIncomeCollector;
 import org.dromara.quant.execution.StrategyFillJournalService;
 import org.dromara.quant.finance.mapper.QuantFinancialEventMapper;
@@ -48,7 +47,6 @@ class TradingReconciliationTransactionTest {
     private final ReconciliationFailureRecorder errors = mock(ReconciliationFailureRecorder.class);
     private final StrategyPositionStateService state = mock(StrategyPositionStateService.class);
     private final StrategyFillJournalService fillJournal = mock(StrategyFillJournalService.class);
-    private final AccountPositionCycleProjectionService accountCycles = mock(AccountPositionCycleProjectionService.class);
     private final StrategyFillSyncCursorMapper fillCursors = mock(StrategyFillSyncCursorMapper.class);
     private final StrategyFillSyncCursorService fillCursorService = mock(StrategyFillSyncCursorService.class);
     private final FinancialEventSyncCursorMapper incomeCursors = mock(FinancialEventSyncCursorMapper.class);
@@ -58,7 +56,7 @@ class TradingReconciliationTransactionTest {
         var source = new DriverManagerDataSource("jdbc:h2:mem:reconciliation_" + UUID.randomUUID() + ";MODE=MySQL;DB_CLOSE_DELAY=-1", "sa", "");
         return new TradingReconciliationService(gateway, accounts, positions, orders, trades, protection, finance, records, errors, state,
             new DataSourceTransactionManager(source), new StrictBinanceTradeCollector(gateway), new StrictBinanceIncomeCollector(gateway), fillJournal,
-            accountCycles, fillCursors, fillCursorService, incomeCursors, incomeCursorService);
+            fillCursors, fillCursorService, incomeCursors, incomeCursorService);
     }
 
     private QuantCredential credential() {
