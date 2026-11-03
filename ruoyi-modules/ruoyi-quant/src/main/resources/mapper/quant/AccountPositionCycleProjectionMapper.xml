@@ -789,7 +789,7 @@ SET opening_balance=COALESCE(c.opening_balance,(
                 AND other_role.allocation_role<>a.allocation_role
           )
         LIMIT 1
-    )),
+    ))
 WHERE c.credential_id=#{credentialId}
   AND c.symbol=#{symbol}
   AND (
