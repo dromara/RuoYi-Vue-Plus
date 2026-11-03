@@ -1,7 +1,5 @@
 package org.dromara.quant.account.mapper;
 
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
 import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
