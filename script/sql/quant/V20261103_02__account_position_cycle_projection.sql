@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS quant_position_cycle_state
     updated_at                datetime(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     PRIMARY KEY (credential_id,symbol,position_side),
     KEY idx_quant_position_cycle_state_status (status,incomplete,updated_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账户级持仓周期投影状态';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='账户级持仓周期投影状态';
 
 CREATE TABLE IF NOT EXISTS quant_position_cycle
 (
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS quant_position_cycle
     UNIQUE KEY uk_quant_position_cycle_key (cycle_key),
     KEY idx_quant_position_cycle_page (credential_id,symbol,opened_at,id),
     KEY idx_quant_position_cycle_status (credential_id,symbol,status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账户级开平仓周期投影';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='账户级开平仓周期投影';
 
 CREATE TABLE IF NOT EXISTS quant_trade_cycle_allocation
 (
@@ -132,6 +132,6 @@ CREATE TABLE IF NOT EXISTS quant_trade_cycle_allocation
     UNIQUE KEY uk_quant_trade_cycle_fill_role (credential_id,symbol,exchange_trade_id,allocation_role),
     KEY idx_quant_trade_cycle_allocation_cycle (position_cycle_id,trade_time,exchange_trade_id),
     KEY idx_quant_trade_cycle_allocation_fill (credential_id,symbol,exchange_trade_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账户成交到持仓周期的逐笔分配';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='账户成交到持仓周期的逐笔分配';
 
 DELIMITER ;
