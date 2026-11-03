@@ -31,6 +31,8 @@ END$
 CALL migrate_account_position_cycle_projection()$
 DROP PROCEDURE migrate_account_position_cycle_projection$
 
+DELIMITER ;
+
 CREATE TABLE IF NOT EXISTS quant_position_cycle_state
 (
     credential_id             bigint          NOT NULL COMMENT '量化凭证ID',
