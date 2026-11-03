@@ -43,7 +43,202 @@ WHERE credential_id=#{credentialId}
       OR quantity IS NULL OR quantity<=0
       OR price IS NULL OR price<=0
       OR commission IS NULL OR commission<0
-      OR commission_asset IS NULL OR TRIM(commission_asset)=''
+      OR commission_asset IS NULL OR UPPER(TRIM(commission_asset)) NOT REGEXP '^[A-Z0-9]{2,20}
+      OR trade_time IS NULL
+  )
+]]></select>
+
+    <delete id="deleteState" timeout="3"><![CDATA[
+DELETE FROM quant_position_cycle_state
+WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+]]></delete>
+
+    <select id="selectUnprojectedFills" resultType="org.dromara.quant.account.domain.vo.AccountPositionCycleFill" timeout="10"><![CDATA[
+SELECT t.id, t.credential_id, t.symbol, t.exchange_trade_id, t.exchange_order_id,
+       t.side, o.position_side, t.quantity, t.price, t.commission,
+       COALESCE(NULLIF(t.commission_asset,''), NULLIF(j.commission_asset,'')) AS commission_asset,
+       t.realized_pnl, t.trade_time, o.leverage_snapshot, o.price_tick_size_snapshot,
+       o.post_fill_wallet_balance, o.post_fill_balance_at
+FROM quant_trade t
+LEFT JOIN quant_order o
+  ON o.credential_id=t.credential_id
+ AND o.symbol=t.symbol
+ AND o.exchange_order_id=t.exchange_order_id
+LEFT JOIN quant_strategy_fill_journal j
+  ON j.credential_id=t.credential_id
+ AND j.symbol=t.symbol
+ AND j.exchange_trade_id=t.exchange_trade_id
+LEFT JOIN quant_trade_cycle_allocation a
+  ON a.credential_id=t.credential_id
+ AND a.symbol=t.symbol
+ AND a.exchange_trade_id=t.exchange_trade_id
+WHERE t.credential_id=#{credentialId}
+  AND t.symbol=#{symbol}
+  AND a.id IS NULL
+ORDER BY t.trade_time, t.exchange_trade_id, t.id
+]]></select>
+
+    <insert id="ensureState" timeout="3"><![CDATA[
+INSERT IGNORE INTO quant_position_cycle_state
+(credential_id,symbol,position_side,signed_quantity,status,incomplete,created_at,updated_at)
+VALUES (#{credentialId},#{symbol},#{positionSide},0,'INITIALIZING',0,NOW(6),NOW(6))
+]]></insert>
+
+    <select id="lockState" resultType="map" timeout="3"><![CDATA[
+SELECT signed_quantity, active_cycle_id, last_trade_time, last_exchange_trade_id,
+       status, incomplete, status_reason, projected_through
+FROM quant_position_cycle_state
+WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+FOR UPDATE
+]]></select>
+
+    <update id="updateState" timeout="3"><![CDATA[
+UPDATE quant_position_cycle_state
+SET signed_quantity=#{quantity}, active_cycle_id=#{activeCycleId},
+    last_trade_time=#{lastTradeTime}, last_exchange_trade_id=#{lastTradeId},
+    projected_through=#{projectedThrough}, status=#{status}, incomplete=#{incomplete}, status_reason=#{reason}, updated_at=NOW(6)
+WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+]]></update>
+
+    <insert id="insertCycle" timeout="3"><![CDATA[
+INSERT INTO quant_position_cycle
+(id,cycle_key,credential_id,symbol,position_side,direction,status,baseline_unknown,
+ opening_quantity,closing_quantity,remaining_quantity,opening_notional,closing_notional,
+ realized_pnl,opening_fill_count,closing_fill_count,opened_at,closed_at,leverage_snapshot,
+ price_tick_size_snapshot,opening_balance,opening_balance_at,created_at,updated_at)
+VALUES
+(#{id},#{cycleKey},#{credentialId},#{symbol},#{positionSide},#{direction},#{status},#{baselineUnknown},
+ #{openingQuantity},0,#{remainingQuantity},#{openingNotional},0,0,#{openingFillCount},0,#{openedAt},NULL,
+ #{leverage},#{tickSize},#{openingBalance},#{openingBalanceAt},NOW(6),NOW(6))
+]]></insert>
+
+    <update id="updateOpenCycle" timeout="3"><![CDATA[
+UPDATE quant_position_cycle
+SET opening_quantity=opening_quantity+#{quantity},
+    opening_notional=CASE WHEN baseline_unknown=1 THEN NULL ELSE COALESCE(opening_notional,0)+#{notional} END,
+    remaining_quantity=remaining_quantity+#{quantity},
+    opening_fill_count=opening_fill_count+1,
+    leverage_snapshot=COALESCE(leverage_snapshot,#{leverage}),
+    price_tick_size_snapshot=COALESCE(price_tick_size_snapshot,#{tickSize}),
+    opening_balance=CASE WHEN baseline_unknown=0 AND opening_fill_count=0 THEN #{balance} ELSE opening_balance END,
+    opening_balance_at=CASE WHEN baseline_unknown=0 AND opening_fill_count=0 THEN #{balanceAt} ELSE opening_balance_at END,
+    updated_at=NOW(6)
+WHERE id=#{id} AND status IN ('OPEN','OPENING_UNKNOWN')
+]]></update>
+
+    <select id="selectCycleState" resultType="map" timeout="3"><![CDATA[
+SELECT baseline_unknown, direction FROM quant_position_cycle WHERE id=#{id}
+]]></select>
+
+    <update id="updateCloseCycle" timeout="3"><![CDATA[
+UPDATE quant_position_cycle
+SET closing_quantity=closing_quantity+#{quantity},
+    closing_notional=closing_notional+#{notional},
+    remaining_quantity=#{remainingQuantity},
+    realized_pnl=realized_pnl+#{realizedPnl},
+    closing_fill_count=closing_fill_count+1,
+    status=#{status}, closed_at=#{closedAt},
+    closing_balance=COALESCE(#{balance},closing_balance),
+    closing_balance_at=COALESCE(#{balanceAt},closing_balance_at),
+    updated_at=NOW(6)
+WHERE id=#{id} AND status IN ('OPEN','OPENING_UNKNOWN')
+]]></update>
+
+    <insert id="insertAllocation" timeout="3"><![CDATA[
+INSERT INTO quant_trade_cycle_allocation
+(id,credential_id,symbol,exchange_trade_id,exchange_order_id,position_cycle_id,
+ allocation_role,allocated_quantity,allocated_price,commission,commission_asset,
+ realized_pnl,trade_time,created_at)
+VALUES
+(#{id},#{credentialId},#{symbol},#{tradeId},#{orderId},#{cycleId},
+ #{role},#{quantity},#{price},#{commission},#{commissionAsset},
+ #{realizedPnl},#{tradeTime},NOW(6))
+]]></insert>
+
+    <select id="selectCycles" resultType="map" timeout="10">
+SELECT id, credential_id AS credentialId, symbol, cycle_key AS positionCycleKey,
+       position_side AS positionSide, direction,
+       opening_quantity AS openingQuantity, closing_quantity AS closingQuantity,
+       remaining_quantity AS remainingQuantity, opening_notional AS openingNotional,
+       closing_notional AS closingNotional, realized_pnl AS realizedPnl,
+       opening_fill_count AS openingFillCount, closing_fill_count AS closingFillCount,
+       leverage_snapshot AS leverage, price_tick_size_snapshot AS priceTickSizeSnapshot,
+       opening_balance AS openingBalance, opening_balance_at AS openingBalanceAt,
+       closing_balance AS closingBalance, closing_balance_at AS closingBalanceAt,
+       opened_at AS openedAt, closed_at AS closedAt, status, baseline_unknown AS baselineUnknown
+FROM quant_position_cycle
+WHERE credential_id IN
+<foreach collection="credentialIds" item="credentialId" open="(" separator="," close=")">
+    #{credentialId}
+</foreach>
+<if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
+<if test="fromUtc != null">AND opened_at IS NOT NULL AND opened_at&gt;=#{fromUtc}</if>
+<if test="toUtc != null">AND opened_at IS NOT NULL AND opened_at&lt;#{toUtc}</if>
+ORDER BY COALESCE(opened_at,created_at) DESC,id DESC
+LIMIT #{limit} OFFSET #{offset}
+</select>
+
+    <select id="countCycles" resultType="long" timeout="5">
+SELECT COUNT(*)
+FROM quant_position_cycle
+WHERE credential_id IN
+<foreach collection="credentialIds" item="credentialId" open="(" separator="," close=")">
+    #{credentialId}
+</foreach>
+<if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
+<if test="fromUtc != null">AND opened_at IS NOT NULL AND opened_at&gt;=#{fromUtc}</if>
+<if test="toUtc != null">AND opened_at IS NOT NULL AND opened_at&lt;#{toUtc}</if>
+</select>
+
+    <select id="countIncompleteScopes" resultType="long" timeout="5">
+SELECT COUNT(DISTINCT CONCAT(credential_id,':',symbol))
+FROM quant_position_cycle_state
+WHERE credential_id IN
+<foreach collection="credentialIds" item="credentialId" open="(" separator="," close=")">
+    #{credentialId}
+</foreach>
+  AND (status&lt;&gt;'READY' OR incomplete=1)
+<if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
+</select>
+
+    <delete id="deleteCycleAllocationsByScope" timeout="5"><![CDATA[
+DELETE FROM quant_trade_cycle_allocation
+WHERE position_cycle_id IN (
+    SELECT id FROM quant_position_cycle
+    WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+)
+]]></delete>
+
+    <delete id="deleteCyclesByScope" timeout="5"><![CDATA[
+DELETE FROM quant_position_cycle
+WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+]]></delete>
+
+    <select id="selectCycleAllocations" resultType="map" timeout="5">
+SELECT position_cycle_id AS cycleId, allocation_role AS allocationRole,
+       exchange_order_id AS exchangeOrderId, exchange_trade_id AS exchangeTradeId
+FROM quant_trade_cycle_allocation
+WHERE position_cycle_id IN
+<foreach collection="cycleIds" item="cycleId" open="(" separator="," close=")">
+    #{cycleId}
+</foreach>
+ORDER BY position_cycle_id,trade_time,exchange_trade_id
+</select>
+
+    <select id="selectCycleFeeTotals" resultType="map" timeout="5">
+SELECT position_cycle_id AS cycleId,
+       COALESCE(NULLIF(UPPER(TRIM(commission_asset)),''),'UNKNOWN') AS commissionAsset,
+       SUM(commission) AS commission
+FROM quant_trade_cycle_allocation
+WHERE position_cycle_id IN
+<foreach collection="cycleIds" item="cycleId" open="(" separator="," close=")">
+    #{cycleId}
+</foreach>
+GROUP BY position_cycle_id,COALESCE(NULLIF(UPPER(TRIM(commission_asset)),''),'UNKNOWN')
+ORDER BY position_cycle_id,commissionAsset
+</select>
+</mapper>
+
       OR realized_pnl IS NULL
       OR trade_time IS NULL
   )
