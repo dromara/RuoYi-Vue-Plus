@@ -298,8 +298,8 @@ WHERE credential_id IN
     #{credentialId}
 </foreach>
 <if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
-<if test="fromUtc != null">AND opened_at IS NOT NULL AND opened_at&gt;=#{fromUtc}</if>
-<if test="toUtc != null">AND opened_at IS NOT NULL AND opened_at&lt;#{toUtc}</if>
+<if test="fromUtc != null">AND (opened_at IS NULL OR opened_at&gt;=#{fromUtc})</if>
+<if test="toUtc != null">AND (opened_at IS NULL OR opened_at&lt;#{toUtc})</if>
 ORDER BY COALESCE(opened_at,created_at) DESC,id DESC
 LIMIT #{limit} OFFSET #{offset}
 </select>
@@ -312,8 +312,8 @@ WHERE credential_id IN
     #{credentialId}
 </foreach>
 <if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
-<if test="fromUtc != null">AND opened_at IS NOT NULL AND opened_at&gt;=#{fromUtc}</if>
-<if test="toUtc != null">AND opened_at IS NOT NULL AND opened_at&lt;#{toUtc}</if>
+<if test="fromUtc != null">AND (opened_at IS NULL OR opened_at&gt;=#{fromUtc})</if>
+<if test="toUtc != null">AND (opened_at IS NULL OR opened_at&lt;#{toUtc})</if>
 </select>
 
     <select id="countIncompleteScopes" resultType="long" timeout="5">
