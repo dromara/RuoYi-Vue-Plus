@@ -5,7 +5,7 @@
         SELECT t.*,
             COALESCE(soi.position_side, soi_client_role.position_side, pre_dispatch_role.position_side,
                 pre_dispatch_client_role.position_side, NULLIF(o.position_side, 'BOTH'), o.position_side) AS position_side,
-            o.reduce_only,
+            CASE WHEN o.reduce_only = '1' THEN 1 WHEN o.reduce_only = '0' THEN 0 ELSE NULL END AS reduce_only,
             COALESCE(soi.fill_role, soi_client_role.fill_role, pre_dispatch_role.operation_type,
                 pre_dispatch_client_role.operation_type, dispatch_role.operation_type,
                 dispatch_client_role.operation_type, e.operation_type) AS operation_type,
