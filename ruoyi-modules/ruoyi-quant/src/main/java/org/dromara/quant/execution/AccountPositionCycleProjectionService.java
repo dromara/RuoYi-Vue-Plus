@@ -221,6 +221,14 @@ public class AccountPositionCycleProjectionService {
                 }
             }
         }
+        mapper.refreshBalanceSnapshots(credentialId, normalizedSymbol);
+    }
+
+    public void refreshBalanceSnapshots(Long credentialId, String symbol) {
+        if (credentialId == null || credentialId <= 0 || symbol == null || symbol.isBlank()) {
+            return;
+        }
+        mapper.refreshBalanceSnapshots(credentialId, symbol.trim().toUpperCase(Locale.ROOT));
     }
 
     private void initialize(Long credentialId, String symbol, String scope, List<AccountPositionCycleFill> fills,
@@ -332,8 +340,8 @@ public class AccountPositionCycleProjectionService {
             boolean crossed = openQuantity.signum() > 0;
             if (mapper.updateCloseCycle(activeCycleId, closeQuantity, closeNotional, remaining, realizedPnl,
                 nextStatus, closed ? fill.getTradeTime() : null,
-                crossed ? null : fill.getPostFillWalletBalance(),
-                crossed ? null : fill.getPostFillBalanceAt()) != 1) {
+                closed && !crossed ? fill.getPostFillWalletBalance() : null,
+                closed && !crossed ? fill.getPostFillBalanceAt() : null) != 1) {
                 throw new IllegalStateException("持仓周期平仓投影更新失败");
             }
             insertAllocation(credentialId, symbol, fill, activeCycleId, "CLOSE", closeQuantity, closeFee, commissionAsset, realizedPnl);
