@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TradeHistoryService {
     private static final Duration ORDER_HISTORY_WINDOW = Duration.ofDays(6);
+    private static final Duration ORDER_CREATION_LOOKBACK = Duration.ofDays(7);
+    private static final Duration ORDER_UPDATE_LOOKAHEAD = Duration.ofMinutes(1);
     private static final int MAX_MISSING_ORDER_IDS = 5000;
     private static final int MAX_ORDER_HISTORY_REQUESTS = 15;
     private static final int MAX_EXACT_ORDER_REQUESTS = 5;
@@ -98,8 +100,10 @@ public class TradeHistoryService {
                 if (scopedFills.isEmpty()) {
                     continue;
                 }
-                Instant from = scopedFills.stream().map(fill -> fill.getTradeTime().toInstant(ZoneOffset.UTC)).min(Instant::compareTo).orElseThrow();
-                Instant to = scopedFills.stream().map(fill -> fill.getTradeTime().toInstant(ZoneOffset.UTC)).max(Instant::compareTo).orElseThrow().plusMillis(1);
+                Instant from = scopedFills.stream().map(fill -> fill.getTradeTime().toInstant(ZoneOffset.UTC)).min(Instant::compareTo)
+                    .orElseThrow().minus(ORDER_CREATION_LOOKBACK);
+                Instant to = scopedFills.stream().map(fill -> fill.getTradeTime().toInstant(ZoneOffset.UTC)).max(Instant::compareTo)
+                    .orElseThrow().plus(ORDER_UPDATE_LOOKAHEAD);
                 Instant now = Instant.now();
                 if (to.isAfter(now.plusMillis(1))) {
                     to = now.plusMillis(1);
