@@ -73,6 +73,7 @@ class TradeHistoryMapperTest {
                     row.put("id", resultSet.getLong("id"));
                     row.put("position_side", resultSet.getString("position_side"));
                     row.put("operation_type", resultSet.getString("operation_type"));
+                    row.put("reduce_only", resultSet.getBoolean("reduce_only"));
                     row.put("position_cycle_key", resultSet.getString("position_cycle_key"));
                     row.put("position_cycle_conflict", resultSet.getBoolean("position_cycle_conflict"));
                     row.put("price_tick_size", resultSet.getBigDecimal("current_price_tick_size"));
@@ -110,6 +111,7 @@ class TradeHistoryMapperTest {
             assertEquals(1, rows.size());
             assertEquals("SHORT", rows.getFirst().get("position_side"));
             assertEquals("OPEN", rows.getFirst().get("operation_type"));
+            assertFalse((Boolean) rows.getFirst().get("reduce_only"));
             assertNull(rows.getFirst().get("position_cycle_key"));
             assertFalse((Boolean) rows.getFirst().get("position_cycle_conflict"));
             assertEquals(new java.math.BigDecimal("0.0100000000"), rows.getFirst().get("price_tick_size"));
@@ -127,6 +129,7 @@ class TradeHistoryMapperTest {
             assertEquals(1, rows.size());
             assertEquals("LONG", rows.getFirst().get("position_side"));
             assertEquals("CLOSE", rows.getFirst().get("operation_type"));
+            assertTrue((Boolean) rows.getFirst().get("reduce_only"));
             assertFalse((Boolean) rows.getFirst().get("position_cycle_conflict"));
         }
     }
