@@ -35,8 +35,18 @@ ORDER BY t.trade_time, t.exchange_trade_id, t.id
 SELECT DISTINCT symbol
 FROM quant_strategy_fill_journal
 WHERE credential_id=#{credentialId}
-  AND attribution_status IN ('PENDING_FACTS','CONFLICT')
   AND symbol=#{symbol}
+  AND (
+      attribution_status IN ('PENDING_FACTS','CONFLICT')
+      OR exchange_order_id IS NULL OR exchange_order_id<=0
+      OR side IS NULL OR UPPER(side) NOT IN ('BUY','SELL')
+      OR quantity IS NULL OR quantity<=0
+      OR price IS NULL OR price<=0
+      OR commission IS NULL OR commission<0
+      OR commission_asset IS NULL OR TRIM(commission_asset)=''
+      OR realized_pnl IS NULL
+      OR trade_time IS NULL
+  )
 ]]></select>
 
     <select id="selectUnprojectedFills" resultType="org.dromara.quant.account.domain.vo.AccountPositionCycleFill" timeout="10"><![CDATA[
@@ -186,6 +196,19 @@ WHERE credential_id IN
   AND (status&lt;&gt;'READY' OR incomplete=1)
 <if test="symbol != null and symbol != ''">AND symbol=#{symbol}</if>
 </select>
+
+    <delete id="deleteCycleAllocationsByScope" timeout="5"><![CDATA[
+DELETE FROM quant_trade_cycle_allocation
+WHERE position_cycle_id IN (
+    SELECT id FROM quant_position_cycle
+    WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+)
+]]></delete>
+
+    <delete id="deleteCyclesByScope" timeout="5"><![CDATA[
+DELETE FROM quant_position_cycle
+WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND position_side=#{positionSide}
+]]></delete>
 
     <select id="selectCycleAllocations" resultType="map" timeout="5">
 SELECT position_cycle_id AS cycleId, allocation_role AS allocationRole,
