@@ -18,6 +18,8 @@ public interface AccountPositionCycleProjectionMapper {
 
     List<AccountPositionCycleFill> selectUnprojectedFills(@Param("credentialId") Long credentialId, @Param("symbol") String symbol);
 
+    List<String> selectProjectionBlockedSymbols(@Param("credentialId") Long credentialId, @Param("symbol") String symbol);
+
     int ensureState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
 
     Map<String, Object> lockState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
