@@ -148,8 +148,9 @@ class TradeHistoryMapperTest {
 
     @Test
     void leavesUnclassifiedOneWayTradesUnresolvedInsteadOfGuessing() throws Exception {
-        try (Connection connection = database()) {
+        try (Connection connection = database(); var statement = connection.createStatement()) {
             insertTrade(connection, 1, 10, "BUY", 104);
+            statement.execute("INSERT INTO quant_order VALUES (1,10,'BTCUSDT',104,'QCLIENT104','BUY','BOTH','0',5,0.01,1000,'2026-10-10 00:00:01')");
             List<Map<String, Object>> rows = query(connection, List.of(10L), null);
             assertEquals(1, rows.size());
             assertEquals("BOTH", rows.getFirst().get("position_side"));
