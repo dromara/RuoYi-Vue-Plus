@@ -40,14 +40,23 @@
         ) dispatch_role ON dispatch_role.credential_id = t.credential_id
             AND dispatch_role.symbol = t.symbol AND dispatch_role.exchange_order_id = t.exchange_order_id
         LEFT JOIN (
-            SELECT credential_id, symbol, client_order_id, MIN(operation_type) AS operation_type,
-                MIN(position_side) AS position_side
-            FROM quant_strategy_pre_dispatch_intent
-            WHERE operation_type IN ('OPEN', 'CLOSE') AND client_order_id IS NOT NULL
-            GROUP BY credential_id, symbol, client_order_id
-            HAVING COUNT(DISTINCT operation_type) = 1 AND COUNT(DISTINCT position_side) = 1
+            SELECT p.credential_id, p.symbol, d.exchange_order_id,
+                MIN(p.operation_type) AS operation_type, MIN(p.position_side) AS position_side
+            FROM quant_strategy_pre_dispatch_intent p
+            JOIN quant_order_dispatch_ticket d ON d.credential_id = p.credential_id
+                AND d.symbol = p.symbol AND d.idempotency_key = p.idempotency_key
+                AND d.client_order_id = p.client_order_id
+            WHERE p.operation_type IN ('OPEN', 'CLOSE')
+                AND d.operation_type IN ('OPEN', 'CLOSE')
+                AND d.dispatch_status IN ('ACKED', 'RECOVERED')
+                AND d.exchange_order_id IS NOT NULL
+            GROUP BY p.credential_id, p.symbol, d.exchange_order_id
+            HAVING COUNT(DISTINCT p.operation_type) = 1
+                AND COUNT(DISTINCT p.position_side) = 1
+                AND COUNT(DISTINCT d.operation_type) = 1
+                AND MIN(p.operation_type) = MIN(d.operation_type)
         ) pre_dispatch_role ON pre_dispatch_role.credential_id = t.credential_id
-            AND pre_dispatch_role.symbol = t.symbol AND pre_dispatch_role.client_order_id = o.client_order_id
+            AND pre_dispatch_role.symbol = t.symbol AND pre_dispatch_role.exchange_order_id = t.exchange_order_id
         LEFT JOIN quant_symbol qs ON qs.symbol = t.symbol
         ORDER BY t.trade_time, t.exchange_trade_id, t.id
         LIMIT 20001
