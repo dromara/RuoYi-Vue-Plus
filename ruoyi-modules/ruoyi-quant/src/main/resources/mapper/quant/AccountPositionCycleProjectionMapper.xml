@@ -21,6 +21,14 @@ WHERE t.credential_id=#{credentialId}
 ORDER BY t.trade_time, t.exchange_trade_id, t.id
 ]]></select>
 
+    <select id="selectProjectionBlockedSymbols" resultType="string" timeout="3"><![CDATA[
+SELECT DISTINCT symbol
+FROM quant_strategy_fill_journal
+WHERE credential_id=#{credentialId}
+  AND attribution_status IN ('PENDING_FACTS','CONFLICT')
+  AND symbol=#{symbol}
+]]></select>
+
     <select id="selectUnprojectedFills" resultType="org.dromara.quant.account.domain.vo.AccountPositionCycleFill" timeout="10"><![CDATA[
 SELECT t.id, t.credential_id, t.symbol, t.exchange_trade_id, t.exchange_order_id,
        t.side, o.position_side, t.quantity, t.price, t.commission,
