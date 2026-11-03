@@ -61,7 +61,7 @@ public class TradeHistoryService {
         }
         int[] remainingRequests = {MAX_ORDER_HISTORY_REQUESTS};
         int[] remainingExactRequests = {MAX_EXACT_ORDER_REQUESTS};
-        Instant retentionStart = Instant.now().minus(Duration.ofDays(90));
+        Instant retentionStart = Instant.now().atZone(ZoneOffset.UTC).minusMonths(3).toInstant();
 
         for (Long credentialId : credentialIds) {
             List<String> symbols = fills.stream()
