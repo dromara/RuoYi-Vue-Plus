@@ -25,19 +25,21 @@ public interface AccountPositionCycleProjectionMapper {
     int updateState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide,
                     @Param("quantity") BigDecimal quantity, @Param("activeCycleId") Long activeCycleId,
                     @Param("lastTradeTime") LocalDateTime lastTradeTime, @Param("lastTradeId") Long lastTradeId,
-                    @Param("status") String status, @Param("incomplete") boolean incomplete, @Param("reason") String reason);
+                    @Param("projectedThrough") LocalDateTime projectedThrough, @Param("status") String status, @Param("incomplete") boolean incomplete, @Param("reason") String reason);
 
     int insertCycle(@Param("id") Long id, @Param("cycleKey") String cycleKey, @Param("credentialId") Long credentialId,
                     @Param("symbol") String symbol, @Param("positionSide") String positionSide, @Param("direction") String direction,
                     @Param("status") String status, @Param("baselineUnknown") boolean baselineUnknown,
                     @Param("openingQuantity") BigDecimal openingQuantity, @Param("remainingQuantity") BigDecimal remainingQuantity,
-                    @Param("openingNotional") BigDecimal openingNotional, @Param("openedAt") LocalDateTime openedAt,
+                    @Param("openingFillCount") int openingFillCount, @Param("openingNotional") BigDecimal openingNotional, @Param("openedAt") LocalDateTime openedAt,
                     @Param("leverage") Integer leverage, @Param("tickSize") BigDecimal tickSize,
                     @Param("openingBalance") BigDecimal openingBalance, @Param("openingBalanceAt") LocalDateTime openingBalanceAt);
 
     int updateOpenCycle(@Param("id") Long id, @Param("quantity") BigDecimal quantity, @Param("notional") BigDecimal notional,
                         @Param("leverage") Integer leverage, @Param("tickSize") BigDecimal tickSize,
                         @Param("balance") BigDecimal balance, @Param("balanceAt") LocalDateTime balanceAt);
+
+    Map<String, Object> selectCycleState(@Param("id") Long id);
 
     int updateCloseCycle(@Param("id") Long id, @Param("quantity") BigDecimal quantity, @Param("notional") BigDecimal notional,
                          @Param("remainingQuantity") BigDecimal remainingQuantity, @Param("realizedPnl") BigDecimal realizedPnl,
