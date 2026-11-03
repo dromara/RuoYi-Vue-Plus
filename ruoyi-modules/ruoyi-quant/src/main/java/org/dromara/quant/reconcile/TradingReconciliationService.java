@@ -815,6 +815,8 @@ public class TradingReconciliationService {
             entity.setSide(s.side());
             entity.setOrderType(s.type());
             entity.setStatus(s.status());
+            entity.setPositionSide(s.positionSide());
+            entity.setReduceOnly(s.reduceOnly());
             entity.setPrice(s.price());
             entity.setOriginalQuantity(nvl(s.originalQuantity()));
             entity.setExecutedQuantity(nvl(s.executedQuantity()));
