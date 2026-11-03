@@ -77,6 +77,8 @@ public class TradeHistoryService {
                 if (missingOrderIds.isEmpty()) {
                     continue;
                 }
+                log.info("开平仓记录发现缺失订单事实 credentialId={} symbol={} missingOrderCount={}",
+                    credentialId, currentSymbol, missingOrderIds.size());
                 if (credential == null) {
                     credential = credentialMapper.selectById(credentialId);
                 }
@@ -170,6 +172,13 @@ public class TradeHistoryService {
         if (snapshots == null) {
             return;
         }
+        long matchedCount = snapshots.stream().filter(snapshot -> snapshot != null && snapshot.orderId() != null
+            && targetOrderIds.contains(snapshot.orderId())).count();
+        long completePositionFacts = snapshots.stream().filter(snapshot -> snapshot != null && snapshot.orderId() != null
+            && targetOrderIds.contains(snapshot.orderId()) && snapshot.positionSide() != null && !snapshot.positionSide().isBlank()
+            && snapshot.reduceOnly() != null).count();
+        log.info("开平仓记录历史订单查询完成 credentialId={} symbol={} returnedCount={} matchedCount={} completePositionFacts={}",
+            credentialId, symbol, snapshots.size(), matchedCount, completePositionFacts);
         for (ExchangeGateway.OrderSnapshot snapshot : snapshots) {
             if (snapshot == null || snapshot.orderId() == null || !targetOrderIds.contains(snapshot.orderId())) {
                 continue;
