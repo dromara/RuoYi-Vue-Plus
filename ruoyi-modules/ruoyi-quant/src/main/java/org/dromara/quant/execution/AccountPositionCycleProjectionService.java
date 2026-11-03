@@ -104,6 +104,11 @@ public class AccountPositionCycleProjectionService {
 
         for (String scope : scopes) {
             if (!validScope(scope)) {
+                for (String knownScope : scopes) {
+                    if (validScope(knownScope)) {
+                        markIncomplete(credentialId, normalizedSymbol, knownScope, "同一交易对存在无法识别 positionSide 的成交，账户周期不完整");
+                    }
+                }
                 markIncomplete(credentialId, normalizedSymbol, "UNKNOWN", "成交订单缺少可信的交易所 positionSide");
                 continue;
             }
@@ -149,10 +154,15 @@ public class AccountPositionCycleProjectionService {
             LocalDateTime projectedThrough = localTime(state.get("projected_through"));
             boolean incomplete = Boolean.TRUE.equals(state.get("incomplete")) || number(state.get("incomplete")) == 1;
             List<AccountPositionCycleFill> sorted = sorted(pending);
-            boolean lateFill = sorted.stream().anyMatch(fill ->
-                lastTradeTime != null && compare(fill.getTradeTime(), fill.getExchangeTradeId(), lastTradeTime, lastTradeId) <= 0
+            boolean lateFill = false;
+            for (AccountPositionCycleFill fill : sorted) {
+                if (lastTradeTime != null && compare(fill.getTradeTime(), fill.getExchangeTradeId(), lastTradeTime, lastTradeId) <= 0
                     || projectedThrough != null && (lastTradeTime == null || projectedThrough.isAfter(lastTradeTime))
-                        && !fill.getTradeTime().isAfter(projectedThrough));
+                        && !fill.getTradeTime().isAfter(projectedThrough)) {
+                    lateFill = true;
+                    break;
+                }
+            }
             if (lateFill) {
                 mapper.updateState(credentialId, normalizedSymbol, scope, quantity, activeCycleId, lastTradeTime, lastTradeId,
                     projectedThrough, INCOMPLETE, true, "检测到晚到的历史成交，必须按完整历史重建该持仓周期");
@@ -425,6 +435,9 @@ public class AccountPositionCycleProjectionService {
     }
 
     private static void preflight(String scope, BigDecimal quantity, boolean activeCycle, List<AccountPositionCycleFill> fills) {
+        if ((quantity.signum() == 0) == activeCycle) {
+            throw new IllegalStateException("活动周期与当前持仓数量不一致");
+        }
         for (AccountPositionCycleFill fill : fills) {
             if (quantity.signum() != 0 && !activeCycle) {
                 throw new IllegalStateException("非零账户仓位缺少活动周期记录");
