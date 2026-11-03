@@ -22,6 +22,8 @@ public interface AccountPositionCycleProjectionMapper {
 
     List<String> selectProjectionBlockedSymbols(@Param("credentialId") Long credentialId, @Param("symbol") String symbol);
 
+    int deleteState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
+
     int ensureState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
 
     Map<String, Object> lockState(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("positionSide") String positionSide);
