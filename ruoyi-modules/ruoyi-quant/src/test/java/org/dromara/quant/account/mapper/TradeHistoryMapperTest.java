@@ -6,6 +6,7 @@ import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
@@ -26,26 +27,74 @@ public class TradeHistoryMapperTest {
     }
 
     private String sql(List<Long> ids, String symbol) throws Exception {
-        var annotation = TradeHistoryMapper.class.getMethod("selectFills", List.class, String.class).getAnnotation(Select.class);
         var parameters = new java.util.HashMap<String, Object>();
         parameters.put("ids", ids);
         parameters.put("symbol", symbol);
-        return new XMLLanguageDriver().createSqlSource(new Configuration(), annotation.value()[0], Map.class).getBoundSql(parameters).getSql();
+        var configuration = new Configuration();
+        String resource = "mapper/quant/TradeHistoryMapper.xml";
+        try (InputStream input = org.apache.ibatis.io.Resources.getResourceAsStream(resource)) {
+            new org.apache.ibatis.builder.xml.XMLMapperBuilder(input, configuration, resource, configuration.getSqlFragments()).parse();
+        }
+        return configuration.getMappedStatement(TradeHistoryMapper.class.getName() + ".selectFills").getBoundSql(parameters).getSql();
     }
 
     private Connection database() throws Exception {
         var connection = DriverManager.getConnection("jdbc:h2:mem:" + UUID.randomUUID() + ";MODE=MySQL");
         try (var statement = connection.createStatement()) {
             statement.execute("CREATE TABLE quant_trade (id BIGINT PRIMARY KEY, credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, trade_time TIMESTAMP)");
-            statement.execute("CREATE TABLE quant_order (id BIGINT PRIMARY KEY, credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, position_side VARCHAR(10), " +
+            statement.execute("CREATE TABLE quant_order (id BIGINT PRIMARY KEY, credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, client_order_id VARCHAR(64), position_side VARCHAR(10), " +
                 "reduce_only BOOLEAN, leverage_snapshot INT, price_tick_size_snapshot DECIMAL(32,16), post_fill_wallet_balance DECIMAL(32,16), post_fill_balance_at TIMESTAMP)");
             statement.execute("CREATE TABLE quant_symbol (symbol VARCHAR(32), price_tick_size DECIMAL(32,16))");
             statement.execute("CREATE TABLE quant_execution_record (id BIGINT PRIMARY KEY, credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, operation_type " +
                 "VARCHAR(20))");
+            statement.execute("CREATE TABLE quant_strategy_order_intent (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, position_side VARCHAR(10), fill_role VARCHAR(20))");
+            statement.execute("CREATE TABLE quant_order_dispatch_ticket (credential_id BIGINT, symbol VARCHAR(32), exchange_order_id BIGINT, operation_type VARCHAR(20), dispatch_status VARCHAR(20))");
+            statement.execute("CREATE TABLE quant_strategy_pre_dispatch_intent (credential_id BIGINT, symbol VARCHAR(32), client_order_id VARCHAR(64), operation_type VARCHAR(20))");
             statement.execute("CREATE INDEX idx_order_history ON quant_order(credential_id, symbol, exchange_order_id)");
             statement.execute("CREATE INDEX idx_execution_history ON quant_execution_record(credential_id, symbol, exchange_order_id, operation_type)");
         }
         return connection;
+    }
+
+
+    @Test
+    void restoresOneWayOrderRoleFromImmutableDispatchIntent() throws Exception {
+        try (var connection = database(); var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO quant_trade VALUES (1,10,'BTCUSDT',101,'2026-10-10 00:00:00')");
+            statement.execute("INSERT INTO quant_order (id,credential_id,symbol,exchange_order_id,client_order_id,position_side,reduce_only) " +
+                "VALUES (1,10,'BTCUSDT',101,'QCLIENT101','BOTH',FALSE)");
+            statement.execute("INSERT INTO quant_order_dispatch_ticket VALUES (10,'BTCUSDT',101,'OPEN','ACKED')");
+            statement.execute("INSERT INTO quant_strategy_pre_dispatch_intent VALUES (10,'BTCUSDT','QCLIENT101','OPEN')");
+            try (var prepared = connection.prepareStatement(sql(List.of(10L), "BTCUSDT"))) {
+                prepared.setLong(1, 10L);
+                prepared.setString(2, "BTCUSDT");
+                try (var result = prepared.executeQuery()) {
+                    assertTrue(result.next());
+                    assertEquals("OPEN", result.getString("operation_type"));
+                    assertEquals("BOTH", result.getString("position_side"));
+                    assertFalse(result.next());
+                }
+            }
+        }
+    }
+
+    @Test
+    void restoresHedgeRoleFromImmutableStrategyOrderIntent() throws Exception {
+        try (var connection = database(); var statement = connection.createStatement()) {
+            statement.execute("INSERT INTO quant_trade VALUES (1,10,'BTCUSDT',102,'2026-10-10 00:00:00')");
+            statement.execute("INSERT INTO quant_order (id,credential_id,symbol,exchange_order_id,position_side,reduce_only) " +
+                "VALUES (1,10,'BTCUSDT',102,NULL,FALSE)");
+            statement.execute("INSERT INTO quant_strategy_order_intent VALUES (10,'BTCUSDT',102,'SHORT','CLOSE')");
+            try (var prepared = connection.prepareStatement(sql(List.of(10L), "BTCUSDT"))) {
+                prepared.setLong(1, 10L);
+                prepared.setString(2, "BTCUSDT");
+                try (var result = prepared.executeQuery()) {
+                    assertTrue(result.next());
+                    assertEquals("CLOSE", result.getString("operation_type"));
+                    assertEquals("SHORT", result.getString("position_side"));
+                }
+            }
+        }
     }
 
     @Test
