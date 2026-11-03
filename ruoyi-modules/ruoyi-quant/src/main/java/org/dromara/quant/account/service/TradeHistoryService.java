@@ -105,7 +105,6 @@ public class TradeHistoryService {
         BigDecimal remainingQuantity = decimal(cycle.get("remainingQuantity"));
         BigDecimal openingNotional = nullableDecimal(cycle.get("openingNotional"));
         BigDecimal closingNotional = decimal(cycle.get("closingNotional"));
-        Integer priceScale = priceScale(nullableDecimal(cycle.get("priceTickSizeSnapshot")));
         LocalDateTime openedAt = localTime(cycle.get("openedAt"));
         LocalDateTime closedAt = localTime(cycle.get("closedAt"));
 
@@ -144,20 +143,20 @@ public class TradeHistoryService {
         row.put("openingTradeIds", List.copyOf(openingTradeIds));
         row.put("closingTradeIds", List.copyOf(closingTradeIds));
         row.put("entryPrice", openingNotional == null || openingQuantity.signum() == 0
-            ? null : price(openingNotional.divide(openingQuantity, 18, RoundingMode.HALF_UP), priceScale));
+            ? null : decimalText(openingNotional.divide(openingQuantity, 18, RoundingMode.HALF_UP)));
         row.put("openingNotional", decimalText(openingNotional));
         row.put("leverage", cycle.get("leverage"));
         row.put("openingBalance", fixedDecimal(nullableDecimal(cycle.get("openingBalance")), 4));
         row.put("openingBalanceAt", timestamp(localTime(cycle.get("openingBalanceAt"))));
         row.put("openedAt", timestamp(openedAt));
-        row.put("closePrice", closedAt == null || closingQuantity.signum() == 0
-            ? null : price(closingNotional.divide(closingQuantity, 18, RoundingMode.HALF_UP), priceScale));
+        row.put("closePrice", closingQuantity.signum() == 0
+            ? null : decimalText(closingNotional.divide(closingQuantity, 18, RoundingMode.HALF_UP)));
         row.put("closingBalance", fixedDecimal(nullableDecimal(cycle.get("closingBalance")), 4));
         row.put("closingBalanceAt", timestamp(localTime(cycle.get("closingBalanceAt"))));
         row.put("realizedPnl", decimalText(decimal(cycle.get("realizedPnl"))));
         row.put("commissionByAsset", fees.entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey, entry -> decimalText(entry.getValue()), (a, b) -> a, LinkedHashMap::new)));
-        row.put("commission", fees.size() == 1 ? decimalText(fees.values().iterator().next()) : fees.isEmpty() ? "0" : null);
+        row.put("commission", fees.size() == 1 ? decimalText(fees.values().iterator().next()) : null);
         row.put("commissionAsset", fees.size() == 1 ? fees.keySet().iterator().next() : null);
         row.put("closedAt", timestamp(closedAt));
         row.put("status", string(cycle.get("status")));
@@ -207,18 +206,6 @@ public class TradeHistoryService {
 
     private static String timestamp(LocalDateTime value) {
         return value == null ? null : value.toInstant(ZoneOffset.UTC).toString();
-    }
-
-    private static Integer priceScale(BigDecimal tickSize) {
-        if (tickSize == null || tickSize.signum() <= 0) {
-            return null;
-        }
-        return Math.max(0, tickSize.stripTrailingZeros().scale());
-    }
-
-    private static String price(BigDecimal value, Integer scale) {
-        return value == null ? null : scale == null
-            ? decimalText(value) : value.setScale(scale, RoundingMode.HALF_UP).toPlainString();
     }
 
     private static String fixedDecimal(BigDecimal value, int scale) {
