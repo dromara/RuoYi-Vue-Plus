@@ -1,6 +1,7 @@
 package org.dromara.common.json.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.json.handler.BigDecimalStripSerializer;
 import org.dromara.common.json.handler.BigNumberSerializer;
 import org.dromara.common.json.handler.CustomDateDeserializer;
 import org.dromara.common.json.handler.CustomLocalDateTimeDeserializer;
@@ -10,7 +11,6 @@ import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomize
 import org.springframework.context.annotation.Bean;
 import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
 import tools.jackson.databind.module.SimpleModule;
-import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -40,7 +40,7 @@ public class JacksonConfig {
         module.addSerializer(Long.class, BigNumberSerializer.INSTANCE);
         module.addSerializer(Long.TYPE, BigNumberSerializer.INSTANCE);
         module.addSerializer(BigInteger.class, BigNumberSerializer.INSTANCE);
-        module.addSerializer(BigDecimal.class, ToStringSerializer.instance);
+        module.addSerializer(BigDecimal.class, new BigDecimalStripSerializer());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
         module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());

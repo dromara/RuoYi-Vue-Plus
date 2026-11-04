@@ -29,6 +29,22 @@ class JacksonConfigTest {
     }
 
     /**
+     * 验证 BigDecimal 去除无意义尾零时仍以普通十进制字符串输出，避免前端浮点精度损失。
+     */
+    @Test
+    @DisplayName("BigDecimal 去尾零并保留精度")
+    void shouldStripBigDecimalTrailingZerosAndKeepStringPrecision() {
+        JsonMapper mapper = configuredMapper();
+
+        assertEquals("\"1.5\"", mapper.writeValueAsString(new BigDecimal("1.50000000")));
+        assertEquals("\"1000\"", mapper.writeValueAsString(new BigDecimal("1000.00000000")));
+        assertEquals("\"0\"", mapper.writeValueAsString(new BigDecimal("0.00000000")));
+        assertEquals("\"0.000001\"", mapper.writeValueAsString(new BigDecimal("0.00000100")));
+        assertEquals("\"12345678901234567890.12345678\"",
+            mapper.writeValueAsString(new BigDecimal("12345678901234567890.1234567800")));
+    }
+
+    /**
      * 验证 LocalDateTime 使用统一格式序列化，并支持带空白的日期和时间字符串反序列化。
      */
     @Test
