@@ -26,6 +26,8 @@ class JacksonConfigTest {
         assertEquals("\"9007199254740992\"", mapper.writeValueAsString(9_007_199_254_740_992L));
         assertEquals("\"1234567890.123456789\"",
             mapper.writeValueAsString(new BigDecimal("1234567890.123456789")));
+        assertEquals("\"23.0546822307066408\"",
+            mapper.writeValueAsString(new BigDecimal("23.0546822307066408000")));
     }
 
     /**
