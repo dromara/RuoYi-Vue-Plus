@@ -49,9 +49,9 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
             o.executed_quantity AS orderExecutedQuantity,
             t.quantity,
             t.price,
-            COALESCE(t.commission,j.commission) AS commission,
-            COALESCE(NULLIF(UPPER(TRIM(t.commission_asset)),''),NULLIF(UPPER(TRIM(j.commission_asset)),'')) AS commissionAsset,
-            t.realized_pnl AS realizedPnl,
+            COALESCE(j.commission,t.commission) AS commission,
+            COALESCE(NULLIF(UPPER(TRIM(j.commission_asset)),''),NULLIF(UPPER(TRIM(t.commission_asset)),'')) AS commissionAsset,
+            COALESCE(j.realized_pnl,t.realized_pnl) AS realizedPnl,
             t.trade_time AS tradeTime,
             CASE WHEN
                 COALESCE(execution.source_conflict,0)=1
