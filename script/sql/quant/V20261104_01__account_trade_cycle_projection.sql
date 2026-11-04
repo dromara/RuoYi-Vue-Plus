@@ -22,6 +22,22 @@ BEGIN
         CREATE INDEX idx_quant_trade_cycle_scope
             ON quant_trade (credential_id,symbol,trade_time,exchange_trade_id);
     END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema=DATABASE() AND table_name='quant_order' AND index_name='idx_quant_order_cycle_lookup'
+    ) THEN
+        CREATE INDEX idx_quant_order_cycle_lookup
+            ON quant_order (credential_id,symbol,exchange_order_id);
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema=DATABASE() AND table_name='quant_execution_record' AND index_name='idx_quant_execution_cycle_lookup'
+    ) THEN
+        CREATE INDEX idx_quant_execution_cycle_lookup
+            ON quant_execution_record (credential_id,symbol,exchange_order_id,operation_type);
+    END IF;
 END$
 CALL migrate_account_trade_cycle_projection()$
 DROP PROCEDURE migrate_account_trade_cycle_projection$
