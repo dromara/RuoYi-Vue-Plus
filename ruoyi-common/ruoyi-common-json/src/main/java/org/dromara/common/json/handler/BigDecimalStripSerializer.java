@@ -2,7 +2,7 @@ package org.dromara.common.json.handler;
 
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 import java.math.BigDecimal;
 
@@ -11,7 +11,11 @@ import java.math.BigDecimal;
  *
  * <p>输出 JSON 字符串而非 JSON 数字，避免 JavaScript Number 解析时丢失交易精度。</p>
  */
-public class BigDecimalStripSerializer extends ValueSerializer<BigDecimal> {
+public class BigDecimalStripSerializer extends StdSerializer<BigDecimal> {
+
+    public BigDecimalStripSerializer() {
+        super(BigDecimal.class);
+    }
 
     @Override
     public void serialize(BigDecimal value, JsonGenerator gen, SerializationContext context) {
