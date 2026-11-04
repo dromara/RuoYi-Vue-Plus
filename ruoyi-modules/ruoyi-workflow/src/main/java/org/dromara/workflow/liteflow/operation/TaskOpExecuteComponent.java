@@ -3,9 +3,13 @@ package org.dromara.workflow.liteflow.operation;
 import com.yomahub.liteflow.annotation.LiteflowComponent;
 import com.yomahub.liteflow.core.NodeComponent;
 import lombok.RequiredArgsConstructor;
-import org.dromara.warm.flow.core.service.TaskService;
+import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.workflow.command.AddSignerCommand;
+import org.dromara.warm.flow.core.workflow.command.DelegateCommand;
+import org.dromara.warm.flow.core.workflow.command.RemoveSignerCommand;
+import org.dromara.warm.flow.core.workflow.command.TransferCommand;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.context.TaskOperationContext;
 
 /**
@@ -18,29 +22,45 @@ import org.dromara.workflow.domain.context.TaskOperationContext;
 @LiteflowComponent("taskOpExecute")
 public class TaskOpExecuteComponent extends NodeComponent {
 
-    private final TaskService taskService;
-
     @Override
     public void process() {
         TaskOperationContext context = getContextBean(TaskOperationContext.class);
         Long taskId = context.getTaskOperationBo().getTaskId();
         boolean result = false;
+        OperatorContext operator = context.getOperator();
+        String message = context.getMessage();
         switch (context.getOperation()) {
             case DELEGATE_TASK -> {
-                context.getFlowParams().hisStatus(TaskStatusEnum.DEPUTE.getStatus());
-                result = taskService.depute(taskId, context.getFlowParams());
+                DelegateCommand command = new DelegateCommand();
+                command.setOperator(operator);
+                command.setTaskId(taskId);
+                command.setTargetHandler(context.getTaskOperationBo().getUserId());
+                command.setMessage(message);
+                result = FlowEngine.workflow().delegate(command).isSuccess();
             }
             case TRANSFER_TASK -> {
-                context.getFlowParams().hisStatus(TaskStatusEnum.TRANSFER.getStatus());
-                result = taskService.transfer(taskId, context.getFlowParams());
+                TransferCommand command = new TransferCommand();
+                command.setOperator(operator);
+                command.setTaskId(taskId);
+                command.setTargetHandler(context.getTaskOperationBo().getUserId());
+                command.setMessage(message);
+                result = FlowEngine.workflow().transfer(command).isSuccess();
             }
             case ADD_SIGNATURE -> {
-                context.getFlowParams().hisStatus(TaskStatusEnum.SIGN.getStatus());
-                result = taskService.addSignature(taskId, context.getFlowParams());
+                AddSignerCommand command = new AddSignerCommand();
+                command.setOperator(operator);
+                command.setTaskId(taskId);
+                command.setTargetHandlers(context.getTaskOperationBo().getUserIds());
+                command.setMessage(message);
+                result = FlowEngine.workflow().addSigner(command).isSuccess();
             }
             case REDUCTION_SIGNATURE -> {
-                context.getFlowParams().hisStatus(TaskStatusEnum.SIGN_OFF.getStatus());
-                result = taskService.reductionSignature(taskId, context.getFlowParams());
+                RemoveSignerCommand command = new RemoveSignerCommand();
+                command.setOperator(operator);
+                command.setTaskId(taskId);
+                command.setTargetHandlers(context.getTaskOperationBo().getUserIds());
+                command.setMessage(message);
+                result = FlowEngine.workflow().removeSigner(command).isSuccess();
             }
         }
         context.setResult(result);

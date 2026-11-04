@@ -1,0 +1,281 @@
+{
+  "version": "1",
+  "category": "1762300000000000100",
+  "flowCode": "demo_service_task",
+  "flowName": "服务任务示例",
+  "formPath": "/workflow/leaveEdit/index",
+  "nodeList": [
+    {
+      "ext": "[]",
+      "nodeCode": "start",
+      "nodeName": "开始",
+      "nodeType": 0,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "80,260;190,260",
+          "nowNodeCode": "start",
+          "nextNodeCode": "submit"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "60,260|60,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "approve",
+      "nodeName": "汇聚后审批",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1730,260;1840,260",
+          "nowNodeCode": "approve",
+          "nextNodeCode": "end"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1710,260|1710,260",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000003"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "bigDay",
+      "nodeName": "大于三天",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1130,100;1240,260",
+          "nowNodeCode": "bigDay",
+          "nextNodeCode": "forkP"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1110,100|1110,100",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000003"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "humanBranch",
+      "nodeName": "并行分支人工",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1430,420;1540,260",
+          "nowNodeCode": "humanBranch",
+          "nextNodeCode": "joinP"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1410,420|1410,420",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000004"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "smallDay",
+      "nodeName": "小于等于三天",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1130,420;1240,260",
+          "nowNodeCode": "smallDay",
+          "nextNodeCode": "forkP"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1110,420|1110,420",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000004"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "end",
+      "nodeName": "结束",
+      "nodeType": 2,
+      "nodeRatio": "0",
+      "coordinate": "1860,260|1860,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "gwDay",
+      "nodeName": "天数分支",
+      "nodeType": 3,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "980,260;1090,100",
+          "nowNodeCode": "gwDay",
+          "nextNodeCode": "bigDay",
+          "skipCondition": "gt@@day|3"
+        },
+        {
+          "skipType": "PASS",
+          "coordinate": "980,260;1090,420",
+          "nowNodeCode": "gwDay",
+          "nextNodeCode": "smallDay"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "960,260|960,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "forkP",
+      "nodeName": "并行网关",
+      "nodeType": 4,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1280,260;1390,100",
+          "nowNodeCode": "forkP",
+          "nextNodeCode": "svcBranch"
+        },
+        {
+          "skipType": "PASS",
+          "coordinate": "1280,260;1390,420",
+          "nowNodeCode": "forkP",
+          "nextNodeCode": "humanBranch"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1260,260|1260,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "joinP",
+      "nodeName": "汇聚网关",
+      "nodeType": 4,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1580,260;1690,260",
+          "nowNodeCode": "joinP",
+          "nextNodeCode": "approve"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1560,260|1560,260",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "svcBranch",
+      "nodeName": "并行分支服务任务",
+      "nodeType": 6,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "1430,100;1540,260",
+          "nowNodeCode": "svcBranch",
+          "nextNodeCode": "joinP"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "1410,100|1410,100",
+      "formCustom": "N",
+      "nodeConfig": "{\"serviceTask\":{\"type\":\"class\",\"handler\":\"org.dromara.workflow.demo.DemoClassServiceTask\"}}"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "svcCalc",
+      "nodeName": "计算天数服务任务",
+      "nodeType": 6,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "830,260;940,260",
+          "nowNodeCode": "svcCalc",
+          "nextNodeCode": "gwDay"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "810,260|810,260",
+      "formCustom": "N",
+      "nodeConfig": "{\"serviceTask\":{\"type\":\"expression\",\"expression\":\"#{@demoOrderService.evalDay(#execution)}\",\"resultVariable\":\"day\"}}"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "svcClass",
+      "nodeName": "Java 类服务任务",
+      "nodeType": 6,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "380,260;490,260",
+          "nowNodeCode": "svcClass",
+          "nextNodeCode": "svcDelegate"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "360,260|360,260",
+      "formCustom": "N",
+      "nodeConfig": "{\"serviceTask\":{\"type\":\"class\",\"handler\":\"org.dromara.workflow.demo.DemoClassServiceTask\"}}"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "svcDelegate",
+      "nodeName": "Bean 委托表达式服务任务",
+      "nodeType": 6,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "530,260;640,260",
+          "nowNodeCode": "svcDelegate",
+          "nextNodeCode": "svcExpression"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "510,260|510,260",
+      "formCustom": "N",
+      "nodeConfig": "{\"serviceTask\":{\"type\":\"delegateExpression\",\"expression\":\"#{@demoDelegateServiceTask}\"}}"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "svcExpression",
+      "nodeName": "方法表达式服务任务",
+      "nodeType": 6,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "680,260;790,260",
+          "nowNodeCode": "svcExpression",
+          "nextNodeCode": "svcCalc"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "660,260|660,260",
+      "formCustom": "N",
+      "nodeConfig": "{\"serviceTask\":{\"type\":\"expression\",\"expression\":\"#{@demoOrderService.createOrder(#execution)}\",\"resultVariable\":\"orderNo\"}}"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "submit",
+      "nodeName": "申请人",
+      "nodeType": 1,
+      "nodeRatio": "0",
+      "coordinate": "210,260|210,260",
+      "formCustom": "N",
+      "permissionFlag": "warmFlowInitiator",
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "230,260;340,260",
+          "nowNodeCode": "submit",
+          "nextNodeCode": "svcClass"
+        }
+      ]
+    }
+  ],
+  "formCustom": "N",
+  "modelValue": "CLASSICS"
+}

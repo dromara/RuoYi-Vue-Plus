@@ -2,13 +2,20 @@ package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.workflow.api.WorkflowService;
 import org.dromara.workflow.api.domain.CompleteTaskDTO;
+import org.dromara.workflow.api.domain.StartMessageEventDTO;
 import org.dromara.workflow.api.domain.StartProcessDTO;
 import org.dromara.workflow.api.domain.StartProcessReturnDTO;
+import org.dromara.workflow.api.domain.StartTimerEventDTO;
+import org.dromara.workflow.api.domain.TriggerMessageEventDTO;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
@@ -170,4 +177,83 @@ public class WorkflowServiceImpl implements WorkflowService {
         taskBo.setHandler(startProcess.getHandler());
         return flwTaskService.completeTask(taskBo);
     }
+
+    /**
+     * 外部消息按流程编码和事件名称启动新实例。
+     *
+     * @param request 消息启动参数，业务 ID 由调用方提供
+     * @return 新建流程实例 ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long startByMessageEvent(StartMessageEventDTO request) {
+        if (request == null) {
+            throw new ServiceException("消息启动参数不能为空");
+        }
+        return FlowEngine.insService().startByMessage(request.getBusinessId(), request.getFlowCode(),
+            request.getEventName(), request.getPayload(), WorkflowContext.create(request.getHandler())).getId();
+    }
+
+    /**
+     * 触发实例中等待的消息捕获或消息边界事件。重复投递时引擎保持实例不变。
+     *
+     * @param request 消息事件参数
+     * @return 流程实例 ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long triggerMessageEvent(TriggerMessageEventDTO request) {
+        if (request == null) {
+            throw new ServiceException("消息事件参数不能为空");
+        }
+        return FlowEngine.insService().triggerMessage(request.getInstanceId(), request.getEventName(),
+            request.getPayload(), WorkflowContext.create(request.getHandler())).getId();
+    }
+
+    /**
+     * 手动发起定时启动事件，不改变等待记录及下一次自动触发时间。
+     *
+     * @param request 定时启动参数，业务 ID 留空时生成数字雪花 ID
+     * @return 新建流程实例 ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long startByTimerEvent(StartTimerEventDTO request) {
+        if (request == null) {
+            throw new ServiceException("定时启动参数不能为空");
+        }
+        String businessId = StringUtils.isNotBlank(request.getBusinessId())
+            ? request.getBusinessId().trim() : String.valueOf(IdWorker.getId());
+        return FlowEngine.insService().startByTimer(businessId, request.getDefinitionId(),
+            request.getNodeCode(), request.getPayload(), WorkflowContext.create(request.getHandler())).getId();
+    }
+
+    /**
+     * 从实例级错误捕获节点处理外部错误。
+     *
+     * @param instanceId   流程实例 ID
+     * @param errorCode    错误码，精确匹配优先于通配
+     * @param errorMessage 错误描述
+     * @return 错误事件已被处理时返回 true
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean throwInstanceErrorEvent(Long instanceId, String errorCode, String errorMessage) {
+        return FlowEngine.insService().throwError(instanceId, errorCode, errorMessage);
+    }
+
+    /**
+     * 从当前待办的错误边界节点处理外部错误。
+     *
+     * @param taskId       当前待办任务 ID
+     * @param errorCode    错误码，精确匹配优先于通配
+     * @param errorMessage 错误描述
+     * @return 错误事件已被处理时返回 true
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean throwTaskErrorEvent(Long taskId, String errorCode, String errorMessage) {
+        return FlowEngine.taskService().throwError(taskId, errorCode, errorMessage);
+    }
+
 }

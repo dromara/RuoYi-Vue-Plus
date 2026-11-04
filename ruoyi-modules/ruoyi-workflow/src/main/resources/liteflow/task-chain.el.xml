@@ -25,17 +25,12 @@
         办理任务链路：
         1. 加载任务实例、补齐变量并解析办理人
         2. 构建参数并执行当前任务跳转
-        3. 开启自动审批时继续办理当前处理人的后续任务
+        自动审批由引擎按流程定义配置 def_config.autoPass 在办理链内完成，宿主不再单独编排。
     -->
     <chain name="completeTaskChain">
         THEN(
             completePrepare,
-            completeExecute,
-            IF(
-                completeNeedAutoPass,
-                completeAutoPass,
-                noop
-            )
+            completeExecute
         );
     </chain>
 

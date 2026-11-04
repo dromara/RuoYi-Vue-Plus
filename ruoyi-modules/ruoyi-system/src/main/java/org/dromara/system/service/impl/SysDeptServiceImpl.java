@@ -180,9 +180,11 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public List<SysDeptVo> selectDeptByIds(Collection<Long> deptIds) {
         return deptMapper.selectDeptList(deptMapper.lambda()
-            .select(SysDept::getDeptId, SysDept::getDeptName, SysDept::getLeader)
+            .select(SysDept::getDeptId, SysDept::getDeptName, SysDept::getLeader,
+                SysDept::getDeptCategory, SysDept::getParentId, SysDept::getAncestors)
             .eq(SysDept::getStatus, SystemConstants.NORMAL)
             .in(CollUtil.isNotEmpty(deptIds), SysDept::getDeptId, deptIds)
+            .orderByAsc(SysDept::getAncestors, SysDept::getParentId, SysDept::getOrderNum, SysDept::getDeptId)
             .build());
     }
 

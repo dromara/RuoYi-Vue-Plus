@@ -11,12 +11,10 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.utils.CollUtil;
-import org.dromara.warm.flow.core.utils.ExpressionUtil;
 import org.dromara.warm.flow.ui.service.NodeExtService;
 import org.dromara.warm.flow.ui.vo.NodeExt;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.ButtonPermissionEnum;
-import org.dromara.workflow.common.enums.CopySettingEnum;
 import org.dromara.workflow.common.enums.NodeExtEnum;
 import org.dromara.workflow.common.enums.VariablesEnum;
 import org.dromara.workflow.domain.vo.ButtonPermissionVo;
@@ -45,14 +43,6 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
 
     static {
         CHILD_NODE_MAP = Map.of(
-            CopySettingEnum.class.getSimpleName(),
-            Map.of(
-                "label", "抄送对象",
-                "type", 5,
-                "must", false,
-                "multiple", false,
-                "desc", "设置该节点的抄送办理人"
-            ),
             VariablesEnum.class.getSimpleName(),
             Map.of(
                 "label", "自定义参数",
@@ -84,7 +74,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
         List<NodeExt> nodeExtList = new ArrayList<>();
         // 构建基础设置页面
         nodeExtList.add(buildNodeExt("wf_basic_tab", "基础设置", 1,
-            List.of(CopySettingEnum.class, VariablesEnum.class)));
+            List.of(VariablesEnum.class)));
         // 构建按钮权限页面
         nodeExtList.add(buildNodeExt("wf_button_tab", "权限", 2,
             List.of(ButtonPermissionEnum.class)));
@@ -192,21 +182,19 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
     /**
      * 解析扩展属性 JSON 并构建 Node 扩展属性对象
      * <p>
-     * 根据传入的 JSON 字符串，将扩展属性分为三类：
+     * 根据传入的 JSON 字符串，将扩展属性分为两类：
      * 1. ButtonPermissionEnum：解析为按钮权限列表，标记每个按钮是否勾选
-     * 2. CopySettingEnum：解析为抄送对象 ID 集合
-     * 3. VariablesEnum：解析为自定义参数 Map
+     * 2. VariablesEnum：解析为自定义参数 Map
      *
      * <p>示例 JSON：
      * [
      * {"code": "ButtonPermissionEnum", "value": "back,termination"},
-     * {"code": "CopySettingEnum", "value": "1,3,4,#{@spelRuleComponent.selectDeptLeaderById(#deptId", "#roleId)}"},
      * {"code": "VariablesEnum", "value": "key1=value1,key2=value2"}
      * ]
      *
      * @param ext      扩展属性 JSON 字符串
      * @param variable 流程变量
-     * @return NodeExtVo 对象，封装按钮权限列表、抄送对象集合和自定义参数 Map
+     * @return NodeExtVo 对象，封装按钮权限列表和自定义参数 Map
      */
     @Override
     public NodeExtVo parseNodeExt(String ext, Map<String, Object> variable) {
@@ -240,22 +228,6 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
 
                 nodeExtVo.setButtonPermissions(buttonList);
 
-            } else if (CopySettingEnum.class.getSimpleName().equals(code)) {
-                List<String> permissions = spelSmartSplit(value).stream()
-                    .map(s -> {
-                        List<String> result = ExpressionUtil.evalVariable(s, variable);
-                        if (CollUtil.isNotEmpty(result)) {
-                            return result;
-                        }
-                        return Collections.singletonList(s);
-                    }).filter(Objects::nonNull)
-                    .flatMap(List::stream)
-                    .distinct()
-                    .collect(Collectors.toList());
-                List<String> copySettings = FlowEngine.permissionHandler().convertPermissions(permissions);
-                // 解析抄送对象 ID 集合
-                nodeExtVo.setCopySettings(new HashSet<>(copySettings));
-
             } else if (VariablesEnum.class.getSimpleName().equals(code)) {
                 // 解析自定义参数
                 // 将 key=value 字符串拆分为 Map
@@ -270,95 +242,6 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
             }
         }
         return nodeExtVo;
-    }
-
-    /**
-     * 按逗号分割字符串，但保留 #{...} 表达式和字符串常量中的逗号
-     *
-     * @param str 原始配置字符串
-     * @return 智能分割后的片段列表
-     */
-    private static List<String> spelSmartSplit(String str) {
-        List<String> result = new ArrayList<>();
-        if (str == null || str.trim().isEmpty()) {
-            return result;
-        }
-
-        StringBuilder token = new StringBuilder();
-        // #{...} 的嵌套深度
-        int depth = 0;
-        // 是否在字符串常量中（" 或 '）
-        boolean inString = false;
-        // 当前字符串引号类型
-        char stringQuote = 0;
-
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-
-            // 检测进入 SpEL 表达式 #{...}
-            if (!inString && c == '#' && depth == 0 && checkNext(str, i, '{')) {
-                depth++;
-                token.append("#{");
-                // 跳过 {
-                i++;
-                continue;
-            }
-
-            // 在表达式中遇到 { 或 } 改变嵌套深度
-            if (!inString && depth > 0) {
-                if (c == '{') {
-                    depth++;
-                } else if (c == '}') {
-                    depth--;
-                }
-                token.append(c);
-                continue;
-            }
-
-            // 检测字符串开始/结束
-            if (depth > 0 && (c == '"' || c == '\'')) {
-                if (!inString) {
-                    inString = true;
-                    stringQuote = c;
-                } else if (stringQuote == c) {
-                    inString = false;
-                }
-                token.append(c);
-                continue;
-            }
-
-            // 外层逗号才分割
-            if (c == ',' && depth == 0 && !inString) {
-                String part = token.toString().trim();
-                if (!part.isEmpty()) {
-                    result.add(part);
-                }
-                token.setLength(0);
-                continue;
-            }
-
-            token.append(c);
-        }
-
-        // 添加最后一个
-        String part = token.toString().trim();
-        if (!part.isEmpty()) {
-            result.add(part);
-        }
-
-        return result;
-    }
-
-    /**
-     * 判断指定位置的下一个字符是否匹配预期字符。
-     *
-     * @param str      原始字符串
-     * @param index    当前索引
-     * @param expected 期望匹配的字符
-     * @return 匹配成功返回 {@code true}
-     */
-    private static boolean checkNext(String str, int index, char expected) {
-        return index + 1 < str.length() && str.charAt(index + 1) == expected;
     }
 
 }

@@ -11,6 +11,7 @@ description: 标准后端 CRUD 专家。用于当前项目中的新增单表 CRU
 2. 再参考当前模块内最近似的标准管理模块。
 3. 分层保持稳定：
    `domain`、`domain.bo`、`domain.vo`、`mapper`、`service`、`service.impl`、`controller`
+4. 新增工具类或通用辅助方法前，先读取 `.claude/agents/backend-engineering.md` 的“已有能力复用”规则，按能力类别检索、确认模块依赖可用性并核对业务语义；满足需求时直接复用，不添加无业务语义的包装。
 
 ## 结构约定
 
@@ -57,6 +58,7 @@ description: 标准后端 CRUD 专家。用于当前项目中的新增单表 CRU
 
 ## 自检
 
+- 新增工具类或通用辅助方法是否已完成同类能力检索与语义核对；确需新增时，在交付说明中简述现有能力为何不适用，无需为此额外添加代码注释，既有 JavaDoc 规则仍适用
 - CRUD 链路是否完整
 - BO / VO / Entity 是否职责分离
 - 导出、分页、删除前校验是否齐全

@@ -55,8 +55,22 @@ class SaTokenFunctionTest {
         NotLoginException timeout = NotLoginException.newInstance("login", NotLoginException.TOKEN_TIMEOUT, "timeout", "token");
         NotLoginException replaced = NotLoginException.newInstance("login", NotLoginException.BE_REPLACED, "replaced", "token");
 
-        assertEquals("登录已过期，请重新登录", handler.handleNotLoginException(timeout, request).getMsg());
-        assertEquals("当前账号已在其他设备登录，您已被强制下线", handler.handleNotLoginException(replaced, request).getMsg());
+        assertEquals("登录已过期，请重新登录", ((R<?>) handler.handleNotLoginException(timeout, request).getBody()).getMsg());
+        assertEquals("当前账号已在其他设备登录，您已被强制下线", ((R<?>) handler.handleNotLoginException(replaced, request).getBody()).getMsg());
+    }
+
+    @Test
+    @DisplayName("SSE 登录失效返回无正文 401")
+    void shouldRejectSseWithoutJsonConversion() {
+        SaTokenExceptionHandler handler = new SaTokenExceptionHandler();
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/resource/message");
+        request.setServletPath("/resource/message");
+        NotLoginException expired = NotLoginException.newInstance("login", NotLoginException.TOKEN_TIMEOUT, "timeout", "token");
+
+        var response = handler.handleNotLoginException(expired, request);
+
+        assertEquals(HttpStatus.HTTP_UNAUTHORIZED, response.getStatusCode().value());
+        assertEquals(null, response.getBody());
     }
 
     /**

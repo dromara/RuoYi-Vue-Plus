@@ -1,7 +1,7 @@
 package org.dromara.workflow.domain.context;
 
 import lombok.Data;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.orm.entity.FlowNode;
 import org.dromara.workflow.common.enums.TaskOperationEnum;
@@ -33,9 +33,14 @@ public class TaskOperationContext {
     private TaskOperationEnum operation;
 
     /**
-     * Warm-Flow 操作参数。
+     * 当前任务操作者。
      */
-    private FlowParams flowParams;
+    private OperatorContext operator;
+
+    /**
+     * 当前操作说明。
+     */
+    private String message;
 
     /**
      * 当前任务。

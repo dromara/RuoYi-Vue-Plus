@@ -85,6 +85,8 @@ mybatis-plus:
     enabled: false
     # 输出方式，可选 console、log
     output: console
+    # 忽略高频轮询表的成功 SQL 日志；执行异常仍会输出
+    ignore-tables: [ flow_event_wait ]
 
 --- # 数据源配置
 spring:

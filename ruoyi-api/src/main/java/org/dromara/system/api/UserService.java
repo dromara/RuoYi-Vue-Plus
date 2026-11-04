@@ -94,12 +94,28 @@ public interface UserService {
     List<UserDTO> selectUsersByDeptIds(Collection<Long> deptIds);
 
     /**
+     * 通过部门ID查询用户ID
+     *
+     * @param deptIds 部门ids
+     * @return 用户ids
+     */
+    List<Long> selectUserIdsByDeptIds(Collection<Long> deptIds);
+
+    /**
      * 通过岗位ID查询用户
      *
      * @param postIds 岗位ids
      * @return 用户
      */
     List<UserDTO> selectUsersByPostIds(Collection<Long> postIds);
+
+    /**
+     * 通过岗位ID查询用户ID
+     *
+     * @param postIds 岗位ids
+     * @return 用户ids
+     */
+    List<Long> selectUserIdsByPostIds(Collection<Long> postIds);
 
     /**
      * 根据用户 ID 列表查询用户昵称映射关系

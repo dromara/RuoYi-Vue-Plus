@@ -8,13 +8,11 @@ import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskOperationEnum;
 import org.dromara.workflow.domain.bo.TaskOperationBo;
 import org.dromara.workflow.domain.context.TaskOperationContext;
-
-import java.util.Collections;
 
 /**
  * 准备任务操作参数。
@@ -42,16 +40,10 @@ public class TaskOpPrepareComponent extends NodeComponent {
             case ADD_SIGNATURE, REDUCTION_SIGNATURE -> ValidatorUtils.validate(bo, EditGroup.class);
         }
 
-        FlowParams flowParams = FlowParams.build().message(bo.getMessage());
-        if (LoginHelper.isSuperAdmin()) {
-            flowParams.ignore(true);
-        }
-        switch (op) {
-            case DELEGATE_TASK, TRANSFER_TASK -> flowParams.addHandlers(Collections.singletonList(bo.getUserId()));
-            case ADD_SIGNATURE -> flowParams.addHandlers(bo.getUserIds());
-            case REDUCTION_SIGNATURE -> flowParams.reductionHandlers(bo.getUserIds());
-        }
-        context.setFlowParams(flowParams);
+        OperatorContext operator = new OperatorContext(LoginHelper.getUserIdStr());
+        operator.setIgnore(LoginHelper.isSuperAdmin());
+        context.setOperator(operator);
+        context.setMessage(bo.getMessage());
     }
 
 }

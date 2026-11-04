@@ -120,6 +120,15 @@ public interface IFlwInstanceService {
     Map<String, Object> flowHisTaskList(String businessId);
 
     /**
+     * 按实例 ID、业务 ID 查询流程图及历史办理记录；同时提供时须指向同一实例。
+     *
+     * @param instanceId 流程实例 ID，可为空
+     * @param businessId 业务 ID，可为空
+     * @return 流程图与办理记录
+     */
+    Map<String, Object> flowHisTaskList(Long instanceId, String businessId);
+
+    /**
      * 按照实例id更新状态
      *
      * @param instanceId 实例id

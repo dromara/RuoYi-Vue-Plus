@@ -82,7 +82,7 @@ public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo>, MPJ
             .select("d", FlowDefinition::getFlowName, FlowDefinition::getFlowCode, FlowDefinition::getCategory,
                 FlowDefinition::getVersion)
             .select("biz", FlowInstanceBizExt::getBusinessCode, FlowInstanceBizExt::getBusinessTitle)
-            .leftJoin(FlowHisTask.class, "b", FlowHisTask::getTaskId, FlowUser::getAssociated)
+            .leftJoin(FlowHisTask.class, "b", FlowHisTask::getId, FlowUser::getAssociated)
             .leftJoin(FlowInstance.class, "c", FlowInstance::getId, FlowHisTask::getInstanceId)
             .leftJoin(FlowDefinition.class, "d", FlowDefinition::getId, FlowInstance::getDefinitionId)
             .leftJoin(FlowInstanceBizExt.class, "biz", FlowInstanceBizExt::getInstanceId, FlowInstance::getId)

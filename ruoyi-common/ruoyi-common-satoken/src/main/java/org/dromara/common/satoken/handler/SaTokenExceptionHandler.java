@@ -7,6 +7,8 @@ import cn.hutool.http.HttpStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.R;
+import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -18,6 +20,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class SaTokenExceptionHandler {
+
+    @Value("${message.path:/resource/message}")
+    private String messagePath = "/resource/message";
 
     /**
      * 处理权限码校验失败异常。
@@ -42,9 +47,12 @@ public class SaTokenExceptionHandler {
      * @return 统一失败响应
      */
     @ExceptionHandler(NotLoginException.class)
-    public R<Void> handleNotLoginException(NotLoginException e, HttpServletRequest request) {
+    public ResponseEntity<?> handleNotLoginException(NotLoginException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',认证失败'{}',无法访问系统资源", requestURI, e.getMessage());
+        log.warn("请求地址'{}',认证失败,类型'{}'", requestURI, e.getType());
+        if (request.getServletPath().equals(messagePath)) {
+            return ResponseEntity.status(HttpStatus.HTTP_UNAUTHORIZED).build();
+        }
         String msg = switch (e.getType()) {
             case NotLoginException.TOKEN_TIMEOUT,
                  NotLoginException.TOKEN_FREEZE -> "登录已过期，请重新登录";
@@ -52,7 +60,7 @@ public class SaTokenExceptionHandler {
             case NotLoginException.KICK_OUT -> "账号已被管理员强制下线";
             default -> "登录状态异常，请重新登录";
         };
-        return R.fail(HttpStatus.HTTP_UNAUTHORIZED, msg);
+        return ResponseEntity.ok(R.fail(HttpStatus.HTTP_UNAUTHORIZED, msg));
     }
 
 }

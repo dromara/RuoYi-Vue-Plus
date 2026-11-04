@@ -20,8 +20,12 @@ import org.dromara.common.mybatis.core.query.LambdaJoinQueryBuilder;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.FlowEngine;
+import org.dromara.warm.flow.core.enums.TaskStatus;
+import org.dromara.warm.flow.core.workflow.command.RevokeCommand;
+import org.dromara.warm.flow.core.workflow.command.TerminateCommand;
+import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
-import org.dromara.warm.flow.core.dto.FlowParams;
+import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
@@ -36,7 +40,6 @@ import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
 import org.dromara.workflow.domain.bo.FlowCancelBo;
 import org.dromara.workflow.domain.bo.FlowInstanceBo;
@@ -267,13 +270,13 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             throw new ServiceException("权限不足，无法撤销流程!");
         }
         BusinessStatusEnum.checkCancelStatus(instance.getFlowStatus());
-        FlowParams flowParams = FlowParams.build()
-            .message(bo.message())
-            .flowStatus(BusinessStatusEnum.CANCEL.getStatus())
-            .hisStatus(BusinessStatusEnum.CANCEL.getStatus())
-            .handler(userIdStr)
-            .ignore(true);
-        taskService.revoke(instance.getId(), flowParams);
+        RevokeCommand command = new RevokeCommand();
+        command.setOperator(new OperatorContext(userIdStr));
+        command.getOperator().setIgnore(true);
+        command.setInstanceId(instance.getId());
+        command.setMessage(bo.message());
+        command.setTaskStatus(BusinessStatusEnum.CANCEL.getStatus());
+        FlowEngine.workflow().revoke(command);
         return true;
     }
 
@@ -300,15 +303,33 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public Map<String, Object> flowHisTaskList(String businessId) {
-        FlowInstance flowInstance = this.selectInstByBusinessId(businessId);
-        if (ObjectUtil.isNull(flowInstance)) {
+        return flowHisTaskList(null, businessId);
+    }
+
+    /**
+     * 按实例 ID、业务 ID 查询流程图及历史办理记录；同时提供时须指向同一实例。
+     *
+     * @param instanceId 流程实例 ID，可为空
+     * @param businessId 业务 ID，可为空
+     * @return 流程图与办理记录
+     */
+    @Override
+    public Map<String, Object> flowHisTaskList(Long instanceId, String businessId) {
+        if (instanceId == null && StringUtils.isBlank(businessId)) {
+            throw new ServiceException("流程实例 ID 和业务 ID 不能同时为空");
+        }
+        FlowInstance flowInstance = instanceId != null
+            ? this.selectInstById(instanceId)
+            : this.selectInstByBusinessId(businessId);
+        if (ObjectUtil.isNull(flowInstance)
+            || (StringUtils.isNotBlank(businessId) && !businessId.equals(flowInstance.getBusinessId()))) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
-        Long instanceId = flowInstance.getId();
+        Long resolvedInstanceId = flowInstance.getId();
 
         // 先组装待审批任务（运行中的任务）
         List<FlowHisTaskVo> runningTaskVos = new ArrayList<>();
-        List<FlowTask> runningTasks = flwTaskService.selectByInstId(instanceId);
+        List<FlowTask> runningTasks = flwTaskService.selectByInstId(resolvedInstanceId);
         if (CollUtil.isNotEmpty(runningTasks)) {
             runningTaskVos = BeanUtil.copyToList(runningTasks, FlowHisTaskVo.class);
 
@@ -317,7 +338,8 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             Map<Long, List<User>> taskUserMap = StreamUtils.groupByKey(associatedUsers, User::getAssociated);
 
             for (FlowHisTaskVo vo : runningTaskVos) {
-                vo.setFlowStatus(TaskStatusEnum.WAITING.getStatus());
+                // 状态列保留待办任务自身的 flow_status（pending 待审批 / back 退回），
+                // 不要覆盖成实例维度编码：审批记录用任务字典渲染这一列。
                 vo.setUpdateTime(null);
                 vo.setRunDuration(null);
 
@@ -332,7 +354,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         List<FlowHisTaskVo> hisTaskVos = new ArrayList<>();
         List<FlowHisTask> hisTasks = flowHisTaskMapper.selectList(
             QueryBuilder.lambda(FlowHisTask.class)
-                .eq(FlowHisTask::getInstanceId, instanceId)
+                .eq(FlowHisTask::getInstanceId, resolvedInstanceId)
                 .eq(FlowHisTask::getNodeType, NodeType.BETWEEN.getKey())
                 .orderByDesc(FlowHisTask::getUpdateTime)
                 .build()
@@ -346,7 +368,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         combinedList.addAll(runningTaskVos);
         combinedList.addAll(hisTaskVos);
 
-        return Map.of("list", combinedList, "instanceId", instanceId);
+        return Map.of("list", combinedList, "instanceId", resolvedInstanceId);
     }
 
     /**
@@ -452,12 +474,14 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (instance != null) {
             BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
         }
-        FlowParams flowParams = FlowParams.build()
-            .message(bo.comment())
-            .flowStatus(BusinessStatusEnum.INVALID.getStatus())
-            .hisStatus(TaskStatusEnum.INVALID.getStatus())
-            .ignore(true);
-        taskService.terminationByInsId(bo.id(), flowParams);
+        TerminateCommand command = new TerminateCommand();
+        command.setOperator(new OperatorContext(LoginHelper.getUserIdStr()));
+        command.getOperator().setIgnore(true);
+        command.setInstanceId(bo.id());
+        command.setMessage(bo.comment());
+        command.setFlowStatus(BusinessStatusEnum.INVALID.getStatus());
+        command.setTaskStatus(TaskStatus.INVALID.getKey());
+        FlowEngine.workflow().terminate(command);
         return true;
     }
 }

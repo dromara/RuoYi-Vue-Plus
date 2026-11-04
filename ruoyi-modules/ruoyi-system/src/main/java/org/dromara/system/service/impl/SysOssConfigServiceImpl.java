@@ -51,14 +51,31 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
      */
     @Override
     public void init() {
-        List<SysOssConfig> list = ossConfigMapper.selectList();
-        // 加载OSS初始化配置
-        for (SysOssConfig config : list) {
-            String configKey = config.getConfigKey();
-            if (SystemConstants.YES.equals(config.getStatus())) {
-                RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, configKey);
+        try {
+            List<SysOssConfig> list = ossConfigMapper.selectList();
+            if (CollUtil.isEmpty(list)) {
+                log.warn("OSS配置初始化未查询到配置数据");
+                return;
             }
-            CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
+
+            boolean hasDefaultConfig = false;
+            // 加载OSS初始化配置
+            for (SysOssConfig config : list) {
+                String configKey = config.getConfigKey();
+                if (SystemConstants.YES.equals(config.getStatus())) {
+                    RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, configKey);
+                    hasDefaultConfig = true;
+                }
+                CacheUtils.put(CacheNames.SYS_OSS_CONFIG, configKey, JsonUtils.toJsonString(config));
+            }
+            if (!hasDefaultConfig) {
+                log.warn("OSS配置初始化未找到启用的默认配置");
+            } else {
+                log.info("初始化OSS配置成功");
+            }
+        } catch (RuntimeException e) {
+            log.error("OSS配置初始化失败", e);
+            throw e;
         }
     }
 

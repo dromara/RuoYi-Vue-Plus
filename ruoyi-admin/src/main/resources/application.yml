@@ -31,6 +31,8 @@ logging:
     org.springframework: warn
     org.mybatis.spring.mapper: error
     org.apache.fury: warn
+    com.yomahub.liteflow: warn
+    org.anyline: warn
   config: classpath:logback-plus.xml
 
 # 用户配置
@@ -239,19 +241,22 @@ warm-flow:
   ui: true
   # 是否显示流程图顶部文字
   top-text-show: true
+  # 流程图状态颜色：未办理、待办理、已办理（RGB）
+  chart-status-color: ["107,114,128", "245,158,11", "64,158,255"]
   # 是否渲染节点悬浮提示，默认true
   node-tooltip: true
   # 默认Authorization，如果有多个token，用逗号分隔
   token-name: ${sa-token.token-name},clientid
+  # 是否开启定时/事件引擎线程（默认false）。开启后常驻扫描线程池，
+  # 已发布的「定时启动」流程定义会按配置自动发起实例
+  timer-enabled: true
 
 --- # LiteFlow 业务规则编排
 liteflow:
   # 跟随工作流模块开关，避免禁用工作流时仍加载任务办理链
   enable: ${warm-flow.enabled:true}
   metrics:
-    # 临时修复：LiteFlow 2.16.2.1 的 Actuator 端点与 Spring Boot 4.1 参数名校验不兼容
-    # 待 LiteFlow 修复该问题后恢复为 ${liteflow.enable:true}
-    enabled: false
+    enabled: ${liteflow.enable:true}
   # 工作流模块用于编排任务办理链路
   rule-source: classpath:liteflow/*.el.xml
   # 开启虚拟线程

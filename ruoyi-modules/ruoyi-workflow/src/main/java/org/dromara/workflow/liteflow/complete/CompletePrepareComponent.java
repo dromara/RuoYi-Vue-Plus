@@ -9,11 +9,11 @@ import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.warm.flow.core.entity.Instance;
+import org.dromara.warm.flow.core.enums.TaskStatus;
 import org.dromara.warm.flow.core.service.InsService;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
-import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.CompleteTaskBo;
 import org.dromara.workflow.domain.context.CompleteTaskContext;
 
@@ -86,12 +86,12 @@ public class CompletePrepareComponent extends NodeComponent {
                     hashSet.addAll(popUserIds);
                     hashSet.addAll(variableUserIds);
                     // Warm-Flow 会按“状态:变量名”读取办理人，正向和退回都写入同一批候选人。
-                    map.put(TaskStatusEnum.PASS.getStatus() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
-                    map.put(TaskStatusEnum.BACK.getStatus() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
+                    map.put(TaskStatus.PASS.getKey() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
+                    map.put(TaskStatus.BACK.getKey() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
                 }
             } else {
-                map.put(TaskStatusEnum.PASS.getStatus() + StringUtils.COLON + entry.getKey(), entry.getValue());
-                map.put(TaskStatusEnum.BACK.getStatus() + StringUtils.COLON + entry.getKey(), entry.getValue());
+                map.put(TaskStatus.PASS.getKey() + StringUtils.COLON + entry.getKey(), entry.getValue());
+                map.put(TaskStatus.BACK.getKey() + StringUtils.COLON + entry.getKey(), entry.getValue());
             }
         }
         return map;

@@ -117,6 +117,8 @@
 <!--        </encoder>-->
 <!--    </appender>-->
 
+    <logger name="org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker" level="ERROR"/>
+
     <!--系统操作日志-->
     <root level="info">
         <appender-ref ref="console" />

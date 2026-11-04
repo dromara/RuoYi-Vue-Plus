@@ -130,7 +130,7 @@ public class GenTableServiceImpl implements IGenTableService {
         String tableName = genTable.getTableName();
         String tableComment = genTable.getTableComment();
 
-        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
+        Map<String, ? extends Table<?>> tablesMap = ServiceProxy.metadata().tables();
         if (CollUtil.isEmpty(tablesMap)) {
             return PageResult.build();
         }
@@ -195,13 +195,13 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public List<GenTable> selectDbTableListByNames(String[] tableNames, String dataName) {
         Set<String> tableNameSet = new HashSet<>(List.of(tableNames));
-        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
+        Map<String, ? extends Table<?>> tablesMap = ServiceProxy.metadata().tables();
 
         if (CollUtil.isEmpty(tablesMap)) {
             return new ArrayList<>();
         }
 
-        List<Table<?>> tableList = tablesMap.values().stream()
+        List<? extends Table<?>> tableList = tablesMap.values().stream()
             .filter(x -> !StringUtils.startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> tableNameSet.contains(x.getName())).toList();
 
@@ -340,9 +340,11 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public byte[] downloadCode(Long tableId) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ZipOutputStream zip = new ZipOutputStream(outputStream);
-        writeCodeToZip(tableId, zip);
-        IoUtil.close(zip);
+        try(ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+            writeCodeToZip(tableId, zip);
+        } catch (IOException e) {
+            log.error("渲染模板失败，Zip输出流IO异常。", e);
+        }
         return outputStream.toByteArray();
     }
 
@@ -407,11 +409,13 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public byte[] downloadCode(String[] tableIds) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ZipOutputStream zip = new ZipOutputStream(outputStream);
-        for (String tableId : tableIds) {
-            writeCodeToZip(Long.parseLong(tableId), zip);
+        try(ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+            for (String tableId : tableIds) {
+                writeCodeToZip(Long.parseLong(tableId), zip);
+            }
+        } catch (IOException e) {
+            log.error("渲染模板失败，Zip输出流IO异常。", e);
         }
-        IoUtil.close(zip);
         return outputStream.toByteArray();
     }
 

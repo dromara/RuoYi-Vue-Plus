@@ -1,0 +1,111 @@
+{
+  "version": "1",
+  "category": "1762300000000000100",
+  "flowCode": "demo_event_cooldown",
+  "flowName": "账号注销-冷静期示例",
+  "formPath": "/workflow/leaveEdit/index",
+  "nodeList": [
+    {
+      "ext": "[]",
+      "nodeCode": "start",
+      "nodeName": "开始",
+      "nodeType": 0,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "85,200;160,200",
+          "nowNodeCode": "start",
+          "nextNodeCode": "apply"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "60,200|60,200",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "apply",
+      "nodeName": "提交注销申请",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "260,200;310,200",
+          "nowNodeCode": "apply",
+          "nextNodeCode": "cooldown"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "210,200|210,200",
+      "formCustom": "N",
+      "permissionFlag": "warmFlowInitiator"
+    },
+    {
+      "ext": "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"copy,back,termination,file\"}]",
+      "nodeCode": "confirm",
+      "nodeName": "注销终审确认",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "560,200;610,200",
+          "nowNodeCode": "confirm",
+          "nextNodeCode": "msgThrow"
+        }
+      ],
+      "nodeRatio": "0",
+      "coordinate": "510,200|510,200",
+      "formCustom": "N",
+      "permissionFlag": "1761100000000000001"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "cooldown",
+      "nodeName": "冷静期 2 分钟",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "410,200;460,200",
+          "nowNodeCode": "cooldown",
+          "nextNodeCode": "confirm"
+        }
+      ],
+      "eventType": "TIMER_CATCH",
+      "nodeRatio": "0",
+      "coordinate": "360,200|360,200",
+      "formCustom": "N",
+      "nodeConfig": "{\"event\":{\"timerType\":\"AFTER\",\"timerValue\":\"PT2M\"}}"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "msgThrow",
+      "nodeName": "注销结果推送",
+      "nodeType": 1,
+      "skipList": [
+        {
+          "skipType": "PASS",
+          "coordinate": "710,200;755,200",
+          "nowNodeCode": "msgThrow",
+          "nextNodeCode": "end"
+        }
+      ],
+      "eventName": "membership.cancelled",
+      "eventType": "MESSAGE_THROW",
+      "nodeRatio": "0",
+      "coordinate": "660,200|660,200",
+      "formCustom": "N"
+    },
+    {
+      "ext": "[]",
+      "nodeCode": "end",
+      "nodeName": "结束",
+      "nodeType": 2,
+      "nodeRatio": "0",
+      "coordinate": "780,200|780,200",
+      "formCustom": "N"
+    }
+  ],
+  "formCustom": "N",
+  "modelValue": "CLASSICS"
+}
