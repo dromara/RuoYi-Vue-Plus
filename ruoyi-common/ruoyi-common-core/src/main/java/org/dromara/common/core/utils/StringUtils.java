@@ -297,6 +297,16 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
+     * 切分字符串，解析成Long列表（默认逗号分隔）
+     *
+     * @param str 被切分字符串
+     * @return 分割后的数据列表
+     */
+    public static List<Long> splitLongList(String str) {
+        return splitTo(str, Convert::toLong);
+    }
+
+    /**
      * 切分字符串自定义转换(分隔符默认逗号)
      *
      * @param str    被切分的字符串

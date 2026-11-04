@@ -56,25 +56,12 @@ public interface TranslationInterface<T> {
         Set<Long> result = new LinkedHashSet<>();
         for (Object key : keys) {
             if (key instanceof String ids) {
-                result.addAll(parseLongIds(ids));
+                result.addAll(StringUtils.splitLongList(ids));
             } else if (key != null) {
                 result.add(Convert.toLong(key));
             }
         }
         return result;
-    }
-
-    /**
-     * 解析逗号分隔的 Long ID 列表。
-     *
-     * @param ids 逗号分隔字符串
-     * @return Long 列表
-     */
-    default List<Long> parseLongIds(String ids) {
-        return StreamUtils.toList(
-            StreamUtils.filter(Arrays.asList(ids.split(StringUtils.SEPARATOR)), StringUtils::isNotBlank),
-            value -> Convert.toLong(value.trim())
-        );
     }
 
     /**
@@ -86,7 +73,7 @@ public interface TranslationInterface<T> {
      * @return 拼接后的结果字符串
      */
     default <E> String joinMappedValues(String ids, Function<Long, E> mapper) {
-        return StreamUtils.join(parseLongIds(ids), id -> {
+        return StreamUtils.join(StringUtils.splitLongList(ids), id -> {
             E value = mapper.apply(id);
             return value == null ? null : String.valueOf(value);
         });

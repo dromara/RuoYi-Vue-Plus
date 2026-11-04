@@ -38,7 +38,6 @@ class TranslationInterfaceTest {
         Set<Long> result = translation.collectLongIds(List.of("1, 2,1", 3L, " "));
 
         assertEquals(new LinkedHashSet<>(List.of(1L, 2L, 3L)), result);
-        assertEquals(List.of(4L, 5L), translation.parseLongIds("4, 5"));
     }
 
     /**
