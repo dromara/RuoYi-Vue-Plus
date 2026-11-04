@@ -8,12 +8,12 @@ WHERE credential_id=#{credentialId}
 ORDER BY symbol]]></select>
     <insert id="insertCursor" timeout="3"><![CDATA[INSERT INTO quant_strategy_fill_sync_cursor
   (credential_id,symbol,last_complete_to,updated_at)
-VALUES (#{credentialId},#{symbol},#{lastCompleteTo},NOW(3))]]></insert>
+VALUES (#{credentialId},#{symbol},#{lastCompleteTo},UTC_TIMESTAMP(3))]]></insert>
     <update id="advanceIfBehind" timeout="3"><![CDATA[UPDATE quant_strategy_fill_sync_cursor
-SET last_complete_to=#{lastCompleteTo}, updated_at=NOW(3)
+SET last_complete_to=#{lastCompleteTo}, updated_at=UTC_TIMESTAMP(3)
 WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND last_complete_to<#{lastCompleteTo}]]></update>
     <update id="repairFuture" timeout="3"><![CDATA[UPDATE quant_strategy_fill_sync_cursor
-SET last_complete_to=#{lastCompleteTo}, updated_at=NOW(3)
+SET last_complete_to=#{lastCompleteTo}, updated_at=UTC_TIMESTAMP(3)
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND last_complete_to=#{expected} AND last_complete_to>#{lastCompleteTo}]]></update>
 </mapper>

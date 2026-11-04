@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ public class ReconciliationFailureRecorder {
         record.setCredentialId(credentialId);
         record.setReconcileType("FULL");
         record.setResult("FAILED");
-        record.setReconciledAt(LocalDateTime.now());
+        record.setReconciledAt(LocalDateTime.now(ZoneOffset.UTC));
         String safeMessage = message == null ? "" : message.replaceAll("[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]", "?");
         try {
             record.setDetailJson(QuantJsonMapper.writeMap(Map.of("message", safeMessage)));

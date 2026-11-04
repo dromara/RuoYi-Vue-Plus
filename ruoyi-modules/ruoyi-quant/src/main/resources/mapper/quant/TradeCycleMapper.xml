@@ -5,12 +5,12 @@
 INSERT INTO quant_trade_cycle_scope
     (credential_id,symbol,dirty_version,projected_version,projection_status,updated_at)
 VALUES
-    (#{credentialId},#{symbol},1,0,'PENDING',NOW(3))
+    (#{credentialId},#{symbol},1,0,'PENDING',UTC_TIMESTAMP(3))
 ON DUPLICATE KEY UPDATE
     dirty_version=dirty_version+1,
     projection_status='PENDING',
     last_error=NULL,
-    updated_at=NOW(3)
+    updated_at=UTC_TIMESTAMP(3)
 ]]></insert>
 
     <select id="selectPendingScopes" resultType="map" timeout="3"><![CDATA[
@@ -145,7 +145,7 @@ VALUES
      #{reconciliationStatus},#{reconciliationReason},#{openedAt},#{closedAt},
      #{openingQuantity},#{openingNotional},#{entryPrice},#{closingQuantity},#{closingNotional},
      #{closePrice},#{remainingQuantity},#{realizedPnl},#{commissionDisplay},
-     CAST(#{commissionByAssetJson} AS JSON),#{fillCount},NOW(3),NOW(3))
+     CAST(#{commissionByAssetJson} AS JSON),#{fillCount},UTC_TIMESTAMP(3),UTC_TIMESTAMP(3))
 ]]></insert>
 
     <insert id="insertCycleFill" timeout="3"><![CDATA[
@@ -156,7 +156,7 @@ INSERT INTO quant_trade_cycle_fill
 VALUES
     (#{id},#{cycleId},#{credentialId},#{symbol},#{exchangeTradeId},#{exchangeOrderId},
      #{allocationSeq},#{fillRole},#{positionSide},#{allocatedQuantity},#{price},
-     #{commission},#{commissionAsset},#{realizedPnl},#{tradeTime},NOW(3))
+     #{commission},#{commissionAsset},#{realizedPnl},#{tradeTime},UTC_TIMESTAMP(3))
 ]]></insert>
 
     <update id="completeProjection" timeout="3"><![CDATA[
@@ -166,8 +166,8 @@ SET projected_version=#{version},
     incomplete_count=#{incompleteCount},
     inferred_count=#{inferredCount},
     last_error=NULL,
-    last_projected_at=NOW(3),
-    updated_at=NOW(3)
+    last_projected_at=UTC_TIMESTAMP(3),
+    updated_at=UTC_TIMESTAMP(3)
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND dirty_version=#{version}
 ]]></update>
@@ -176,7 +176,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
 UPDATE quant_trade_cycle_scope
 SET projection_status='FAILED',
     last_error=LEFT(#{reason},1000),
-    updated_at=NOW(3)
+    updated_at=UTC_TIMESTAMP(3)
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND dirty_version>projected_version
 ]]></update>
@@ -204,14 +204,14 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
             c.opening_quantity AS openingQuantity,
             c.opening_notional AS openingNotional,
             c.entry_price AS entryPrice,
-            c.opened_at AS openedAt,
+            DATE_FORMAT(c.opened_at, '%Y-%m-%dT%H:%i:%sZ') AS openedAt,
             c.closing_quantity AS closingQuantity,
             c.closing_notional AS closingNotional,
             c.close_price AS closePrice,
             c.remaining_quantity AS remainingQuantity,
             c.realized_pnl AS realizedPnl,
             c.commission_display AS commission,
-            c.closed_at AS closedAt,
+            DATE_FORMAT(c.closed_at, '%Y-%m-%dT%H:%i:%sZ') AS closedAt,
             c.fill_count AS fillCount
         FROM quant_trade_cycle c
         INNER JOIN quant_credential q ON q.id=c.credential_id

@@ -4,7 +4,7 @@
     <insert id="append" timeout="3"><![CDATA[INSERT INTO quant_live_recovery_audit
     (audit_id, case_id, actor_id, action, evidence_sha256, detail_hash, created_at)
 VALUES (#{auditId}, #{caseId}, #{actorId}, #{action}, #{evidenceHash},
-        #{detailHash}, NOW(6))]]></insert>
+        #{detailHash}, UTC_TIMESTAMP(6))]]></insert>
     <select id="listByCase" resultType="map" timeout="3"><![CDATA[SELECT audit_id, case_id, actor_id, action,
        evidence_sha256, detail_hash, created_at
 FROM quant_live_recovery_audit

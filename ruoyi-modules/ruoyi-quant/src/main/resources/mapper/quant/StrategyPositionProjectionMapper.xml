@@ -8,7 +8,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND exchange_order_id=#{orderId}]]></select>
     <insert id="ensure" timeout="3"><![CDATA[INSERT IGNORE INTO quant_strategy_position_inventory
 (credential_id,symbol,strategy_instance_id,position_side,strategy_id,updated_at)
-VALUES (#{credentialId},#{symbol},#{instanceId},#{side},#{strategyId},NOW(6))]]></insert>
+VALUES (#{credentialId},#{symbol},#{instanceId},#{side},#{strategyId},UTC_TIMESTAMP(6))]]></insert>
     <select id="lock" resultType="map" timeout="3"><![CDATA[SELECT strategy_id,open_quantity,cost_basis,realized_pnl,commissions,commission_asset,
        cycle_number,cycle_id,last_trade_time,last_trade_id
 FROM quant_strategy_position_inventory
@@ -37,7 +37,7 @@ VALUES (#{id},#{credentialId},#{symbol},#{strategyId},#{instanceId},
 SET open_quantity=#{quantity},cost_basis=#{cost},
     realized_pnl=#{pnl},commissions=#{fees},commission_asset=#{feeAsset},
     cycle_number=#{cycle},cycle_id=#{cycleId},
-    last_trade_time=#{tradeTime},last_trade_id=#{tradeId},updated_at=NOW(6)
+    last_trade_time=#{tradeTime},last_trade_id=#{tradeId},updated_at=UTC_TIMESTAMP(6)
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND strategy_instance_id=#{instanceId} AND position_side=#{side}
   AND strategy_id=#{strategyId}

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -113,7 +114,7 @@ public class QuantTradeNotificationService {
             blockedNoticeTimes.entrySet().removeIf(entry -> now - entry.getValue() > 60_000L);
         }
         String content =
-            "实盘开仓已阻止\n账户: " + safe(credential == null ? null : credential.getAccountName()) + "\n交易对: " + safe(symbol) + "\n原因: " + safe(reason) + "\n时间: " + LocalDateTime.now();
+            "实盘开仓已阻止\n账户: " + safe(credential == null ? null : credential.getAccountName()) + "\n交易对: " + safe(symbol) + "\n原因: " + safe(reason) + "\n时间: " + LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         try {
             List<Long> adminIds = jdbcTemplate.query("SELECT DISTINCT ur.user_id FROM sys_user_role ur JOIN sys_role r ON r.role_id=ur.role_id JOIN sys_user u ON u.user_id=ur" +
                 ".user_id " + "WHERE r.role_key='admin' AND u.status='0' AND u.del_flag='0'", (rs, rowNum) -> rs.getLong(1));

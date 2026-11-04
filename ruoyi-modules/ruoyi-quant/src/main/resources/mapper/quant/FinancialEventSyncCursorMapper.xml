@@ -8,11 +8,11 @@ WHERE credential_id=#{credentialId}
     <insert id="insertCursor" timeout="3"><![CDATA[
 INSERT INTO quant_financial_event_sync_cursor
   (credential_id,last_complete_to,updated_at)
-VALUES (#{credentialId},#{lastCompleteTo},NOW(3))
+VALUES (#{credentialId},#{lastCompleteTo},UTC_TIMESTAMP(3))
 ]]></insert>
     <update id="advanceIfBehind" timeout="3"><![CDATA[
 UPDATE quant_financial_event_sync_cursor
-SET last_complete_to=#{lastCompleteTo},updated_at=NOW(3)
+SET last_complete_to=#{lastCompleteTo},updated_at=UTC_TIMESTAMP(3)
 WHERE credential_id=#{credentialId} AND last_complete_to<#{lastCompleteTo}
 ]]></update>
 </mapper>

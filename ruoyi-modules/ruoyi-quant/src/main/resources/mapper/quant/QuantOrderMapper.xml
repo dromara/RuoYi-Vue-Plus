@@ -9,7 +9,7 @@ WHERE credential_id=#{credentialId}
 ORDER BY UPPER(TRIM(symbol))
 ]]></select>
     <update id="claimPostFillBalanceSnapshot">
-        <![CDATA[UPDATE quant_order SET post_fill_balance_requested_at=#{requestedAt} WHERE id=#{id} AND (post_fill_balance_requested_at IS NULL OR post_fill_balance_requested_at < TIMESTAMPADD(SECOND, -30, CURRENT_TIMESTAMP))]]></update>
+        <![CDATA[UPDATE quant_order SET post_fill_balance_requested_at=#{requestedAt} WHERE id=#{id} AND (post_fill_balance_requested_at IS NULL OR post_fill_balance_requested_at < TIMESTAMPADD(SECOND, -30, UTC_TIMESTAMP()))]]></update>
     <update id="savePostFillBalanceSnapshot"><![CDATA[UPDATE quant_order SET post_fill_wallet_balance=#{balance}, post_fill_balance_at=#{observedAt} WHERE id=#{id}]]></update>
     <update id="mergeExchangeFactIfMonotonic" timeout="3"><![CDATA[UPDATE quant_order
 SET exchange_order_id=COALESCE(exchange_order_id, #{fact.exchangeOrderId}),

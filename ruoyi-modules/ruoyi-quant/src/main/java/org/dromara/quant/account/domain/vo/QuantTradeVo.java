@@ -13,7 +13,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 /**
@@ -93,11 +93,11 @@ public class QuantTradeVo implements Serializable {
      * 返回给前端的成交时间（北京时间）。
      */
     @JsonProperty("tradeTime")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    public LocalDateTime getTradeTimeBeijing() {
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    public OffsetDateTime getTradeTimeBeijing() {
         if (tradeTime == null) {
             return null;
         }
-        return tradeTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.of("Asia/Shanghai")).toLocalDateTime();
+        return tradeTime.atOffset(ZoneOffset.UTC).withOffsetSameInstant(ZoneOffset.ofHours(8));
     }
 }

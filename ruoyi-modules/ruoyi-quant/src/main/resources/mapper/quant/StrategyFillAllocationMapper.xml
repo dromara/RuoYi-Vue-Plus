@@ -13,7 +13,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
    allocated_fee_asset,realized_pnl,trade_time,created_at)
 VALUES (#{credentialId},#{symbol},#{tradeId},#{orderId},#{strategyId},
         #{instanceId},#{side},#{quantity},#{price},#{fee},#{feeAsset},#{pnl},
-        #{tradeTime},NOW())]]></insert>
+        #{tradeTime},UTC_TIMESTAMP())]]></insert>
     <select id="summarizeVerifiedFills" resultType="map" timeout="3"><![CDATA[SELECT COUNT(*) AS fill_count,
        COALESCE(SUM(CASE WHEN side='BUY' THEN allocated_qty ELSE 0 END),0) AS bought_qty,
        COALESCE(SUM(CASE WHEN side='SELL' THEN allocated_qty ELSE 0 END),0) AS sold_qty,

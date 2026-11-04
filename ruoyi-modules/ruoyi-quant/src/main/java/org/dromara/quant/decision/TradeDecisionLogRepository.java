@@ -109,7 +109,7 @@ public class TradeDecisionLogRepository {
     }
 
     private static Timestamp timestamp(Instant instant) {
-        return instant == null ? null : Timestamp.valueOf(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+        return instant == null ? null : Timestamp.valueOf(LocalDateTime.ofInstant(instant, ZoneId.of("Asia/Shanghai")));
     }
 
     private static String percent(BigDecimal rate) {
@@ -518,7 +518,7 @@ public class TradeDecisionLogRepository {
         add(where, args, "operation", q.getOperation(), false);
         add(where, args, "status", q.getStatus(), false);
         add(where, args, "reason", q.getReason(), true);
-        LocalDateTime to = q.getTo() == null ? LocalDateTime.now() : q.getTo();
+        LocalDateTime to = q.getTo() == null ? LocalDateTime.now(ZoneId.of("Asia/Shanghai")) : q.getTo();
         LocalDateTime from = q.getFrom() == null ? to.minusHours(24) : q.getFrom();
         if (from.isAfter(to)) {
             throw new org.dromara.common.core.exception.ServiceException("开始时间不能晚于结束时间");

@@ -5,7 +5,7 @@
   (credential_id,symbol,exchange_order_id,strategy_id,strategy_instance_id,
    position_side,fill_role,position_cycle_key,exchange_side,client_order_id,created_at)
 VALUES (#{credentialId},#{symbol},#{orderId},#{strategyId},#{instanceId},
-        #{positionSide},#{role},#{positionCycleKey},#{exchangeSide},#{clientOrderId},NOW(6))]]></insert>
+        #{positionSide},#{role},#{positionCycleKey},#{exchangeSide},#{clientOrderId},UTC_TIMESTAMP(6))]]></insert>
     <select id="find" resultType="map" timeout="3"><![CDATA[SELECT credential_id,symbol,exchange_order_id,strategy_id,strategy_instance_id,
        position_side,fill_role,position_cycle_key,exchange_side,client_order_id
 FROM quant_strategy_order_intent
@@ -25,7 +25,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
 (credential_id,symbol,exchange_order_id,strategy_id,strategy_instance_id,
  position_side,fill_role,position_cycle_key,exchange_side,client_order_id,created_at)
 SELECT credential_id,symbol,#{orderId},strategy_id,strategy_instance_id,
-       position_side,operation_type,position_cycle_key,exchange_side,client_order_id,NOW(6)
+       position_side,operation_type,position_cycle_key,exchange_side,client_order_id,UTC_TIMESTAMP(6)
 FROM quant_strategy_pre_dispatch_intent
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND idempotency_key=#{key} AND client_order_id=#{clientOrderId}

@@ -11,10 +11,10 @@
     </resultMap>
     <select id="lockAccount" resultMap="lockAccountResult" timeout="3"><![CDATA[SELECT * FROM quant_paper_account WHERE credential_id=#{credentialId} FOR UPDATE]]></select>
     <update id="reserveMargin" timeout="3"><![CDATA[UPDATE quant_paper_account
-SET available_balance=available_balance-#{margin}, updated_at=NOW()
+SET available_balance=available_balance-#{margin}, updated_at=UTC_TIMESTAMP()
 WHERE id=#{accountId} AND available_balance>=#{margin}]]></update>
     <update id="refundMargin" timeout="3"><![CDATA[UPDATE quant_paper_account
-SET available_balance=available_balance+#{margin}, updated_at=NOW()
+SET available_balance=available_balance+#{margin}, updated_at=UTC_TIMESTAMP()
 WHERE id=#{accountId}]]></update>
     <select id="lockPosition" resultType="java.lang.Long" timeout="3"><![CDATA[SELECT id FROM quant_position WHERE id=#{positionId} FOR UPDATE]]></select>
     <update id="settleClose" timeout="3"><![CDATA[UPDATE quant_paper_account
@@ -22,12 +22,12 @@ SET balance=balance+#{realized},
     available_balance=available_balance+#{releasedMargin}+#{realized},
     realized_pnl=realized_pnl+#{realized},
     unrealized_pnl=unrealized_pnl-#{oldPnl},
-    updated_at=NOW()
+    updated_at=UTC_TIMESTAMP()
 WHERE id=#{accountId}]]></update>
-    <update id="updateUnrealized" timeout="3"><![CDATA[UPDATE quant_paper_account SET unrealized_pnl=#{total}, updated_at=NOW()
+    <update id="updateUnrealized" timeout="3"><![CDATA[UPDATE quant_paper_account SET unrealized_pnl=#{total}, updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId}]]></update>
     <update id="adjustUnrealized" timeout="3"><![CDATA[UPDATE quant_paper_account
-SET unrealized_pnl=unrealized_pnl+#{pnl}-#{oldPnl}, updated_at=NOW()
+SET unrealized_pnl=unrealized_pnl+#{pnl}-#{oldPnl}, updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId}]]></update>
     <select id="lockExecution" resultType="java.lang.Long" timeout="3"><![CDATA[SELECT id FROM quant_execution_record
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}

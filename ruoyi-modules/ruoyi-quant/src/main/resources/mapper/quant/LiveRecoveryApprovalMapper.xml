@@ -7,7 +7,7 @@
  expected_client_order_id, state, created_at)
 SELECT #{caseId}, g.credential_id, g.symbol, t.idempotency_key,
        t.operation_type, #{requesterId}, #{evidenceHash},
-       t.exchange_order_id, t.client_order_id, 'PENDING', NOW(6)
+       t.exchange_order_id, t.client_order_id, 'PENDING', UTC_TIMESTAMP(6)
 FROM quant_live_dispatch_guard g
 JOIN quant_order_dispatch_ticket t ON t.credential_id=g.credential_id
    AND t.symbol=g.symbol AND t.idempotency_key=g.active_dispatch_key
@@ -22,7 +22,7 @@ WHERE g.credential_id=#{credentialId} AND g.symbol=#{symbol}
         AND c.state IN ('PENDING','APPROVED')
   )]]></insert>
     <update id="approve" timeout="3"><![CDATA[UPDATE quant_live_recovery_case
-SET state='APPROVED', reviewed_by=#{reviewerId}, reviewed_at=NOW(6)
+SET state='APPROVED', reviewed_by=#{reviewerId}, reviewed_at=UTC_TIMESTAMP(6)
 WHERE case_id=#{caseId} AND state='PENDING'
   AND requested_by<>#{reviewerId}
   AND evidence_sha256=#{evidenceHash}
@@ -41,7 +41,7 @@ WHERE case_id=#{caseId} AND state='PENDING'
         AND t.dispatch_status IN ('UNKNOWN','DISPATCHING')
   )]]></update>
     <update id="reject" timeout="3"><![CDATA[UPDATE quant_live_recovery_case
-SET state='REJECTED', reviewed_by=#{reviewerId}, reviewed_at=NOW(6)
+SET state='REJECTED', reviewed_by=#{reviewerId}, reviewed_at=UTC_TIMESTAMP(6)
 WHERE case_id=#{caseId} AND state='PENDING'
   AND requested_by<>#{reviewerId}
   AND evidence_sha256=#{evidenceHash}]]></update>
@@ -50,7 +50,7 @@ WHERE case_id=#{caseId} AND state='PENDING'
        expected_exchange_order_id, expected_client_order_id, state
 FROM quant_live_recovery_case WHERE case_id=#{caseId}]]></select>
     <update id="markExecuted" timeout="3"><![CDATA[UPDATE quant_live_recovery_case
-SET state='EXECUTED', completed_at=NOW(6)
+SET state='EXECUTED', completed_at=UTC_TIMESTAMP(6)
 WHERE case_id=#{caseId} AND state='APPROVED'
   AND evidence_sha256=#{evidenceHash}
   AND reviewed_by IS NOT NULL AND reviewed_by<>requested_by

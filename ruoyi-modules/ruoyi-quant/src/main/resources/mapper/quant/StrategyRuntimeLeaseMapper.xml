@@ -4,17 +4,17 @@
     <insert id="ensureRow" timeout="3"><![CDATA[INSERT IGNORE INTO quant_strategy_runtime_lease
     (instance_id, credential_id, symbol, owner_token, lease_epoch, lease_until, create_time, update_time)
 VALUES (#{instanceId}, #{credentialId}, #{symbol}, #{ownerToken}, 1,
-        DATE_ADD(NOW(), INTERVAL #{leaseSeconds} SECOND), NOW(), NOW())]]></insert>
+        DATE_ADD(NOW(), INTERVAL #{leaseSeconds} SECOND), UTC_TIMESTAMP(), UTC_TIMESTAMP())]]></insert>
     <update id="acquireOrRenew" timeout="3"><![CDATA[UPDATE quant_strategy_runtime_lease
 SET lease_epoch=CASE WHEN owner_token<>#{ownerToken} OR lease_until<=NOW()
         THEN lease_epoch+1 ELSE lease_epoch END,
     instance_id=#{instanceId}, owner_token=#{ownerToken},
     lease_until=DATE_ADD(NOW(), INTERVAL #{leaseSeconds} SECOND),
-    update_time=NOW()
+    update_time=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND (owner_token=#{ownerToken} OR lease_until<NOW())]]></update>
     <update id="release" timeout="3"><![CDATA[UPDATE quant_strategy_runtime_lease
-SET lease_until=DATE_SUB(NOW(), INTERVAL 1 SECOND), update_time=NOW()
+SET lease_until=DATE_SUB(NOW(), INTERVAL 1 SECOND), update_time=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND owner_token=#{ownerToken}
   AND lease_until>NOW()]]></update>
     <select id="countCurrentOwner" resultType="java.lang.Long" timeout="3"><![CDATA[SELECT COUNT(*) FROM quant_strategy_runtime_lease

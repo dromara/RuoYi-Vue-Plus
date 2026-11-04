@@ -48,6 +48,8 @@ public class QuantAccountQueryController {
     /**
      * 交易凭证 Mapper。
      */
+    private static final ZoneId BEIJING_ZONE = ZoneId.of("Asia/Shanghai");
+
     private final QuantCredentialMapper credentialMapper;
     /**
      * 交易所统一网关。
@@ -83,7 +85,7 @@ public class QuantAccountQueryController {
     @GetMapping("/account/{credentialId}/daily-baseline")
     public R<DailyAccountBaseline> dailyBaseline(@PathVariable Long credentialId) {
         credentialEntity(credentialId);
-        LocalDateTime dayStart = LocalDate.now(ZoneId.of("Asia/Shanghai")).atStartOfDay();
+        LocalDateTime dayStart = LocalDate.now(BEIJING_ZONE).atStartOfDay(BEIJING_ZONE).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
         QuantAccountSnapshot baseline = accountSnapshotMapper.selectOne(new LambdaQueryWrapper<QuantAccountSnapshot>()
             .select(QuantAccountSnapshot::getMarginBalance, QuantAccountSnapshot::getObservedAt)
             .eq(QuantAccountSnapshot::getCredentialId, credentialId)
@@ -91,13 +93,13 @@ public class QuantAccountQueryController {
             .lt(QuantAccountSnapshot::getObservedAt, dayStart.plusMinutes(5))
             .orderByAsc(QuantAccountSnapshot::getObservedAt)
             .last("LIMIT 1"));
-        return R.ok(baseline == null ? null : new DailyAccountBaseline(baseline.getMarginBalance(), baseline.getObservedAt()));
+        return R.ok(baseline == null ? null : new DailyAccountBaseline(baseline.getMarginBalance(), baseline.getObservedAt().atOffset(ZoneOffset.UTC).withOffsetSameInstant(ZoneOffset.ofHours(8))));
     }
 
     /**
      * 当日账户权益基线及其观测时间。
      */
-    public record DailyAccountBaseline(java.math.BigDecimal equity, LocalDateTime observedAt) {
+    public record DailyAccountBaseline(java.math.BigDecimal equity, java.time.OffsetDateTime observedAt) {
     }
 
     /**
@@ -169,7 +171,7 @@ public class QuantAccountQueryController {
             row.put("originalQuantity", item.getOriginalQuantity());
             row.put("executedQuantity", item.getExecutedQuantity());
             row.put("tradeCount", fillCounts.getOrDefault(item.getCredentialId() + ":" + item.getSymbol() + ":" + item.getExchangeOrderId(), 0L));
-            row.put("updateTime", item.getUpdatedAt());
+            row.put("updateTime", item.getUpdatedAt() == null ? null : item.getUpdatedAt().toInstant(ZoneOffset.UTC));
             return row;
         }).toList();
         return R.ok(PageResult.build(rows, page.getTotal()));
@@ -230,8 +232,8 @@ public class QuantAccountQueryController {
         lqw.eq(StringUtils.isNotBlank(symbol), QuantTrade::getSymbol, symbol);
         lqw.eq(orderId != null, QuantTrade::getExchangeOrderId, orderId);
         lqw.eq(StringUtils.isNotBlank(side), QuantTrade::getSide, side);
-        lqw.ge(StringUtils.isNotBlank(from), QuantTrade::getTradeTime, StringUtils.isBlank(from) ? null : LocalDate.parse(from).atStartOfDay());
-        lqw.lt(StringUtils.isNotBlank(to), QuantTrade::getTradeTime, StringUtils.isBlank(to) ? null : LocalDate.parse(to).plusDays(1).atStartOfDay());
+        lqw.ge(StringUtils.isNotBlank(from), QuantTrade::getTradeTime, StringUtils.isBlank(from) ? null : tradeDateBoundary(from, false));
+        lqw.lt(StringUtils.isNotBlank(to), QuantTrade::getTradeTime, StringUtils.isBlank(to) ? null : tradeDateBoundary(to, true));
         lqw.orderByDesc(QuantTrade::getTradeTime).orderByDesc(QuantTrade::getId);
         Page<QuantTrade> page = tradeMapper.selectPage(pageQuery.build(), lqw);
         List<QuantTradeVo> rows = page.getRecords().stream().map(item -> toVo(item, credential)).toList();
@@ -273,8 +275,8 @@ public class QuantAccountQueryController {
             .eq(StringUtils.isNotBlank(symbol), QuantTrade::getSymbol, symbol)
             .eq(StringUtils.isNotBlank(side), QuantTrade::getSide, side)
             .eq(orderId != null, QuantTrade::getExchangeOrderId, orderId)
-            .ge(StringUtils.isNotBlank(from), QuantTrade::getTradeTime, StringUtils.isBlank(from) ? null : LocalDate.parse(from).atStartOfDay())
-            .lt(StringUtils.isNotBlank(to), QuantTrade::getTradeTime, StringUtils.isBlank(to) ? null : LocalDate.parse(to).plusDays(1).atStartOfDay())
+            .ge(StringUtils.isNotBlank(from), QuantTrade::getTradeTime, StringUtils.isBlank(from) ? null : tradeDateBoundary(from, false))
+            .lt(StringUtils.isNotBlank(to), QuantTrade::getTradeTime, StringUtils.isBlank(to) ? null : tradeDateBoundary(to, true))
             .orderByDesc(QuantTrade::getTradeTime).orderByDesc(QuantTrade::getId);
         Page<QuantTrade> page = tradeMapper.selectPage(pageQuery.build(), tradeQuery);
         List<QuantTradeVo> rows = page.getRecords().stream()
@@ -355,6 +357,14 @@ public class QuantAccountQueryController {
         if (restored > 0) {
             log.info("历史成交订单来源事实已补齐 credentialId={} symbol={} restoredOrderCount={}", credential.getId(), symbol, restored);
         }
+    }
+
+    static LocalDateTime tradeDateBoundary(String date, boolean nextDay) {
+        LocalDate target = LocalDate.parse(date);
+        if (nextDay) {
+            target = target.plusDays(1);
+        }
+        return target.atStartOfDay(BEIJING_ZONE).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }
 
     private ExchangeGateway.Credential credential(Long id) {

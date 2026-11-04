@@ -3,19 +3,19 @@
 <mapper namespace="org.dromara.quant.execution.mapper.LiveOrderDispatchMapper">
     <insert id="ensureGuard" timeout="3"><![CDATA[INSERT IGNORE INTO quant_live_dispatch_guard
     (credential_id, symbol, active_dispatch_key, updated_at)
-VALUES (#{credentialId}, #{symbol}, NULL, NOW())]]></insert>
+VALUES (#{credentialId}, #{symbol}, NULL, UTC_TIMESTAMP())]]></insert>
     <insert id="ensureSettingsIntent" timeout="3"><![CDATA[INSERT IGNORE INTO quant_live_account_settings_intent
     (credential_id, symbol, margin_mode, leverage, created_at)
-VALUES (#{credentialId}, #{symbol}, #{marginMode}, #{leverage}, NOW())]]></insert>
+VALUES (#{credentialId}, #{symbol}, #{marginMode}, #{leverage}, UTC_TIMESTAMP())]]></insert>
     <select id="matchingSettingsIntent" resultType="long" timeout="3"><![CDATA[SELECT COUNT(*) FROM quant_live_account_settings_intent
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND margin_mode=#{marginMode} AND leverage=#{leverage}]]></select>
     <update id="claim" timeout="3"><![CDATA[UPDATE quant_live_dispatch_guard
-SET active_dispatch_key=#{key}, updated_at=NOW()
+SET active_dispatch_key=#{key}, updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND active_dispatch_key IS NULL]]></update>
     <update id="claimWithLease" timeout="3"><![CDATA[UPDATE quant_live_dispatch_guard
-SET active_dispatch_key=#{key}, updated_at=NOW()
+SET active_dispatch_key=#{key}, updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND active_dispatch_key IS NULL
   AND EXISTS (
@@ -28,14 +28,14 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   (credential_id, symbol, idempotency_key, operation_type, client_order_id,
    strategy_instance_id, lease_epoch, dispatch_status, created_at, updated_at)
 VALUES (#{credentialId}, #{symbol}, #{key}, #{operation}, #{clientOrderId},
-        #{instanceId}, #{epoch}, 'DISPATCHING', NOW(), NOW())]]></insert>
+        #{instanceId}, #{epoch}, 'DISPATCHING', UTC_TIMESTAMP(), UTC_TIMESTAMP())]]></insert>
     <insert id="insertPreDispatchIntent" timeout="3"><![CDATA[INSERT INTO quant_strategy_pre_dispatch_intent
 (credential_id,symbol,idempotency_key,client_order_id,strategy_id,
  strategy_instance_id,operation_type,position_side,exchange_side,position_cycle_key,
  lease_epoch,created_at)
 SELECT #{credentialId},#{symbol},#{key},#{clientOrderId},#{strategyId},
        #{instanceId},#{operation},#{positionSide},#{exchangeSide},s.position_cycle_key,
-       #{epoch},NOW(6)
+       #{epoch},UTC_TIMESTAMP(6)
 FROM quant_strategy_position_state s
 JOIN quant_strategy_instance i ON i.id=s.instance_id AND i.credential_id=#{credentialId}
 JOIN quant_strategy_symbol ss ON ss.id=i.strategy_symbol_id
@@ -46,16 +46,16 @@ WHERE s.instance_id=#{instanceId}
   AND s.pending_idempotency_key=#{key}
   AND s.status IN ('OPEN_PENDING','OPEN','EXIT_PENDING')]]></insert>
     <update id="acknowledge" timeout="3"><![CDATA[UPDATE quant_order_dispatch_ticket
-SET dispatch_status='ACKED', exchange_order_id=#{orderId}, updated_at=NOW()
+SET dispatch_status='ACKED', exchange_order_id=#{orderId}, updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}
   AND dispatch_status='DISPATCHING']]></update>
     <update id="acknowledgeConfiguration" timeout="3"><![CDATA[UPDATE quant_order_dispatch_ticket
-SET dispatch_status='CONFIG_APPLIED', updated_at=NOW()
+SET dispatch_status='CONFIG_APPLIED', updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}
   AND symbol=#{symbol} AND operation_type='CONFIG_SETTINGS'
   AND dispatch_status='DISPATCHING' AND exchange_order_id IS NULL]]></update>
     <update id="recoverConfiguration" timeout="3"><![CDATA[UPDATE quant_order_dispatch_ticket
-SET dispatch_status='RECOVERED', updated_at=NOW()
+SET dispatch_status='RECOVERED', updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}
   AND symbol=#{symbol} AND client_order_id=#{clientOrderId}
   AND operation_type='CONFIG_SETTINGS' AND exchange_order_id IS NULL
@@ -71,18 +71,18 @@ WHERE credential_id=#{credentialId} AND idempotency_key=#{key}
       AND i.margin_mode=#{marginMode} AND i.leverage=#{leverage}
   )]]></update>
     <update id="notSent" timeout="3"><![CDATA[UPDATE quant_order_dispatch_ticket
-SET dispatch_status='FAILED_NOT_SENT', updated_at=NOW()
+SET dispatch_status='FAILED_NOT_SENT', updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}
   AND dispatch_status='DISPATCHING']]></update>
     <update id="unknown" timeout="3"><![CDATA[UPDATE quant_order_dispatch_ticket
-SET dispatch_status='UNKNOWN', updated_at=NOW()
+SET dispatch_status='UNKNOWN', updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}
   AND dispatch_status='DISPATCHING']]></update>
-    <update id="release" timeout="3"><![CDATA[UPDATE quant_live_dispatch_guard SET active_dispatch_key=NULL, updated_at=NOW()
+    <update id="release" timeout="3"><![CDATA[UPDATE quant_live_dispatch_guard SET active_dispatch_key=NULL, updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND symbol=#{symbol}
   AND active_dispatch_key=#{key}]]></update>
     <update id="recoverVerified" timeout="3"><![CDATA[UPDATE quant_order_dispatch_ticket
-SET dispatch_status='RECOVERED', exchange_order_id=#{orderId}, updated_at=NOW()
+SET dispatch_status='RECOVERED', exchange_order_id=#{orderId}, updated_at=UTC_TIMESTAMP()
 WHERE credential_id=#{credentialId} AND idempotency_key=#{key}
   AND symbol=#{symbol} AND client_order_id=#{clientOrderId}
   AND (exchange_order_id IS NULL OR exchange_order_id=#{orderId})

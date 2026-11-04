@@ -257,7 +257,7 @@ public class TradingReconciliationService {
         }
         long openPositionCount = positions.stream().filter(p -> p.quantity() != null && p.quantity().signum() != 0).count();
         log.info("账户级持仓快照已提交 credentialId={} runMode={} generation={} trigger={} snapshotCount={} openPositionCount={} elapsedMs={}", credential.getId(), credential.getRunMode(),
-            eventGeneration, trigger, positions.size(), openPositionCount, java.time.Duration.between(fetchStartedAt, LocalDateTime.now()).toMillis());
+            eventGeneration, trigger, positions.size(), openPositionCount, java.time.Duration.between(fetchStartedAt, LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai"))).toMillis());
     }
 
     private long positionGeneration(Long credentialId) {
@@ -332,7 +332,7 @@ public class TradingReconciliationService {
         try {
             long generation = positionGeneration(credentialId);
             long runtimeGeneration = runtimeSnapshotGeneration(credentialId);
-            LocalDateTime fetchStartedAt = LocalDateTime.now();
+            LocalDateTime fetchStartedAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai"));
             ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(),
                 credential.getRunMode());
             // Network I/O stays outside the account write lock and database transaction.
@@ -479,7 +479,7 @@ public class TradingReconciliationService {
         if (credential == null || credential.getId() == null || symbol == null || symbol.isBlank() || exchangeCredential == null) {
             throw new IllegalArgumentException("Credential, symbol and exchange credentials are required");
         }
-        LocalDateTime fetchStartedAt = LocalDateTime.now();
+        LocalDateTime fetchStartedAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai"));
         long generation = positionGeneration(credential.getId());
         long runtimeGeneration = runtimeSnapshotGeneration(credential.getId());
         final List<ExchangeGateway.PositionSnapshot> snapshots;
@@ -532,7 +532,7 @@ public class TradingReconciliationService {
         try {
             long positionGeneration = positionGeneration(credential.getId());
             long runtimeGeneration = runtimeSnapshotGeneration(credential.getId());
-            LocalDateTime fetchStartedAt = LocalDateTime.now();
+            LocalDateTime fetchStartedAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai"));
             ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(),
                 credential.getRunMode());
             // Collect a complete account position snapshot before any DB writes.
@@ -692,7 +692,7 @@ public class TradingReconciliationService {
      * 同步账户资产快照。
      */
     private void syncAccount(QuantCredential credential, ExchangeGateway.AccountSnapshot snapshot) {
-        LocalDateTime observedAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai")).withNano(0);
+        LocalDateTime observedAt = LocalDateTime.now(ZoneOffset.UTC).withNano(0);
         QuantAccountSnapshot entity = accountSnapshotMapper.selectOne(new LambdaQueryWrapper<QuantAccountSnapshot>().eq(QuantAccountSnapshot::getCredentialId,
             credential.getId()).eq(QuantAccountSnapshot::getObservedAt, observedAt));
         if (entity == null) {
@@ -747,7 +747,7 @@ public class TradingReconciliationService {
             entity.setLiquidationPrice(s.liquidationPrice());
             entity.setMargin(s.margin());
             entity.setLeverage(s.leverage());
-            entity.setUpdatedAt(LocalDateTime.now());
+            entity.setUpdatedAt(LocalDateTime.now(ZoneOffset.UTC));
             if (entity.getId() == null) {
                 positionMapper.insert(entity);
             } else {
@@ -769,7 +769,7 @@ public class TradingReconciliationService {
                 if (previousQuantity != null && previousQuantity.signum() > 0) {
                     local.setQuantity(BigDecimal.ZERO);
                     local.setUnrealizedPnl(BigDecimal.ZERO);
-                    local.setUpdatedAt(LocalDateTime.now());
+                    local.setUpdatedAt(LocalDateTime.now(ZoneOffset.UTC));
                     positionMapper.updateById(local);
                 }
                 strategyPositionStateService.markClosedByPositionId(local.getId());
@@ -808,7 +808,7 @@ public class TradingReconciliationService {
                 entity = new QuantOrder();
                 entity.setCredentialId(credential.getId());
                 entity.setClientOrderId(clientOrderId);
-                entity.setCreatedAt(LocalDateTime.now());
+                entity.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
                 entity.setIdempotencyKey(clientOrderId);
             }
             entity.setClientOrderId(clientOrderId);
@@ -822,7 +822,7 @@ public class TradingReconciliationService {
             entity.setPrice(s.price());
             entity.setOriginalQuantity(nvl(s.originalQuantity()));
             entity.setExecutedQuantity(nvl(s.executedQuantity()));
-            entity.setUpdatedAt(s.updateTime() == null ? LocalDateTime.now() : LocalDateTime.ofInstant(s.updateTime(), ZoneOffset.UTC));
+            entity.setUpdatedAt(s.updateTime() == null ? LocalDateTime.now(ZoneOffset.UTC) : LocalDateTime.ofInstant(s.updateTime(), ZoneOffset.UTC));
             int persisted;
             if (entity.getId() == null) {
                 persisted = orderMapper.insert(entity);
@@ -1164,7 +1164,7 @@ public class TradingReconciliationService {
             entity = new QuantFinancialEvent();
             entity.setCredentialId(credential.getId());
             entity.setExchangeTransactionId(s.transactionId());
-            entity.setCreatedAt(LocalDateTime.now());
+            entity.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
             entity.setSymbol(s.symbol());
             entity.setEventType(s.incomeType());
             entity.setEventIdentityKey(identityKey);
@@ -1261,7 +1261,7 @@ public class TradingReconciliationService {
         record.setReconcileType("FULL");
         record.setResult(result);
         record.setDetailJson(detail);
-        record.setReconciledAt(LocalDateTime.now());
+        record.setReconciledAt(LocalDateTime.now(ZoneOffset.UTC));
         return record;
     }
 

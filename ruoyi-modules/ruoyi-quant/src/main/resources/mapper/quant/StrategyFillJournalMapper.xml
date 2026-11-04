@@ -26,7 +26,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol} AND exchange_trade_id=#
     <insert id="insertRaw" timeout="3"><![CDATA[INSERT INTO quant_strategy_fill_journal
   (id,credential_id,symbol,exchange_trade_id,exchange_order_id,side,quantity,price,commission,commission_asset,realized_pnl,trade_time,attribution_status,attempt_count,created_at,updated_at)
 VALUES
-  (#{id},#{credentialId},#{symbol},#{exchangeTradeId},#{exchangeOrderId},#{side},#{quantity},#{price},#{commission},#{commissionAsset},#{realizedPnl},#{tradeTime},'CAPTURED',0,NOW(3),NOW(3))]]></insert>
+  (#{id},#{credentialId},#{symbol},#{exchangeTradeId},#{exchangeOrderId},#{side},#{quantity},#{price},#{commission},#{commissionAsset},#{realizedPnl},#{tradeTime},'CAPTURED',0,UTC_TIMESTAMP(3),UTC_TIMESTAMP(3))]]></insert>
     <update id="enrichMissingFacts" timeout="3"><![CDATA[
 UPDATE quant_strategy_fill_journal
 SET exchange_order_id=COALESCE(exchange_order_id, #{exchangeOrderId}),
@@ -37,7 +37,7 @@ SET exchange_order_id=COALESCE(exchange_order_id, #{exchangeOrderId}),
     commission_asset=COALESCE(commission_asset, #{commissionAsset}),
     realized_pnl=COALESCE(realized_pnl, #{realizedPnl}),
     trade_time=COALESCE(trade_time, #{tradeTime}),
-    updated_at=NOW(3)
+    updated_at=UTC_TIMESTAMP(3)
 WHERE id=#{id}
   AND credential_id=#{credentialId}
   AND symbol=#{symbol}
@@ -53,7 +53,7 @@ WHERE id=#{id}
 ]]></update>
     <update id="updateStatus" timeout="3"><![CDATA[UPDATE quant_strategy_fill_journal
 SET attribution_status=#{status}, status_reason=#{reason}, attempt_count=attempt_count+1,
-    last_attempt_at=NOW(3), updated_at=NOW(3)
+    last_attempt_at=UTC_TIMESTAMP(3), updated_at=UTC_TIMESTAMP(3)
 WHERE id=#{id}
   AND (
       #{status}='CONFLICT'

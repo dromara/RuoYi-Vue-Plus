@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -81,7 +82,7 @@ public class StrategyPositionStateService {
         Object lock = locks.computeIfAbsent(state.getInstanceId(), ignored -> new Object());
         synchronized (lock) {
             // updated_at 在数据库中是 NOT NULL 且没有默认值，插入和更新都由服务统一维护。
-            state.setUpdatedAt(LocalDateTime.now());
+            state.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Shanghai")));
             if (state.getVersion() == null) {
                 state.setVersion(0);
             }

@@ -4,5 +4,5 @@
     <insert id="ensure"><![CDATA[INSERT IGNORE INTO quant_position_sync_fence (credential_id) VALUES (#{id})]]></insert>
     <select id="lockAndRead" resultType="java.time.LocalDateTime">
         <![CDATA[SELECT snapshot_started_at FROM quant_position_sync_fence WHERE credential_id = #{id} FOR UPDATE]]></select>
-    <update id="advance"><![CDATA[UPDATE quant_position_sync_fence SET snapshot_started_at = #{started}, updated_at = NOW(6) WHERE credential_id = #{id}]]></update>
+    <update id="advance"><![CDATA[UPDATE quant_position_sync_fence SET snapshot_started_at = #{started}, updated_at = UTC_TIMESTAMP(6) WHERE credential_id = #{id}]]></update>
 </mapper>

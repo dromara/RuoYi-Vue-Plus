@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * 统一写入本地订单账本。
@@ -68,7 +69,7 @@ public class OrderLedgerService {
             entity = new QuantOrder();
             entity.setCredentialId(credentialId);
             entity.setClientOrderId(clientOrderId);
-            entity.setCreatedAt(LocalDateTime.now());
+            entity.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
             entity.setIdempotencyKey(clientOrderId);
         }
         // Always carry the exchange-confirmed client ID into the merge statement.
@@ -86,7 +87,7 @@ public class OrderLedgerService {
         entity.setOriginalQuantity(snapshot.originalQuantity());
         entity.setExecutedQuantity(snapshot.executedQuantity());
         entity.setReduceOnly(snapshot.reduceOnly());
-        entity.setUpdatedAt(snapshot.updateTime() == null ? LocalDateTime.now() : LocalDateTime.ofInstant(snapshot.updateTime(), java.time.ZoneOffset.UTC));
+        entity.setUpdatedAt(snapshot.updateTime() == null ? LocalDateTime.now(ZoneOffset.UTC) : LocalDateTime.ofInstant(snapshot.updateTime(), java.time.ZoneOffset.UTC));
         return persistMonotonic(entity);
     }
 
@@ -110,7 +111,7 @@ public class OrderLedgerService {
             entity = new QuantOrder();
             entity.setCredentialId(credentialId);
             entity.setClientOrderId(clientOrderId);
-            entity.setCreatedAt(LocalDateTime.now());
+            entity.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
             entity.setIdempotencyKey(request.clientOrderId());
         }
         entity.setStrategyId(strategyId);
@@ -134,7 +135,7 @@ public class OrderLedgerService {
                 entity.setPriceTickSizeSnapshot(priceTickSizeSnapshot);
             }
         }
-        entity.setUpdatedAt(LocalDateTime.now());
+        entity.setUpdatedAt(LocalDateTime.now(ZoneOffset.UTC));
         return persistMonotonic(entity);
     }
 

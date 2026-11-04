@@ -3,10 +3,10 @@
 <mapper namespace="org.dromara.quant.runtime.coordination.mapper.StrategyEntryGuardMapper">
     <insert id="tryClaim"><![CDATA[INSERT IGNORE INTO quant_strategy_entry_guard
     (credential_id, symbol, instance_id, kline_open_time, guard_type, created_at)
-VALUES (#{credentialId}, #{symbol}, #{instanceId}, #{openTime}, 'ENTRY', NOW())]]></insert>
+VALUES (#{credentialId}, #{symbol}, #{instanceId}, #{openTime}, 'ENTRY', UTC_TIMESTAMP())]]></insert>
     <insert id="blockClosedCandle"><![CDATA[INSERT INTO quant_strategy_entry_guard
     (credential_id, symbol, instance_id, kline_open_time, guard_type, created_at)
-VALUES (#{credentialId}, #{symbol}, #{instanceId}, #{openTime}, 'CLOSE', NOW())
+VALUES (#{credentialId}, #{symbol}, #{instanceId}, #{openTime}, 'CLOSE', UTC_TIMESTAMP())
 ON DUPLICATE KEY UPDATE guard_type = 'CLOSE', instance_id = VALUES(instance_id)]]></insert>
     <update id="bindOrder"><![CDATA[UPDATE quant_strategy_entry_guard SET order_id = #{orderId}
 WHERE instance_id = #{instanceId}

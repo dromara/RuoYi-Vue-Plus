@@ -5,7 +5,7 @@
   (target_key,credential_id,position_id,position_cycle_key,position_side,
    protection_type,target_version,step_index,confirmed_step,updated_at)
 VALUES (#{key},#{credentialId},#{positionId},#{cycleKey},#{side},
-        #{type},0,0,0,CURRENT_TIMESTAMP)
+        #{type},0,0,0,UTC_TIMESTAMP())
 ON DUPLICATE KEY UPDATE target_key=target_key]]></insert>
     <update id="acquireLease" timeout="3"><![CDATA[UPDATE quant_protection_target
 SET owner_token=#{owner},lease_until=TIMESTAMPADD(SECOND,30,CURRENT_TIMESTAMP)
@@ -23,16 +23,16 @@ WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTA
     <update id="prepareTarget" timeout="3"><![CDATA[UPDATE quant_protection_target
 SET target_version=#{version},step_index=#{stepIndex},quantity=#{quantity},
     trigger_price=#{triggerPrice},order_type=#{orderType},
-    pending_order_id=#{pendingId},previous_order_id=#{previousId},updated_at=CURRENT_TIMESTAMP
+    pending_order_id=#{pendingId},previous_order_id=#{previousId},updated_at=UTC_TIMESTAMP()
 WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
     <update id="confirmTarget" timeout="3"><![CDATA[UPDATE quant_protection_target
 SET current_order_id=#{currentId},pending_order_id=NULL,step_index=#{stepIndex},
     confirmed_step=#{confirmedStep},quantity=#{quantity},trigger_price=#{triggerPrice},
-    order_type=#{orderType},updated_at=CURRENT_TIMESTAMP
+    order_type=#{orderType},updated_at=UTC_TIMESTAMP()
 WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
-    <update id="clearPending" timeout="3"><![CDATA[UPDATE quant_protection_target SET pending_order_id=NULL,updated_at=CURRENT_TIMESTAMP
+    <update id="clearPending" timeout="3"><![CDATA[UPDATE quant_protection_target SET pending_order_id=NULL,updated_at=UTC_TIMESTAMP()
 WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
-    <update id="clearPrevious" timeout="3"><![CDATA[UPDATE quant_protection_target SET previous_order_id=NULL,updated_at=CURRENT_TIMESTAMP
+    <update id="clearPrevious" timeout="3"><![CDATA[UPDATE quant_protection_target SET previous_order_id=NULL,updated_at=UTC_TIMESTAMP()
 WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
     <update id="releaseLease" timeout="3"><![CDATA[UPDATE quant_protection_target SET owner_token=NULL,lease_until=NULL
 WHERE target_key=#{key} AND owner_token=#{owner}]]></update>

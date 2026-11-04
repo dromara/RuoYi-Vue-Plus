@@ -8,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * 数据库幂等执行记录服务。
@@ -42,7 +43,7 @@ public class ExecutionRecordService {
         entity.setIdempotencyKey(idempotencyKey);
         entity.setClientOrderId(clientOrderId == null || clientOrderId.isBlank() ? idempotencyKey : clientOrderId);
         entity.setExecutionStatus("PENDING");
-        entity.setCreatedAt(LocalDateTime.now());
+        entity.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
         entity.setRecoveryAttempts(0);
         entity.setPaperSettled(false);
         entity.setUpdatedAt(entity.getCreatedAt());
@@ -59,7 +60,7 @@ public class ExecutionRecordService {
      */
     public void accepted(QuantExecutionRecord entity, Long exchangeOrderId, String exchangeStatus) {
         String status = exchangeStatus == null ? "ACCEPTED" : exchangeStatus;
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         if (mapper.markAccepted(entity.getId(), exchangeOrderId, status, now) != 1) {
             // Binance has already returned an order result. A failed durable transition
             // must stop the caller before it can acknowledge/release the dispatch guard.
@@ -75,7 +76,7 @@ public class ExecutionRecordService {
      * 记录一次执行恢复尝试。
      */
     public void markRecoveryAttempt(QuantExecutionRecord entity) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         if (mapper.recordRecoveryAttempt(entity.getId(), now) == 1) {
             entity.setRecoveryAttempts((entity.getRecoveryAttempts() == null ? 0 : entity.getRecoveryAttempts()) + 1);
             entity.setLastRecoveryAt(now);
@@ -88,7 +89,7 @@ public class ExecutionRecordService {
      */
     public void failed(QuantExecutionRecord entity, String message) {
         String reason = message == null ? "未知执行异常" : message;
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         if (mapper.markFailedBeforeSend(entity.getId(), reason, now) == 1) {
             entity.setExecutionStatus("FAILED");
             entity.setErrorMessage(reason);
@@ -101,7 +102,7 @@ public class ExecutionRecordService {
      */
     public void markUnknown(QuantExecutionRecord entity, String message) {
         String reason = message == null ? "无法确认交易所订单事实" : message;
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         if (mapper.markUnknownIfUnresolved(entity.getId(), reason, now) == 1) {
             entity.setExecutionStatus("UNKNOWN");
             entity.setErrorMessage(reason);
@@ -113,7 +114,7 @@ public class ExecutionRecordService {
      * 把经过事实核实的执行记录标记为 RECOVERED。
      */
     public void markRecovered(QuantExecutionRecord entity, Long exchangeOrderId, String exchangeStatus) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         if (mapper.markRecoveredAfterFact(entity.getId(), exchangeOrderId, exchangeStatus, now) != 1) {
             // Never let a caller treat a non-persisted recovery fact as durable
             // and release the account-symbol dispatch guard.
