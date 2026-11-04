@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.quant.account.mapper.TradeCycleMapper">
+    <insert id="markDirty" timeout="3"><![CDATA[
+INSERT INTO quant_trade_cycle_scope
+    (credential_id,symbol,dirty_version,projected_version,projection_status,updated_at)
+VALUES
+    (#{credentialId},#{symbol},1,0,'PENDING',NOW(3))
+ON DUPLICATE KEY UPDATE
+    dirty_version=dirty_version+1,
+    projection_status='PENDING',
+    last_error=NULL,
+    updated_at=NOW(3)
+]]></insert>
+
+    <select id="selectPendingScopes" resultType="map" timeout="3"><![CDATA[
+SELECT credential_id AS credentialId,symbol
+FROM quant_trade_cycle_scope
+WHERE dirty_version>projected_version
+ORDER BY updated_at,credential_id,symbol
+LIMIT #{limit}
+]]></select>
+
+    <select id="lockScope" resultType="map" timeout="3"><![CDATA[
+SELECT dirty_version AS dirtyVersion,projected_version AS projectedVersion
+FROM quant_trade_cycle_scope
+WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+FOR UPDATE
+]]></select>
+
+    <select id="countSourceFills" resultType="long" timeout="5"><![CDATA[
+SELECT COUNT(*) FROM quant_trade
+WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+]]></select>
+
+    <select id="selectSourceFills" resultType="org.dromara.quant.account.domain.vo.TradeCycleSourceFill" timeout="15">
+        SELECT
+            t.id,
+            t.credential_id AS credentialId,
+            t.symbol,
+            t.exchange_trade_id AS exchangeTradeId,
+            t.exchange_order_id AS exchangeOrderId,
+            UPPER(t.side) AS side,
+            COALESCE(soi.position_side,pre.position_side,NULLIF(o.position_side,'BOTH')) AS positionSide,
+            o.position_side AS exchangePositionSide,
+            COALESCE(soi.fill_role,pre.operation_type,execution.operation_type) AS fillRole,
+            COALESCE(soi.position_cycle_key,pre.position_cycle_key) AS positionCycleKey,
+            CASE WHEN o.reduce_only='1' THEN 1 WHEN o.reduce_only='0' THEN 0 ELSE NULL END AS reduceOnly,
+            o.executed_quantity AS orderExecutedQuantity,
+            t.quantity,
+            t.price,
+            COALESCE(t.commission,j.commission) AS commission,
+            COALESCE(NULLIF(UPPER(TRIM(t.commission_asset)),''),NULLIF(UPPER(TRIM(j.commission_asset)),'')) AS commissionAsset,
+            t.realized_pnl AS realizedPnl,
+            t.trade_time AS tradeTime,
+            CASE WHEN
+                COALESCE(execution.source_conflict,0)=1
+                OR COALESCE(pre.source_conflict,0)=1
+                OR j.attribution_status='CONFLICT'
+                OR (soi.fill_role IS NOT NULL AND execution.operation_type IS NOT NULL
+                    AND soi.fill_role<>execution.operation_type)
+                OR (soi.fill_role IS NOT NULL AND pre.operation_type IS NOT NULL
+                    AND soi.fill_role<>pre.operation_type)
+                OR (o.side IS NOT NULL AND UPPER(o.side)<>UPPER(t.side))
+                OR (soi.exchange_side IS NOT NULL AND UPPER(soi.exchange_side)<>UPPER(t.side))
+                OR (pre.exchange_side IS NOT NULL AND UPPER(pre.exchange_side)<>UPPER(t.side))
+                OR (soi.position_side IS NOT NULL AND pre.position_side IS NOT NULL
+                    AND soi.position_side<>pre.position_side)
+                OR (soi.position_cycle_key IS NOT NULL AND pre.position_cycle_key IS NOT NULL
+                    AND soi.position_cycle_key<>pre.position_cycle_key)
+                OR (o.position_side IN ('LONG','SHORT') AND soi.position_side IS NOT NULL
+                    AND o.position_side<>soi.position_side)
+                THEN 1 ELSE 0 END AS sourceConflict,
+            COALESCE(t.strategy_instance_id,soi.strategy_instance_id,pre.strategy_instance_id,o.strategy_instance_id) AS strategyInstanceId
+        FROM quant_trade t
+        LEFT JOIN quant_order o
+            ON o.credential_id=t.credential_id
+            AND o.symbol=t.symbol
+            AND o.exchange_order_id=t.exchange_order_id
+        LEFT JOIN quant_strategy_order_intent soi
+            ON soi.credential_id=t.credential_id
+            AND soi.symbol=t.symbol
+            AND soi.exchange_order_id=t.exchange_order_id
+        LEFT JOIN (
+            SELECT credential_id,symbol,client_order_id,
+                MIN(operation_type) AS operation_type,
+                MIN(position_side) AS position_side,
+                MIN(position_cycle_key) AS position_cycle_key,
+                MIN(exchange_side) AS exchange_side,
+                MIN(strategy_instance_id) AS strategy_instance_id,
+                CASE WHEN COUNT(DISTINCT operation_type)<>1
+                    OR COUNT(DISTINCT position_side)<>1
+                    OR COUNT(DISTINCT position_cycle_key)>1
+                    OR COUNT(DISTINCT exchange_side)<>1
+                    OR COUNT(DISTINCT strategy_instance_id)<>1
+                    THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_strategy_pre_dispatch_intent
+            WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+            GROUP BY credential_id,symbol,client_order_id
+        ) pre
+            ON pre.credential_id=t.credential_id
+            AND pre.symbol=t.symbol
+            AND pre.client_order_id=o.client_order_id
+        LEFT JOIN (
+            SELECT credential_id,symbol,exchange_order_id,
+                MIN(operation_type) AS operation_type,
+                CASE WHEN COUNT(DISTINCT operation_type)<>1 THEN 1 ELSE 0 END AS source_conflict
+            FROM quant_execution_record
+            WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+                AND operation_type IN ('OPEN','CLOSE')
+                AND exchange_order_id IS NOT NULL
+            GROUP BY credential_id,symbol,exchange_order_id
+        ) execution
+            ON execution.credential_id=t.credential_id
+            AND execution.symbol=t.symbol
+            AND execution.exchange_order_id=t.exchange_order_id
+        LEFT JOIN quant_strategy_fill_journal j
+            ON j.credential_id=t.credential_id
+            AND j.symbol=t.symbol
+            AND j.exchange_trade_id=t.exchange_trade_id
+        WHERE t.credential_id=#{credentialId}
+          AND t.symbol=#{symbol}
+        ORDER BY t.trade_time,t.exchange_trade_id,t.id
+    </select>
+
+    <delete id="deleteCycleFills" timeout="5"><![CDATA[
+DELETE FROM quant_trade_cycle_fill
+WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+]]></delete>
+
+    <delete id="deleteCycles" timeout="5"><![CDATA[
+DELETE FROM quant_trade_cycle
+WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+]]></delete>
+
+    <insert id="insertCycle" timeout="3"><![CDATA[
+INSERT INTO quant_trade_cycle
+    (id,cycle_key,credential_id,symbol,position_side,status,reconstruction_source,
+     reconciliation_status,reconciliation_reason,opened_at,closed_at,
+     opening_quantity,opening_notional,entry_price,closing_quantity,closing_notional,
+     close_price,remaining_quantity,realized_pnl,commission_display,commission_by_asset,
+     fill_count,created_at,updated_at)
+VALUES
+    (#{id},#{cycleKey},#{credentialId},#{symbol},#{positionSide},#{status},#{reconstructionSource},
+     #{reconciliationStatus},#{reconciliationReason},#{openedAt},#{closedAt},
+     #{openingQuantity},#{openingNotional},#{entryPrice},#{closingQuantity},#{closingNotional},
+     #{closePrice},#{remainingQuantity},#{realizedPnl},#{commissionDisplay},
+     CAST(#{commissionByAssetJson} AS JSON),#{fillCount},NOW(3),NOW(3))
+]]></insert>
+
+    <insert id="insertCycleFill" timeout="3"><![CDATA[
+INSERT INTO quant_trade_cycle_fill
+    (id,cycle_id,credential_id,symbol,exchange_trade_id,exchange_order_id,
+     allocation_seq,fill_role,position_side,allocated_quantity,price,
+     commission,commission_asset,realized_pnl,trade_time,created_at)
+VALUES
+    (#{id},#{cycleId},#{credentialId},#{symbol},#{exchangeTradeId},#{exchangeOrderId},
+     #{allocationSeq},#{fillRole},#{positionSide},#{allocatedQuantity},#{price},
+     #{commission},#{commissionAsset},#{realizedPnl},#{tradeTime},NOW(3))
+]]></insert>
+
+    <update id="completeProjection" timeout="3"><![CDATA[
+UPDATE quant_trade_cycle_scope
+SET projected_version=#{version},
+    projection_status='READY',
+    incomplete_count=#{incompleteCount},
+    inferred_count=#{inferredCount},
+    last_error=NULL,
+    last_projected_at=NOW(3),
+    updated_at=NOW(3)
+WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+  AND dirty_version=#{version}
+]]></update>
+
+    <update id="markFailed" timeout="3"><![CDATA[
+UPDATE quant_trade_cycle_scope
+SET projection_status='FAILED',
+    last_error=LEFT(#{reason},1000),
+    updated_at=NOW(3)
+WHERE credential_id=#{credentialId} AND symbol=#{symbol}
+  AND dirty_version>projected_version
+]]></update>
+
+    <select id="countCycles" resultType="long" timeout="5">
+        SELECT COUNT(*)
+        FROM quant_trade_cycle c
+        WHERE c.credential_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        <if test="symbol != null">AND c.symbol=#{symbol}</if>
+        <if test="from != null">AND c.opened_at&gt;=#{from}</if>
+        <if test="to != null">AND c.opened_at&lt;#{to}</if>
+    </select>
+
+    <select id="selectCycles" resultType="map" timeout="5">
+        SELECT CAST(c.id AS CHAR) AS id,
+            CAST(c.credential_id AS CHAR) AS credentialId,
+            q.account_name AS accountName,
+            c.symbol,
+            c.position_side AS direction,
+            c.status,
+            c.reconstruction_source AS reconstructionSource,
+            c.reconciliation_status AS reconciliationStatus,
+            c.reconciliation_reason AS reconciliationReason,
+            c.opening_quantity AS openingQuantity,
+            c.opening_notional AS openingNotional,
+            c.entry_price AS entryPrice,
+            c.opened_at AS openedAt,
+            c.closing_quantity AS closingQuantity,
+            c.closing_notional AS closingNotional,
+            c.close_price AS closePrice,
+            c.remaining_quantity AS remainingQuantity,
+            c.realized_pnl AS realizedPnl,
+            c.commission_display AS commission,
+            c.closed_at AS closedAt,
+            c.fill_count AS fillCount
+        FROM quant_trade_cycle c
+        INNER JOIN quant_credential q ON q.id=c.credential_id
+        WHERE c.credential_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        <if test="symbol != null">AND c.symbol=#{symbol}</if>
+        <if test="from != null">AND c.opened_at&gt;=#{from}</if>
+        <if test="to != null">AND c.opened_at&lt;#{to}</if>
+        ORDER BY c.opened_at DESC,c.id DESC
+        LIMIT #{offset},#{pageSize}
+    </select>
+
+    <select id="countIncompleteScopes" resultType="int" timeout="5">
+        SELECT COUNT(*)
+        FROM quant_trade_cycle_scope s
+        WHERE s.credential_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        AND (s.projection_status&lt;&gt;'READY' OR s.incomplete_count&gt;0)
+        <if test="symbol != null">AND s.symbol=#{symbol}</if>
+    </select>
+
+    <select id="countInferredCycles" resultType="int" timeout="5">
+        SELECT COUNT(*)
+        FROM quant_trade_cycle c
+        WHERE c.credential_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        AND c.reconstruction_source='INFERRED'
+        <if test="symbol != null">AND c.symbol=#{symbol}</if>
+        <if test="from != null">AND c.opened_at&gt;=#{from}</if>
+        <if test="to != null">AND c.opened_at&lt;#{to}</if>
+    </select>
+</mapper>

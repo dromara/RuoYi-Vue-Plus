@@ -106,6 +106,8 @@ public class TradingReconciliationService {
     private static final Duration RUNTIME_POSITION_CACHE_AGE = Duration.ofSeconds(20);
     @Autowired
     private TradeDecisionLogService decisionLogs;
+    @Autowired(required = false)
+    private org.dromara.quant.execution.TradeCycleProjectionService tradeCycleProjectionService;
     private final StrictBinanceTradeCollector tradeCollector;
     private final org.dromara.quant.execution.StrictBinanceIncomeCollector incomeCollector;
     private final StrategyFillJournalService fillJournal;
@@ -783,6 +785,7 @@ public class TradingReconciliationService {
      * 同步交易所订单事实。
      */
     private void syncOrders(QuantCredential credential, List<ExchangeGateway.OrderSnapshot> snapshots) {
+        Set<String> projectionDirtySymbols = new HashSet<>();
         for (ExchangeGateway.OrderSnapshot s : snapshots) {
             String clientOrderId = s.clientOrderId() == null ? "EXCHANGE:" + s.orderId() : s.clientOrderId();
             QuantOrder entity = s.orderId() == null ? null :
@@ -792,6 +795,15 @@ public class TradingReconciliationService {
                 entity = orderMapper.selectOne(new LambdaQueryWrapper<QuantOrder>().eq(QuantOrder::getCredentialId, credential.getId()).eq(QuantOrder::getClientOrderId,
                     clientOrderId).eq(QuantOrder::getSymbol, s.symbol()));
             }
+            boolean sourceFactsChanged = entity == null
+                || entity.getExchangeOrderId() == null && s.orderId() != null
+                || entity.getClientOrderId() == null || entity.getClientOrderId().startsWith("EXCHANGE:")
+                    && !clientOrderId.startsWith("EXCHANGE:")
+                || entity.getSide() == null && s.side() != null
+                || (entity.getPositionSide() == null || entity.getPositionSide().isBlank()) && s.positionSide() != null
+                || entity.getReduceOnly() == null && s.reduceOnly() != null
+                || s.executedQuantity() != null && (entity.getExecutedQuantity() == null
+                    || entity.getExecutedQuantity().compareTo(s.executedQuantity()) != 0);
             if (entity == null) {
                 entity = new QuantOrder();
                 entity.setCredentialId(credential.getId());
@@ -799,26 +811,36 @@ public class TradingReconciliationService {
                 entity.setCreatedAt(LocalDateTime.now());
                 entity.setIdempotencyKey(clientOrderId);
             }
+            entity.setClientOrderId(clientOrderId);
             entity.setSymbol(s.symbol());
             entity.setExchangeOrderId(s.orderId());
             entity.setSide(s.side());
+            entity.setPositionSide(s.positionSide());
+            entity.setReduceOnly(s.reduceOnly());
             entity.setOrderType(s.type());
             entity.setStatus(s.status());
             entity.setPrice(s.price());
             entity.setOriginalQuantity(nvl(s.originalQuantity()));
             entity.setExecutedQuantity(nvl(s.executedQuantity()));
             entity.setUpdatedAt(s.updateTime() == null ? LocalDateTime.now() : LocalDateTime.ofInstant(s.updateTime(), ZoneOffset.UTC));
+            int persisted;
             if (entity.getId() == null) {
-                orderMapper.insert(entity);
+                persisted = orderMapper.insert(entity);
             } else {
                 // 订单历史与活动订单列表可能返回较旧快照。更新必须走 SQL 原子单调合并，
                 // 不能用 updateById 把已成交数量或终态回滚；返回 0 表示事实冲突/过期，保留现有账本。
-                orderMapper.mergeExchangeFactIfMonotonic(entity);
+                persisted = orderMapper.mergeExchangeFactIfMonotonic(entity);
+            }
+            if (persisted == 1 && sourceFactsChanged) {
+                projectionDirtySymbols.add(s.symbol().toUpperCase(Locale.ROOT));
             }
             // 历史/当前订单快照同样可补齐受理后的成交事实；价格、数量、时间均沿用交易所返回值。
             if (decisionLogs != null) {
                 decisionLogs.order(credential.getId(), s);
             }
+        }
+        if (tradeCycleProjectionService != null) {
+            projectionDirtySymbols.forEach(symbol -> tradeCycleProjectionService.markDirty(credential.getId(), symbol));
         }
     }
 
@@ -828,6 +850,7 @@ public class TradingReconciliationService {
     private void syncTrades(QuantCredential credential, List<ExchangeGateway.TradeSnapshot> snapshots) {
         Map<Long, QuantOrder> filledOrders = new LinkedHashMap<>();
         boolean live = "LIVE".equalsIgnoreCase(credential.getRunMode());
+        boolean projectionDirty = false;
         for (ExchangeGateway.TradeSnapshot s : snapshots) {
             // Pagination identity is mandatory, but incomplete money facts must still reach the
             // LIVE raw-fill journal so the account's history watermark does not erase the evidence.
@@ -890,6 +913,7 @@ public class TradingReconciliationService {
                 entity.setQuantity(s.quantity());
                 entity.setPrice(s.price());
                 entity.setCommission(s.commission());
+                entity.setCommissionAsset(s.commissionAsset());
                 entity.setRealizedPnl(s.realizedPnl());
                 // Funding income is stored separately in quant_financial_event. Zero is only
                 // an initial display default; a replay must never erase a previously stored value.
@@ -900,6 +924,7 @@ public class TradingReconciliationService {
                     if (tradeMapper.insert(entity) != 1) {
                         throw new IllegalStateException("Binance成交事实未写入本地成交账本");
                     }
+                    projectionDirty = true;
                 } catch (DuplicateKeyException concurrentInsert) {
                     QuantTrade raced = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>()
                         .eq(QuantTrade::getCredentialId, credential.getId())
@@ -908,10 +933,12 @@ public class TradingReconciliationService {
                     if (raced == null) {
                         throw concurrentInsert;
                     }
-                    final boolean attributionChanged;
+                    boolean attributionChanged;
+                    boolean commissionAssetChanged;
                     try {
                         assertImmutableTradeFacts(raced, s);
                         attributionChanged = mergeStrategyAttribution(raced, sourceOrder);
+                        commissionAssetChanged = mergeCommissionAsset(raced, s);
                     } catch (IllegalStateException conflict) {
                         if (!live) {
                             throw conflict;
@@ -921,17 +948,20 @@ public class TradingReconciliationService {
                             credential.getId(), s.symbol(), s.tradeId());
                         continue;
                     }
-                    if (attributionChanged && tradeMapper.updateById(raced) != 1) {
+                    if ((attributionChanged || commissionAssetChanged) && tradeMapper.updateById(raced) != 1) {
                         throw new IllegalStateException("Concurrent Binance fill attribution could not be enriched safely", concurrentInsert);
                     }
+                    projectionDirty |= attributionChanged || commissionAssetChanged;
                     log.debug("并发对账已写入相同成交事实，跳过重复插入 credentialId={} symbol={} exchangeTradeId={}",
                         credential.getId(), s.symbol(), s.tradeId());
                 }
             } else {
-                final boolean attributionChanged;
+                boolean attributionChanged;
+                boolean commissionAssetChanged;
                 try {
                     assertImmutableTradeFacts(entity, s);
                     attributionChanged = mergeStrategyAttribution(entity, sourceOrder);
+                    commissionAssetChanged = mergeCommissionAsset(entity, s);
                 } catch (IllegalStateException conflict) {
                     if (!live) {
                         throw conflict;
@@ -941,10 +971,11 @@ public class TradingReconciliationService {
                         credential.getId(), s.symbol(), s.tradeId());
                     continue;
                 }
-                if (attributionChanged && tradeMapper.updateById(entity) != 1) {
+                if ((attributionChanged || commissionAssetChanged) && tradeMapper.updateById(entity) != 1) {
                     throw new IllegalStateException("Binance fill attribution could not be enriched safely: credentialId="
                         + credential.getId() + ", symbol=" + s.symbol() + ", exchangeTradeId=" + s.tradeId());
                 }
+                projectionDirty |= attributionChanged || commissionAssetChanged;
             }
 
             if (live && sourceOrder != null && sourceOrder.getStrategyId() != null && sourceOrder.getStrategyInstanceId() != null) {
@@ -959,6 +990,9 @@ public class TradingReconciliationService {
             }
         }
         filledOrders.values().forEach(order -> capturePostFillBalance(credential, order));
+        if (projectionDirty && tradeCycleProjectionService != null && !snapshots.isEmpty()) {
+            tradeCycleProjectionService.markDirty(credential.getId(), snapshots.getFirst().symbol());
+        }
     }
 
     private static void assertImmutableTradeFacts(QuantTrade stored, ExchangeGateway.TradeSnapshot incoming) {
@@ -968,6 +1002,8 @@ public class TradingReconciliationService {
             || !sameDecimal(stored.getQuantity(), incoming.quantity())
             || !sameDecimal(stored.getPrice(), incoming.price())
             || !sameDecimal(stored.getCommission(), incoming.commission())
+            || stored.getCommissionAsset() != null && incoming.commissionAsset() != null
+                && !sameText(stored.getCommissionAsset(), incoming.commissionAsset())
             || !sameDecimal(stored.getRealizedPnl(), incoming.realizedPnl())
             || !sameTradeTime(stored.getTradeTime(), incoming.time())) {
             throw new IllegalStateException("Persisted local trade conflicts with immutable Binance fill facts; refusing overwrite: symbol="
@@ -997,6 +1033,20 @@ public class TradingReconciliationService {
             changed = true;
         }
         return changed;
+    }
+
+    private static boolean mergeCommissionAsset(QuantTrade trade, ExchangeGateway.TradeSnapshot incoming) {
+        if (incoming.commissionAsset() == null || incoming.commissionAsset().isBlank()) {
+            return false;
+        }
+        if (trade.getCommissionAsset() != null && !trade.getCommissionAsset().equalsIgnoreCase(incoming.commissionAsset())) {
+            throw new IllegalStateException("Binance成交手续费资产与本地不可变事实冲突");
+        }
+        if (trade.getCommissionAsset() == null) {
+            trade.setCommissionAsset(incoming.commissionAsset().toUpperCase(Locale.ROOT));
+            return true;
+        }
+        return false;
     }
 
     private static boolean sameText(String left, String right) {

@@ -25,6 +25,7 @@ import org.dromara.quant.exchange.ExchangeHistoryCollector;
 import org.dromara.quant.execution.OrderLedgerService;
 import org.dromara.quant.order.domain.QuantOrder;
 import org.dromara.quant.order.mapper.QuantOrderMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -63,6 +64,8 @@ public class QuantAccountQueryController {
     private final TradeHistoryMapper tradeHistoryMapper;
     private final OrderLedgerService orderLedgerService;
     private final QuantOrderMapper orderMapper;
+    @Autowired(required = false)
+    private org.dromara.quant.execution.TradeCycleProjectionService tradeCycleProjectionService;
 
     /**
      * 查询指定凭证的账户资金快照。
@@ -294,7 +297,8 @@ public class QuantAccountQueryController {
             range -> gateway.queryTrades(exchangeCredential, normalizedSymbol, range));
         if (snapshots.stream().anyMatch(snapshot -> snapshot == null || snapshot.tradeId() == null || snapshot.orderId() == null
             || !normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || StringUtils.isBlank(snapshot.side()) || snapshot.quantity() == null
-            || snapshot.price() == null || snapshot.time() == null || snapshot.commission() == null || snapshot.realizedPnl() == null)) {
+            || snapshot.price() == null || snapshot.time() == null || snapshot.commission() == null || snapshot.realizedPnl() == null
+            || snapshot.commissionAsset() == null || !snapshot.commissionAsset().matches("[A-Za-z0-9]{2,20}"))) {
             throw new IllegalStateException("交易所历史成交缺少必要事实或返回了不匹配的交易对，拒绝写入本地账本");
         }
         int count = 0;
@@ -311,7 +315,11 @@ public class QuantAccountQueryController {
             entity.setSide(snapshot.side());
             entity.setQuantity(snapshot.quantity());
             entity.setPrice(snapshot.price());
+            if (entity.getCommissionAsset() != null && !entity.getCommissionAsset().equalsIgnoreCase(snapshot.commissionAsset())) {
+                throw new IllegalStateException("交易所成交手续费资产与本地事实冲突，拒绝覆盖");
+            }
             entity.setCommission(snapshot.commission());
+            entity.setCommissionAsset(snapshot.commissionAsset().toUpperCase(java.util.Locale.ROOT));
             entity.setRealizedPnl(snapshot.realizedPnl());
             entity.setFundingFee(java.math.BigDecimal.ZERO);
             entity.setTradeTime(LocalDateTime.ofInstant(snapshot.time(), ZoneOffset.UTC));
@@ -320,6 +328,9 @@ public class QuantAccountQueryController {
         }
         syncOrderSnapshots(credential, normalizedSymbol);
         backfillTradeOrderFacts(credential, normalizedSymbol);
+        if (count > 0 && tradeCycleProjectionService != null) {
+            tradeCycleProjectionService.markDirty(credentialId, normalizedSymbol);
+        }
         return R.ok(count);
     }
 
