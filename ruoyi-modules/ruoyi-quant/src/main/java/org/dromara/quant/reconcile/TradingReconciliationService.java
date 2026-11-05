@@ -106,6 +106,8 @@ public class TradingReconciliationService {
     private final Map<Long, ScheduledFuture<?>> positionRetryTasks = new HashMap<>();
     private final ConcurrentHashMap<Long, java.util.concurrent.atomic.AtomicLong> runtimeSnapshotGenerations = new ConcurrentHashMap<>();
     private static final Duration RUNTIME_POSITION_CACHE_AGE = Duration.ofSeconds(20);
+    private static final Duration MANUAL_HISTORY_LOOKBACK = Duration.ofDays(90);
+    private static final Duration BINANCE_HISTORY_START_SAFETY_MARGIN = Duration.ofMinutes(1);
     @Autowired
     private TradeDecisionLogService decisionLogs;
     @Autowired
@@ -201,14 +203,16 @@ public class TradingReconciliationService {
         }
 
         Instant historyEnd = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
-        Instant historyStart = historyEnd.minus(Duration.ofDays(90));
+        // Binance rejects a startTime that falls even slightly outside its rolling 90-day boundary
+        // by the time the request reaches the exchange. Keep a one-minute margin inside retention.
+        Instant historyStart = historyEnd.minus(MANUAL_HISTORY_LOOKBACK).plus(BINANCE_HISTORY_START_SAFETY_MARGIN);
         int orderCount = 0;
         int tradeCount = 0;
         for (String symbol : symbols) {
             try {
                 Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
-                log.info("手动历史订单同步开始 credentialId={} symbol={} historyStart={} historyEnd={} lookbackDays=90",
-                    credential.getId(), symbol, historyStart, historyEnd);
+                log.info("手动历史订单同步开始 credentialId={} symbol={} historyStart={} historyEnd={} retentionDays=90 startSafetyMarginSeconds={}",
+                    credential.getId(), symbol, historyStart, historyEnd, BINANCE_HISTORY_START_SAFETY_MARGIN.toSeconds());
                 List<ExchangeGateway.OrderSnapshot> historyOrders = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
                     log.debug("手动历史订单查询窗口 credentialId={} symbol={} rangeStart={} rangeEnd={}",
                         credential.getId(), symbol, range.from(), range.to());
