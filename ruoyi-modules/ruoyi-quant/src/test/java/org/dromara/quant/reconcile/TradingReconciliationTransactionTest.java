@@ -698,6 +698,37 @@ class TradingReconciliationTransactionTest {
     }
 
     @Test
+    void tradeTimeConflictReportsPersistedAndBinanceUtcTimes() {
+        Instant incomingTime = Instant.parse("2026-10-17T00:00:00Z");
+        var fill = new ExchangeGateway.TradeSnapshot("BTCUSDT", 102L, 203L, "BUY", BigDecimal.ONE, BigDecimal.TEN,
+            new BigDecimal("0.01"), BigDecimal.ZERO, incomingTime, "USDT");
+        var local = new org.dromara.quant.account.domain.QuantTrade();
+        local.setId(78L);
+        local.setCredentialId(1L);
+        local.setSymbol("BTCUSDT");
+        local.setExchangeTradeId(102L);
+        local.setExchangeOrderId(203L);
+        local.setSide("BUY");
+        local.setQuantity(BigDecimal.ONE);
+        local.setPrice(BigDecimal.TEN);
+        local.setCommission(new BigDecimal("0.01"));
+        local.setRealizedPnl(BigDecimal.ZERO);
+        local.setTradeTime(java.time.LocalDateTime.of(2026, 10, 17, 8, 0, 0));
+        when(trades.selectOne(any())).thenReturn(local);
+
+        var testnetCredential = credential();
+        testnetCredential.setRunMode("TESTNET");
+        IllegalStateException conflict = assertThrows(IllegalStateException.class,
+            () -> org.springframework.test.util.ReflectionTestUtils.invokeMethod(service(), "syncTrades", testnetCredential, List.of(fill)));
+
+        assertTrue(conflict.getMessage().contains("conflictingFields=tradeTime"));
+        assertTrue(conflict.getMessage().contains("persistedTradeTime=2026-10-17T08:00"));
+        assertTrue(conflict.getMessage().contains("incomingTradeTimeUtc=2026-10-17T00:00"));
+        assertTrue(conflict.getMessage().contains("timeDeltaSeconds=-28800"));
+        verify(trades, never()).updateById(any(org.dromara.quant.account.domain.QuantTrade.class));
+    }
+
+    @Test
     void conflictingReplayCannotRewriteExistingTradePrice() {
         var fill = new ExchangeGateway.TradeSnapshot("BTCUSDT", 101L, 202L, "BUY", BigDecimal.ONE, BigDecimal.TEN,
             new BigDecimal("0.01"), BigDecimal.ZERO, Instant.parse("2026-10-17T00:00:00Z"), "USDT");
