@@ -460,7 +460,8 @@ public class ProtectionOrderService {
             return;
         }
         List<ProtectionSignal> desired = desiredSignals == null ? List.of() : desiredSignals;
-        boolean firstProfitPending = firstRemaining != null && firstRemaining.signum() > 0;
+        boolean firstProfitPending = desired.stream().anyMatch(signal -> signal != null && "FIRST_TP".equals(signal.type()))
+            && desired.stream().noneMatch(signal -> signal != null && "STEP_TP".equals(signal.type()));
         if (firstProfitPending && live) {
             List<QuantProtectionOrder> previousSteps = mapper.selectList(new LambdaQueryWrapper<QuantProtectionOrder>()
                 .eq(QuantProtectionOrder::getCredentialId, credentialId)
