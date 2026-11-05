@@ -585,7 +585,6 @@ class TradingReconciliationTransactionTest {
 
     @Test
     void manualHistoricalOrdersAndTradesShareWindowInsideBinanceNinetyDayLimit() {
-        stubManualSyncQueries("BTCUSDT", null);
         when(gateway.queryTrades(any(), eq("BTCUSDT"), any())).thenReturn(List.of());
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
