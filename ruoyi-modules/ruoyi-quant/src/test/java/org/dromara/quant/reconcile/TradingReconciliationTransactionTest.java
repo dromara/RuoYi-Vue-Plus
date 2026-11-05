@@ -717,9 +717,10 @@ class TradingReconciliationTransactionTest {
 
         var testnetCredential = credential();
         testnetCredential.setRunMode("TESTNET");
-        assertThrows(IllegalStateException.class,
+        IllegalStateException conflict = assertThrows(IllegalStateException.class,
             () -> org.springframework.test.util.ReflectionTestUtils.invokeMethod(service(), "syncTrades", testnetCredential, List.of(fill)));
 
+        assertTrue(conflict.getMessage().contains("conflictingFields=price"));
         verifyNoInteractions(fillJournal);
         verify(trades, never()).updateById(any(org.dromara.quant.account.domain.QuantTrade.class));
         verifyNoInteractions(fillCursors, fillCursorService);
