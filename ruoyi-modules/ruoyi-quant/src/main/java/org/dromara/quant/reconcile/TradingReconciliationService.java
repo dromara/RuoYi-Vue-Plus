@@ -207,8 +207,15 @@ public class TradingReconciliationService {
         for (String symbol : symbols) {
             try {
                 Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
-                List<ExchangeGateway.OrderSnapshot> historyOrders = ExchangeHistoryCollector.collectLast90Days(
-                    range -> gateway.queryOrderHistory(exchangeCredential, symbol, range, 1000L));
+                log.info("手动历史订单同步开始 credentialId={} symbol={} historyStart={} historyEnd={} lookbackDays=90",
+                    credential.getId(), symbol, historyStart, historyEnd);
+                List<ExchangeGateway.OrderSnapshot> historyOrders = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
+                    log.debug("手动历史订单查询窗口 credentialId={} symbol={} rangeStart={} rangeEnd={}",
+                        credential.getId(), symbol, range.from(), range.to());
+                    return gateway.queryOrderHistory(exchangeCredential, symbol, range, 1000L);
+                });
+                log.info("手动历史订单同步查询完成 credentialId={} symbol={} historyStart={} historyEnd={} historyOrderCount={}",
+                    credential.getId(), symbol, historyStart, historyEnd, historyOrders.size());
                 for (ExchangeGateway.OrderSnapshot snapshot : historyOrders) {
                     validateSyncOrderSnapshot(snapshot, symbol);
                     ordersById.put(snapshot.orderId(), snapshot);
@@ -859,6 +866,8 @@ public class TradingReconciliationService {
         Instant now = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
         ExchangeGateway.TimeRange range = new ExchangeGateway.TimeRange(now.minus(Duration.ofHours(Math.max(1, historyHours))), now);
         var openOrders = List.copyOf(gateway.queryOrders(c, null));
+        log.debug("周期账户对账历史订单查询 credentialId={} historyHours={} rangeStart={} rangeEnd={}",
+            credential.getId(), historyHours, range.from(), range.to());
         var history = List.copyOf(gateway.queryOrderHistory(c, null, range, 1000L));
         Set<String> symbols = new HashSet<>();
         positions.forEach(p -> addSymbol(symbols, p.symbol()));
