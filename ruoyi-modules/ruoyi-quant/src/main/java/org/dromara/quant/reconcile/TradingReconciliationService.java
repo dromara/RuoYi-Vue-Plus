@@ -232,13 +232,27 @@ public class TradingReconciliationService {
                 }
                 ordersById.putAll(activeOrdersBySymbol.getOrDefault(symbol, Map.of()));
 
-                // Fill rows can predate the order ledger or lack positionSide/reduceOnly.
-                // Resolve only the affected order identities, outside the write transaction.
-                for (Long orderId : tradeHistoryMapper.selectOrderIdsMissingOrderFacts(credential.getId(), symbol, 200)) {
-                    ExchangeGateway.OrderSnapshot existing = ordersById.get(orderId);
-                    if (hasCompleteOrderSourceFacts(existing)) {
-                        continue;
+                List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
+                    tradeCollector.collect(exchangeCredential, symbol, historyStart, historyEnd);
+
+                // Include both existing local fills and this round's new fills when resolving
+                // orders that still lack positionSide/reduceOnly source facts.
+                Set<Long> orderIdsNeedingSourceFacts = new LinkedHashSet<>();
+                for (ExchangeGateway.TradeSnapshot trade : tradeSnapshots) {
+                    if (trade != null && trade.orderId() != null && trade.orderId() > 0
+                        && !hasCompleteOrderSourceFacts(ordersById.get(trade.orderId()))) {
+                        orderIdsNeedingSourceFacts.add(trade.orderId());
                     }
+                }
+                for (Long orderId : tradeHistoryMapper.selectOrderIdsMissingOrderFacts(credential.getId(), symbol, 200)) {
+                    if (orderId != null && !hasCompleteOrderSourceFacts(ordersById.get(orderId))) {
+                        orderIdsNeedingSourceFacts.add(orderId);
+                    }
+                }
+
+                // Resolve only the affected order identities, outside the write transaction.
+                for (Long orderId : orderIdsNeedingSourceFacts.stream().limit(200).toList()) {
+                    ExchangeGateway.OrderSnapshot existing = ordersById.get(orderId);
                     try {
                         ExchangeGateway.OrderSnapshot recovered = gateway.queryOrder(exchangeCredential, symbol, orderId, null);
                         if (recovered == null) {
@@ -261,8 +275,6 @@ public class TradingReconciliationService {
                 }
 
                 List<ExchangeGateway.OrderSnapshot> orderSnapshots = List.copyOf(ordersById.values());
-                List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
-                    tradeCollector.collect(exchangeCredential, symbol, historyStart, historyEnd);
 
                 // Order sources are committed first so syncTrades can attribute fills
                 // from the exact order, all within the same account-symbol transaction.
