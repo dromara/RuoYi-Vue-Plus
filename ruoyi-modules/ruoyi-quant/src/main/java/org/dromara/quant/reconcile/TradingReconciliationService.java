@@ -325,10 +325,15 @@ public class TradingReconciliationService {
         if (existing == null) {
             return recovered;
         }
-        if (existing.positionSide() != null && recovered.positionSide() != null
-            && !existing.positionSide().equalsIgnoreCase(recovered.positionSide())
+        if (existing.side() != null && recovered.side() != null
+            && !existing.side().equalsIgnoreCase(recovered.side())
+            || existing.positionSide() != null && !existing.positionSide().isBlank()
+                && recovered.positionSide() != null && !existing.positionSide().equalsIgnoreCase(recovered.positionSide())
             || existing.reduceOnly() != null && recovered.reduceOnly() != null
-                && !existing.reduceOnly().equals(recovered.reduceOnly())) {
+                && !existing.reduceOnly().equals(recovered.reduceOnly())
+            || existing.clientOrderId() != null && !existing.clientOrderId().isBlank()
+                && !existing.clientOrderId().startsWith("EXCHANGE:")
+                && recovered.clientOrderId() != null && !existing.clientOrderId().equals(recovered.clientOrderId())) {
             throw new IllegalStateException("订单来源事实冲突，拒绝覆盖已有订单记录");
         }
         String clientOrderId = existing.clientOrderId();
