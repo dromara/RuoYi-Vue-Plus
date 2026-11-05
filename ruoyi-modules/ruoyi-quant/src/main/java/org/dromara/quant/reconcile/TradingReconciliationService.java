@@ -356,7 +356,7 @@ public class TradingReconciliationService {
             existing.symbol(), existing.orderId(), clientOrderId,
             existing.side() == null ? recovered.side() : existing.side(),
             existing.type() == null ? recovered.type() : existing.type(),
-            existing.status(),
+            existing.status() == null ? recovered.status() : existing.status(),
             existing.price() == null ? recovered.price() : existing.price(),
             existing.originalQuantity() == null ? recovered.originalQuantity() : existing.originalQuantity(),
             existing.executedQuantity() == null ? recovered.executedQuantity() : existing.executedQuantity(),
