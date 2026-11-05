@@ -723,6 +723,32 @@ class TradingReconciliationTransactionTest {
     }
 
     @Test
+    void tradeTimeWithFractionalSecondsMatchesMysqlDatetimeRounding() {
+        Instant incomingTime = Instant.parse("2026-10-16T11:55:32.794Z");
+        var fill = new ExchangeGateway.TradeSnapshot("BATUSDT", 72167948L, 366327650L, "BUY", BigDecimal.ONE, BigDecimal.TEN,
+            new BigDecimal("0.01"), BigDecimal.ZERO, incomingTime, "USDT");
+        var local = new org.dromara.quant.account.domain.QuantTrade();
+        local.setId(79L);
+        local.setCredentialId(1L);
+        local.setSymbol("BATUSDT");
+        local.setExchangeTradeId(72167948L);
+        local.setExchangeOrderId(366327650L);
+        local.setSide("BUY");
+        local.setQuantity(BigDecimal.ONE);
+        local.setPrice(BigDecimal.TEN);
+        local.setCommission(new BigDecimal("0.01"));
+        local.setRealizedPnl(BigDecimal.ZERO);
+        local.setTradeTime(java.time.LocalDateTime.of(2026, 10, 16, 11, 55, 33));
+        when(trades.selectOne(any())).thenReturn(local);
+        when(orders.selectOne(any())).thenReturn(null);
+
+        org.springframework.test.util.ReflectionTestUtils.invokeMethod(service(), "syncTrades", credential(), List.of(fill));
+
+        verify(fillJournal, never()).quarantineConflict(any(), any(), any(), any());
+        verify(trades, never()).updateById(any(org.dromara.quant.account.domain.QuantTrade.class));
+    }
+
+    @Test
     void tradeTimeConflictReportsPersistedAndBinanceUtcTimes() {
         Instant incomingTime = Instant.parse("2026-10-17T00:00:00Z");
         var fill = new ExchangeGateway.TradeSnapshot("BTCUSDT", 102L, 203L, "BUY", BigDecimal.ONE, BigDecimal.TEN,
