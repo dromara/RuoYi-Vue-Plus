@@ -549,7 +549,6 @@ class TradingReconciliationTransactionTest {
     }
 
     private void stubManualSyncQueries(String symbol, ExchangeGateway.TradeSnapshot fill) {
-        when(gateway.queryOrders(any(), eq(symbol))).thenReturn(List.of());
         when(gateway.queryOrderHistory(any(), eq(symbol), any(), anyLong())).thenReturn(List.of());
         when(gateway.queryTrades(any(), eq(symbol), any())).thenAnswer(invocation -> {
             ExchangeGateway.TimeRange range = invocation.getArgument(2);
@@ -559,6 +558,29 @@ class TradingReconciliationTransactionTest {
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq(symbol), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
             .thenReturn(List.of());
         when(orders.selectList(any())).thenReturn(List.of());
+    }
+
+    @Test
+    void manualSyncPersistsHistoricalOrdersWithoutReadingCurrentOpenOrders() {
+        initializeManualSyncMapperMetadata();
+        ExchangeGateway.OrderSnapshot historicalOrder = new ExchangeGateway.OrderSnapshot("BTCUSDT", 303L, "client-303",
+            "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
+            Instant.now().minusSeconds(60), BigDecimal.TEN, "BOTH", false);
+        when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of(historicalOrder));
+        when(gateway.queryTrades(any(), eq("BTCUSDT"), any())).thenReturn(List.of());
+        when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
+            .thenReturn(List.of());
+        when(orders.selectOne(any())).thenReturn(null);
+        when(orders.insert(any(org.dromara.quant.order.domain.QuantOrder.class))).thenReturn(1);
+
+        TradingReconciliationService.TradingDataSyncResult result = service().syncTradingData(credential(), "BTCUSDT");
+
+        assertEquals(1, result.symbolCount());
+        assertEquals(1, result.orderCount());
+        assertEquals(0, result.tradeCount());
+        verify(gateway, atLeastOnce()).queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong());
+        verify(gateway, never()).queryOrders(any(), any());
+        verify(orders).insert(any(org.dromara.quant.order.domain.QuantOrder.class));
     }
 
     @Test
