@@ -353,8 +353,15 @@ public class TradingReconciliationService {
             clientOrderId = recovered.clientOrderId();
         }
         return new ExchangeGateway.OrderSnapshot(
-            existing.symbol(), existing.orderId(), clientOrderId, existing.side(), existing.type(), existing.status(),
-            existing.price(), existing.originalQuantity(), existing.executedQuantity(), existing.updateTime(), existing.averagePrice(),
+            existing.symbol(), existing.orderId(), clientOrderId,
+            existing.side() == null ? recovered.side() : existing.side(),
+            existing.type() == null ? recovered.type() : existing.type(),
+            existing.status(),
+            existing.price() == null ? recovered.price() : existing.price(),
+            existing.originalQuantity() == null ? recovered.originalQuantity() : existing.originalQuantity(),
+            existing.executedQuantity() == null ? recovered.executedQuantity() : existing.executedQuantity(),
+            existing.updateTime() == null ? recovered.updateTime() : existing.updateTime(),
+            existing.averagePrice() == null ? recovered.averagePrice() : existing.averagePrice(),
             existing.positionSide() == null || existing.positionSide().isBlank() ? recovered.positionSide() : existing.positionSide(),
             existing.reduceOnly() == null ? recovered.reduceOnly() : existing.reduceOnly());
     }
