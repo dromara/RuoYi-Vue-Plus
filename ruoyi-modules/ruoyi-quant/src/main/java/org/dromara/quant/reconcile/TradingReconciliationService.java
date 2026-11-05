@@ -981,6 +981,12 @@ public class TradingReconciliationService {
                 entity = orderMapper.selectOne(new LambdaQueryWrapper<QuantOrder>().eq(QuantOrder::getCredentialId, credential.getId()).eq(QuantOrder::getClientOrderId,
                     clientOrderId).eq(QuantOrder::getSymbol, s.symbol()));
             }
+            if (entity != null && s.side() != null && entity.getSide() != null && !entity.getSide().equalsIgnoreCase(s.side())
+                || entity != null && s.positionSide() != null && entity.getPositionSide() != null && !entity.getPositionSide().isBlank()
+                    && !entity.getPositionSide().equalsIgnoreCase(s.positionSide())
+                || entity != null && s.reduceOnly() != null && entity.getReduceOnly() != null && !entity.getReduceOnly().equals(s.reduceOnly())) {
+                throw new IllegalStateException("Binance 订单方向或持仓来源事实与本地账本冲突，拒绝覆盖 orderId=" + s.orderId());
+            }
             boolean sourceFactsChanged = entity == null
                 || entity.getExchangeOrderId() == null && s.orderId() != null
                 || entity.getClientOrderId() == null || entity.getClientOrderId().startsWith("EXCHANGE:")
