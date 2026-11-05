@@ -180,12 +180,80 @@ public class QuantAccountQueryController {
     /** 将交易所历史订单和当前活动订单同步到本地账本。 */
     @SaCheckPermission("quant:order:sync")
     @PostMapping("/order/{credentialId}/sync")
-    public R<Integer> syncOrders(@PathVariable Long credentialId, @RequestParam String symbol) {
-        return R.ok(syncOrderSnapshots(credentialEntity(credentialId), symbol));
+    public R<Integer> syncOrders(@PathVariable Long credentialId, @RequestParam(required = false) String symbol) {
+        QuantCredential credential = credentialEntity(credentialId);
+        return R.ok(StringUtils.isBlank(symbol) ? syncAccountOrderSnapshots(credential) : syncOrderSnapshots(credential, symbol));
+    }
+
+    /**
+     * 同步账户已知交易对的历史订单，并合并交易所当前持仓和活动订单涉及的交易对。
+     * Binance 历史订单接口要求指定 symbol，因此不能直接用一个请求遍历账户全部历史订单。
+     */
+    private int syncAccountOrderSnapshots(QuantCredential credential) {
+        ExchangeGateway.Credential exchangeCredential = credential(credential.getId());
+        java.util.Set<String> symbols = new java.util.TreeSet<>();
+        orderMapper.selectList(new LambdaQueryWrapper<QuantOrder>()
+            .select(QuantOrder::getSymbol)
+            .eq(QuantOrder::getCredentialId, credential.getId()))
+            .forEach(order -> {
+                if (StringUtils.isNotBlank(order.getSymbol())) symbols.add(order.getSymbol().trim().toUpperCase(java.util.Locale.ROOT));
+            });
+        tradeMapper.selectList(new LambdaQueryWrapper<QuantTrade>()
+            .select(QuantTrade::getSymbol)
+            .eq(QuantTrade::getCredentialId, credential.getId()))
+            .forEach(trade -> {
+                if (StringUtils.isNotBlank(trade.getSymbol())) symbols.add(trade.getSymbol().trim().toUpperCase(java.util.Locale.ROOT));
+            });
+
+        List<ExchangeGateway.PositionSnapshot> positions = gateway.queryPositions(exchangeCredential, null);
+        if (positions != null) {
+            positions.forEach(position -> {
+                if (position != null && StringUtils.isNotBlank(position.symbol())) {
+                    symbols.add(position.symbol().trim().toUpperCase(java.util.Locale.ROOT));
+                }
+            });
+        }
+
+        Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> activeOrdersBySymbol = new java.util.LinkedHashMap<>();
+        List<ExchangeGateway.OrderSnapshot> activeOrders = gateway.queryOrders(exchangeCredential, null);
+        if (activeOrders != null) {
+            for (ExchangeGateway.OrderSnapshot snapshot : activeOrders) {
+                if (snapshot == null) continue;
+                if (StringUtils.isBlank(snapshot.symbol()) || snapshot.orderId() == null) {
+                    throw new IllegalStateException("交易所全账户活动订单缺少交易对或订单 ID，拒绝写入本地账本");
+                }
+                String activeSymbol = snapshot.symbol().trim().toUpperCase(java.util.Locale.ROOT);
+                symbols.add(activeSymbol);
+                activeOrdersBySymbol.computeIfAbsent(activeSymbol, ignored -> new java.util.LinkedHashMap<>())
+                    .put(snapshot.orderId(), snapshot);
+            }
+        }
+
+        Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> snapshotsBySymbol = new java.util.LinkedHashMap<>();
+        for (String normalizedSymbol : symbols) {
+            Map<Long, ExchangeGateway.OrderSnapshot> snapshots = new java.util.LinkedHashMap<>();
+            for (ExchangeGateway.OrderSnapshot snapshot : ExchangeHistoryCollector.collectLast90Days(
+                range -> gateway.queryOrderHistory(exchangeCredential, normalizedSymbol, range, 1000L))) {
+                if (snapshot == null) continue;
+                if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || snapshot.orderId() == null) {
+                    throw new IllegalStateException("交易所历史订单缺少订单 ID 或返回了不匹配的交易对，拒绝写入本地账本");
+                }
+                snapshots.put(snapshot.orderId(), snapshot);
+            }
+            snapshots.putAll(activeOrdersBySymbol.getOrDefault(normalizedSymbol, Map.of()));
+            snapshotsBySymbol.put(normalizedSymbol, snapshots);
+        }
+
+        int count = 0;
+        for (Map.Entry<String, Map<Long, ExchangeGateway.OrderSnapshot>> entry : snapshotsBySymbol.entrySet()) {
+            entry.getValue().values().forEach(snapshot ->
+                orderLedgerService.syncHistoricalSnapshot(credential.getId(), entry.getKey(), snapshot));
+            count += entry.getValue().size();
+        }
+        return count;
     }
 
     private int syncOrderSnapshots(QuantCredential credential, String symbol) {
-        if (StringUtils.isBlank(symbol)) throw new ServiceException("请指定交易对同步订单");
         String normalizedSymbol = symbol.trim().toUpperCase(java.util.Locale.ROOT);
         ExchangeGateway.Credential exchangeCredential = credential(credential.getId());
         Map<Long, ExchangeGateway.OrderSnapshot> snapshots = new java.util.LinkedHashMap<>();
