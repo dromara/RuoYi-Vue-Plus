@@ -224,7 +224,7 @@ public class QuantProperties {
          */
         private int intervalSeconds = 60;
         /**
-         * 对账回溯历史的小时数。
+         * 仅用于周期账户事实对账的回溯小时数；手动订单与成交同步固定回溯最近 90 天。
          */
         private int historyHours = 48;
     }
