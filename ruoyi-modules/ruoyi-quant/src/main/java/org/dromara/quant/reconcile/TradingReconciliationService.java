@@ -1393,9 +1393,13 @@ public class TradingReconciliationService {
         if (stored == null || incoming == null) {
             return stored == null && incoming == null;
         }
-        // quant_trade.trade_time is DATETIME without fractional seconds in the supported schema.
-        return stored.truncatedTo(java.time.temporal.ChronoUnit.SECONDS).equals(
-            LocalDateTime.ofInstant(incoming, ZoneOffset.UTC).truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
+        // Match MySQL DATETIME(0) fractional-second rounding during persistence.
+        LocalDateTime incomingUtc = LocalDateTime.ofInstant(incoming, ZoneOffset.UTC);
+        LocalDateTime persistedPrecision = incomingUtc.truncatedTo(java.time.temporal.ChronoUnit.SECONDS);
+        if (incomingUtc.getNano() >= 500_000_000) {
+            persistedPrecision = persistedPrecision.plusSeconds(1);
+        }
+        return stored.equals(persistedPrecision);
     }
 
     /** Capture a best-effort account wallet balance after reconciled exchange fills. */
