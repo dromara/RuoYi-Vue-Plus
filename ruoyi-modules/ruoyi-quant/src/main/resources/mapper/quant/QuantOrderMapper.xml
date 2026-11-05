@@ -16,8 +16,8 @@ SET exchange_order_id=COALESCE(exchange_order_id, #{fact.exchangeOrderId}),
     client_order_id=CASE WHEN client_order_id LIKE 'EXCHANGE:%'
         AND #{fact.clientOrderId} NOT LIKE 'EXCHANGE:%'
         THEN #{fact.clientOrderId} ELSE client_order_id END,
-    symbol=#{fact.symbol}, side=#{fact.side}, order_type=#{fact.orderType},
-    status=#{fact.status}, price=COALESCE(#{fact.price},price),
+    symbol=#{fact.symbol}, side=COALESCE(#{fact.side},side), order_type=COALESCE(#{fact.orderType},order_type),
+    status=COALESCE(#{fact.status},status), price=COALESCE(#{fact.price},price),
     original_quantity=COALESCE(#{fact.originalQuantity},original_quantity),
     executed_quantity=COALESCE(#{fact.executedQuantity},executed_quantity),
     leverage_snapshot=COALESCE(leverage_snapshot, #{fact.leverageSnapshot}),
