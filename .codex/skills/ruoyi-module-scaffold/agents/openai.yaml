@@ -1,0 +1,7 @@
+interface:
+  display_name: "RuoYi-Vue-Plus 新模块脚手架"
+  short_description: "在 ruoyi-modules 下从零创建独立业务模块：Maven 骨架、sys_menu 权限 SQL、ruoyi-api 跨模块接口、前端路由注册"
+  default_prompt: "使用 $ruoyi-module-scaffold 新建一个独立业务模块。先确认模块名/包名/中文名，再按 references 依次完成 Maven 结构、菜单权限、跨模块接口和前端路由。"
+
+policy:
+  allow_implicit_invocation: true
