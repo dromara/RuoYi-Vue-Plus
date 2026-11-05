@@ -11,4 +11,6 @@ import java.util.List;
 public interface TradeHistoryMapper {
 
     List<Long> selectOrderIdsMissingOrderFacts(@Param("credentialId") Long credentialId, @Param("symbol") String symbol, @Param("limit") int limit);
+
+    List<String> selectHistoricalSymbolsByCredential(@Param("credentialId") Long credentialId);
 }
