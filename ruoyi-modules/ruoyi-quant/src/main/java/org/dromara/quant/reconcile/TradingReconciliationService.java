@@ -281,6 +281,9 @@ public class TradingReconciliationService {
                 transaction.executeWithoutResult(status -> {
                     syncOrders(credential, orderSnapshots);
                     syncTrades(credential, tradeSnapshots);
+                    if (tradeCycleProjectionService != null) {
+                        tradeCycleProjectionService.markDirty(credential.getId(), symbol);
+                    }
                 });
 
                 orderCount += orderSnapshots.size();
