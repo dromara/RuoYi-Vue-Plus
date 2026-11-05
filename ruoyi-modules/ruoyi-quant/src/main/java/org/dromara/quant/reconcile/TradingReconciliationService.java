@@ -1302,9 +1302,19 @@ public class TradingReconciliationService {
         if (!sameDecimal(stored.getRealizedPnl(), incoming.realizedPnl())) conflictingFields.add("realizedPnl");
         if (!sameTradeTime(stored.getTradeTime(), incoming.time())) conflictingFields.add("tradeTime");
         if (!conflictingFields.isEmpty()) {
+            String timeDetails = "";
+            if (conflictingFields.contains("tradeTime")) {
+                LocalDateTime incomingTradeTimeUtc = incoming.time() == null
+                    ? null : LocalDateTime.ofInstant(incoming.time(), ZoneOffset.UTC);
+                String deltaSeconds = stored.getTradeTime() == null || incomingTradeTimeUtc == null ? "unknown"
+                    : String.valueOf(Duration.between(stored.getTradeTime(), incomingTradeTimeUtc).getSeconds());
+                timeDetails = ", persistedTradeTime=" + stored.getTradeTime()
+                    + ", incomingTradeTimeUtc=" + incomingTradeTimeUtc
+                    + ", timeDeltaSeconds=" + deltaSeconds;
+            }
             throw new IllegalStateException("Persisted local trade conflicts with immutable Binance fill facts; refusing overwrite: symbol="
                 + incoming.symbol() + ", exchangeTradeId=" + incoming.tradeId() + ", exchangeOrderId=" + incoming.orderId()
-                + ", conflictingFields=" + String.join(",", conflictingFields));
+                + ", conflictingFields=" + String.join(",", conflictingFields) + timeDetails);
         }
     }
 
