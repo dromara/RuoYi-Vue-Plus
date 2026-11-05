@@ -165,7 +165,8 @@ public class TradingReconciliationService {
     }
 
     /**
-     * Manually synchronize order and fill facts as one account-symbol unit.
+     * Manually synchronize historical order and fill facts as one account-symbol unit.
+     * Order facts come from allOrders history windows, not the current open-order snapshot.
      * Exchange reads are completed before the short per-symbol write transaction.
      */
     public TradingDataSyncResult syncTradingData(QuantCredential credential, String requestedSymbol) {
@@ -190,7 +191,6 @@ public class TradingReconciliationService {
                 }
                 symbols.add(normalizeTradingSymbol(position.symbol()));
             }
-
         } else {
             symbols.add(normalizeTradingSymbol(requestedSymbol));
             String symbol = symbols.iterator().next();
