@@ -2,6 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.quant.account.mapper.TradeHistoryMapper">
 
+    <select id="selectHistoricalSymbolsByCredential" resultType="java.lang.String" timeout="3">
+        SELECT DISTINCT symbol
+        FROM quant_trade
+        WHERE credential_id = #{credentialId}
+          AND symbol IS NOT NULL
+          AND TRIM(symbol) <> ''
+        ORDER BY symbol
+    </select>
+
     <select id="selectOrderIdsMissingOrderFacts" resultType="java.lang.Long" timeout="3">
         SELECT DISTINCT t.exchange_order_id
         FROM quant_trade t
