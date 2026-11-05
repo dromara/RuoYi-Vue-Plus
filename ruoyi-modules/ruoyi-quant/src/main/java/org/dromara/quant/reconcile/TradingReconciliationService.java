@@ -179,9 +179,9 @@ public class TradingReconciliationService {
         Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> activeOrdersBySymbol = new HashMap<>();
 
         if (requestedSymbol == null || requestedSymbol.isBlank()) {
-            symbols.addAll(fillSyncCursors.selectSymbols(credential.getId()));
-            symbols.addAll(orderMapper.selectHistoricalSymbolsByCredential(credential.getId()));
-            symbols.addAll(tradeHistoryMapper.selectHistoricalSymbolsByCredential(credential.getId()));
+            fillSyncCursors.selectSymbols(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
+            orderMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
+            tradeHistoryMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
 
             List<ExchangeGateway.PositionSnapshot> positions = Objects.requireNonNull(
                 gateway.queryPositions(exchangeCredential, null), "Binance 全账户持仓快照缺失");
@@ -221,8 +221,6 @@ public class TradingReconciliationService {
         Instant historyStart = historyEnd.minus(Duration.ofDays(90));
         int orderCount = 0;
         int tradeCount = 0;
-        boolean[] pendingJournalRetried = {false};
-
         for (String symbol : symbols) {
             try {
                 Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
@@ -270,10 +268,6 @@ public class TradingReconciliationService {
                 // from the exact order, all within the same account-symbol transaction.
                 transaction.executeWithoutResult(status -> {
                     syncOrders(credential, orderSnapshots);
-                    if (!pendingJournalRetried[0] && "LIVE".equalsIgnoreCase(credential.getRunMode())) {
-                        fillJournal.retryPending(credential.getId());
-                        pendingJournalRetried[0] = true;
-                    }
                     syncTrades(credential, tradeSnapshots);
                 });
 
@@ -285,7 +279,21 @@ public class TradingReconciliationService {
             }
         }
 
+        if ("LIVE".equalsIgnoreCase(credential.getRunMode())) {
+            transaction.executeWithoutResult(status -> {
+                int retried = fillJournal.retryPending(credential.getId());
+                if (retried > 0 && tradeCycleProjectionService != null) {
+                    symbols.forEach(symbol -> tradeCycleProjectionService.markDirty(credential.getId(), symbol));
+                }
+            });
+        }
         return new TradingDataSyncResult(symbols.size(), orderCount, tradeCount);
+    }
+
+    private static void addNormalizedTradingSymbol(Set<String> symbols, String symbol) {
+        if (symbol != null && !symbol.isBlank()) {
+            symbols.add(normalizeTradingSymbol(symbol));
+        }
     }
 
     private static String normalizeTradingSymbol(String symbol) {
