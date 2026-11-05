@@ -1290,18 +1290,21 @@ public class TradingReconciliationService {
     }
 
     private static void assertImmutableTradeFacts(QuantTrade stored, ExchangeGateway.TradeSnapshot incoming) {
-        if (!Objects.equals(stored.getExchangeOrderId(), incoming.orderId())
-            || !sameText(stored.getSymbol(), incoming.symbol())
-            || !sameText(stored.getSide(), incoming.side())
-            || !sameDecimal(stored.getQuantity(), incoming.quantity())
-            || !sameDecimal(stored.getPrice(), incoming.price())
-            || !sameDecimal(stored.getCommission(), incoming.commission())
-            || stored.getCommissionAsset() != null && incoming.commissionAsset() != null
-                && !sameText(stored.getCommissionAsset(), incoming.commissionAsset())
-            || !sameDecimal(stored.getRealizedPnl(), incoming.realizedPnl())
-            || !sameTradeTime(stored.getTradeTime(), incoming.time())) {
+        List<String> conflictingFields = new ArrayList<>();
+        if (!Objects.equals(stored.getExchangeOrderId(), incoming.orderId())) conflictingFields.add("exchangeOrderId");
+        if (!sameText(stored.getSymbol(), incoming.symbol())) conflictingFields.add("symbol");
+        if (!sameText(stored.getSide(), incoming.side())) conflictingFields.add("side");
+        if (!sameDecimal(stored.getQuantity(), incoming.quantity())) conflictingFields.add("quantity");
+        if (!sameDecimal(stored.getPrice(), incoming.price())) conflictingFields.add("price");
+        if (!sameDecimal(stored.getCommission(), incoming.commission())) conflictingFields.add("commission");
+        if (stored.getCommissionAsset() != null && incoming.commissionAsset() != null
+            && !sameText(stored.getCommissionAsset(), incoming.commissionAsset())) conflictingFields.add("commissionAsset");
+        if (!sameDecimal(stored.getRealizedPnl(), incoming.realizedPnl())) conflictingFields.add("realizedPnl");
+        if (!sameTradeTime(stored.getTradeTime(), incoming.time())) conflictingFields.add("tradeTime");
+        if (!conflictingFields.isEmpty()) {
             throw new IllegalStateException("Persisted local trade conflicts with immutable Binance fill facts; refusing overwrite: symbol="
-                + incoming.symbol() + ", exchangeTradeId=" + incoming.tradeId() + ", exchangeOrderId=" + incoming.orderId());
+                + incoming.symbol() + ", exchangeTradeId=" + incoming.tradeId() + ", exchangeOrderId=" + incoming.orderId()
+                + ", conflictingFields=" + String.join(",", conflictingFields));
         }
     }
 
