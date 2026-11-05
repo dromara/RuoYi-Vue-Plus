@@ -17,15 +17,12 @@ import org.dromara.quant.account.domain.QuantTrade;
 import org.dromara.quant.account.domain.vo.QuantTradeVo;
 import org.dromara.quant.account.mapper.QuantAccountSnapshotMapper;
 import org.dromara.quant.account.mapper.QuantTradeMapper;
-import org.dromara.quant.account.mapper.TradeHistoryMapper;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.credential.mapper.QuantCredentialMapper;
 import org.dromara.quant.exchange.ExchangeGateway;
-import org.dromara.quant.exchange.ExchangeHistoryCollector;
-import org.dromara.quant.execution.OrderLedgerService;
 import org.dromara.quant.order.domain.QuantOrder;
 import org.dromara.quant.order.mapper.QuantOrderMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dromara.quant.reconcile.TradingReconciliationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -63,11 +60,8 @@ public class QuantAccountQueryController {
      * 已持久化的账户权益快照。
      */
     private final QuantAccountSnapshotMapper accountSnapshotMapper;
-    private final TradeHistoryMapper tradeHistoryMapper;
-    private final OrderLedgerService orderLedgerService;
     private final QuantOrderMapper orderMapper;
-    @Autowired(required = false)
-    private org.dromara.quant.execution.TradeCycleProjectionService tradeCycleProjectionService;
+    private final TradingReconciliationService tradingReconciliationService;
 
     /**
      * 查询指定凭证的账户资金快照。
@@ -177,104 +171,11 @@ public class QuantAccountQueryController {
         return R.ok(PageResult.build(rows, page.getTotal()));
     }
 
-    /** 将交易所历史订单和当前活动订单同步到本地账本。 */
+    /** 同步交易所订单和成交事实；保持订单管理原有权限入口。 */
     @SaCheckPermission("quant:order:sync")
     @PostMapping("/order/{credentialId}/sync")
     public R<Integer> syncOrders(@PathVariable Long credentialId, @RequestParam(required = false) String symbol) {
-        QuantCredential credential = credentialEntity(credentialId);
-        return R.ok(StringUtils.isBlank(symbol) ? syncAccountOrderSnapshots(credential) : syncOrderSnapshots(credential, symbol));
-    }
-
-    /**
-     * 同步账户已知交易对的历史订单，并合并交易所当前持仓和活动订单涉及的交易对。
-     * Binance 历史订单接口要求指定 symbol，因此不能直接用一个请求遍历账户全部历史订单。
-     */
-    private int syncAccountOrderSnapshots(QuantCredential credential) {
-        ExchangeGateway.Credential exchangeCredential = credential(credential.getId());
-        java.util.Set<String> symbols = new java.util.TreeSet<>();
-        orderMapper.selectList(new LambdaQueryWrapper<QuantOrder>()
-            .select(QuantOrder::getSymbol)
-            .eq(QuantOrder::getCredentialId, credential.getId()))
-            .forEach(order -> {
-                if (StringUtils.isNotBlank(order.getSymbol())) symbols.add(order.getSymbol().trim().toUpperCase(java.util.Locale.ROOT));
-            });
-        tradeMapper.selectList(new LambdaQueryWrapper<QuantTrade>()
-            .select(QuantTrade::getSymbol)
-            .eq(QuantTrade::getCredentialId, credential.getId()))
-            .forEach(trade -> {
-                if (StringUtils.isNotBlank(trade.getSymbol())) symbols.add(trade.getSymbol().trim().toUpperCase(java.util.Locale.ROOT));
-            });
-
-        List<ExchangeGateway.PositionSnapshot> positions = gateway.queryPositions(exchangeCredential, null);
-        if (positions != null) {
-            positions.forEach(position -> {
-                if (position != null && StringUtils.isNotBlank(position.symbol())) {
-                    symbols.add(position.symbol().trim().toUpperCase(java.util.Locale.ROOT));
-                }
-            });
-        }
-
-        Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> activeOrdersBySymbol = new java.util.LinkedHashMap<>();
-        List<ExchangeGateway.OrderSnapshot> activeOrders = gateway.queryOrders(exchangeCredential, null);
-        if (activeOrders != null) {
-            for (ExchangeGateway.OrderSnapshot snapshot : activeOrders) {
-                if (snapshot == null) continue;
-                if (StringUtils.isBlank(snapshot.symbol()) || snapshot.orderId() == null) {
-                    throw new IllegalStateException("交易所全账户活动订单缺少交易对或订单 ID，拒绝写入本地账本");
-                }
-                String activeSymbol = snapshot.symbol().trim().toUpperCase(java.util.Locale.ROOT);
-                symbols.add(activeSymbol);
-                activeOrdersBySymbol.computeIfAbsent(activeSymbol, ignored -> new java.util.LinkedHashMap<>())
-                    .put(snapshot.orderId(), snapshot);
-            }
-        }
-
-        Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> snapshotsBySymbol = new java.util.LinkedHashMap<>();
-        for (String normalizedSymbol : symbols) {
-            Map<Long, ExchangeGateway.OrderSnapshot> snapshots = new java.util.LinkedHashMap<>();
-            for (ExchangeGateway.OrderSnapshot snapshot : ExchangeHistoryCollector.collectLast90Days(
-                range -> gateway.queryOrderHistory(exchangeCredential, normalizedSymbol, range, 1000L))) {
-                if (snapshot == null) continue;
-                if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || snapshot.orderId() == null) {
-                    throw new IllegalStateException("交易所历史订单缺少订单 ID 或返回了不匹配的交易对，拒绝写入本地账本");
-                }
-                snapshots.put(snapshot.orderId(), snapshot);
-            }
-            snapshots.putAll(activeOrdersBySymbol.getOrDefault(normalizedSymbol, Map.of()));
-            snapshotsBySymbol.put(normalizedSymbol, snapshots);
-        }
-
-        int count = 0;
-        for (Map.Entry<String, Map<Long, ExchangeGateway.OrderSnapshot>> entry : snapshotsBySymbol.entrySet()) {
-            entry.getValue().values().forEach(snapshot ->
-                orderLedgerService.syncHistoricalSnapshot(credential.getId(), entry.getKey(), snapshot));
-            count += entry.getValue().size();
-        }
-        return count;
-    }
-
-    private int syncOrderSnapshots(QuantCredential credential, String symbol) {
-        String normalizedSymbol = symbol.trim().toUpperCase(java.util.Locale.ROOT);
-        ExchangeGateway.Credential exchangeCredential = credential(credential.getId());
-        Map<Long, ExchangeGateway.OrderSnapshot> snapshots = new java.util.LinkedHashMap<>();
-        for (ExchangeGateway.OrderSnapshot snapshot : ExchangeHistoryCollector.collectLast90Days(
-            range -> gateway.queryOrderHistory(exchangeCredential, normalizedSymbol, range, 1000L))) {
-            if (snapshot == null) continue;
-            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || snapshot.orderId() == null) {
-                throw new IllegalStateException("交易所历史订单缺少订单 ID 或返回了不匹配的交易对，拒绝写入本地账本");
-            }
-            snapshots.put(snapshot.orderId(), snapshot);
-        }
-        // 活动订单覆盖历史快照，避免旧状态覆盖当前状态。
-        for (ExchangeGateway.OrderSnapshot snapshot : gateway.queryOrders(exchangeCredential, normalizedSymbol)) {
-            if (snapshot == null) continue;
-            if (!normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || snapshot.orderId() == null) {
-                throw new IllegalStateException("交易所活动订单缺少订单 ID 或返回了不匹配的交易对，拒绝写入本地账本");
-            }
-            snapshots.put(snapshot.orderId(), snapshot);
-        }
-        snapshots.values().forEach(snapshot -> orderLedgerService.syncHistoricalSnapshot(credential.getId(), normalizedSymbol, snapshot));
-        return snapshots.size();
+        return R.ok(tradingReconciliationService.syncTradingData(credentialEntity(credentialId), symbol).orderCount());
     }
 
     /**
@@ -354,77 +255,12 @@ public class QuantAccountQueryController {
     }
 
     /**
-     * 同步交易所成交事实。
+     * 同步交易所成交和订单事实；与订单管理共用同一协调流程。
      */
     @SaCheckPermission("quant:trade:sync")
     @PostMapping("/trade/{credentialId}/sync")
-    public R<Integer> syncTrades(@PathVariable Long credentialId, @RequestParam String symbol) {
-        if (StringUtils.isBlank(symbol)) throw new ServiceException("请指定交易对同步成交记录");
-        String normalizedSymbol = symbol.trim().toUpperCase(java.util.Locale.ROOT);
-        QuantCredential credential = credentialEntity(credentialId);
-        ExchangeGateway.Credential exchangeCredential = credential(credentialId);
-        List<ExchangeGateway.TradeSnapshot> snapshots = ExchangeHistoryCollector.collectLast90Days(
-            range -> gateway.queryTrades(exchangeCredential, normalizedSymbol, range));
-        if (snapshots.stream().anyMatch(snapshot -> snapshot == null || snapshot.tradeId() == null || snapshot.orderId() == null
-            || !normalizedSymbol.equalsIgnoreCase(snapshot.symbol()) || StringUtils.isBlank(snapshot.side()) || snapshot.quantity() == null
-            || snapshot.price() == null || snapshot.time() == null || snapshot.commission() == null || snapshot.realizedPnl() == null
-            || snapshot.commissionAsset() == null || !snapshot.commissionAsset().matches("[A-Za-z0-9]{2,20}"))) {
-            throw new IllegalStateException("交易所历史成交缺少必要事实或返回了不匹配的交易对，拒绝写入本地账本");
-        }
-        int count = 0;
-        for (ExchangeGateway.TradeSnapshot snapshot : snapshots) {
-            QuantTrade entity = tradeMapper.selectOne(new LambdaQueryWrapper<QuantTrade>().eq(QuantTrade::getCredentialId, credentialId).eq(QuantTrade::getSymbol, normalizedSymbol)
-                .eq(QuantTrade::getExchangeTradeId, snapshot.tradeId()));
-            if (entity == null) {
-                entity = new QuantTrade();
-                entity.setCredentialId(credentialId);
-                entity.setExchangeTradeId(snapshot.tradeId());
-            }
-            entity.setSymbol(snapshot.symbol());
-            entity.setExchangeOrderId(snapshot.orderId());
-            entity.setSide(snapshot.side());
-            entity.setQuantity(snapshot.quantity());
-            entity.setPrice(snapshot.price());
-            if (entity.getCommissionAsset() != null && !entity.getCommissionAsset().equalsIgnoreCase(snapshot.commissionAsset())) {
-                throw new IllegalStateException("交易所成交手续费资产与本地事实冲突，拒绝覆盖");
-            }
-            entity.setCommission(snapshot.commission());
-            entity.setCommissionAsset(snapshot.commissionAsset().toUpperCase(java.util.Locale.ROOT));
-            entity.setRealizedPnl(snapshot.realizedPnl());
-            entity.setFundingFee(java.math.BigDecimal.ZERO);
-            entity.setTradeTime(LocalDateTime.ofInstant(snapshot.time(), ZoneOffset.UTC));
-            if (entity.getId() == null) tradeMapper.insert(entity); else tradeMapper.updateById(entity);
-            count++;
-        }
-        syncOrderSnapshots(credential, normalizedSymbol);
-        backfillTradeOrderFacts(credential, normalizedSymbol);
-        if (count > 0 && tradeCycleProjectionService != null) {
-            tradeCycleProjectionService.markDirty(credentialId, normalizedSymbol);
-        }
-        return R.ok(count);
-    }
-
-    private void backfillTradeOrderFacts(QuantCredential credential, String symbol) {
-        List<Long> orderIds = tradeHistoryMapper.selectOrderIdsMissingOrderFacts(credential.getId(), symbol.trim().toUpperCase(), 200);
-        int restored = 0;
-        for (Long orderId : orderIds) {
-            try {
-                ExchangeGateway.OrderSnapshot snapshot = gateway.queryOrder(credential(credential.getId()), symbol, orderId, null);
-                if (snapshot == null || !symbol.equalsIgnoreCase(snapshot.symbol()) || !orderId.equals(snapshot.orderId())
-                    || (snapshot.positionSide() == null && snapshot.reduceOnly() == null)) {
-                    continue;
-                }
-                orderLedgerService.syncHistoricalSnapshot(credential.getId(), symbol, snapshot);
-                restored++;
-            } catch (RuntimeException ex) {
-                log.warn("历史成交订单来源补齐暂停，相关交易记录将按来源不完整处理 credentialId={} symbol={} orderId={} errorType={}",
-                    credential.getId(), symbol, orderId, ex.getClass().getSimpleName());
-                break;
-            }
-        }
-        if (restored > 0) {
-            log.info("历史成交订单来源事实已补齐 credentialId={} symbol={} restoredOrderCount={}", credential.getId(), symbol, restored);
-        }
+    public R<Integer> syncTrades(@PathVariable Long credentialId, @RequestParam(required = false) String symbol) {
+        return R.ok(tradingReconciliationService.syncTradingData(credentialEntity(credentialId), symbol).tradeCount());
     }
 
     static LocalDateTime tradeDateBoundary(String date, boolean nextDay) {
