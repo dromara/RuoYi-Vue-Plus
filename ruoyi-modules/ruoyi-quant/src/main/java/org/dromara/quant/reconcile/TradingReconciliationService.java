@@ -109,7 +109,7 @@ public class TradingReconciliationService {
     @Autowired
     private TradeDecisionLogService decisionLogs;
     @Autowired
-    private org.dromara.quant.account.mapper.TradeHistoryMapper tradeHistoryMapper;
+    private TradeHistoryMapper tradeHistoryMapper;
     @Autowired(required = false)
     private org.dromara.quant.execution.TradeCycleProjectionService tradeCycleProjectionService;
     private final StrictBinanceTradeCollector tradeCollector;
