@@ -7,9 +7,11 @@ import org.dromara.quant.account.domain.QuantAccountSnapshot;
 import org.dromara.quant.account.domain.QuantTrade;
 import org.dromara.quant.account.mapper.QuantAccountSnapshotMapper;
 import org.dromara.quant.account.mapper.QuantTradeMapper;
+import org.dromara.quant.account.mapper.TradeHistoryMapper;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.decision.TradeDecisionLogService;
 import org.dromara.quant.exchange.ExchangeGateway;
+import org.dromara.quant.exchange.ExchangeHistoryCollector;
 import org.dromara.quant.exchange.ExchangeMarketPort;
 import org.dromara.quant.execution.StrictBinanceTradeCollector;
 import org.dromara.quant.execution.StrategyFillJournalService;
@@ -106,6 +108,8 @@ public class TradingReconciliationService {
     private static final Duration RUNTIME_POSITION_CACHE_AGE = Duration.ofSeconds(20);
     @Autowired
     private TradeDecisionLogService decisionLogs;
+    @Autowired
+    private org.dromara.quant.account.mapper.TradeHistoryMapper tradeHistoryMapper;
     @Autowired(required = false)
     private org.dromara.quant.execution.TradeCycleProjectionService tradeCycleProjectionService;
     private final StrictBinanceTradeCollector tradeCollector;
@@ -156,6 +160,180 @@ public class TradingReconciliationService {
         this.transaction.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
         this.transaction.setTimeout(30);
     }
+
+    public record TradingDataSyncResult(int symbolCount, int orderCount, int tradeCount) {
+    }
+
+    /**
+     * Manually synchronize order and fill facts as one account-symbol unit.
+     * Exchange reads are completed before the short per-symbol write transaction.
+     */
+    public TradingDataSyncResult syncTradingData(QuantCredential credential, String requestedSymbol) {
+        if (credential == null || credential.getId() == null) {
+            throw new IllegalArgumentException("交易账户不能为空");
+        }
+
+        ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
+            credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
+        Set<String> symbols = new TreeSet<>();
+        Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> activeOrdersBySymbol = new HashMap<>();
+
+        if (requestedSymbol == null || requestedSymbol.isBlank()) {
+            symbols.addAll(fillSyncCursors.selectSymbols(credential.getId()));
+            symbols.addAll(orderMapper.selectHistoricalSymbolsByCredential(credential.getId()));
+            symbols.addAll(tradeHistoryMapper.selectHistoricalSymbolsByCredential(credential.getId()));
+
+            List<ExchangeGateway.PositionSnapshot> positions = Objects.requireNonNull(
+                gateway.queryPositions(exchangeCredential, null), "Binance 全账户持仓快照缺失");
+            for (ExchangeGateway.PositionSnapshot position : positions) {
+                if (position == null || position.symbol() == null || position.symbol().isBlank()) {
+                    throw new IllegalStateException("Binance 全账户持仓快照缺少交易对，无法确定同步范围");
+                }
+                symbols.add(normalizeTradingSymbol(position.symbol()));
+            }
+
+            List<ExchangeGateway.OrderSnapshot> activeOrders = Objects.requireNonNull(
+                gateway.queryOrders(exchangeCredential, null), "Binance 全账户活动订单快照缺失");
+            for (ExchangeGateway.OrderSnapshot snapshot : activeOrders) {
+                validateSyncOrderSnapshot(snapshot, null);
+                String symbol = normalizeTradingSymbol(snapshot.symbol());
+                symbols.add(symbol);
+                activeOrdersBySymbol.computeIfAbsent(symbol, ignored -> new LinkedHashMap<>())
+                    .put(snapshot.orderId(), snapshot);
+            }
+        } else {
+            symbols.add(normalizeTradingSymbol(requestedSymbol));
+            String symbol = symbols.iterator().next();
+            List<ExchangeGateway.OrderSnapshot> activeOrders = Objects.requireNonNull(
+                gateway.queryOrders(exchangeCredential, symbol), "Binance 活动订单快照缺失: " + symbol);
+            for (ExchangeGateway.OrderSnapshot snapshot : activeOrders) {
+                validateSyncOrderSnapshot(snapshot, symbol);
+                activeOrdersBySymbol.computeIfAbsent(symbol, ignored -> new LinkedHashMap<>())
+                    .put(snapshot.orderId(), snapshot);
+            }
+        }
+
+        if (symbols.isEmpty()) {
+            return new TradingDataSyncResult(0, 0, 0);
+        }
+
+        Instant historyEnd = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
+        Instant historyStart = historyEnd.minus(Duration.ofDays(90));
+        int orderCount = 0;
+        int tradeCount = 0;
+        boolean[] pendingJournalRetried = {false};
+
+        for (String symbol : symbols) {
+            try {
+                Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
+                List<ExchangeGateway.OrderSnapshot> historyOrders = ExchangeHistoryCollector.collectLast90Days(
+                    range -> gateway.queryOrderHistory(exchangeCredential, symbol, range, 1000L));
+                for (ExchangeGateway.OrderSnapshot snapshot : historyOrders) {
+                    validateSyncOrderSnapshot(snapshot, symbol);
+                    ordersById.put(snapshot.orderId(), snapshot);
+                }
+                ordersById.putAll(activeOrdersBySymbol.getOrDefault(symbol, Map.of()));
+
+                // Fill rows can predate the order ledger or lack positionSide/reduceOnly.
+                // Resolve only the affected order identities, outside the write transaction.
+                for (Long orderId : tradeHistoryMapper.selectOrderIdsMissingOrderFacts(credential.getId(), symbol, 200)) {
+                    ExchangeGateway.OrderSnapshot existing = ordersById.get(orderId);
+                    if (hasCompleteOrderSourceFacts(existing)) {
+                        continue;
+                    }
+                    try {
+                        ExchangeGateway.OrderSnapshot recovered = gateway.queryOrder(exchangeCredential, symbol, orderId, null);
+                        if (recovered == null) {
+                            continue;
+                        }
+                        validateSyncOrderSnapshot(recovered, symbol);
+                        ordersById.put(orderId, mergeOrderSourceFacts(existing, recovered));
+                    } catch (IllegalStateException conflict) {
+                        if (conflict.getMessage() != null && conflict.getMessage().startsWith("订单来源事实冲突")) {
+                            throw conflict;
+                        }
+                        log.warn("成交关联订单来源补齐暂停 credentialId={} symbol={} orderId={} errorType={}",
+                            credential.getId(), symbol, orderId, conflict.getClass().getSimpleName());
+                        break;
+                    } catch (RuntimeException failure) {
+                        log.warn("成交关联订单来源补齐暂停 credentialId={} symbol={} orderId={} errorType={}",
+                            credential.getId(), symbol, orderId, failure.getClass().getSimpleName());
+                        break;
+                    }
+                }
+
+                List<ExchangeGateway.OrderSnapshot> orderSnapshots = List.copyOf(ordersById.values());
+                List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
+                    tradeCollector.collect(exchangeCredential, symbol, historyStart, historyEnd);
+
+                // Order sources are committed first so syncTrades can attribute fills
+                // from the exact order, all within the same account-symbol transaction.
+                transaction.executeWithoutResult(status -> {
+                    syncOrders(credential, orderSnapshots);
+                    if (!pendingJournalRetried[0] && "LIVE".equalsIgnoreCase(credential.getRunMode())) {
+                        fillJournal.retryPending(credential.getId());
+                        pendingJournalRetried[0] = true;
+                    }
+                    syncTrades(credential, tradeSnapshots);
+                });
+
+                orderCount += orderSnapshots.size();
+                tradeCount += tradeSnapshots.size();
+            } catch (RuntimeException failure) {
+                throw new IllegalStateException(
+                    "交易对 " + symbol + " 的订单与成交同步失败；此前已完成交易对的数据已提交，可安全重试补齐", failure);
+            }
+        }
+
+        return new TradingDataSyncResult(symbols.size(), orderCount, tradeCount);
+    }
+
+    private static String normalizeTradingSymbol(String symbol) {
+        String normalized = symbol == null ? "" : symbol.trim().toUpperCase(Locale.ROOT);
+        if (!normalized.matches("[A-Z0-9]{2,32}")) {
+            throw new IllegalArgumentException("无效的 Binance 交易对");
+        }
+        return normalized;
+    }
+
+    private static void validateSyncOrderSnapshot(ExchangeGateway.OrderSnapshot snapshot, String expectedSymbol) {
+        if (snapshot == null || snapshot.orderId() == null || snapshot.orderId() <= 0
+            || snapshot.symbol() == null || snapshot.symbol().isBlank()
+            || expectedSymbol != null && !expectedSymbol.equalsIgnoreCase(snapshot.symbol())) {
+            throw new IllegalStateException("Binance 订单快照缺少有效身份或交易对不匹配，拒绝同步");
+        }
+    }
+
+    private static boolean hasCompleteOrderSourceFacts(ExchangeGateway.OrderSnapshot snapshot) {
+        return snapshot != null
+            && snapshot.positionSide() != null && !snapshot.positionSide().isBlank()
+            && snapshot.reduceOnly() != null
+            && snapshot.clientOrderId() != null && !snapshot.clientOrderId().isBlank()
+            && !snapshot.clientOrderId().startsWith("EXCHANGE:");
+    }
+
+    private static ExchangeGateway.OrderSnapshot mergeOrderSourceFacts(
+        ExchangeGateway.OrderSnapshot existing, ExchangeGateway.OrderSnapshot recovered) {
+        if (existing == null) {
+            return recovered;
+        }
+        if (existing.positionSide() != null && recovered.positionSide() != null
+            && !existing.positionSide().equalsIgnoreCase(recovered.positionSide())
+            || existing.reduceOnly() != null && recovered.reduceOnly() != null
+                && !existing.reduceOnly().equals(recovered.reduceOnly())) {
+            throw new IllegalStateException("订单来源事实冲突，拒绝覆盖已有订单记录");
+        }
+        String clientOrderId = existing.clientOrderId();
+        if (clientOrderId == null || clientOrderId.isBlank() || clientOrderId.startsWith("EXCHANGE:")) {
+            clientOrderId = recovered.clientOrderId();
+        }
+        return new ExchangeGateway.OrderSnapshot(
+            existing.symbol(), existing.orderId(), clientOrderId, existing.side(), existing.type(), existing.status(),
+            existing.price(), existing.originalQuantity(), existing.executedQuantity(), existing.updateTime(), existing.averagePrice(),
+            existing.positionSide() == null || existing.positionSide().isBlank() ? recovered.positionSide() : existing.positionSide(),
+            existing.reduceOnly() == null ? recovered.reduceOnly() : existing.reduceOnly());
+    }
+
     /**
      * Commit an account's verified REST snapshot under a database row lock.
      * Earlier-started requests cannot overwrite later-started snapshots.
