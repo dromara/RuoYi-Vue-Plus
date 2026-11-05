@@ -42,9 +42,9 @@ WHERE id=#{fact.id} AND credential_id=#{fact.credentialId}
   AND (executed_quantity IS NULL OR
        (#{fact.executedQuantity} IS NOT NULL
         AND executed_quantity<=#{fact.executedQuantity}))
-  AND (status IS NULL OR status NOT IN
+  AND (#{fact.status} IS NULL OR status IS NULL OR status NOT IN
        ('FILLED','CANCELED','EXPIRED','EXPIRED_IN_MATCH','REJECTED')
        OR status=#{fact.status})
-  AND (status IS NULL OR status NOT IN ('PARTIALLY_FILLED','PENDING_CANCEL')
+  AND (#{fact.status} IS NULL OR status IS NULL OR status NOT IN ('PARTIALLY_FILLED','PENDING_CANCEL')
        OR #{fact.status} NOT IN ('NEW','PENDING_NEW'))]]></update>
 </mapper>
