@@ -474,6 +474,10 @@ public class ProtectionOrderService {
                     || Set.of("TRIGGERING", "TRIGGERED", "FINISHED", "PARTIALLY_FILLED", "FILLED").contains(status)) {
                     throw new ProtectionExecutionPendingException();
                 }
+                if (!Set.of("CANCELED", "EXPIRED", "REJECTED", "NOT_SENT").contains(status)
+                    && !cancelOne(credentialId, previousStep, true, true)) {
+                    throw new ProtectionExecutionPendingException();
+                }
             }
         }
         if (targets != null && desired.stream().anyMatch(signal -> signal != null && "FIRST_TP".equals(signal.type())) && desired.stream().noneMatch(signal -> signal != null &&
