@@ -438,7 +438,7 @@ public class ProtectionOrderService {
     }
 
     /**
-     * 同步策略保护单：达到首次止盈回报率后可并行设置 STEP_TP；首次止盈确认后撤销已终结的 FIRST_TP 目标。
+     * 同步策略保护单：首次止盈目标全部成交确认后才设置 STEP_TP；未完成首平时安全清理旧版本提前建立的阶梯单。
      * 只有目标发生变化才撤旧挂新，高频实时价不会持续打 REST。
      */
     public void syncStrategyProtections(Long credentialId, QuantPosition position, BigDecimal initialPositionQuantity, List<ProtectionSignal> desiredSignals, boolean live) {
@@ -460,8 +460,23 @@ public class ProtectionOrderService {
             return;
         }
         List<ProtectionSignal> desired = desiredSignals == null ? List.of() : desiredSignals;
+        boolean firstProfitPending = firstRemaining != null && firstRemaining.signum() > 0;
+        if (firstProfitPending && live) {
+            List<QuantProtectionOrder> previousSteps = mapper.selectList(new LambdaQueryWrapper<QuantProtectionOrder>()
+                .eq(QuantProtectionOrder::getCredentialId, credentialId)
+                .eq(QuantProtectionOrder::getPositionId, position.getId())
+                .eq(QuantProtectionOrder::getPositionCycleKey, position.getProtectionCycleKey())
+                .eq(QuantProtectionOrder::getProtectionType, "STEP_TP"));
+            for (QuantProtectionOrder previousStep : previousSteps) {
+                String status = Objects.toString(previousStep.getStatus(), "");
+                if (previousStep.getExecutedQuantity() != null && previousStep.getExecutedQuantity().signum() > 0
+                    || Set.of("TRIGGERING", "TRIGGERED", "FINISHED", "PARTIALLY_FILLED", "FILLED").contains(status)) {
+                    throw new ProtectionExecutionPendingException();
+                }
+            }
+        }
         if (targets != null && desired.stream().anyMatch(signal -> signal != null && "FIRST_TP".equals(signal.type())) && desired.stream().noneMatch(signal -> signal != null &&
-            "STEP_TP".equals(signal.type())) && confirmedStep(credentialId, position) > 0) {
+            "STEP_TP".equals(signal.type())) && !firstProfitPending && confirmedStep(credentialId, position) > 0) {
             throw new IllegalStateException("已确认阶梯保护不能回退为首次止盈，先核实首平事实");
         }
         Set<String> desiredTypes = new HashSet<>();
@@ -510,7 +525,8 @@ public class ProtectionOrderService {
                         normalizeQuantity(credentialId, position.getSymbol(), position.getQuantity(), true), order.getStopPrice()) == null) {
                     throw new IllegalStateException("缺少已确认的替代保护，保留已有止损: " + order.getProtectionType());
                 }
-                if (!cancelOne(credentialId, order, live)) {
+                boolean requireUnfilled = firstProfitPending && "STEP_TP".equals(order.getProtectionType());
+                if (!cancelOne(credentialId, order, live, requireUnfilled)) {
                     throw new IllegalStateException("过期策略保护单撤销失败: " + order.getProtectionType());
                 }
             }
@@ -1285,18 +1301,25 @@ public class ProtectionOrderService {
      * 撤销单张保护单并更新本地状态。
      */
     private boolean cancelOne(Long credentialId, QuantProtectionOrder order, boolean live) {
+        return cancelOne(credentialId, order, live, false);
+    }
+
+    private boolean cancelOne(Long credentialId, QuantProtectionOrder order, boolean live, boolean requireUnfilled) {
         if (targets != null && targetLease.get() == null) {
             QuantPosition scope = new QuantPosition();
             scope.setId(order.getPositionId());
             scope.setPositionSide(order.getPositionSide());
             scope.setProtectionCycleKey(order.getPositionCycleKey());
-            return coordinated(credentialId, scope, order.getProtectionType(), () -> cancelOne(credentialId, order, live));
+            return coordinated(credentialId, scope, order.getProtectionType(), () -> cancelOne(credentialId, order, live, requireUnfilled));
         }
         checkTargetLease();
         if ("MISSING".equals(order.getStatus()) && !live) {
             return true;
         }
-        if (cancelProtected(credentialId, order, live, Set.of("CANCELED", "EXPIRED", "REJECTED", "FINISHED"), false)) {
+        Set<String> terminalStatuses = requireUnfilled
+            ? Set.of("CANCELED", "EXPIRED", "REJECTED")
+            : Set.of("CANCELED", "EXPIRED", "REJECTED", "FINISHED");
+        if (cancelProtected(credentialId, order, live, terminalStatuses, requireUnfilled)) {
             return true;
         }
         // No terminal exchange fact means cancellation is still unresolved; do not

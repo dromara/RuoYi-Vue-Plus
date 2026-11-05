@@ -142,26 +142,31 @@ public class QuantAccountStreamController {
         payload.put("eventTime", BeijingTime.format(event.eventTime() == null ? Instant.now() : event.eventTime()));
         if ("SNAPSHOT".equals(event.eventType())) {
             ExchangeGateway.Credential exchangeCredential = executionService.toCredential(credential);
-            boolean available = false;
+            boolean accountAvailable = false;
+            boolean positionsAvailable = false;
+            boolean ordersAvailable = false;
             try {
                 payload.put("account", gateway.queryAccount(exchangeCredential));
-                available = true;
+                accountAvailable = true;
             } catch (RuntimeException ex) {
                 log.warn("账户 SSE 初始资金快照失败 credentialId={} error={}", credential.getId(), ex.getMessage());
             }
             try {
                 payload.put("positions", gateway.queryPositions(exchangeCredential, null));
-                available = true;
+                positionsAvailable = true;
             } catch (RuntimeException ex) {
                 log.warn("账户 SSE 初始持仓快照失败 credentialId={} error={}", credential.getId(), ex.getMessage());
             }
             try {
                 payload.put("orders", gateway.queryOrders(exchangeCredential, null));
-                available = true;
+                ordersAvailable = true;
             } catch (RuntimeException ex) {
                 log.warn("账户 SSE 初始委托快照失败 credentialId={} error={}", credential.getId(), ex.getMessage());
             }
-            payload.put("snapshotAvailable", available);
+            payload.put("accountSnapshotAvailable", accountAvailable);
+            payload.put("positionsSnapshotAvailable", positionsAvailable);
+            payload.put("ordersSnapshotAvailable", ordersAvailable);
+            payload.put("snapshotAvailable", positionsAvailable);
         } else if ("ACCOUNT_UPDATE".equals(event.eventType()) || "ORDER_TRADE_UPDATE".equals(event.eventType()) || "ALGO_UPDATE".equals(event.eventType())) {
             // 实时事件直接转发原始用户数据，不再为每条事件查询三次 REST。
             payload.put("snapshotAvailable", true);

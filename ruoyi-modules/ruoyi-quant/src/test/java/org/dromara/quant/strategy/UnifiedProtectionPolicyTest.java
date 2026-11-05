@@ -26,19 +26,18 @@ class UnifiedProtectionPolicyTest {
             new BigDecimal(peak), new BigDecimal("100"), firstFilled, highest);
     }
     @ParameterizedTest
-    @CsvSource({"0.10,0.20,101,1,100", "0.10,0.10,101,1,100", "0.30,0.10,103,3,102"})
-    void startsAtFirstThresholdForAllStepRatios(String first, String ratio, String price, int index, String lockedPrice) {
+    @CsvSource({"0.10,0.20,101", "0.10,0.10,101", "0.30,0.10,103"})
+    void keepsOnlyFirstTpUntilItsFullTargetIsConfirmed(String first, String ratio, String price) {
         var signals = strategy.evaluateProtection(context(price, price, false, 0), params(first, ratio));
-        assertEquals(java.util.List.of("STEP_TP", "FIRST_TP"), signals.stream().map(ProtectionSignal::type).toList());
-        assertEquals(index, signals.getFirst().stepIndex());
-        assertEquals(0, new BigDecimal(lockedPrice).compareTo(signals.getFirst().triggerPrice()));
+        assertEquals(java.util.List.of("FIRST_TP"), signals.stream().map(ProtectionSignal::type).toList());
+        assertEquals(ProtectionSignal.QuantityBase.INITIAL, signals.getFirst().quantityBase());
     }
     @Test
-    void retraceKeepsHighestStepAndInitialFirstProfitQuantityBasis() {
-        var signals = strategy.evaluateProtection(context("100.5", "102.5", false, 2), params("0.10", "0.10"));
+    void activatesHighestConfirmedStepAfterFirstProfitFill() {
+        var signals = strategy.evaluateProtection(context("100.5", "102.5", true, 2), params("0.10", "0.10"));
+        assertEquals(java.util.List.of("STEP_TP"), signals.stream().map(ProtectionSignal::type).toList());
         assertEquals(2, signals.getFirst().stepIndex());
         assertEquals(0, new BigDecimal("101").compareTo(signals.getFirst().triggerPrice()));
-        assertEquals(ProtectionSignal.QuantityBase.INITIAL, signals.get(1).quantityBase());
     }
     @Test
     void legacySnapshotKeepsLocalStopAndOldStepActivation() {

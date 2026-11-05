@@ -148,7 +148,7 @@ public final class KlineSlopeRateStrategy implements StrategyPlugin {
         BigDecimal step = rate(params, "stepRatio", "StepRatio", DEFAULT_STEP_RATIO);
         BigDecimal favorable = maxFavorableReturn(context).max(leveragedReturn(context.direction(), context.currentPrice(), context.entryPrice(), leverage(context)));
         int reached = Math.max(Math.max(0, context.highestStep()), rateStep(favorable, step));
-        return unifiedProtection(params) && stepProtectionStarted(context, rate(params, "firstProfitTakingRate", "FirstProfitTakingRate", DEFAULT_FIRST_PROFIT_TAKING_RATE))
+        return unifiedProtection(params) && stepProtectionStarted(context)
             ? Math.max(1, reached) : reached;
     }
 
@@ -239,10 +239,10 @@ public final class KlineSlopeRateStrategy implements StrategyPlugin {
     }
 
     /**
-     * 阶梯保护在达到首次止盈回报率时即可启用，不再依赖首次分批止盈成交确认。
+     * 阶梯保护仅在首次分批止盈目标全部成交确认后启用。
      */
-    private static boolean stepProtectionStarted(StrategyContext context, BigDecimal firstProfit) {
-        return context.firstTakeProfitTriggered() || maxFavorableReturn(context).compareTo(firstProfit) >= 0;
+    private static boolean stepProtectionStarted(StrategyContext context) {
+        return context.firstTakeProfitTriggered();
     }
 
     /**
@@ -352,7 +352,7 @@ public final class KlineSlopeRateStrategy implements StrategyPlugin {
             return List.of(new ExitSignal(EXIT_FIRST_TP, firstClose, "首次止盈触发，首次止盈阈值=" + percent(firstProfit) + "，触发时回报率=" + percent(currentReturn) + "，计划平初始仓位比例=" + percent(firstClose), true, PROTECTION_FIRST_TP,
                 ExitSignal.QuantityBase.INITIAL));
         }
-        if (stepProtectionStarted(context, firstProfit)) {
+        if (stepProtectionStarted(context)) {
             BigDecimal maxReturn = maxFavorableReturn(context);
             int stepIndex = reachedStep(context, params);
             if (stepIndex > 0) {
@@ -385,7 +385,7 @@ public final class KlineSlopeRateStrategy implements StrategyPlugin {
                 context.direction(), localStop.negate(), leverage), "Binance 本地止损镜像"));
         }
 
-        boolean firstProfitReached = stepProtectionStarted(context, firstProfit);
+        boolean firstProfitReached = stepProtectionStarted(context);
         if (!context.firstTakeProfitTriggered()) {
             result.add(new ProtectionSignal(PROTECTION_FIRST_TP, "TAKE_PROFIT_MARKET", firstClose, ProtectionSignal.QuantityBase.INITIAL, priceForReturn(context.entryPrice(),
                 context.direction(), firstProfit, leverage), "Binance 首次分批止盈"));

@@ -50,6 +50,18 @@ class StepProtectionPersistenceTest {
     }
 
     @Test
+    void firstTakeProfitRequiresItsFullTargetBeforeItIsMarkedTriggered() {
+        var state = new QuantStrategyPositionState();
+        state.setFirstTakeProfitTargetQty(new BigDecimal("50"));
+
+        PositionProtectionState.confirmLocalFirstProfit(state, new BigDecimal("20"));
+        assertEquals(false, state.getFirstTakeProfitTriggered());
+
+        PositionProtectionState.confirmLocalFirstProfit(state, new BigDecimal("30"));
+        assertEquals(true, state.getFirstTakeProfitTriggered());
+    }
+
+    @Test
     void newCycleResetsObservedAndConfirmedSteps() {
         var state = new QuantStrategyPositionState();
         state.setHighestStep(3);

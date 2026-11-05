@@ -83,25 +83,28 @@ class KlineSlopeRateStrategyTest {
     }
 
     @Test
-    void stepProtectionStartsAtFirstProfitThresholdBeforeFirstTpFill() {
-        StrategyContext c = context("LONG", new BigDecimal("100"), null, new BigDecimal("101"), false, new BigDecimal("101"), null);
-        var protections = strategy.evaluateProtection(c, Map.of("firstProfitTakingRate", "0.10", "stepRatio", "0.10"));
-        assertTrue(protections.stream().anyMatch(p -> p.type().equals("FIRST_TP")));
-        var step = protections.stream().filter(p -> p.type().equals("STEP_TP")).findFirst().orElseThrow();
+    void stepProtectionWaitsForFirstTpFillConfirmation() {
+        StrategyContext pending = context("LONG", new BigDecimal("100"), null, new BigDecimal("101"), false, new BigDecimal("101"), null);
+        var pendingSignals = strategy.evaluateProtection(pending, Map.of("firstProfitTakingRate", "0.10", "stepRatio", "0.10"));
+        assertTrue(pendingSignals.stream().anyMatch(p -> p.type().equals("FIRST_TP")));
+        assertTrue(pendingSignals.stream().noneMatch(p -> p.type().equals("STEP_TP")));
+
+        StrategyContext confirmed = context("LONG", new BigDecimal("100"), null, new BigDecimal("101"), true, new BigDecimal("101"), null);
+        var confirmedSignals = strategy.evaluateProtection(confirmed, Map.of("firstProfitTakingRate", "0.10", "stepRatio", "0.10"));
+        var step = confirmedSignals.stream().filter(p -> p.type().equals("STEP_TP")).findFirst().orElseThrow();
         assertEquals(1, step.stepIndex());
         assertEquals(0, new BigDecimal("100").compareTo(step.triggerPrice()));
     }
 
     @Test
-    void firstProfitTriggeredExitDoesNotRequireFirstTpFillConfirmation() {
+    void stepExitWaitsForFirstTpFillConfirmation() {
         StrategyContext c = context("LONG", new BigDecimal("100"), null, new BigDecimal("100"), false, new BigDecimal("101"), null);
-        var exit = strategy.evaluateExit(c, Map.of("firstProfitTakingRate", "0.10", "stepRatio", "0.10")).getFirst();
-        assertEquals(KlineSlopeRateStrategy.EXIT_STEP_TP, exit.type());
+        assertTrue(strategy.evaluateExit(c, Map.of("firstProfitTakingRate", "0.10", "stepRatio", "0.10")).isEmpty());
     }
 
     @Test
-    void retracingBelowReachedStepKeepsSameStepProtectionBeforeFirstTpFill() {
-        StrategyContext c = context("LONG", new BigDecimal("100"), null, new BigDecimal("100.5"), false, new BigDecimal("101"), null);
+    void retracingBelowReachedStepKeepsSameStepProtectionAfterFirstTpFill() {
+        StrategyContext c = context("LONG", new BigDecimal("100"), null, new BigDecimal("100.5"), true, new BigDecimal("101"), null);
         var step =
             strategy.evaluateProtection(c, Map.of("firstProfitTakingRate", "0.10", "stepRatio", "0.10")).stream().filter(p -> p.type().equals("STEP_TP")).findFirst().orElseThrow();
         assertEquals(1, step.stepIndex());
