@@ -172,7 +172,7 @@ public class QuantAccountQueryController {
     }
 
     /** 同步交易所订单和成交事实；保持订单管理原有权限入口。 */
-    @SaCheckPermission("quant:order:sync")
+    @SaCheckPermission(value = {"quant:order:sync", "quant:trade:sync"}, mode = SaMode.AND)
     @PostMapping("/order/{credentialId}/sync")
     public R<Integer> syncOrders(@PathVariable Long credentialId, @RequestParam(required = false) String symbol) {
         return R.ok(tradingReconciliationService.syncTradingData(credentialEntity(credentialId), symbol).orderCount());
@@ -257,7 +257,7 @@ public class QuantAccountQueryController {
     /**
      * 同步交易所成交和订单事实；与订单管理共用同一协调流程。
      */
-    @SaCheckPermission("quant:trade:sync")
+    @SaCheckPermission(value = {"quant:order:sync", "quant:trade:sync"}, mode = SaMode.AND)
     @PostMapping("/trade/{credentialId}/sync")
     public R<Integer> syncTrades(@PathVariable Long credentialId, @RequestParam(required = false) String symbol) {
         return R.ok(tradingReconciliationService.syncTradingData(credentialEntity(credentialId), symbol).tradeCount());
