@@ -11,6 +11,7 @@ import java.util.function.Function;
  */
 public final class ExchangeHistoryCollector {
     private static final long LOOKBACK_MILLIS = Duration.ofDays(90).toMillis();
+    private static final long START_SAFETY_MARGIN_MILLIS = Duration.ofMinutes(1).toMillis();
     private static final long WINDOW_MILLIS = Duration.ofDays(7).toMillis();
     private static final int PAGE_LIMIT = 1000;
     private static final int MAX_REQUESTS = 256;
@@ -18,9 +19,16 @@ public final class ExchangeHistoryCollector {
     private ExchangeHistoryCollector() {
     }
 
+    public static Instant recent90DaysStart(Instant end) {
+        if (end == null) {
+            throw new IllegalArgumentException("交易所历史查询结束时间不能为空");
+        }
+        return Instant.ofEpochMilli(end.toEpochMilli() - LOOKBACK_MILLIS + START_SAFETY_MARGIN_MILLIS);
+    }
+
     public static <T> List<T> collectLast90Days(Function<ExchangeGateway.TimeRange, List<T>> query) {
-        long end = Instant.now().toEpochMilli();
-        return collect(Instant.ofEpochMilli(end - LOOKBACK_MILLIS), Instant.ofEpochMilli(end), query);
+        Instant end = Instant.now();
+        return collect(recent90DaysStart(end), end, query);
     }
 
     public static <T> List<T> collect(Instant from, Instant to, Function<ExchangeGateway.TimeRange, List<T>> query) {
