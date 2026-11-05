@@ -20,7 +20,15 @@ public final class ExchangeHistoryCollector {
 
     public static <T> List<T> collectLast90Days(Function<ExchangeGateway.TimeRange, List<T>> query) {
         long end = Instant.now().toEpochMilli();
-        long start = end - LOOKBACK_MILLIS;
+        return collect(Instant.ofEpochMilli(end - LOOKBACK_MILLIS), Instant.ofEpochMilli(end), query);
+    }
+
+    public static <T> List<T> collect(Instant from, Instant to, Function<ExchangeGateway.TimeRange, List<T>> query) {
+        if (from == null || to == null || query == null || from.isAfter(to)) {
+            throw new IllegalArgumentException("交易所历史查询范围无效");
+        }
+        long start = from.toEpochMilli();
+        long end = to.toEpochMilli();
         List<T> result = new ArrayList<>();
         int[] requests = {0};
         while (start <= end) {
