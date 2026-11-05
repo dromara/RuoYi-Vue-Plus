@@ -584,6 +584,32 @@ class TradingReconciliationTransactionTest {
     }
 
     @Test
+    void manualHistoricalOrdersAndTradesShareWindowInsideBinanceNinetyDayLimit() {
+        stubManualSyncQueries("BTCUSDT", null);
+        when(gateway.queryTrades(any(), eq("BTCUSDT"), any())).thenReturn(List.of());
+        when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
+        when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
+            .thenReturn(List.of());
+
+        Instant beforeSync = Instant.now();
+        service().syncTradingData(credential(), "BTCUSDT");
+
+        var orderRanges = org.mockito.ArgumentCaptor.forClass(ExchangeGateway.TimeRange.class);
+        var tradeRanges = org.mockito.ArgumentCaptor.forClass(ExchangeGateway.TimeRange.class);
+        verify(gateway, atLeastOnce()).queryOrderHistory(any(), eq("BTCUSDT"), orderRanges.capture(), anyLong());
+        verify(gateway, atLeastOnce()).queryTrades(any(), eq("BTCUSDT"), tradeRanges.capture());
+
+        ExchangeGateway.TimeRange firstOrderRange = orderRanges.getAllValues().getFirst();
+        ExchangeGateway.TimeRange lastOrderRange = orderRanges.getAllValues().getLast();
+        ExchangeGateway.TimeRange firstTradeRange = tradeRanges.getAllValues().getFirst();
+        assertTrue(firstOrderRange.from().isAfter(beforeSync.minus(java.time.Duration.ofDays(90)).plusSeconds(50)));
+        assertEquals(firstOrderRange.from().toEpochMilli(), firstTradeRange.from().toEpochMilli());
+        assertEquals(lastOrderRange.to().toEpochMilli(), tradeRanges.getAllValues().getLast().to().toEpochMilli());
+        assertEquals(java.time.Duration.ofDays(90).minusMinutes(1).toMillis(),
+            java.time.Duration.between(firstOrderRange.from(), lastOrderRange.to()).toMillis());
+    }
+
+    @Test
     void missingFillOrderBlocksSymbolSyncBeforeAnyOrderOrTradeWrite() {
         initializeManualSyncMapperMetadata();
         ExchangeGateway.TradeSnapshot fill = manualSyncFill("BTCUSDT", 202L);
