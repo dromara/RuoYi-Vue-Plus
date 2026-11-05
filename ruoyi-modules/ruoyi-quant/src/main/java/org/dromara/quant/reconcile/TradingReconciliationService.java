@@ -213,14 +213,29 @@ public class TradingReconciliationService {
                 List<ExchangeGateway.OrderSnapshot> historyOrders = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
                     log.debug("手动历史订单查询窗口 credentialId={} symbol={} rangeStart={} rangeEnd={}",
                         credential.getId(), symbol, range.from(), range.to());
-                    return gateway.queryOrderHistory(exchangeCredential, symbol, range, 1000L);
+                    List<ExchangeGateway.OrderSnapshot> page =
+                        gateway.queryOrderHistory(exchangeCredential, symbol, range, 1000L);
+                    log.debug("手动历史订单查询窗口结果 credentialId={} symbol={} rangeStart={} rangeEnd={} returnedOrderCount={}",
+                        credential.getId(), symbol, range.from(), range.to(), page == null ? null : page.size());
+                    return page;
                 });
-                log.info("手动历史订单同步查询完成 credentialId={} symbol={} historyStart={} historyEnd={} historyOrderCount={}",
-                    credential.getId(), symbol, historyStart, historyEnd, historyOrders.size());
+                Instant earliestOrderUpdateTime = historyOrders.stream()
+                    .map(ExchangeGateway.OrderSnapshot::updateTime)
+                    .filter(Objects::nonNull)
+                    .min(Comparator.naturalOrder())
+                    .orElse(null);
+                Instant latestOrderUpdateTime = historyOrders.stream()
+                    .map(ExchangeGateway.OrderSnapshot::updateTime)
+                    .filter(Objects::nonNull)
+                    .max(Comparator.naturalOrder())
+                    .orElse(null);
                 for (ExchangeGateway.OrderSnapshot snapshot : historyOrders) {
                     validateSyncOrderSnapshot(snapshot, symbol);
                     ordersById.put(snapshot.orderId(), snapshot);
                 }
+                log.info("手动历史订单数据覆盖范围 credentialId={} symbol={} queryStart={} queryEnd={} responseCount={} distinctOrderCount={} earliestExchangeUpdateTime={} latestExchangeUpdateTime={}",
+                    credential.getId(), symbol, historyStart, historyEnd, historyOrders.size(), ordersById.size(),
+                    earliestOrderUpdateTime, latestOrderUpdateTime);
 
                 List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
                     tradeCollector.collect(exchangeCredential, symbol, historyStart, historyEnd);
