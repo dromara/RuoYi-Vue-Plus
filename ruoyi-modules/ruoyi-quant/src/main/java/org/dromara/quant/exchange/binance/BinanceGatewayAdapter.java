@@ -979,7 +979,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             ApiResponse<CurrentAllOpenOrdersResponse> response =
                 client.currentAllOpenOrders(symbol == null ? null : symbol.trim(), RECV_WINDOW_MILLIS);
             if (response == null || response.getData() == null) {
-                return List.of();
+                throw new IllegalStateException("Binance 活动订单响应缺少数据载荷，无法确认查询完整性");
             }
             return response.getData().stream().map(item -> new OrderSnapshot(item.getSymbol(), item.getOrderId(), item.getClientOrderId(), item.getSide(), item.getType(),
                 item.getStatus(), decimal(item.getPrice()), decimal(item.getOrigQty()), decimal(item.getExecutedQty()), instant(item.getUpdateTime()), decimal(string(item,
@@ -1050,7 +1050,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         return signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
             ApiResponse<AccountTradeListResponse> response = client.accountTradeList(symbol.trim(), null, from, to, null, 1000L, RECV_WINDOW_MILLIS);
             if (response == null || response.getData() == null) {
-                return List.of();
+                throw new IllegalStateException("Binance 历史成交响应缺少数据载荷，无法确认查询完整性");
             }
             return response.getData().stream().map(item -> new TradeSnapshot(item.getSymbol(), item.getId(), item.getOrderId(), item.getSide(), decimal(item.getQty()),
                 decimal(item.getPrice()), decimal(item.getCommission()), decimal(item.getRealizedPnl()), instant(item.getTime()), string(item, "getCommissionAsset"))).toList();
@@ -1068,7 +1068,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         var data = signedRead(credential, RestRequestScheduler.Kind.BACKGROUND,
             client -> client.allOrders(symbol, null, start, end, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS).getData());
         if (data == null) {
-            return List.of();
+            throw new IllegalStateException("Binance 历史订单响应缺少数据载荷，无法确认查询完整性");
         }
         return data.stream().map(item -> new OrderSnapshot(item.getSymbol(), item.getOrderId(), item.getClientOrderId(), item.getSide(), item.getType(), item.getStatus(),
             decimal(item.getPrice()), decimal(item.getOrigQty()), decimal(item.getExecutedQty()), instant(item.getUpdateTime()), decimal(string(item, "getAvgPrice")),
