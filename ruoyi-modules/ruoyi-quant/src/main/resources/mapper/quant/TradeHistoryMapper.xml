@@ -18,7 +18,9 @@
             AND o.symbol = t.symbol AND o.exchange_order_id = t.exchange_order_id
         WHERE t.credential_id = #{credentialId}
           AND t.symbol = #{symbol}
+          AND t.trade_time >= #{fromTime}
           AND t.exchange_order_id IS NOT NULL
+          AND t.exchange_order_id > #{afterOrderId}
           AND (
               o.id IS NULL
               OR NULLIF(TRIM(o.position_side), '') IS NULL
