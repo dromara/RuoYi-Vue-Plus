@@ -176,7 +176,6 @@ public class TradingReconciliationService {
         ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
             credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
         Set<String> symbols = new TreeSet<>();
-        Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> activeOrdersBySymbol = new HashMap<>();
 
         if (requestedSymbol == null || requestedSymbol.isBlank()) {
             fillSyncCursors.selectSymbols(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
@@ -192,25 +191,9 @@ public class TradingReconciliationService {
                 symbols.add(normalizeTradingSymbol(position.symbol()));
             }
 
-            List<ExchangeGateway.OrderSnapshot> activeOrders = Objects.requireNonNull(
-                gateway.queryOrders(exchangeCredential, null), "Binance 全账户活动订单快照缺失");
-            for (ExchangeGateway.OrderSnapshot snapshot : activeOrders) {
-                validateSyncOrderSnapshot(snapshot, null);
-                String symbol = normalizeTradingSymbol(snapshot.symbol());
-                symbols.add(symbol);
-                activeOrdersBySymbol.computeIfAbsent(symbol, ignored -> new LinkedHashMap<>())
-                    .put(snapshot.orderId(), snapshot);
-            }
         } else {
             symbols.add(normalizeTradingSymbol(requestedSymbol));
             String symbol = symbols.iterator().next();
-            List<ExchangeGateway.OrderSnapshot> activeOrders = Objects.requireNonNull(
-                gateway.queryOrders(exchangeCredential, symbol), "Binance 活动订单快照缺失: " + symbol);
-            for (ExchangeGateway.OrderSnapshot snapshot : activeOrders) {
-                validateSyncOrderSnapshot(snapshot, symbol);
-                activeOrdersBySymbol.computeIfAbsent(symbol, ignored -> new LinkedHashMap<>())
-                    .put(snapshot.orderId(), snapshot);
-            }
         }
 
         if (symbols.isEmpty()) {
@@ -230,7 +213,6 @@ public class TradingReconciliationService {
                     validateSyncOrderSnapshot(snapshot, symbol);
                     ordersById.put(snapshot.orderId(), snapshot);
                 }
-                ordersById.putAll(activeOrdersBySymbol.getOrDefault(symbol, Map.of()));
 
                 List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
                     tradeCollector.collect(exchangeCredential, symbol, historyStart, historyEnd);
