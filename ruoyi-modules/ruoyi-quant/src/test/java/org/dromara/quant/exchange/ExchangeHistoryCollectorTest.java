@@ -36,6 +36,30 @@ class ExchangeHistoryCollectorTest {
         assertTrue(calls.get() >= 13);
     }
     @Test
+    void explicitHistoryBoundsAreUsedAcrossSevenDayWindows() {
+        java.time.Instant from = java.time.Instant.parse("2026-08-07T10:22:30Z");
+        java.time.Instant to = java.time.Instant.parse("2026-11-05T10:22:30Z");
+        java.util.List<ExchangeGateway.TimeRange> ranges = new java.util.ArrayList<>();
+
+        ExchangeHistoryCollector.collect(from, to, range -> {
+            ranges.add(range);
+            return List.of();
+        });
+
+        assertFalse(ranges.isEmpty());
+        assertEquals(from.toEpochMilli(), ranges.getFirst().from().toEpochMilli());
+        assertEquals(to.toEpochMilli(), ranges.getLast().to().toEpochMilli());
+        assertTrue(ranges.size() >= 13);
+        for (int i = 0; i < ranges.size(); i++) {
+            assertTrue(java.time.Duration.between(ranges.get(i).from(), ranges.get(i).to()).toMillis()
+                < java.time.Duration.ofDays(7).toMillis());
+            if (i > 0) {
+                assertEquals(ranges.get(i - 1).to().toEpochMilli() + 1, ranges.get(i).from().toEpochMilli());
+            }
+        }
+    }
+
+    @Test
     void rejectsHistoryWhenRequestBudgetCannotProveCompleteness() {
         assertThrows(IllegalStateException.class, () -> ExchangeHistoryCollector.collectLast90Days(range -> java.util.Collections.nCopies(1000, 1)));
     }
