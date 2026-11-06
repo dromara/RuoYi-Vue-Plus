@@ -144,10 +144,6 @@ public final class TradeCycleAssembler {
         }
         String activeDirection = activeOneWayDirection(cycles);
         String cycleKey = normalizedCycleKey(fill.getPositionCycleKey(), fill);
-        if (role == null && directionHint == null && activeDirection == null && !reduceOnly) {
-            throw new IllegalStateException("单向持仓历史起点缺少开平仓意图，无法确认成交是否属于存量仓位");
-        }
-
         if ("CLOSE".equals(role) || reduceOnly) {
             String closeDirection = directionHint != null ? directionHint
                 : activeDirection != null ? activeDirection : opposite(sideDirection);
