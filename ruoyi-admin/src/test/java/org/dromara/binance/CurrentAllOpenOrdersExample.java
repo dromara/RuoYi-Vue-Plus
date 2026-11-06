@@ -38,8 +38,7 @@ public class CurrentAllOpenOrdersExample {
     public void currentAllOpenOrdersExample() throws ApiException, IOException {
         String symbol = "BRUSDT";
         Long recvWindow = 5000L;
-        ApiResponse<CurrentAllOpenOrdersResponse> response =
-                getApi().currentAllOpenOrders(symbol, recvWindow);
+        ApiResponse<CurrentAllOpenOrdersResponse> response = getApi().currentAllOpenOrders(symbol, recvWindow);
         System.out.println(response.getData());
     }
 

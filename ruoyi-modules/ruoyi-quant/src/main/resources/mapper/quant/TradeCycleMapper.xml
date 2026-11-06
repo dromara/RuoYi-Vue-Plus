@@ -34,7 +34,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
 ]]></select>
 
     <select id="selectSourceFills" resultType="org.dromara.quant.account.domain.vo.TradeCycleSourceFill" timeout="15">
-        SELECT
+        <![CDATA[ SELECT
             t.id,
             t.credential_id AS credentialId,
             t.symbol,
@@ -120,7 +120,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
             AND j.exchange_trade_id=t.exchange_trade_id
         WHERE t.credential_id=#{credentialId}
           AND t.symbol=#{symbol}
-        ORDER BY t.trade_time,t.exchange_trade_id,t.id
+        ORDER BY t.trade_time,t.exchange_trade_id,t.id ]]>
     </select>
 
     <delete id="deleteCycleFills" timeout="5"><![CDATA[

@@ -3,12 +3,12 @@
 <mapper namespace="org.dromara.quant.account.mapper.TradeHistoryMapper">
 
     <select id="selectHistoricalSymbolsByCredential" resultType="java.lang.String" timeout="3">
-        SELECT DISTINCT symbol
+        <![CDATA[ SELECT DISTINCT symbol
         FROM quant_trade
         WHERE credential_id = #{credentialId}
           AND symbol IS NOT NULL
           AND TRIM(symbol) <> ''
-        ORDER BY symbol
+        ORDER BY symbol ]]>
     </select>
 
     <select id="selectOrderIdsMissingOrderFacts" resultType="java.lang.Long" timeout="3">

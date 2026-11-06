@@ -218,6 +218,7 @@ public class TradingReconciliationService {
                         credential.getId(), symbol, range.from(), range.to(), page == null ? null : page.size());
                     return page;
                 });
+                System.out.println(symbol + "   &&&&&&&&&&&&&&&&&& "  + historyOrders.size());
                 Instant earliestOrderUpdateTime = historyOrders.stream()
                     .map(ExchangeGateway.OrderSnapshot::updateTime)
                     .filter(Objects::nonNull)
@@ -312,8 +313,7 @@ public class TradingReconciliationService {
                         continue;
                     }
 
-                    ExchangeGateway.OrderSnapshot recovered =
-                        gateway.queryOrder(exchangeCredential, symbol, orderId, null);
+                    ExchangeGateway.OrderSnapshot recovered = gateway.queryOrder(exchangeCredential, symbol, orderId, null);
                     if (recovered == null) {
                         if (existing == null && localOrder == null) {
                             unresolvedOrderIds.add(orderId);
@@ -369,7 +369,7 @@ public class TradingReconciliationService {
             } catch (RuntimeException failure) {
                 String reason = failure.getMessage();
                 throw new IllegalStateException(
-                    "交易对 " + symbol + " 的订单与成交同步失败"
+                    "/////////////交易对 " + symbol + " 的订单与成交同步失败"
                         + (reason == null || reason.isBlank() ? "" : "：" + reason)
                         + "；此前已完成交易对的数据已提交，可安全重试补齐", failure);
             }
