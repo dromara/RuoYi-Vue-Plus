@@ -42,6 +42,14 @@ public class TradeCycleProjectionService {
         mapper.markDirty(credentialId, symbol.trim().toUpperCase(Locale.ROOT));
     }
 
+    /**
+     * Rebuild one account-symbol projection synchronously after its source transaction commits.
+     * The scheduler remains as the retry path for failed or independently dirtied scopes.
+     */
+    public void projectNow(Long credentialId, String symbol) {
+        rebuild(credentialId, symbol);
+    }
+
     /** The scope row lock makes this safe when more than one application node runs the scheduler. */
     @Scheduled(fixedDelay = 5000, initialDelay = 15000)
     public void projectPendingScopes() {
