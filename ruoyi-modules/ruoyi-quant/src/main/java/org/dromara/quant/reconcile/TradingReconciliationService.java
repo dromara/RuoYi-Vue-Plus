@@ -212,7 +212,7 @@ public class TradingReconciliationService {
                 log.info("手动历史订单同步开始 credentialId={} symbol={} historyStart={} historyEnd={} retentionDays=90 startBoundaryAdjusted=true",
                     credential.getId(), symbol, historyStart, historyEnd);
                 List<ExchangeGateway.OrderSnapshot> historyOrders = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
-                    log.debug("手动历史订单查询窗口 credentialId={} symbol={} rangeStart={} rangeEnd={}",
+                    log.info("手动历史订单查询窗口 credentialId={} symbol={} rangeStart={} rangeEnd={} mode=MANUAL_90D",
                         credential.getId(), symbol, range.from(), range.to());
                     List<ExchangeGateway.OrderSnapshot> page =
                         gateway.queryOrderHistory(exchangeCredential, symbol, range, 1000L);
@@ -413,6 +413,8 @@ public class TradingReconciliationService {
                 }
             }
         }
+        log.info("手动历史同步完成 credentialId={} symbolCount={} orderCount={} tradeCount={} mode=MANUAL_90D",
+            credential.getId(), symbols.size(), orderCount, tradeCount);
         return new TradingDataSyncResult(symbols.size(), orderCount, tradeCount);
     }
 
