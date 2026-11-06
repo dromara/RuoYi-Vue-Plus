@@ -202,6 +202,8 @@ public class TradingReconciliationService {
         Instant historyEnd = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
         // Use the same safe rolling-90-day start for both order and trade history queries.
         Instant historyStart = ExchangeHistoryCollector.recent90DaysStart(historyEnd);
+        log.info("手动历史同步使用完整回溯范围 credentialId={} requestedSymbol={} historyStart={} historyEnd={} retentionDays=90",
+            credential.getId(), requestedSymbol, historyStart, historyEnd);
         int orderCount = 0;
         int tradeCount = 0;
         for (String symbol : symbols) {
@@ -909,7 +911,7 @@ public class TradingReconciliationService {
         Instant now = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
         ExchangeGateway.TimeRange range = new ExchangeGateway.TimeRange(now.minus(Duration.ofHours(Math.max(1, historyHours))), now);
         var openOrders = List.copyOf(gateway.queryOrders(c, null));
-        log.debug("周期账户对账历史订单查询 credentialId={} historyHours={} rangeStart={} rangeEnd={}",
+        log.info("周期账户对账历史订单查询 credentialId={} historyHours={} rangeStart={} rangeEnd={} mode=PERIODIC",
             credential.getId(), historyHours, range.from(), range.to());
         var history = List.copyOf(gateway.queryOrderHistory(c, null, range, 1000L));
         Set<String> symbols = new HashSet<>();
