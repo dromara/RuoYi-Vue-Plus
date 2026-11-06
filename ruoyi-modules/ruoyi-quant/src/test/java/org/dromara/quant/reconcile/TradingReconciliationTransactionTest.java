@@ -828,6 +828,16 @@ class TradingReconciliationTransactionTest {
         assertEquals(1, result.symbolCount());
         verify(tradeCycleProjection).markDirty(1L, "BTCUSDT");
         verify(tradeCycleProjection).projectNow(1L, "BTCUSDT");
+
+        org.mockito.ArgumentCaptor<ExchangeGateway.TimeRange> ranges =
+            org.mockito.ArgumentCaptor.forClass(ExchangeGateway.TimeRange.class);
+        verify(gateway, atLeast(13)).queryOrderHistory(any(), eq("BTCUSDT"), ranges.capture(), anyLong());
+        List<ExchangeGateway.TimeRange> queriedRanges = ranges.getAllValues();
+        assertTrue(queriedRanges.getFirst().from().isBefore(Instant.now().minus(java.time.Duration.ofDays(89))));
+        assertTrue(queriedRanges.stream().allMatch(range ->
+            java.time.Duration.between(range.from(), range.to()).compareTo(java.time.Duration.ofDays(7)) < 0));
+        assertTrue(java.time.Duration.between(queriedRanges.getFirst().from(),
+            queriedRanges.getLast().to()).compareTo(java.time.Duration.ofDays(89)) > 0);
     }
 
 }
