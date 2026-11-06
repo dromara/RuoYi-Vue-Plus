@@ -53,6 +53,8 @@ class TradingReconciliationTransactionTest {
     private final StrategyFillSyncCursorService fillCursorService = mock(StrategyFillSyncCursorService.class);
     private final FinancialEventSyncCursorMapper incomeCursors = mock(FinancialEventSyncCursorMapper.class);
     private final FinancialEventSyncCursorService incomeCursorService = mock(FinancialEventSyncCursorService.class);
+    private final org.dromara.quant.execution.TradeCycleProjectionService tradeCycleProjection =
+        mock(org.dromara.quant.execution.TradeCycleProjectionService.class);
 
     private TradingReconciliationService service() {
         var source = new DriverManagerDataSource("jdbc:h2:mem:reconciliation_" + UUID.randomUUID() + ";MODE=MySQL;DB_CLOSE_DELAY=-1", "sa", "");
@@ -60,6 +62,7 @@ class TradingReconciliationTransactionTest {
             new DataSourceTransactionManager(source), new StrictBinanceTradeCollector(gateway), new StrictBinanceIncomeCollector(gateway), fillJournal,
             fillCursors, fillCursorService, incomeCursors, incomeCursorService);
         org.springframework.test.util.ReflectionTestUtils.setField(reconciliation, "tradeHistoryMapper", tradeHistory);
+        org.springframework.test.util.ReflectionTestUtils.setField(reconciliation, "tradeCycleProjectionService", tradeCycleProjection);
         return reconciliation;
     }
 
@@ -806,6 +809,25 @@ class TradingReconciliationTransactionTest {
         verifyNoInteractions(fillJournal);
         verify(trades, never()).updateById(any(org.dromara.quant.account.domain.QuantTrade.class));
         verifyNoInteractions(fillCursors, fillCursorService);
+    }
+
+    @Test
+    void manualSyncProjectsTradeRecordsAfterSourceTransactionCommits() {
+        when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
+        when(gateway.queryTrades(any(), eq("BTCUSDT"), any())).thenReturn(List.of());
+        when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
+            .thenReturn(List.of());
+        doAnswer(invocation -> {
+            assertFalse(TransactionSynchronizationManager.isActualTransactionActive(),
+                "trade-cycle projection must run after order/fill source transaction commits");
+            return null;
+        }).when(tradeCycleProjection).projectNow(1L, "BTCUSDT");
+
+        TradingReconciliationService.TradingDataSyncResult result = service().syncTradingData(credential(), "BTCUSDT");
+
+        assertEquals(1, result.symbolCount());
+        verify(tradeCycleProjection).markDirty(1L, "BTCUSDT");
+        verify(tradeCycleProjection).projectNow(1L, "BTCUSDT");
     }
 
 }
