@@ -116,18 +116,30 @@ class TradeHistoryAssemblerTest {
     }
 
     @Test
-    void keepsOneWayOpeningWithoutKnownRoleOrBaselineUnresolved() {
+    void infersInitialOneWayPositionWhenHistoricalBaselineIsFlat() {
+        TradeCycleSourceFill opening = fill(1, "SELL", null, "BOTH", null, null,
+            "2", "100", "0.2", "0", false, false);
+        opening.setReduceOnly(null);
+
         var result = TradeCycleAssembler.assemble(List.of(
-            fill(1, "SELL", null, "BOTH", null, null, "2", "100", "0.2", "0", false, false),
-            fill(2, "BUY", null, "BOTH", "OPEN", null, "1", "90", "0.1", "0", false, false)
+            opening,
+            fill(2, "BUY", null, "BOTH", "CLOSE", null, "2", "90", "0.2", "20", true, false)
         ));
 
-        assertEquals(1, result.incompleteCount());
+        assertEquals(0, result.incompleteCount());
         assertEquals(1, result.cycles().size());
-        assertEquals("RECONCILE_REQUIRED", result.cycles().getFirst().getStatus());
-        assertEquals("UNKNOWN", result.cycles().getFirst().getPositionSide());
-        assertEquals(1, result.allocations().size());
-        assertEquals("UNKNOWN", result.allocations().getFirst().getFillRole());
+        TradeCycleRecord cycle = result.cycles().getFirst();
+        assertEquals("SHORT", cycle.getPositionSide());
+        assertEquals("CLOSED", cycle.getStatus());
+        assertEquals("INFERRED", cycle.getReconstructionSource());
+        assertEquals("INFERRED", cycle.getReconciliationStatus());
+        assertEquals(0, cycle.getOpeningQuantity().compareTo(new BigDecimal("2")));
+        assertEquals(0, cycle.getEntryPrice().compareTo(new BigDecimal("100")));
+        assertEquals(0, cycle.getClosingQuantity().compareTo(new BigDecimal("2")));
+        assertEquals(0, cycle.getClosePrice().compareTo(new BigDecimal("90")));
+        assertEquals(0, cycle.getRealizedPnl().compareTo(new BigDecimal("20")));
+        assertEquals(2, cycle.getFillCount());
+        assertEquals(2, result.allocations().size());
     }
 
     @Test
