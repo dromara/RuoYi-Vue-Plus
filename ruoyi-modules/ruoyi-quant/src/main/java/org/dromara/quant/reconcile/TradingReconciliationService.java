@@ -193,7 +193,6 @@ public class TradingReconciliationService {
             }
         } else {
             symbols.add(normalizeTradingSymbol(requestedSymbol));
-            String symbol = symbols.iterator().next();
         }
 
         if (symbols.isEmpty()) {
@@ -374,15 +373,43 @@ public class TradingReconciliationService {
                         + (reason == null || reason.isBlank() ? "" : "：" + reason)
                         + "；此前已完成交易对的数据已提交，可安全重试补齐", failure);
             }
+
+            if (tradeCycleProjectionService != null) {
+                try {
+                    // Source facts are committed above. Rebuild now so the manual-sync response
+                    // is not returned while the trade-record projection is still stale.
+                    tradeCycleProjectionService.projectNow(credential.getId(), symbol);
+                } catch (RuntimeException failure) {
+                    String reason = failure.getMessage();
+                    throw new IllegalStateException(
+                        "交易对 " + symbol + " 的订单与成交已同步，但交易记录生成失败"
+                            + (reason == null || reason.isBlank() ? "" : "：" + reason)
+                            + "；可重试同步以重新生成交易记录", failure);
+                }
+            }
         }
 
         if ("LIVE".equalsIgnoreCase(credential.getRunMode())) {
-            transaction.executeWithoutResult(status -> {
-                int retried = fillJournal.retryPending(credential.getId());
-                if (retried > 0 && tradeCycleProjectionService != null) {
+            int retried = transaction.execute(status -> {
+                int count = fillJournal.retryPending(credential.getId());
+                if (count > 0 && tradeCycleProjectionService != null) {
                     symbols.forEach(symbol -> tradeCycleProjectionService.markDirty(credential.getId(), symbol));
                 }
+                return count;
             });
+            if (retried > 0 && tradeCycleProjectionService != null) {
+                for (String symbol : symbols) {
+                    try {
+                        tradeCycleProjectionService.projectNow(credential.getId(), symbol);
+                    } catch (RuntimeException failure) {
+                        String reason = failure.getMessage();
+                        throw new IllegalStateException(
+                            "交易对 " + symbol + " 的补录成交已提交，但交易记录重新生成失败"
+                                + (reason == null || reason.isBlank() ? "" : "：" + reason)
+                                + "；可重试同步以重新生成交易记录", failure);
+                    }
+                }
+            }
         }
         return new TradingDataSyncResult(symbols.size(), orderCount, tradeCount);
     }
