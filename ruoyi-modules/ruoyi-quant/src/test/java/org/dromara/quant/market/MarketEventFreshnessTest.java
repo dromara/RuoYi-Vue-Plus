@@ -36,6 +36,24 @@ class MarketEventFreshnessTest {
     }
 
     @Test
+    void acceptsKlineEventAtPeriodOpenAndBeforeNextPeriod() {
+        Instant open = Instant.parse("2026-11-08T00:45:00Z");
+        Instant nextOpen = Instant.parse("2026-11-08T01:00:00Z");
+
+        assertTrue(MarketStreamHub.isEventTimeWithinKlinePeriod(open, open, nextOpen));
+        assertTrue(MarketStreamHub.isEventTimeWithinKlinePeriod(nextOpen.minusMillis(1), open, nextOpen));
+    }
+
+    @Test
+    void rejectsKlineEventAtOrOutsidePeriodBoundaries() {
+        Instant open = Instant.parse("2026-11-08T00:45:00Z");
+        Instant nextOpen = Instant.parse("2026-11-08T01:00:00Z");
+
+        assertFalse(MarketStreamHub.isEventTimeWithinKlinePeriod(open.minusMillis(1), open, nextOpen));
+        assertFalse(MarketStreamHub.isEventTimeWithinKlinePeriod(nextOpen, open, nextOpen));
+    }
+
+    @Test
     void rejectsExchangeTimestampMoreThanOneSecondInTheFuture() {
         Instant localNow = Instant.parse("2026-10-17T07:21:33Z");
 
