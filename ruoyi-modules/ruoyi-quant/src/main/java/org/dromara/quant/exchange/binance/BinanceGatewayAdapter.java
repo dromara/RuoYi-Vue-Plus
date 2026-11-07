@@ -1672,7 +1672,8 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
                 ? accountRestClient(client, kind) : restClient(client, kind));
         }
         ApiClient client = new ApiClient(config);
-        return new DerivativesTradingUsdsFuturesRestApi(kind == RestRequestScheduler.Kind.ACCOUNT ? accountRestClient(client) : restClient(client, kind));
+        return new DerivativesTradingUsdsFuturesRestApi(kind == RestRequestScheduler.Kind.ACCOUNT || kind == RestRequestScheduler.Kind.POSITION_VERIFY
+            ? accountRestClient(client, kind) : restClient(client, kind));
     }
 
     ApiClient restClient(ApiClient client) {
