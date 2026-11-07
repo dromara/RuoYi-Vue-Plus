@@ -580,11 +580,14 @@ public class MarketStreamHub {
             long processingStartedNanos = System.nanoTime();
             long ingressQueueWaitMs = Math.max(0L, TimeUnit.NANOSECONDS.toMillis(dequeuedAtNanos - enqueuedAtNanos));
             long recoveryBufferWaitMs = Math.max(0L, TimeUnit.NANOSECONDS.toMillis(recoveryBufferWaitNanos));
+            long monitorWaitNanos = 0L;
             if (closed || attempt != generation || event == null) {
                 return;
             }
             if (recovering) {
+                long recoveryLockRequestedAtNanos = System.nanoTime();
                 synchronized (this) {
+                    monitorWaitNanos += Math.max(0L, System.nanoTime() - recoveryLockRequestedAtNanos);
                     if (closed || attempt != generation || event == null) {
                         return;
                     }
@@ -628,7 +631,7 @@ public class MarketStreamHub {
             }
             long lockRequestedAtNanos = System.nanoTime();
             synchronized (this) {
-                long monitorWaitNanos = Math.max(0L, System.nanoTime() - lockRequestedAtNanos);
+                monitorWaitNanos += Math.max(0L, System.nanoTime() - lockRequestedAtNanos);
                 if (closed || attempt != generation || event == null) {
                     return;
                 }
