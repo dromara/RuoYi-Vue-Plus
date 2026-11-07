@@ -81,18 +81,54 @@ public interface ExchangeMarketPort {
      */
     class RequestDeferredException extends IllegalStateException {
         private final long retryAfterMillis;
+        private final String reason;
+        private final String kind;
+        private final int queueSize;
+        private final int[] queueSizes;
+        private final long waitedMillis;
 
         public RequestDeferredException() {
-            this(1_000L);
+            this("DEFERRED", "UNKNOWN", 0, new int[0], 0L, 1_000L);
         }
 
         public RequestDeferredException(long retryAfterMillis) {
-            super("REST 请求被本地调度器延后，当前调用尚未发送");
-            this.retryAfterMillis = Math.max(1L, retryAfterMillis);
+            this("DEFERRED", "UNKNOWN", 0, new int[0], 0L, retryAfterMillis);
+        }
+
+        public RequestDeferredException(String reason, String kind, int queueSize, int[] queueSizes,
+                                        long waitedMillis, long retryAfterMillis) {
+            super("REST 请求被本地调度器延后，当前调用尚未发送: reason=" + reason + ", kind=" + kind
+                + ", queueSize=" + queueSize + ", waitedMs=" + waitedMillis);
+            this.reason = reason;
+            this.kind = kind;
+            this.queueSize = queueSize;
+            this.queueSizes = queueSizes == null ? new int[0] : queueSizes.clone();
+            this.waitedMillis = Math.max(0L, waitedMillis);
+            this.retryAfterMillis = Math.max(0L, retryAfterMillis);
         }
 
         public long retryAfterMillis() {
             return retryAfterMillis;
+        }
+
+        public String reason() {
+            return reason;
+        }
+
+        public String kind() {
+            return kind;
+        }
+
+        public int queueSize() {
+            return queueSize;
+        }
+
+        public int[] queueSizes() {
+            return queueSizes.clone();
+        }
+
+        public long waitedMillis() {
+            return waitedMillis;
         }
     }
 
