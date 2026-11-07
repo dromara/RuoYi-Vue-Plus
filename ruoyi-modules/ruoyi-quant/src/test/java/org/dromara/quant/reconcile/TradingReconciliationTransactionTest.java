@@ -551,13 +551,6 @@ class TradingReconciliationTransactionTest {
             new BigDecimal("0.01"), BigDecimal.ZERO, Instant.now().minusSeconds(60), "USDT");
     }
 
-    private void stubManualSyncQueries(String symbol, ExchangeGateway.TradeSnapshot fill) {
-        when(gateway.queryOrderHistory(any(), eq(symbol), any(), anyLong())).thenReturn(List.of());
-        when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq(symbol), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
-            .thenReturn(List.of(fill.orderId()));
-        when(orders.selectList(any())).thenReturn(List.of());
-    }
-
     @Test
     void manualSyncPersistsHistoricalOrdersWithoutReadingCurrentOpenOrders() {
         initializeManualSyncMapperMetadata();
@@ -574,6 +567,8 @@ class TradingReconciliationTransactionTest {
             .thenReturn(List.of());
         when(orders.selectOne(any())).thenReturn(null);
         when(orders.insert(any(org.dromara.quant.order.domain.QuantOrder.class))).thenReturn(1);
+        when(trades.selectOne(any())).thenReturn(null);
+        when(trades.insert(any(org.dromara.quant.account.domain.QuantTrade.class))).thenReturn(1);
 
         TradingReconciliationService.TradingDataSyncResult result = service().syncTradingData(credential(), "BTCUSDT");
 
@@ -587,18 +582,22 @@ class TradingReconciliationTransactionTest {
     }
 
     @Test
-    void manualSyncQueriesOrdersAcrossNinetyDaysThenUsesOrderIdsForFills() {
-        when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
-        when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
-            .thenReturn(List.of());
-
+    void manualSyncQueriesNinetyDayOrdersBeforeQueryingTheirFills() {
         Instant beforeSync = Instant.now();
+        ExchangeGateway.OrderSnapshot order = new ExchangeGateway.OrderSnapshot("BTCUSDT", 404L, "client-404",
+            "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
+            Instant.now(), BigDecimal.TEN, "BOTH", false, beforeSync.minusSeconds(120));
+        when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of(order));
+        when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(404L), any(), anyLong())).thenReturn(List.of());
+        when(orders.selectOne(any())).thenReturn(null);
+        when(orders.insert(any(org.dromara.quant.order.domain.QuantOrder.class))).thenReturn(1);
+
         service().syncTradingData(credential(), "BTCUSDT");
 
         var orderRanges = org.mockito.ArgumentCaptor.forClass(ExchangeGateway.TimeRange.class);
-        verify(gateway, atLeastOnce()).queryOrderHistory(any(), eq("BTCUSDT"), orderRanges.capture(), anyLong());
+        verify(gateway, atLeast(13)).queryOrderHistory(any(), eq("BTCUSDT"), orderRanges.capture(), anyLong());
+        verify(gateway, atLeastOnce()).queryTradesByOrder(any(), eq("BTCUSDT"), eq(404L), any(), eq(1000L));
         verify(gateway, never()).queryTrades(any(), any(), any());
-        verify(gateway, never()).queryTradesByOrder(any(), any(), any(), any(), any());
         List<ExchangeGateway.TimeRange> queriedRanges = orderRanges.getAllValues();
         assertTrue(queriedRanges.getFirst().from().isAfter(beforeSync.minus(java.time.Duration.ofDays(90)).plusSeconds(50)));
         assertTrue(queriedRanges.stream().allMatch(range ->
@@ -606,57 +605,6 @@ class TradingReconciliationTransactionTest {
         assertTrue(java.time.Duration.between(queriedRanges.getFirst().from(),
             queriedRanges.getLast().to()).compareTo(java.time.Duration.ofDays(89)) > 0);
     }
-
-    @Test
-    void missingFillOrderBlocksSymbolSyncBeforeAnyOrderOrTradeWrite() {
-        initializeManualSyncMapperMetadata();
-        ExchangeGateway.TradeSnapshot fill = manualSyncFill("BTCUSDT", 202L);
-        stubManualSyncQueries("BTCUSDT", fill);
-        when(gateway.queryOrder(any(), eq("BTCUSDT"), eq(202L), isNull())).thenReturn(null);
-
-        IllegalStateException failure = assertThrows(IllegalStateException.class,
-            () -> service().syncTradingData(credential(), "BTCUSDT"));
-
-        assertTrue(failure.getMessage().contains("交易对 BTCUSDT"));
-        assertTrue(failure.getMessage().contains("未补齐订单数=1"));
-        assertTrue(failure.getMessage().contains("202"));
-        verify(orders, never()).insert(any(org.dromara.quant.order.domain.QuantOrder.class));
-        verify(trades, never()).insert(any(org.dromara.quant.account.domain.QuantTrade.class));
-    }
-
-    @Test
-    void exactOrderLookupRestoresMissingOrderFactsForPersistedFill() {
-        initializeManualSyncMapperMetadata();
-        ExchangeGateway.TradeSnapshot fill = manualSyncFill("BTCUSDT", 202L);
-        ExchangeGateway.OrderSnapshot recovered = new ExchangeGateway.OrderSnapshot("BTCUSDT", 202L, "client-202",
-            "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
-            fill.time(), BigDecimal.TEN, "BOTH", false);
-        stubManualSyncQueries("BTCUSDT", fill);
-        when(gateway.queryOrder(any(), eq("BTCUSDT"), eq(202L), isNull())).thenReturn(recovered);
-
-        java.util.concurrent.atomic.AtomicReference<org.dromara.quant.order.domain.QuantOrder> persistedOrder =
-            new java.util.concurrent.atomic.AtomicReference<>();
-        when(orders.selectOne(any())).thenAnswer(invocation -> persistedOrder.get());
-        when(orders.insert(any(org.dromara.quant.order.domain.QuantOrder.class))).thenAnswer(invocation -> {
-            var order = invocation.getArgument(0, org.dromara.quant.order.domain.QuantOrder.class);
-            order.setId(2020L);
-            persistedOrder.set(order);
-            return 1;
-        });
-        when(trades.selectOne(any())).thenReturn(null);
-        when(trades.insert(any(org.dromara.quant.account.domain.QuantTrade.class))).thenReturn(1);
-
-        TradingReconciliationService.TradingDataSyncResult result = service().syncTradingData(credential(), "BTCUSDT");
-
-        assertEquals(1, result.symbolCount());
-        assertEquals(1, result.orderCount());
-        assertEquals(0, result.tradeCount());
-        assertNotNull(persistedOrder.get());
-        assertEquals(202L, persistedOrder.get().getExchangeOrderId());
-        verify(orders).insert(any(org.dromara.quant.order.domain.QuantOrder.class));
-        verify(trades, never()).insert(any(org.dromara.quant.account.domain.QuantTrade.class));
-    }
-
     @Test
     void incompleteLiveFillIsJournaledAndNeverWrittenAsZeroValuedTrade() {
         var fill = new ExchangeGateway.TradeSnapshot("BTCUSDT", 501L, 202L, "BUY", BigDecimal.ONE, BigDecimal.TEN,
