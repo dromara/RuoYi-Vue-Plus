@@ -553,12 +553,8 @@ class TradingReconciliationTransactionTest {
 
     private void stubManualSyncQueries(String symbol, ExchangeGateway.TradeSnapshot fill) {
         when(gateway.queryOrderHistory(any(), eq(symbol), any(), anyLong())).thenReturn(List.of());
-        when(gateway.queryOrderHistory(any(), eq(symbol), any(), anyLong())).thenReturn(List.of(
-            new ExchangeGateway.OrderSnapshot(symbol, fill.orderId(), "client-" + fill.orderId(), "BUY", "MARKET", "FILLED",
-                BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, fill.time(), BigDecimal.TEN, "BOTH", false)));
-        when(gateway.queryTradesByOrder(any(), eq(symbol), eq(fill.orderId()), isNull(), anyLong())).thenReturn(List.of(fill));
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq(symbol), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
-            .thenReturn(List.of());
+            .thenReturn(List.of(fill.orderId()));
         when(orders.selectList(any())).thenReturn(List.of());
     }
 
@@ -569,7 +565,8 @@ class TradingReconciliationTransactionTest {
             "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
             Instant.now().minusSeconds(60), BigDecimal.TEN, "BOTH", false);
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of(historicalOrder));
-        when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(303L), isNull(), anyLong())).thenReturn(List.of());
+        when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(303L), isNull(), anyLong()))
+            .thenReturn(List.of(manualSyncFill("BTCUSDT", 303L)));
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
             .thenReturn(List.of());
         when(orders.selectOne(any())).thenReturn(null);
@@ -579,8 +576,9 @@ class TradingReconciliationTransactionTest {
 
         assertEquals(1, result.symbolCount());
         assertEquals(1, result.orderCount());
-        assertEquals(0, result.tradeCount());
+        assertEquals(1, result.tradeCount());
         verify(gateway, atLeastOnce()).queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong());
+        verify(gateway).queryTradesByOrder(any(), eq("BTCUSDT"), eq(303L), isNull(), eq(1000L));
         verify(gateway, never()).queryOrders(any(), any());
         verify(orders).insert(any(org.dromara.quant.order.domain.QuantOrder.class));
     }
@@ -624,7 +622,7 @@ class TradingReconciliationTransactionTest {
     }
 
     @Test
-    void exactOrderLookupRestoresMissingFillOrderBeforeCommittingTrade() {
+    void exactOrderLookupRestoresMissingOrderFactsForPersistedFill() {
         initializeManualSyncMapperMetadata();
         ExchangeGateway.TradeSnapshot fill = manualSyncFill("BTCUSDT", 202L);
         ExchangeGateway.OrderSnapshot recovered = new ExchangeGateway.OrderSnapshot("BTCUSDT", 202L, "client-202",
@@ -649,11 +647,11 @@ class TradingReconciliationTransactionTest {
 
         assertEquals(1, result.symbolCount());
         assertEquals(1, result.orderCount());
-        assertEquals(1, result.tradeCount());
+        assertEquals(0, result.tradeCount());
         assertNotNull(persistedOrder.get());
         assertEquals(202L, persistedOrder.get().getExchangeOrderId());
         verify(orders).insert(any(org.dromara.quant.order.domain.QuantOrder.class));
-        verify(trades).insert(any(org.dromara.quant.account.domain.QuantTrade.class));
+        verify(trades, never()).insert(any(org.dromara.quant.account.domain.QuantTrade.class));
     }
 
     @Test
@@ -808,7 +806,6 @@ class TradingReconciliationTransactionTest {
 
     @Test
     void manualSyncProjectsTradeRecordsAfterSourceTransactionCommits() {
-        when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
             .thenReturn(List.of());
