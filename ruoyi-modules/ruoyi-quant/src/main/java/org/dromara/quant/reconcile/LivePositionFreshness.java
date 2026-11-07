@@ -1,5 +1,6 @@
 package org.dromara.quant.reconcile;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * permits new LIVE risk exposure. No success is inherited across a process restart.
  * Multi-node deployments require every node to refresh at startup.
  */
+@Slf4j
 @Component
 public class LivePositionFreshness {
     private static final Duration MAX_AGE = Duration.ofSeconds(120);
@@ -68,11 +70,20 @@ public class LivePositionFreshness {
      * 使当前持仓快照失效并推进事实代次。
      */
     public void invalidate(Long credentialId) {
+        invalidate(credentialId, "UNSPECIFIED");
+    }
+
+    /**
+     * 使当前持仓快照失效并记录事实来源，便于定位不必要的代次推进。
+     */
+    public void invalidate(Long credentialId, String reason) {
         if (credentialId != null) {
             var counter = generations.computeIfAbsent(credentialId, ignored -> new java.util.concurrent.atomic.AtomicLong());
             synchronized (counter) {
-                counter.incrementAndGet();
+                long previous = counter.getAndIncrement();
                 verified.remove(credentialId);
+                log.debug("LIVE position snapshot invalidated credentialId={} reason={} generation={}->{}",
+                    credentialId, reason == null ? "UNSPECIFIED" : reason, previous, previous + 1);
             }
         }
     }
