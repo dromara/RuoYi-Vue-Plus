@@ -80,6 +80,48 @@ class BinanceGatewayClockOffsetTest {
     }
 
     @Test
+    void staleButUsableMarketClockOffsetReturnsImmediatelyAndRefreshesOnceInBackground() throws Exception {
+        var calls = new AtomicInteger();
+        var server = server(calls, new AtomicInteger(200));
+        var properties = new QuantProperties();
+        String baseUrl = "http://127.0.0.1:" + server.getAddress().getPort();
+        properties.getBinance().setBaseUrl(baseUrl);
+        var adapter = new BinanceGatewayAdapter(properties);
+        try {
+            long cachedValue = clock(adapter, server);
+            @SuppressWarnings("unchecked")
+            var offsets = (java.util.Map<String, Object>) ReflectionTestUtils.getField(adapter, "clockOffsets");
+            long staleUpdatedAt = System.currentTimeMillis() - 31_000L;
+            Class<?> offsetType = Class.forName("org.dromara.quant.exchange.binance.BinanceGatewayAdapter$ClockOffset");
+            var constructor = offsetType.getDeclaredConstructor(long.class, long.class);
+            constructor.setAccessible(true);
+            offsets.put(baseUrl, constructor.newInstance(cachedValue, staleUpdatedAt));
+
+            long startedAt = System.nanoTime();
+            for (int i = 0; i < 8; i++) {
+                assertEquals(cachedValue, adapter.exchangeTimeOffsetMillis("LIVE"));
+            }
+            long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+            assertTrue(elapsedMillis < 150L, "a usable cached offset must not wait for the refresh HTTP request");
+
+            var updatedAtAccessor = offsetType.getDeclaredMethod("updatedAt");
+            updatedAtAccessor.setAccessible(true);
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(4);
+            long refreshedAt = staleUpdatedAt;
+            while (System.nanoTime() < deadline && refreshedAt <= staleUpdatedAt) {
+                Thread.sleep(10L);
+                refreshedAt = (long) updatedAtAccessor.invoke(offsets.get(baseUrl));
+            }
+
+            assertTrue(refreshedAt > staleUpdatedAt, "the background refresh should replace the stale cache");
+            assertEquals(2, calls.get(), "concurrent market callers should share one background refresh");
+        } finally {
+            adapter.shutdownClockOffsetRefreshExecutor();
+            server.stop(0);
+        }
+    }
+
+    @Test
     void liveAndTestnetEndpointsHaveIndependentClockCaches() throws Exception {
         var liveCalls = new AtomicInteger();
         var testCalls = new AtomicInteger();
