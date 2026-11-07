@@ -54,7 +54,7 @@ public class StrictBinanceTradeCollector {
 
     /**
      * 先取得历史订单，再逐个按 symbol + orderId 收集其成交。
-     * 单个订单成交达到单页上限时，使用 fromId 继续分页，避免静默截断。
+     * 单个订单成交达到单页上限时，按订单生命周期和交易所时间窗口拆分查询，避免静默截断。
      */
     public List<ExchangeGateway.TradeSnapshot> collectByOrders(ExchangeGateway.Credential credential, String symbol,
                                                                  List<ExchangeGateway.OrderSnapshot> orders, Instant historyStart, Instant historyEnd) {
