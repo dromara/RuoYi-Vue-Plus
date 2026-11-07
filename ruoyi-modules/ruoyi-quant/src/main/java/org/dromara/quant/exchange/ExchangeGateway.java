@@ -59,7 +59,11 @@ public interface ExchangeGateway extends ExchangeMarketPort, ExchangeAccountPort
      * @param status            当前状态
      */
     record SymbolRule(String symbol, String quoteAsset, int pricePrecision, int quantityPrecision, BigDecimal priceTickSize, BigDecimal stepSize, BigDecimal marketStepSize,
-                      BigDecimal minNotional, String status) {
+                      BigDecimal maxQuantity, BigDecimal marketMaxQuantity, BigDecimal minNotional, String status) {
+        public SymbolRule(String symbol, String quoteAsset, int pricePrecision, int quantityPrecision, BigDecimal priceTickSize, BigDecimal stepSize,
+                          BigDecimal marketStepSize, BigDecimal minNotional, String status) {
+            this(symbol, quoteAsset, pricePrecision, quantityPrecision, priceTickSize, stepSize, marketStepSize, BigDecimal.ZERO, BigDecimal.ZERO, minNotional, status);
+        }
     }
 
     /**
