@@ -249,18 +249,25 @@ public class TradingReconciliationService {
 
     private List<ExchangeGateway.OrderSnapshot> collectManualOrderHistory(ExchangeGateway.Credential credential, Long credentialId,
                                                                             String symbol, Instant historyStart, Instant historyEnd) {
-        List<ExchangeGateway.OrderSnapshot> history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
-            log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}", credentialId, symbol, range.from(), range.to());
-            return gateway.queryOrderHistory(credential, symbol, range, 1000L);
-        });
+        List<ExchangeGateway.OrderSnapshot> history;
+        if (symbol == null || symbol.isBlank()) {
+            log.info("手动账户级历史订单查询 credentialId={} symbolFilter=ALL limit=1000", credentialId);
+            history = gateway.queryOrderHistory(credential, "", null, 1000L);
+        } else {
+            history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
+                log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}", credentialId, symbol, range.from(), range.to());
+                return gateway.queryOrderHistory(credential, symbol, range, 1000L);
+            });
+        }
         Map<String, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
         for (ExchangeGateway.OrderSnapshot order : history) {
             validateSyncOrderSnapshot(order, symbol);
             String identity = normalizeTradingSymbol(order.symbol()) + ":" + order.orderId();
             ordersById.put(identity, order);
         }
-        log.info("手动历史订单获取完成 credentialId={} symbolFilter={} returnedCount={} distinctOrderCount={}",
-            credentialId, symbol, history.size(), ordersById.size());
+        log.info("手动历史订单获取完成 credentialId={} symbolFilter={} returnedCount={} distinctOrderCount={} scope={}",
+            credentialId, symbol, history.size(), ordersById.size(),
+            symbol == null || symbol.isBlank() ? "ACCOUNT_SINGLE_PAGE" : "SYMBOL_90D");
         return List.copyOf(ordersById.values());
     }
 
