@@ -560,7 +560,7 @@ public class TradingReconciliationService {
             ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(),
                 credential.getRunMode());
             // Network I/O stays outside the account write lock and database transaction.
-            var account = java.util.Objects.requireNonNull(gateway.queryAccount(exchangeCredential), "Binance account snapshot missing");
+            var account = java.util.Objects.requireNonNull(gateway.queryAccountForPosition(exchangeCredential), "Binance account snapshot missing");
             var snapshots = List.copyOf(java.util.Objects.requireNonNull(gateway.queryPositions(exchangeCredential, null), "Binance full position snapshot missing"));
             commitPositionSnapshot(credential, account, snapshots, fetchStartedAt, generation, runtimeGeneration, trigger);
             AccountPositionSnapshot result = new AccountPositionSnapshot(account, snapshots, generation, runtimeGeneration);
@@ -588,6 +588,9 @@ public class TradingReconciliationService {
 
     private long snapshotRetryAfterMillis(RuntimeException failure) {
         if (failure instanceof ExchangeMarketPort.RequestDeferredException deferred) {
+            if ("INTERRUPTED".equals(deferred.reason()) || "MANUAL_BLOCK".equals(deferred.reason())) {
+                return 0L;
+            }
             return deferred.retryAfterMillis();
         }
         if (failure instanceof ExchangeMarketPort.RateLimitException rateLimited) {
