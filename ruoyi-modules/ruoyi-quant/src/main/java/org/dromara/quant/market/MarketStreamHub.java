@@ -826,7 +826,7 @@ public class MarketStreamHub {
                 exchangeOffsetMillis = gateway.exchangeTimeOffsetMillis(key.runMode());
             } catch (RuntimeException ex) {
                 synchronized (this) {
-                    if (closed || terminalFailure || reconnect != null) {
+                    if (closed || terminalFailure || reconnect != null || recovering) {
                         return;
                     }
                     if (clockUnavailable(ex)) {
