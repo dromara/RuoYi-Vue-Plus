@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  */
 final class RestRequestScheduler {
     private final ArrayDeque<Object>[] queues;
-    private final int[] rotation = {0, 1, 0, 2, 1, 0, 1, 3};
+    private final int[] rotation = {0, 1, 0, 2, 0, 0, 1, 3};
     private static final long MANUAL_BLOCK_RETRY_HINT_MILLIS = TimeUnit.HOURS.toMillis(24);
     private final long interval;
     private long nextStart;
