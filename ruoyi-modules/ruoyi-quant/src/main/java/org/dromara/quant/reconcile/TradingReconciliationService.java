@@ -192,6 +192,8 @@ public class TradingReconciliationService {
                     exchangeCredential, credential.getId(), symbol, historyStart, historyEnd);
                 List<ExchangeGateway.TradeSnapshot> trades = tradeCollector.collectByOrders(
                     exchangeCredential, symbol, orders, historyStart, historyEnd);
+                log.info("手动订单关联成交获取完成 credentialId={} symbol={} orderCount={} tradeCount={}",
+                    credential.getId(), symbol, orders.size(), trades.size());
 
                 transaction.executeWithoutResult(status -> {
                     syncOrders(credential, orders);
@@ -270,6 +272,7 @@ public class TradingReconciliationService {
             credentialId, symbol, history.size(), ordersById.size());
         return List.copyOf(ordersById.values());
     }
+
     private static void addNormalizedTradingSymbol(Set<String> symbols, String symbol) {
         if (symbol != null && !symbol.isBlank()) {
             symbols.add(normalizeTradingSymbol(symbol));
