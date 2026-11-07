@@ -31,8 +31,8 @@ class BinanceGatewayTradingRuleTest {
             } else if (path.endsWith("/exchangeInfo")) {
                 calls.incrementAndGet();
                 body = "{\"symbols\":[{\"symbol\":\"ONDOUSDT\",\"quoteAsset\":\"USDT\",\"status\":\"TRADING\",\"pricePrecision\":2,\"quantityPrecision\":2," +
-                    "\"filters\":[{\"filterType\":\"PRICE_FILTER\",\"tickSize\":\"0.01\"},{\"filterType\":\"LOT_SIZE\",\"stepSize\":\"" + step + "\"},{\"filterType" +
-                    "\":\"MARKET_LOT_SIZE\",\"stepSize\":\"" + step + "\"},{\"filterType\":\"MIN_NOTIONAL\",\"notional\":\"5\"}]}]}";
+                    "\"filters\":[{\"filterType\":\"PRICE_FILTER\",\"tickSize\":\"0.01\"},{\"filterType\":\"LOT_SIZE\",\"minQty\":\"0.01\",\"maxQty\":\"100\",\"stepSize\":\"" + step + "\"},{\"filterType" +
+                    "\":\"MARKET_LOT_SIZE\",\"minQty\":\"0.01\",\"maxQty\":\"50\",\"stepSize\":\"" + step + "\"},{\"filterType\":\"MIN_NOTIONAL\",\"notional\":\"5\"}]}]}";
             } else {
                 code = status;
                 body = status == 400 ? "{\"code\":" + errorCode + ",\"msg\":\"No need to change is not a confirmation\"}" : "{\"code\":-1007,\"msg\":\"Timeout\"}";
@@ -112,7 +112,10 @@ class BinanceGatewayTradingRuleTest {
             props.getBinance().setTestnetUrl("http://127.0.0.1:" + test.getAddress().getPort());
             var gateway = new BinanceGatewayAdapter(props);
             var testCredential = new ExchangeGateway.Credential("test", "test", "HMAC", "TESTNET");
-            assertEquals(0, BigDecimal.ONE.compareTo(gateway.queryTradingRule(testCredential, "ONDOUSDT").stepSize()));
+            ExchangeGateway.SymbolRule testRule = gateway.queryTradingRule(testCredential, "ONDOUSDT");
+            assertEquals(0, BigDecimal.ONE.compareTo(testRule.stepSize()));
+            assertEquals(0, new BigDecimal("100").compareTo(testRule.maxQuantity()));
+            assertEquals(0, new BigDecimal("50").compareTo(testRule.marketMaxQuantity()));
             gateway.queryTradingRule(testCredential, "ONDOUSDT");
             assertEquals(0, new BigDecimal("0.1").compareTo(gateway.queryTradingRule(new ExchangeGateway.Credential("test", "test", "HMAC", "LIVE"), "ONDOUSDT").stepSize()));
             assertEquals(1, liveCalls.get());
