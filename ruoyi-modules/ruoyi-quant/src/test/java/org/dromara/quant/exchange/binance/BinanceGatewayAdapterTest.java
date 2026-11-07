@@ -1,5 +1,7 @@
 package org.dromara.quant.exchange.binance;
 
+import org.dromara.quant.exchange.ExchangeGateway;
+
 import org.junit.jupiter.api.Test;
 import com.binance.connector.client.common.ApiException;
 import com.binance.connector.client.derivatives_trading_usds_futures.rest.model.QueryAllAlgoOrdersResponseInner;
