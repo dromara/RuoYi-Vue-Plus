@@ -231,6 +231,7 @@ class LivePositionEventCoordinatorTest {
         coordinator.onUserDataEvent(89L, new org.dromara.quant.exchange.ExchangeGateway.UserDataEvent("CONNECTED", java.time.Instant.now(), null));
         coordinator.drain();
 
+        org.junit.jupiter.api.Assertions.assertEquals(0L, freshness.generation(89L));
         verify(protection).recoverUnresolvedProtectionDispatches(89L, null);
     }
 
