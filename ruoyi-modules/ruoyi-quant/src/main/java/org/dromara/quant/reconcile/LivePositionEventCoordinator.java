@@ -59,15 +59,29 @@ public class LivePositionEventCoordinator {
         }
         if ("CONNECTED".equalsIgnoreCase(type)) {
             protectionRecoveryPending.add(new ProtectionRecoveryRequest(credentialId, null));
-        } else if ("ALGO_UPDATE".equalsIgnoreCase(type)) {
-            // Algorithm-order events can recover the exact active protection create/cancel ticket.
-            // Parsing and exchange REST reconciliation are deferred to drain(), off the WS callback thread.
-            protectionRecoveryPending.add(new ProtectionRecoveryRequest(credentialId, algoEventSymbol(event.rawJson())));
-        }
-        if ("ACCOUNT_UPDATE".equalsIgnoreCase(type) || "CONNECTED".equalsIgnoreCase(type)
-            || ("ORDER_TRADE_UPDATE".equalsIgnoreCase(type) && mayChangePosition(event.rawJson()))) {
             request(credentialId);
+            return;
         }
+        if ("ALGO_UPDATE".equalsIgnoreCase(type)) {
+            // Algorithm-order events affect protection recovery, not account position facts.
+            // Keep the position snapshot valid unless a subsequent trade/account event confirms a position change.
+            protectionRecoveryPending.add(new ProtectionRecoveryRequest(credentialId, algoEventSymbol(event.rawJson())));
+            return;
+        }
+        if ("ACCOUNT_UPDATE".equalsIgnoreCase(type)) {
+            if (mayChangeAccountPosition(event.rawJson())) {
+                request(credentialId);
+            }
+            return;
+        }
+        if ("ORDER_TRADE_UPDATE".equalsIgnoreCase(type)) {
+            if (mayChangePosition(event.rawJson())) {
+                request(credentialId);
+            }
+            return;
+        }
+        // Unknown event types retain fail-closed behavior, but also queue a refresh so the gate can recover.
+        request(credentialId);
     }
 
     private static String algoEventSymbol(String rawJson) {
@@ -85,6 +99,24 @@ public class LivePositionEventCoordinator {
     }
 
     /**
+     * Binance ACCOUNT_UPDATE may contain balance-only changes with an empty P array.
+     * Only a non-empty or unrecognized position payload invalidates the account position snapshot.
+     */
+    private static boolean mayChangeAccountPosition(String rawJson) {
+        try {
+            java.util.Map<String, Object> root = QuantJsonMapper.readMap(rawJson);
+            Object accountValue = root.get("a");
+            if (!(accountValue instanceof java.util.Map<?, ?> account)) {
+                return true;
+            }
+            Object positionValue = account.get("P");
+            return !(positionValue instanceof java.util.List<?> positions) || !positions.isEmpty();
+        } catch (Exception ex) {
+            return true;
+        }
+    }
+
+    /**
      * 判断订单私有事件是否表示成交；无法确认事件类型时按可能改变持仓处理。
      */
     private static boolean mayChangePosition(String rawJson) {
@@ -94,7 +126,12 @@ public class LivePositionEventCoordinator {
                 return true;
             }
             Object executionType = order.get("x");
-            return executionType == null || "TRADE".equalsIgnoreCase(executionType.toString());
+            if (executionType == null) {
+                return true;
+            }
+            String type = executionType.toString();
+            return !"NEW".equalsIgnoreCase(type) && !"CANCELED".equalsIgnoreCase(type)
+                && !"EXPIRED".equalsIgnoreCase(type) && !"AMENDMENT".equalsIgnoreCase(type);
         } catch (Exception ex) {
             return true;
         }
