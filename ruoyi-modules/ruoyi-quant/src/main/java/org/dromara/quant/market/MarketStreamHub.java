@@ -627,12 +627,13 @@ public class MarketStreamHub {
             }
             long networkLag = Math.max(0, java.time.Duration.between(event.eventTime(), receivedAt.plusMillis(exchangeOffsetMillis)).toMillis());
             long queueLag = Math.max(0, java.time.Duration.between(receivedAt, now).toMillis());
+            long preProcessMs = Math.max(0L, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - processingStartedNanos));
             maxNetworkLag.accumulate(networkLag);
             maxQueueLag.accumulate(queueLag);
             if (queueLag >= 1_000L && System.currentTimeMillis() >= nextQueueLagWarningAt) {
                 nextQueueLagWarningAt = System.currentTimeMillis() + 10_000L;
-                log.warn("行情入口处理延迟拆分: mode={} symbol={} interval={} type={} queueLagMs={} ingressQueueWaitMs={} monitorWaitMs={} recovering={}",
-                    key.runMode(), key.symbol(), key.interval(), event.type(), queueLag, ingressQueueWaitMs, monitorWaitMs, recovering);
+                log.warn("行情入口处理延迟拆分: mode={} symbol={} interval={} type={} queueLagMs={} ingressQueueWaitMs={} monitorWaitMs={} preProcessMs={} recovering={}",
+                    key.runMode(), key.symbol(), key.interval(), event.type(), queueLag, ingressQueueWaitMs, monitorWaitMs, preProcessMs, recovering);
             }
             lastReceived.put(event.type(), receivedAt);
             long maxEventAgeMillis = Math.max(1, properties.getMarket().getMaxEventAgeMillis());
