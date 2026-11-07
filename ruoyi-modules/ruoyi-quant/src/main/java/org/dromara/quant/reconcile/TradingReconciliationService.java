@@ -176,20 +176,27 @@ public class TradingReconciliationService {
 
         ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
             credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
-        Set<String> symbols = resolveManualSyncSymbols(credential, exchangeCredential, requestedSymbol);
-        if (symbols.isEmpty()) {
+        String symbolFilter = requestedSymbol == null || requestedSymbol.isBlank()
+            ? "" : normalizeTradingSymbol(requestedSymbol);
+        Instant historyEnd = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
+        Instant historyStart = ExchangeHistoryCollector.recent90DaysStart(historyEnd);
+        List<ExchangeGateway.OrderSnapshot> historyOrders = collectManualOrderHistory(
+            exchangeCredential, credential.getId(), symbolFilter, historyStart, historyEnd);
+        Map<String, List<ExchangeGateway.OrderSnapshot>> ordersBySymbol = new TreeMap<>();
+        for (ExchangeGateway.OrderSnapshot order : historyOrders) {
+            String symbol = normalizeTradingSymbol(order.symbol());
+            ordersBySymbol.computeIfAbsent(symbol, ignored -> new ArrayList<>()).add(order);
+        }
+        if (ordersBySymbol.isEmpty()) {
             return new TradingDataSyncResult(0, 0, 0);
         }
 
-        Instant historyEnd = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
-        Instant historyStart = ExchangeHistoryCollector.recent90DaysStart(historyEnd);
         int orderCount = 0;
         int tradeCount = 0;
-
-        for (String symbol : symbols) {
+        for (Map.Entry<String, List<ExchangeGateway.OrderSnapshot>> entry : ordersBySymbol.entrySet()) {
+            String symbol = entry.getKey();
+            List<ExchangeGateway.OrderSnapshot> orders = entry.getValue();
             try {
-                List<ExchangeGateway.OrderSnapshot> orders = collectManualOrderHistory(
-                    exchangeCredential, credential.getId(), symbol, historyStart, historyEnd);
                 List<ExchangeGateway.TradeSnapshot> trades = tradeCollector.collectByOrders(
                     exchangeCredential, symbol, orders, historyStart, historyEnd);
                 log.info("手动订单关联成交获取完成 credentialId={} symbol={} orderCount={} tradeCount={}",
@@ -225,36 +232,16 @@ public class TradingReconciliationService {
         if ("LIVE".equalsIgnoreCase(credential.getRunMode())) {
             int retried = transaction.execute(status -> fillJournal.retryPending(credential.getId()));
             if (retried > 0 && tradeCycleProjectionService != null) {
-                for (String symbol : symbols) {
+                for (String symbol : ordersBySymbol.keySet()) {
                     tradeCycleProjectionService.markDirty(credential.getId(), symbol);
                     tradeCycleProjectionService.projectNow(credential.getId(), symbol);
                 }
             }
         }
 
-        log.info("手动历史同步完成 credentialId={} symbolCount={} orderCount={} tradeCount={} historyStart={} historyEnd={} mode=ORDER_FIRST_90D",
-            credential.getId(), symbols.size(), orderCount, tradeCount, historyStart, historyEnd);
-        return new TradingDataSyncResult(symbols.size(), orderCount, tradeCount);
-    }
-
-    private Set<String> resolveManualSyncSymbols(QuantCredential credential, ExchangeGateway.Credential exchangeCredential, String requestedSymbol) {
-        Set<String> symbols = new TreeSet<>();
-        if (requestedSymbol != null && !requestedSymbol.isBlank()) {
-            symbols.add(normalizeTradingSymbol(requestedSymbol));
-            return symbols;
-        }
-        fillSyncCursors.selectSymbols(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
-        orderMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
-        tradeHistoryMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
-        List<ExchangeGateway.PositionSnapshot> positions = Objects.requireNonNull(
-            gateway.queryPositions(exchangeCredential, null), "Binance 全账户持仓快照缺失");
-        for (ExchangeGateway.PositionSnapshot position : positions) {
-            if (position == null || position.symbol() == null || position.symbol().isBlank()) {
-                throw new IllegalStateException("Binance 全账户持仓快照缺少交易对，无法确定同步范围");
-            }
-            symbols.add(normalizeTradingSymbol(position.symbol()));
-        }
-        return symbols;
+        log.info("手动历史同步完成 credentialId={} symbolCount={} orderCount={} tradeCount={} historyStart={} historyEnd={} mode=ACCOUNT_ORDER_FIRST_90D",
+            credential.getId(), ordersBySymbol.size(), orderCount, tradeCount, historyStart, historyEnd);
+        return new TradingDataSyncResult(ordersBySymbol.size(), orderCount, tradeCount);
     }
 
     private List<ExchangeGateway.OrderSnapshot> collectManualOrderHistory(ExchangeGateway.Credential credential, Long credentialId,
@@ -263,20 +250,15 @@ public class TradingReconciliationService {
             log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}", credentialId, symbol, range.from(), range.to());
             return gateway.queryOrderHistory(credential, symbol, range, 1000L);
         });
-        Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
+        Map<String, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
         for (ExchangeGateway.OrderSnapshot order : history) {
             validateSyncOrderSnapshot(order, symbol);
-            ordersById.put(order.orderId(), order);
+            String identity = normalizeTradingSymbol(order.symbol()) + ":" + order.orderId();
+            ordersById.put(identity, order);
         }
-        log.info("手动历史订单获取完成 credentialId={} symbol={} returnedCount={} distinctOrderCount={}",
+        log.info("手动历史订单获取完成 credentialId={} symbolFilter={} returnedCount={} distinctOrderCount={}",
             credentialId, symbol, history.size(), ordersById.size());
         return List.copyOf(ordersById.values());
-    }
-
-    private static void addNormalizedTradingSymbol(Set<String> symbols, String symbol) {
-        if (symbol != null && !symbol.isBlank()) {
-            symbols.add(normalizeTradingSymbol(symbol));
-        }
     }
 
     private static String normalizeTradingSymbol(String symbol) {
@@ -290,7 +272,7 @@ public class TradingReconciliationService {
     private static void validateSyncOrderSnapshot(ExchangeGateway.OrderSnapshot snapshot, String expectedSymbol) {
         if (snapshot == null || snapshot.orderId() == null || snapshot.orderId() <= 0
             || snapshot.symbol() == null || snapshot.symbol().isBlank()
-            || expectedSymbol != null && !expectedSymbol.equalsIgnoreCase(snapshot.symbol())) {
+            || expectedSymbol != null && !expectedSymbol.isBlank() && !expectedSymbol.equalsIgnoreCase(snapshot.symbol())) {
             throw new IllegalStateException("Binance 订单快照缺少有效身份或交易对不匹配，拒绝同步");
         }
     }
