@@ -489,7 +489,8 @@ public class TradingReconciliationService {
             existing.updateTime() == null ? recovered.updateTime() : existing.updateTime(),
             existing.averagePrice() == null ? recovered.averagePrice() : existing.averagePrice(),
             existing.positionSide() == null || existing.positionSide().isBlank() ? recovered.positionSide() : existing.positionSide(),
-            existing.reduceOnly() == null ? recovered.reduceOnly() : existing.reduceOnly());
+            existing.reduceOnly() == null ? recovered.reduceOnly() : existing.reduceOnly(),
+            existing.createTime() == null ? recovered.createTime() : existing.createTime());
     }
 
     /**
