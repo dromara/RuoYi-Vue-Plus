@@ -89,7 +89,7 @@ class MarketStreamHubRecoveryTest {
         CountDownLatch slowLookupStarted = new CountDownLatch(1);
         CountDownLatch releaseSlowLookup = new CountDownLatch(1);
         when(gateway.exchangeTimeOffsetMillis("LIVE")).thenAnswer(invocation -> {
-            if (clockCalls.incrementAndGet() == 3) {
+            if (clockCalls.incrementAndGet() == 4) {
                 slowLookupStarted.countDown();
                 assertTrue(releaseSlowLookup.await(3, TimeUnit.SECONDS));
             }
