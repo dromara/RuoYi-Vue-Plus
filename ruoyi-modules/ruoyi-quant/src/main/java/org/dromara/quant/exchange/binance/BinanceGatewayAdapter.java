@@ -1677,7 +1677,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         try {
             clockOffsetRefreshExecutor.execute(() -> {
                 try {
-                    refreshClockOffset(baseUrl, observedUpdatedAt);
+                    refreshClockOffsetInBackground(baseUrl, observedUpdatedAt);
                 } catch (RuntimeException ex) {
                     long failedAt = System.currentTimeMillis();
                     java.util.concurrent.atomic.AtomicBoolean shouldWarn = new java.util.concurrent.atomic.AtomicBoolean();
@@ -1810,6 +1810,24 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
                 sync.schedulerQueueMillis(), sync.responseReceivedAtMillis() - sync.requestStartedAtMillis());
             return sync.offsetMillis();
         }
+    }
+
+    /**
+     * 行情偏移后台刷新不持有签名请求使用的同步刷新锁，避免后台网络等待阻塞交易请求。
+     */
+    private void refreshClockOffsetInBackground(String baseUrl, long observedUpdatedAt) {
+        ClockOffset cached = clockOffsets.get(baseUrl);
+        if (cached != null && cached.updatedAt() > observedUpdatedAt) {
+            return;
+        }
+        long refreshStartedAt = System.currentTimeMillis();
+        ClockSyncResult sync = synchronizeClock(baseUrl);
+        ClockOffset refreshed = new ClockOffset(sync.offsetMillis(), sync.responseReceivedAtMillis());
+        clockOffsets.compute(baseUrl, (ignored, current) ->
+            current == null || current.updatedAt() < refreshed.updatedAt() ? refreshed : current);
+        log.info("Binance服务端时间偏移异步刷新完成: baseUrl={}, offsetMillis={}, syncElapsedMillis={}, schedulerQueueMillis={}, requestElapsedMillis={}",
+            baseUrl, sync.offsetMillis(), sync.responseReceivedAtMillis() - refreshStartedAt,
+            sync.schedulerQueueMillis(), sync.responseReceivedAtMillis() - sync.requestStartedAtMillis());
     }
 
     /** 强制刷新偏移；若其他并发请求已在本次请求后完成刷新，则复用其结果。 */
