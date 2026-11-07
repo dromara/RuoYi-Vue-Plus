@@ -29,6 +29,39 @@ class StrictBinanceTradeCollectorTest {
     }
 
     @Test
+    void collectsFillsByOrderIdAndContinuesFullPagesWithFromId() {
+        var order = new ExchangeGateway.OrderSnapshot("BTCUSDT", 11L, "client-11", "BUY", "MARKET", "FILLED",
+            BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, end, BigDecimal.TEN);
+        var firstPage = java.util.stream.LongStream.rangeClosed(1, 1000).mapToObj(this::trade).toList();
+        when(gateway.queryTradesByOrder(credential, "BTCUSDT", 11L, null, 1000L)).thenReturn(firstPage);
+        when(gateway.queryTradesByOrder(credential, "BTCUSDT", 11L, 1001L, 1000L)).thenReturn(List.of(trade(1001L)));
+
+        var result = collector.collectByOrders(credential, "BTCUSDT", List.of(order));
+
+        assertEquals(1001, result.size());
+        assertEquals(1L, result.getFirst().tradeId());
+        assertEquals(1001L, result.getLast().tradeId());
+    }
+
+    @Test
+    void skipsOrdersThatCannotHaveFills() {
+        var order = new ExchangeGateway.OrderSnapshot("BTCUSDT", 12L, "client-12", "BUY", "LIMIT", "CANCELED",
+            BigDecimal.TEN, BigDecimal.ONE, BigDecimal.ZERO, end);
+        assertEquals(List.of(), collector.collectByOrders(credential, "BTCUSDT", List.of(order)));
+        org.mockito.Mockito.verifyNoInteractions(gateway);
+    }
+
+    @Test
+    void rejectsFillsReturnedForAnotherOrder() {
+        var order = new ExchangeGateway.OrderSnapshot("BTCUSDT", 11L, "client-11", "BUY", "MARKET", "FILLED",
+            BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, end, BigDecimal.TEN);
+        when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(11L), any(), anyLong())).thenReturn(List.of(
+            new ExchangeGateway.TradeSnapshot("BTCUSDT", 1L, 12L, "BUY", BigDecimal.ONE, BigDecimal.TEN,
+                BigDecimal.ZERO, BigDecimal.ZERO, start, "USDT")));
+        assertThrows(IllegalStateException.class, () -> collector.collectByOrders(credential, "BTCUSDT", List.of(order)));
+    }
+
+    @Test
     void splitsSaturatedPagesAndDeduplicatesInclusiveBoundaryFacts() {
         when(gateway.queryTrades(any(), eq("BTCUSDT"), argThat(range -> range.from().equals(start) && range.to().equals(end))))
             .thenReturn(java.util.Collections.nCopies(1000, trade(1L)));
