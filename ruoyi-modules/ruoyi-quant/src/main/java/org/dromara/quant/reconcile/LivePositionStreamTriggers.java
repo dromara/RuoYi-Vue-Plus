@@ -69,7 +69,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
             // previously authorized account and a renewable stale lease.
             for (Long id : Set.copyOf(subscriptions.keySet())) {
                 closeSubscription(id);
-                freshness.invalidate(id);
+                freshness.invalidate(id, "CREDENTIAL_DISCOVERY_FAILED");
                 try {
                     lease.release(id);
                 } catch (RuntimeException releaseError) {
@@ -100,7 +100,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
                         log.warn("LIVE私有流租约竞争 credentialId={} dbLease=[{}]；本节点禁止创建交易策略运行时", id, leaseState);
                     }
                     closeSubscription(id);
-                    freshness.invalidate(id);
+                    freshness.invalidate(id, "LEASE_NOT_OWNED");
                     continue;
                 }
                 Long previousEpoch = subscriptionEpochs.get(id);
@@ -108,7 +108,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
                     // A process can reacquire an expired lease with the same token.
                     // Epoch changes still fence the old socket and its account facts.
                     closeSubscription(id);
-                    freshness.invalidate(id);
+                    freshness.invalidate(id, "LEASE_EPOCH_CHANGED");
                 }
                 // Hub may have forcibly removed the old WebSocket after a
                 // lease loss while this supervisor still holds its old handle.
@@ -136,7 +136,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
                 coordinator.queueRefresh(id);
             } catch (RuntimeException ex) {
                 closeSubscription(id);
-                freshness.invalidate(id);
+                freshness.invalidate(id, "STREAM_ENROLLMENT_FAILED");
                 // A failed Hub enrollment must not strand a DB lease for 75 seconds.
                 // A conditional release cannot affect another node's ownership.
                 try {
@@ -150,7 +150,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
         for (Long id : Set.copyOf(subscriptions.keySet())) {
             if (!liveIds.contains(id)) {
                 closeSubscription(id);
-                freshness.invalidate(id);
+                freshness.invalidate(id, "CREDENTIAL_DISABLED");
                 try {
                     lease.release(id);
                 } catch (RuntimeException ex) {
@@ -184,7 +184,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
     public synchronized void close() {
         for (Long id : Set.copyOf(subscriptions.keySet())) {
             closeSubscription(id);
-            freshness.invalidate(id);
+            freshness.invalidate(id, "APPLICATION_SHUTDOWN");
             try {
                 lease.release(id);
             } catch (RuntimeException ex) {
