@@ -56,8 +56,9 @@ public class StrictBinanceTradeCollector {
      * 单个订单成交达到单页上限时，使用 fromId 继续分页，避免静默截断。
      */
     public List<ExchangeGateway.TradeSnapshot> collectByOrders(ExchangeGateway.Credential credential, String symbol,
-                                                                 List<ExchangeGateway.OrderSnapshot> orders) {
-        if (credential == null || symbol == null || symbol.isBlank() || orders == null) {
+                                                                 List<ExchangeGateway.OrderSnapshot> orders, Instant historyStart, Instant historyEnd) {
+        if (credential == null || symbol == null || symbol.isBlank() || orders == null || historyStart == null
+            || historyEnd == null || historyStart.isAfter(historyEnd)) {
             throw new IllegalArgumentException("按历史订单收集成交的参数无效");
         }
         Map<Long, ExchangeGateway.TradeSnapshot> unique = new HashMap<>();
@@ -72,37 +73,38 @@ public class StrictBinanceTradeCollector {
             if (!mayHaveFills) {
                 continue;
             }
-            Long fromId = null;
-            while (true) {
+            Instant orderStart = order.createTime() == null ? historyStart : order.createTime();
+            Instant orderEnd = order.updateTime() == null ? historyEnd : order.updateTime();
+            if (orderStart.isBefore(historyStart)) {
+                orderStart = historyStart;
+            }
+            if (orderEnd.isAfter(historyEnd)) {
+                orderEnd = historyEnd;
+            }
+            if (orderStart.isAfter(orderEnd)) {
+                throw new IllegalStateException("历史订单创建时间晚于更新时间，无法安全查询其成交");
+            }
+            List<ExchangeGateway.TradeSnapshot> orderTrades = ExchangeHistoryCollector.collect(orderStart, orderEnd, range -> {
                 if (++queryCount > MAX_QUERIES) {
                     throw new IllegalStateException("Binance per-order trade query budget exceeded; history completeness unproven");
                 }
                 List<ExchangeGateway.TradeSnapshot> page =
-                    gateway.queryTradesByOrder(credential, symbol, order.orderId(), fromId, (long) LIMIT);
+                    gateway.queryTradesByOrder(credential, symbol, order.orderId(), range, (long) LIMIT);
                 if (page == null) {
                     throw new IllegalStateException("Binance per-order trade response unavailable; history completeness unproven");
                 }
-                long previousTradeId = fromId == null ? 0L : fromId - 1L;
-                for (ExchangeGateway.TradeSnapshot trade : page) {
-                    if (trade == null || trade.tradeId() == null || trade.tradeId() <= previousTradeId
-                        || trade.orderId() == null || !order.orderId().equals(trade.orderId())
-                        || trade.symbol() == null || !symbol.equalsIgnoreCase(trade.symbol()) || trade.time() == null) {
-                        throw new IllegalStateException("Binance per-order trade page contains invalid or mismatched identity");
-                    }
-                    previousTradeId = trade.tradeId();
-                    ExchangeGateway.TradeSnapshot prior = unique.putIfAbsent(trade.tradeId(), trade);
-                    if (prior != null && !prior.equals(trade)) {
-                        throw new IllegalStateException("Conflicting Binance TradeId across per-order queries");
-                    }
+                return page;
+            });
+            for (ExchangeGateway.TradeSnapshot trade : orderTrades) {
+                if (trade == null || trade.tradeId() == null || trade.tradeId() <= 0
+                    || trade.orderId() == null || !order.orderId().equals(trade.orderId())
+                    || trade.symbol() == null || !symbol.equalsIgnoreCase(trade.symbol()) || trade.time() == null) {
+                    throw new IllegalStateException("Binance per-order trade page contains invalid or mismatched identity");
                 }
-                if (page.size() < LIMIT) {
-                    break;
+                ExchangeGateway.TradeSnapshot prior = unique.putIfAbsent(trade.tradeId(), trade);
+                if (prior != null && !prior.equals(trade)) {
+                    throw new IllegalStateException("Conflicting Binance TradeId across per-order queries");
                 }
-                long lastTradeId = page.getLast().tradeId();
-                if (lastTradeId == Long.MAX_VALUE) {
-                    throw new IllegalStateException("Binance trade ID cursor overflow");
-                }
-                fromId = lastTradeId + 1L;
             }
         }
         List<ExchangeGateway.TradeSnapshot> sorted = new ArrayList<>(unique.values());
