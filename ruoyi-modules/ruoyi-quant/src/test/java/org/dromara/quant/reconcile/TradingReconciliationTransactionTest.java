@@ -581,6 +581,35 @@ class TradingReconciliationTransactionTest {
     }
 
     @Test
+    void manualSyncDiscoversAndGroupsAllSymbolsFromAccountOrderHistory() {
+        initializeManualSyncMapperMetadata();
+        Instant orderUpdatedAt = Instant.now();
+        ExchangeGateway.OrderSnapshot btcOrder = new ExchangeGateway.OrderSnapshot("BTCUSDT", 501L, "client-501",
+            "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
+            orderUpdatedAt, BigDecimal.TEN, "BOTH", false, orderUpdatedAt.minusSeconds(60));
+        ExchangeGateway.OrderSnapshot ethOrder = new ExchangeGateway.OrderSnapshot("ETHUSDT", 601L, "client-601",
+            "SELL", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
+            orderUpdatedAt, BigDecimal.TEN, "BOTH", false, orderUpdatedAt.minusSeconds(60));
+        when(gateway.queryOrderHistory(any(), eq(""), any(), anyLong())).thenReturn(List.of(btcOrder, ethOrder));
+        when(gateway.queryTradesByOrder(any(), anyString(), anyLong(), any(), anyLong())).thenReturn(List.of());
+        when(orders.selectOne(any())).thenReturn(null);
+        when(orders.insert(any(org.dromara.quant.order.domain.QuantOrder.class))).thenReturn(1);
+
+        TradingReconciliationService.TradingDataSyncResult result = service().syncTradingData(credential(), null);
+
+        assertEquals(2, result.symbolCount());
+        assertEquals(2, result.orderCount());
+        assertEquals(0, result.tradeCount());
+        verify(gateway, atLeastOnce()).queryOrderHistory(any(), eq(""), any(), eq(1000L));
+        verify(gateway, never()).queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong());
+        verify(gateway, never()).queryOrderHistory(any(), eq("ETHUSDT"), any(), anyLong());
+        verify(gateway).queryTradesByOrder(any(), eq("BTCUSDT"), eq(501L), any(), eq(1000L));
+        verify(gateway).queryTradesByOrder(any(), eq("ETHUSDT"), eq(601L), any(), eq(1000L));
+        verify(tradeCycleProjection).projectNow(1L, "BTCUSDT");
+        verify(tradeCycleProjection).projectNow(1L, "ETHUSDT");
+    }
+
+    @Test
     void manualSyncQueriesNinetyDayOrdersBeforeQueryingTheirFills() {
         Instant beforeSync = Instant.now();
         ExchangeGateway.OrderSnapshot order = new ExchangeGateway.OrderSnapshot("BTCUSDT", 404L, "client-404",
