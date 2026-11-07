@@ -179,4 +179,66 @@ class BinanceGatewayAdapterTest {
         assertThrows(org.dromara.quant.exchange.ExchangeMarketPort.RequestDeferredException.class, () -> scheduler.acquire(RestRequestScheduler.Kind.ACCOUNT));
     }
 
+
+    @Test
+    void retriesTransientTlsHandshakeEofAndSucceeds() {
+        var attempts = new java.util.concurrent.atomic.AtomicInteger();
+        String result = BinanceGatewayAdapter.executeWithNetworkRetries(() -> {
+            if (attempts.incrementAndGet() <= 2) {
+                var handshake = new javax.net.ssl.SSLHandshakeException("Remote host terminated the handshake");
+                handshake.initCause(new java.io.EOFException("SSL peer shut down incorrectly"));
+                throw new IllegalStateException("SDK transport failure", handshake);
+            }
+            return "ok";
+        }, RestRequestScheduler.Kind.ACCOUNT, "TESTNET");
+
+        assertEquals("ok", result);
+        assertEquals(3, attempts.get());
+    }
+
+    @Test
+    void doesNotRetryCertificateValidationFailure() {
+        var attempts = new java.util.concurrent.atomic.AtomicInteger();
+        var failure = new IllegalStateException("TLS certificate validation failed",
+            new java.security.cert.CertificateException("certificate expired"));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () ->
+            BinanceGatewayAdapter.executeWithNetworkRetries(() -> {
+                attempts.incrementAndGet();
+                throw failure;
+            }, RestRequestScheduler.Kind.ACCOUNT, "TESTNET"));
+
+        assertSame(failure, thrown);
+        assertEquals(1, attempts.get());
+    }
+
+    @Test
+    void retriesTransientNetworkFailureAtMostThreeTimes() {
+        var attempts = new java.util.concurrent.atomic.AtomicInteger();
+        var failure = new IllegalStateException("connection reset", new java.net.SocketException("Connection reset"));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () ->
+            BinanceGatewayAdapter.executeWithNetworkRetries(() -> {
+                attempts.incrementAndGet();
+                throw failure;
+            }, RestRequestScheduler.Kind.ACCOUNT, "TESTNET"));
+
+        assertSame(failure, thrown);
+        assertEquals(4, attempts.get());
+    }
+
+    @Test
+    void doesNotRetryLocallyDeferredRestRequest() {
+        var attempts = new java.util.concurrent.atomic.AtomicInteger();
+        var deferred = new org.dromara.quant.exchange.ExchangeMarketPort.RequestDeferredException(5_000L);
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () ->
+            BinanceGatewayAdapter.executeWithNetworkRetries(() -> {
+                attempts.incrementAndGet();
+                throw deferred;
+            }, RestRequestScheduler.Kind.ACCOUNT, "TESTNET"));
+
+        assertSame(deferred, thrown);
+        assertEquals(1, attempts.get());
+    }
 }
