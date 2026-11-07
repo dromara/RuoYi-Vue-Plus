@@ -177,6 +177,12 @@ public interface ExchangeGateway extends ExchangeMarketPort, ExchangeAccountPort
                          Instant updateTime, BigDecimal averagePrice, String positionSide, Boolean reduceOnly, Instant createTime,
                          Boolean closePosition) {
         public OrderSnapshot(String symbol, Long orderId, String clientOrderId, String side, String type, String status, BigDecimal price, BigDecimal originalQuantity,
+                             BigDecimal executedQuantity, Instant updateTime, BigDecimal averagePrice, String positionSide, Boolean reduceOnly, Instant createTime) {
+            this(symbol, orderId, clientOrderId, side, type, status, price, originalQuantity, executedQuantity, updateTime,
+                averagePrice, positionSide, reduceOnly, createTime, null);
+        }
+
+        public OrderSnapshot(String symbol, Long orderId, String clientOrderId, String side, String type, String status, BigDecimal price, BigDecimal originalQuantity,
                              BigDecimal executedQuantity, Instant updateTime, BigDecimal averagePrice, String positionSide, Boolean reduceOnly) {
             this(symbol, orderId, clientOrderId, side, type, status, price, originalQuantity, executedQuantity, updateTime,
                 averagePrice, positionSide, reduceOnly, null, null);
