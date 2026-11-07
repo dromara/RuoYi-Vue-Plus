@@ -92,7 +92,7 @@ public interface ExchangeMarketPort {
         }
 
         public RequestDeferredException(long retryAfterMillis) {
-            this("DEFERRED", "UNKNOWN", 0, new int[0], 0L, retryAfterMillis);
+            this("DEFERRED", "UNKNOWN", 0, new int[0], 0L, Math.max(1L, retryAfterMillis));
         }
 
         public RequestDeferredException(String reason, String kind, int queueSize, int[] queueSizes,
