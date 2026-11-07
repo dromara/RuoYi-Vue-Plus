@@ -48,8 +48,9 @@ public final class QuantityNormalizer {
         var a = lot.movePointRight(scale).toBigIntegerExact();
         var b = market.movePointRight(scale).toBigIntegerExact();
         BigDecimal step = new BigDecimal(a.divide(a.gcd(b)).multiply(b), scale);
+        BigDecimal maxQuantity = minPositive(rule.maxQuantity(), rule.marketMaxQuantity());
         return quantity(value, new ExchangeGateway.SymbolRule(rule.symbol(), rule.quoteAsset(), rule.pricePrecision(), rule.quantityPrecision(), rule.priceTickSize(), step,
-            market, rule.minNotional(), rule.status()));
+            market, maxQuantity, maxQuantity, rule.minNotional(), rule.status()));
     }
 
     /**
@@ -64,7 +65,20 @@ public final class QuantityNormalizer {
         if (normalized.signum() <= 0 || rule.minNotional() == null || rule.minNotional().signum() <= 0) {
             throw new IllegalArgumentException("交易对缺少有效最小名义价值");
         }
+        if (rule.maxQuantity() != null && rule.maxQuantity().signum() > 0 && normalized.compareTo(rule.maxQuantity()) > 0) {
+            throw new IllegalArgumentException("交易对 " + rule.symbol() + " 数量 " + normalized.toPlainString()
+                + " 超过最大允许数量 " + rule.maxQuantity().toPlainString());
+        }
         return normalized;
+    }
+
+    private static BigDecimal minPositive(BigDecimal first, BigDecimal second) {
+        boolean firstValid = first != null && first.signum() > 0;
+        boolean secondValid = second != null && second.signum() > 0;
+        if (!firstValid) {
+            return secondValid ? second : BigDecimal.ZERO;
+        }
+        return !secondValid || first.compareTo(second) <= 0 ? first : second;
     }
 
     /**
