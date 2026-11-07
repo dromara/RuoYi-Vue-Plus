@@ -350,7 +350,7 @@ class TradingReconciliationTransactionTest {
 
         assertNotNull(snapshots);
         assertTrue(snapshots.isEmpty(), "an empty list is a complete confirmed-flat account snapshot");
-        verify(gateway, times(1)).queryAccount(any());
+        verify(gateway, times(1)).queryAccountForPosition(any());
         verify(gateway, times(1)).queryPositions(any(), isNull());
     }
 
@@ -373,7 +373,7 @@ class TradingReconciliationTransactionTest {
             releaseFetch.countDown();
             assertTrue(first.get(5, java.util.concurrent.TimeUnit.SECONDS).isEmpty());
             assertTrue(second.get(5, java.util.concurrent.TimeUnit.SECONDS).isEmpty());
-            verify(gateway, times(1)).queryAccount(any());
+            verify(gateway, times(1)).queryAccountForPosition(any());
             verify(gateway, times(1)).queryPositions(any(), isNull());
         } finally {
             releaseFetch.countDown();
@@ -390,7 +390,7 @@ class TradingReconciliationTransactionTest {
         reconciliation.invalidateRuntimePositionSnapshot(1L);
         reconciliation.runtimePositionSnapshot(credential());
 
-        verify(gateway, times(2)).queryAccount(any());
+        verify(gateway, times(2)).queryAccountForPosition(any());
         verify(gateway, times(2)).queryPositions(any(), isNull());
     }
 
