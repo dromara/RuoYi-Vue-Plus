@@ -13,6 +13,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BinanceGatewayAdapterTest {
     @Test
+    void usesCachedClockOffsetDuringTheThirtySecondToFiveMinuteRefreshWindow() {
+        long now = 1_800_000_000_000L;
+
+        assertFalse(BinanceGatewayAdapter.isClockOffsetRefreshDue(now - 29_999L, now));
+        assertTrue(BinanceGatewayAdapter.isClockOffsetRefreshDue(now - 30_000L, now));
+        assertTrue(BinanceGatewayAdapter.isMarketClockOffsetCacheUsable(now - 30_000L, now));
+        assertTrue(BinanceGatewayAdapter.isMarketClockOffsetCacheUsable(now - 5 * 60_000L, now));
+    }
+
+    @Test
+    void refusesClockOffsetCacheOlderThanFiveMinutesOrFromFuture() {
+        long now = 1_800_000_000_000L;
+
+        assertFalse(BinanceGatewayAdapter.isMarketClockOffsetCacheUsable(now - 5 * 60_000L - 1L, now));
+        assertFalse(BinanceGatewayAdapter.isMarketClockOffsetCacheUsable(now + 1L, now));
+    }
+
+    @Test
     void mapsPositionSideFromBinanceAccountTradeResponse() {
         var raw = new com.binance.connector.client.derivatives_trading_usds_futures.rest.model.AccountTradeListResponseInner()
             .symbol("BTCUSDT").id(123L).orderId(456L).side("SELL").qty("0.5").price("100")
