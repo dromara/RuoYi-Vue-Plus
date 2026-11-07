@@ -3,6 +3,7 @@ package org.dromara.quant.execution;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.dromara.quant.exchange.ExchangeGateway;
+import org.dromara.quant.exchange.ExchangeHistoryCollector;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -62,7 +63,7 @@ public class StrictBinanceTradeCollector {
             throw new IllegalArgumentException("按历史订单收集成交的参数无效");
         }
         Map<Long, ExchangeGateway.TradeSnapshot> unique = new HashMap<>();
-        int queryCount = 0;
+        int[] queryCount = {0};
         for (ExchangeGateway.OrderSnapshot order : orders) {
             if (order == null || order.orderId() == null || order.orderId() <= 0
                 || order.symbol() == null || !symbol.equalsIgnoreCase(order.symbol())) {
@@ -84,8 +85,10 @@ public class StrictBinanceTradeCollector {
             if (orderStart.isAfter(orderEnd)) {
                 throw new IllegalStateException("历史订单创建时间晚于更新时间，无法安全查询其成交");
             }
-            List<ExchangeGateway.TradeSnapshot> orderTrades = ExchangeHistoryCollector.collect(orderStart, orderEnd, range -> {
-                if (++queryCount > MAX_QUERIES) {
+            Instant queryStart = orderStart;
+            Instant queryEnd = orderEnd;
+            List<ExchangeGateway.TradeSnapshot> orderTrades = ExchangeHistoryCollector.collect(queryStart, queryEnd, range -> {
+                if (++queryCount[0] > MAX_QUERIES) {
                     throw new IllegalStateException("Binance per-order trade query budget exceeded; history completeness unproven");
                 }
                 List<ExchangeGateway.TradeSnapshot> page =
@@ -99,7 +102,7 @@ public class StrictBinanceTradeCollector {
                 if (trade == null || trade.tradeId() == null || trade.tradeId() <= 0
                     || trade.orderId() == null || !order.orderId().equals(trade.orderId())
                     || trade.symbol() == null || !symbol.equalsIgnoreCase(trade.symbol()) || trade.time() == null
-                    || trade.time().isBefore(orderStart) || trade.time().isAfter(orderEnd)) {
+                    || trade.time().isBefore(queryStart) || trade.time().isAfter(queryEnd)) {
                     throw new IllegalStateException("Binance per-order trade page contains invalid or mismatched identity");
                 }
                 ExchangeGateway.TradeSnapshot prior = unique.putIfAbsent(trade.tradeId(), trade);
