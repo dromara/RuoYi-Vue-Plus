@@ -1086,10 +1086,9 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     @Override
     public List<OrderSnapshot> queryOrderHistory(Credential credential, String symbol, TimeRange range, Long limit) {
         requireCredential(credential);
-        System.out.println(symbol + "   "  + range.from() + "   ***********************   " + range.to());
-        Long start = range == null || range.from() == null ? null : range.from().toEpochMilli();
-        Long end = range == null || range.to() == null ? null : range.to().toEpochMilli();
         String querySymbol = symbol == null ? "" : symbol.trim();
+        Long start = querySymbol.isEmpty() || range == null || range.from() == null ? null : range.from().toEpochMilli();
+        Long end = querySymbol.isEmpty() || range == null || range.to() == null ? null : range.to().toEpochMilli();
         Long orderId = querySymbol.isEmpty() ? 0L : null;
         var data = signedRead(credential, RestRequestScheduler.Kind.BACKGROUND,
             client -> client.allOrders(querySymbol, orderId, start, end, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS).getData());
