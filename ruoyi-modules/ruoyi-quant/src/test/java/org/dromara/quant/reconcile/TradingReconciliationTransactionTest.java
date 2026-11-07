@@ -554,17 +554,16 @@ class TradingReconciliationTransactionTest {
     @Test
     void manualSyncPersistsHistoricalOrdersWithoutReadingCurrentOpenOrders() {
         initializeManualSyncMapperMetadata();
+        Instant orderUpdatedAt = Instant.now();
         ExchangeGateway.OrderSnapshot historicalOrder = new ExchangeGateway.OrderSnapshot("BTCUSDT", 303L, "client-303",
             "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
-            Instant.now().minusSeconds(30), BigDecimal.TEN, "BOTH", false);
+            orderUpdatedAt, BigDecimal.TEN, "BOTH", false, orderUpdatedAt.minusSeconds(120));
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of(historicalOrder));
         when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(303L), any(), anyLong())).thenAnswer(invocation -> {
             var fill = manualSyncFill("BTCUSDT", 303L);
             ExchangeGateway.TimeRange range = invocation.getArgument(3);
             return !fill.time().isBefore(range.from()) && !fill.time().isAfter(range.to()) ? List.of(fill) : List.of();
         });
-        when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
-            .thenReturn(List.of());
         when(orders.selectOne(any())).thenReturn(null);
         when(orders.insert(any(org.dromara.quant.order.domain.QuantOrder.class))).thenReturn(1);
         when(trades.selectOne(any())).thenReturn(null);
