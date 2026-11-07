@@ -86,10 +86,11 @@ class MarketStreamHubRecoveryTest {
     @Test
     void slowClockOffsetLookupDoesNotHoldSharedStreamMonitor() throws Exception {
         AtomicInteger clockCalls = new AtomicInteger();
+        AtomicInteger blockAtCall = new AtomicInteger(Integer.MAX_VALUE);
         CountDownLatch slowLookupStarted = new CountDownLatch(1);
         CountDownLatch releaseSlowLookup = new CountDownLatch(1);
         when(gateway.exchangeTimeOffsetMillis("LIVE")).thenAnswer(invocation -> {
-            if (clockCalls.incrementAndGet() == 4) {
+            if (clockCalls.incrementAndGet() == blockAtCall.get()) {
                 slowLookupStarted.countDown();
                 assertTrue(releaseSlowLookup.await(3, TimeUnit.SECONDS));
             }
@@ -110,7 +111,8 @@ class MarketStreamHubRecoveryTest {
                 callback.get().accept(new ExchangeGateway.MarketEvent("MARK", "BTCUSDT", "1m", BigDecimal.TEN, null, Instant.now()));
                 assertTrue(ready.await(2, TimeUnit.SECONDS));
 
-                callback.get().accept(new ExchangeGateway.MarketEvent("MARK", "BTCUSDT", "1m", BigDecimal.TEN, null, Instant.now()));
+                blockAtCall.set(clockCalls.get() + 1);
+                Future<?> slowHealthCheck = executor.submit(() -> checkHealth(hub));
                 assertTrue(slowLookupStarted.await(2, TimeUnit.SECONDS));
 
                 Future<AutoCloseable> secondSubscriptionFuture = executor.submit(() -> hub.subscribe("LIVE", "BTCUSDT", "1m", ignored -> {
