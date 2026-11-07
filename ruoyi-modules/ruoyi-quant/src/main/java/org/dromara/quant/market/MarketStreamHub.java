@@ -567,14 +567,6 @@ public class MarketStreamHub {
             };
         }
 
-        /**
-         * 接收上游事件，过滤旧代次消息并更新连续性与新鲜度状态。
-         */
-        private void onEvent(long attempt, ExchangeGateway.MarketEvent event) {
-            long nowNanos = System.nanoTime();
-            onEvent(attempt, event, nowNanos, nowNanos, 0L, null);
-        }
-
         private void onEvent(long attempt, ExchangeGateway.MarketEvent event, long enqueuedAtNanos, long dequeuedAtNanos,
                              long recoveryBufferWaitNanos, Long resolvedExchangeOffsetMillis) {
             long processingStartedNanos = System.nanoTime();
