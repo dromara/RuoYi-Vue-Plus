@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  */
 final class RestRequestScheduler {
     private final ArrayDeque<Object>[] queues;
-    private final int[] rotation = {0, 1, 0, 2};
+    private final int[] rotation = {0, 1, 0, 2, 1, 0, 1, 3};
     private static final long MANUAL_BLOCK_RETRY_HINT_MILLIS = TimeUnit.HOURS.toMillis(24);
     private final long interval;
     private long nextStart;
@@ -21,20 +21,20 @@ final class RestRequestScheduler {
     @SuppressWarnings("unchecked")
     RestRequestScheduler(long intervalMillis) {
         interval = TimeUnit.MILLISECONDS.toNanos(intervalMillis);
-        queues = new ArrayDeque[]{new ArrayDeque<>(), new ArrayDeque<>(), new ArrayDeque<>()};
+        queues = new ArrayDeque[]{new ArrayDeque<>(), new ArrayDeque<>(), new ArrayDeque<>(), new ArrayDeque<>()};
     }
 
     synchronized void acquire(Kind kind) {
-        if (manualBlock) {
-            throw new ExchangeMarketPort.RequestDeferredException(MANUAL_BLOCK_RETRY_HINT_MILLIS);
-        }
         long initialNow = System.nanoTime();
+        if (manualBlock) {
+            throw deferred("MANUAL_BLOCK", kind, 0L, MANUAL_BLOCK_RETRY_HINT_MILLIS);
+        }
         if (initialNow < blockedUntil) {
-            throw new ExchangeMarketPort.RequestDeferredException(TimeUnit.NANOSECONDS.toMillis(blockedUntil - initialNow) + 1L);
+            throw deferred("BLOCKED_UNTIL", kind, 0L, TimeUnit.NANOSECONDS.toMillis(blockedUntil - initialNow) + 1L);
         }
         var queue = queues[kind.ordinal()];
         if (queue.size() >= 16) {
-            throw new ExchangeMarketPort.RequestDeferredException();
+            throw deferred("QUEUE_FULL", kind, 0L, 2_000L);
         }
         Object ticket = new Object();
         queue.addLast(ticket);
@@ -42,17 +42,17 @@ final class RestRequestScheduler {
         try {
             for (; ; ) {
                 if (Thread.currentThread().isInterrupted()) {
-                    throw new ExchangeMarketPort.RequestDeferredException();
+                    throw deferred("INTERRUPTED", kind, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - initialNow), 0L);
                 }
                 if (manualBlock) {
-                    throw new ExchangeMarketPort.RequestDeferredException(MANUAL_BLOCK_RETRY_HINT_MILLIS);
+                    throw deferred("MANUAL_BLOCK", kind, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - initialNow), MANUAL_BLOCK_RETRY_HINT_MILLIS);
                 }
                 long now = System.nanoTime();
                 if (now < blockedUntil) {
-                    throw new ExchangeMarketPort.RequestDeferredException(TimeUnit.NANOSECONDS.toMillis(blockedUntil - now) + 1L);
+                    throw deferred("BLOCKED_UNTIL", kind, TimeUnit.NANOSECONDS.toMillis(now - initialNow), TimeUnit.NANOSECONDS.toMillis(blockedUntil - now) + 1L);
                 }
                 if (now >= deadline) {
-                    throw new ExchangeMarketPort.RequestDeferredException();
+                    throw deferred("QUEUE_TIMEOUT", kind, TimeUnit.NANOSECONDS.toMillis(now - initialNow), 1_500L);
                 }
                 int selected = cursor;
                 for (int i = 0; i < rotation.length; i++) {
@@ -73,11 +73,20 @@ final class RestRequestScheduler {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new ExchangeMarketPort.RequestDeferredException();
+            throw deferred("INTERRUPTED", kind, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - initialNow), 0L);
         } finally {
             queue.remove(ticket);
             notifyAll();
         }
+    }
+
+    private ExchangeMarketPort.RequestDeferredException deferred(String reason, Kind kind, long waitedMillis, long retryAfterMillis) {
+        int[] queueSizes = new int[queues.length];
+        for (int i = 0; i < queues.length; i++) {
+            queueSizes[i] = queues[i].size();
+        }
+        return new ExchangeMarketPort.RequestDeferredException(reason, kind.name(), queueSizes[kind.ordinal()],
+            queueSizes, waitedMillis, retryAfterMillis);
     }
 
     /**
@@ -102,5 +111,5 @@ final class RestRequestScheduler {
     /**
      * REST 请求优先级：交易请求优先于账户和后台补偿查询。
      */
-    enum Kind {TRADE, ACCOUNT, BACKGROUND}
+    enum Kind {TRADE, POSITION_VERIFY, ACCOUNT, BACKGROUND}
 }
