@@ -19,6 +19,14 @@ public interface ExchangeAccountPort {
         return queryAccount(credential);
     }
 
+    /**
+     * Account facts fetched as part of a position verification receive higher REST scheduling priority
+     * than informational balance refreshes.
+     */
+    default ExchangeGateway.AccountSnapshot queryAccountForPosition(ExchangeGateway.Credential credential) {
+        return queryAccountFresh(credential);
+    }
+
     List<ExchangeGateway.PositionSnapshot> queryPositions(ExchangeGateway.Credential credential, String symbol);
 
     List<ExchangeGateway.IncomeSnapshot> queryIncomeHistory(ExchangeGateway.Credential credential, String symbol, String incomeType, ExchangeGateway.TimeRange range, Long limit);
