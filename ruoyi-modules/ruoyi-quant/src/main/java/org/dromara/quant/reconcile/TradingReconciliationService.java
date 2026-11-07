@@ -240,7 +240,9 @@ public class TradingReconciliationService {
                     earliestOrderUpdateTime, latestOrderUpdateTime);
 
                 List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
-                    tradeCollector.collect(exchangeCredential, symbol, historyStart, historyEnd);
+                    tradeCollector.collectByOrders(exchangeCredential, symbol, List.copyOf(ordersById.values()));
+                log.info("手动历史订单关联成交收集完成 credentialId={} symbol={} historyOrderCount={} tradeCount={} mode=ORDER_ID",
+                    credential.getId(), symbol, ordersById.size(), tradeSnapshots.size());
 
                 // Collect every order referenced by the new fills or by persisted fills whose
                 // source order is absent/incomplete. Page the database query so no fixed 200-row
