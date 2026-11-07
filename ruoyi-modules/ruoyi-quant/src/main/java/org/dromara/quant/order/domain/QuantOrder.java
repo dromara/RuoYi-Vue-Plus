@@ -60,7 +60,7 @@ public class QuantOrder {
      */
     private String positionSide;
     /**
-     * 订单或成交价格。
+     * 交易所委托价格；市价单实际成交均价单独存储。
      */
     private BigDecimal price;
     /** 实际累计成交均价；未成交或交易所未提供时为空。 */
