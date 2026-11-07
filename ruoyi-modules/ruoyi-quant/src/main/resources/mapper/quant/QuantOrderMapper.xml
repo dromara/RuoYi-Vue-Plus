@@ -25,7 +25,10 @@ SET exchange_order_id=COALESCE(exchange_order_id, #{fact.exchangeOrderId}),
     strategy_id=COALESCE(strategy_id, #{fact.strategyId}),
     strategy_instance_id=COALESCE(strategy_instance_id, #{fact.strategyInstanceId}),
     position_side=CASE WHEN position_side IS NULL OR TRIM(position_side)='' THEN #{fact.positionSide} ELSE position_side END,
-    reduce_only=COALESCE(reduce_only, #{fact.reduceOnly}),
+    reduce_only=CASE WHEN #{fact.reduceOnlySource}='BINANCE_REST' THEN #{fact.reduceOnly} ELSE reduce_only END,
+    reduce_only_source=CASE WHEN #{fact.reduceOnlySource}='BINANCE_REST' THEN 'BINANCE_REST'
+        ELSE COALESCE(reduce_only_source, #{fact.reduceOnlySource}) END,
+    close_position=COALESCE(#{fact.closePosition}, close_position),
     updated_at=#{fact.updatedAt}
 WHERE id=#{fact.id} AND credential_id=#{fact.credentialId}
   AND (exchange_order_id IS NULL OR #{fact.exchangeOrderId} IS NULL
@@ -38,7 +41,9 @@ WHERE id=#{fact.id} AND credential_id=#{fact.credentialId}
        OR strategy_instance_id=#{fact.strategyInstanceId})
   AND (position_side IS NULL OR TRIM(position_side)='' OR #{fact.positionSide} IS NULL
        OR position_side=#{fact.positionSide})
-  AND (reduce_only IS NULL OR #{fact.reduceOnly} IS NULL OR reduce_only=#{fact.reduceOnly})
+  AND (reduce_only_source IS NULL OR reduce_only_source<>'BINANCE_REST'
+       OR #{fact.reduceOnlySource}<>'BINANCE_REST' OR reduce_only=#{fact.reduceOnly})
+  AND (close_position IS NULL OR #{fact.closePosition} IS NULL OR close_position=#{fact.closePosition})
   AND (executed_quantity IS NULL OR
        (#{fact.executedQuantity} IS NOT NULL
         AND executed_quantity<=#{fact.executedQuantity}))

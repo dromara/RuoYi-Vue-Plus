@@ -75,6 +75,10 @@ public class QuantOrder {
      * 是否为只减仓订单。
      */
     private Boolean reduceOnly;
+    /** Binance 原始订单事实来源。 */
+    private String reduceOnlySource;
+    /** 是否触发后平掉该方向全部持仓。 */
+    private Boolean closePosition;
     /** 开仓订单受理时冻结的杠杆。 */
     private Integer leverageSnapshot;
     /** 开仓订单受理时冻结的价格最小变动单位。 */

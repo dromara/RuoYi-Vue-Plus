@@ -1034,7 +1034,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         }
         return new OrderSnapshot(actualSymbol, actualOrderId, actualClientOrderId, string(data, "getSide"), type, status, decimal(string(data, "getPrice")), decimal(string(data,
             "getOrigQty")), decimal(string(data, "getExecutedQty")), instant(number(data, "getUpdateTime")), decimal(string(data, "getAvgPrice")), string(data, "getPositionSide"),
-            nullableBoolean(data, "getReduceOnly"), instant(number(data, "getTime")));
+            nullableBoolean(data, "getReduceOnly"), instant(number(data, "getTime")), nullableBoolean(data, "getClosePosition"));
     }
 
     /**
@@ -1089,18 +1089,18 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     @Override
     public List<OrderSnapshot> queryOrderHistory(Credential credential, String symbol, TimeRange range, Long limit) {
         requireCredential(credential);
-        String querySymbol = symbol == null ? "" : symbol.trim();
-        Long start = querySymbol.isEmpty() || range == null || range.from() == null ? null : range.from().toEpochMilli();
-        Long end = querySymbol.isEmpty() || range == null || range.to() == null ? null : range.to().toEpochMilli();
-        Long orderId = querySymbol.isEmpty() ? 0L : null;
+        String querySymbol = symbol == null || symbol.isBlank() ? null : symbol.trim();
+        Long start = range == null || range.from() == null ? null : range.from().toEpochMilli();
+        Long end = range == null || range.to() == null ? null : range.to().toEpochMilli();
         var data = signedRead(credential, RestRequestScheduler.Kind.BACKGROUND,
-            client -> client.allOrders(querySymbol, orderId, start, end, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS).getData());
+            client -> client.allOrders(querySymbol, null, start, end, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS).getData());
         if (data == null) {
             throw new IllegalStateException("Binance 历史订单响应缺少数据载荷，无法确认查询完整性");
         }
         return data.stream().map(item -> new OrderSnapshot(item.getSymbol(), item.getOrderId(), item.getClientOrderId(), item.getSide(), item.getType(), item.getStatus(),
             decimal(item.getPrice()), decimal(item.getOrigQty()), decimal(item.getExecutedQty()), instant(item.getUpdateTime()), decimal(string(item, "getAvgPrice")),
-            string(item, "getPositionSide"), nullableBoolean(item, "getReduceOnly"), instant(number(item, "getTime")))).toList();
+            string(item, "getPositionSide"), nullableBoolean(item, "getReduceOnly"), instant(number(item, "getTime")),
+            nullableBoolean(item, "getClosePosition"))).toList();
     }
 
     /**

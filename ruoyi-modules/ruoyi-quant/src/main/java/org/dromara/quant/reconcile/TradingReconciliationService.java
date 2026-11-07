@@ -247,62 +247,35 @@ public class TradingReconciliationService {
 
     private Map<String, List<ExchangeGateway.OrderSnapshot>> collectManualOrderHistory(ExchangeGateway.Credential credential, Long credentialId,
                                                                                               String symbol, Instant historyStart, Instant historyEnd) {
-        Set<String> symbols = new TreeSet<>();
+        List<ExchangeGateway.OrderSnapshot> history;
         if (symbol == null || symbol.isBlank()) {
-            log.info("手动账户级历史订单交易对发现 credentialId={} discoveryLimit=1000", credentialId);
-            List<ExchangeGateway.OrderSnapshot> discovery = gateway.queryOrderHistory(credential, "", null, 1000L);
-            if (discovery == null) {
-                throw new IllegalStateException("Binance 账户级订单发现响应缺少数据载荷");
-            }
-            for (ExchangeGateway.OrderSnapshot order : discovery) {
-                validateSyncOrderSnapshot(order, null);
-                symbols.add(normalizeTradingSymbol(order.symbol()));
-            }
-            if (discovery.size() >= 1000) {
-                log.warn("Binance 账户级订单发现结果达到单页上限，未出现在发现页且本地也无记录的交易对可能无法被自动发现 credentialId={}",
-                    credentialId);
-            }
-            for (String knownSymbol : orderMapper.selectHistoricalSymbolsByCredential(credentialId)) {
-                if (knownSymbol != null && !knownSymbol.isBlank()) {
-                    symbols.add(normalizeTradingSymbol(knownSymbol));
-                }
-            }
-            for (String knownSymbol : tradeHistoryMapper.selectHistoricalSymbolsByCredential(credentialId)) {
-                if (knownSymbol != null && !knownSymbol.isBlank()) {
-                    symbols.add(normalizeTradingSymbol(knownSymbol));
-                }
-            }
-            List<QuantPosition> localPositions = positionMapper.selectList(
-                new LambdaQueryWrapper<QuantPosition>().eq(QuantPosition::getCredentialId, credentialId));
-            for (QuantPosition position : localPositions) {
-                if (position.getSymbol() != null && !position.getSymbol().isBlank()) {
-                    symbols.add(normalizeTradingSymbol(position.getSymbol()));
-                }
-            }
+            log.info("手动账户级历史订单查询 credentialId={} from={} to={} scope=ACCOUNT_90D",
+                credentialId, historyStart, historyEnd);
+            history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range ->
+                gateway.queryOrderHistory(credential, null, range, 1000L));
         } else {
-            symbols.add(normalizeTradingSymbol(symbol));
-        }
-
-        Map<String, List<ExchangeGateway.OrderSnapshot>> result = new TreeMap<>();
-        for (String querySymbol : symbols) {
-            List<ExchangeGateway.OrderSnapshot> history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
-                log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}", credentialId, querySymbol, range.from(), range.to());
+            String querySymbol = normalizeTradingSymbol(symbol);
+            history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
+                log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}",
+                    credentialId, querySymbol, range.from(), range.to());
                 return gateway.queryOrderHistory(credential, querySymbol, range, 1000L);
             });
-            Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
-            for (ExchangeGateway.OrderSnapshot order : history) {
-                validateSyncOrderSnapshot(order, querySymbol);
-                ExchangeGateway.OrderSnapshot previous = ordersById.putIfAbsent(order.orderId(), order);
-                if (previous != null && !previous.equals(order)) {
-                    throw new IllegalStateException("Binance 历史订单分页返回冲突的订单事实 orderId=" + order.orderId());
-                }
-            }
-            result.put(querySymbol, List.copyOf(ordersById.values()));
-            log.info("手动历史订单获取完成 credentialId={} symbol={} returnedCount={} distinctOrderCount={} scope=SYMBOL_90D",
-                credentialId, querySymbol, history.size(), ordersById.size());
         }
-        log.info("手动历史订单交易对发现完成 credentialId={} symbolFilter={} symbolCount={} discoveryMode={}",
-            credentialId, symbol, result.size(), symbol == null || symbol.isBlank() ? "ACCOUNT_PAGE_PLUS_LOCAL_LEDGER" : "EXPLICIT_SYMBOL");
+        Map<String, Map<Long, ExchangeGateway.OrderSnapshot>> grouped = new TreeMap<>();
+        for (ExchangeGateway.OrderSnapshot order : history) {
+            validateSyncOrderSnapshot(order, symbol == null || symbol.isBlank() ? null : symbol);
+            String orderSymbol = normalizeTradingSymbol(order.symbol());
+            Map<Long, ExchangeGateway.OrderSnapshot> ordersById =
+                grouped.computeIfAbsent(orderSymbol, ignored -> new LinkedHashMap<>());
+            ExchangeGateway.OrderSnapshot previous = ordersById.putIfAbsent(order.orderId(), order);
+            if (previous != null && !previous.equals(order)) {
+                throw new IllegalStateException("Binance 历史订单分页返回冲突的订单事实 orderId=" + order.orderId());
+            }
+        }
+        Map<String, List<ExchangeGateway.OrderSnapshot>> result = new TreeMap<>();
+        grouped.forEach((orderSymbol, ordersById) -> result.put(orderSymbol, List.copyOf(ordersById.values())));
+        log.info("手动历史订单同步范围完成 credentialId={} symbolFilter={} symbolCount={} returnedCount={} scope=90D",
+            credentialId, symbol, result.size(), history.size());
         return result;
     }
 
@@ -1011,7 +984,10 @@ public class TradingReconciliationService {
                     || s.side() != null && entity.getSide() != null && !entity.getSide().equalsIgnoreCase(s.side())
                     || s.positionSide() != null && entity.getPositionSide() != null && !entity.getPositionSide().isBlank()
                         && !entity.getPositionSide().equalsIgnoreCase(s.positionSide())
-                    || s.reduceOnly() != null && entity.getReduceOnly() != null && !entity.getReduceOnly().equals(s.reduceOnly()))) {
+                    || s.reduceOnly() != null && "BINANCE_REST".equals(entity.getReduceOnlySource())
+                        && entity.getReduceOnly() != null && !entity.getReduceOnly().equals(s.reduceOnly())
+                    || s.closePosition() != null && entity.getClosePosition() != null
+                        && !entity.getClosePosition().equals(s.closePosition()))) {
                 throw new IllegalStateException("Binance 订单身份、方向或持仓来源事实与本地账本冲突，拒绝覆盖 orderId=" + s.orderId());
             }
             boolean sourceFactsChanged = entity == null
@@ -1020,7 +996,9 @@ public class TradingReconciliationService {
                     && !clientOrderId.startsWith("EXCHANGE:")
                 || entity.getSide() == null && s.side() != null
                 || (entity.getPositionSide() == null || entity.getPositionSide().isBlank()) && s.positionSide() != null
-                || entity.getReduceOnly() == null && s.reduceOnly() != null
+                || (s.reduceOnly() != null && (!s.reduceOnly().equals(entity.getReduceOnly())
+                    || !"BINANCE_REST".equals(entity.getReduceOnlySource())))
+                || s.closePosition() != null && !s.closePosition().equals(entity.getClosePosition())
                 || s.executedQuantity() != null && (entity.getExecutedQuantity() == null
                     || entity.getExecutedQuantity().compareTo(s.executedQuantity()) != 0);
             if (entity == null) {
@@ -1035,7 +1013,13 @@ public class TradingReconciliationService {
             entity.setExchangeOrderId(s.orderId());
             entity.setSide(s.side());
             entity.setPositionSide(s.positionSide());
-            entity.setReduceOnly(s.reduceOnly());
+            if (s.reduceOnly() != null) {
+                entity.setReduceOnly(s.reduceOnly());
+                entity.setReduceOnlySource("BINANCE_REST");
+            } else if (entity.getReduceOnlySource() == null || "LEGACY_UNKNOWN".equals(entity.getReduceOnlySource())) {
+                entity.setReduceOnlySource("UNAVAILABLE");
+            }
+            entity.setClosePosition(s.closePosition());
             entity.setOrderType(s.type());
             entity.setStatus(s.status());
             entity.setPrice(s.price());

@@ -135,7 +135,7 @@ public final class TradeCycleAssembler {
                                      Map<String, Cycle> explicitCycles) {
         String sideDirection = "BUY".equals(side) ? "LONG" : "SHORT";
         String role = role(fill);
-        boolean reduceOnly = Boolean.TRUE.equals(fill.getReduceOnly());
+        boolean reduceOnly = Boolean.TRUE.equals(fill.getReduceOnly()) || Boolean.TRUE.equals(fill.getClosePosition());
         if (role == null && directionHint != null) {
             role = side.equals("LONG".equals(directionHint) ? "BUY" : "SELL") ? "OPEN" : "CLOSE";
         }

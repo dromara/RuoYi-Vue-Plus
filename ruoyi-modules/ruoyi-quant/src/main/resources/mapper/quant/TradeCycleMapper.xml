@@ -46,7 +46,9 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
             COALESCE(NULLIF(UPPER(t.position_side),''),NULLIF(UPPER(j.position_side),''),o.position_side) AS exchangePositionSide,
             COALESCE(soi.fill_role,pre.operation_type,execution.operation_type) AS fillRole,
             COALESCE(soi.position_cycle_key,pre.position_cycle_key) AS positionCycleKey,
-            CASE WHEN o.reduce_only='1' THEN 1 WHEN o.reduce_only='0' THEN 0 ELSE NULL END AS reduceOnly,
+            CASE WHEN o.reduce_only_source='BINANCE_REST' AND o.reduce_only='1' THEN 1
+                 WHEN o.reduce_only_source='BINANCE_REST' AND o.reduce_only='0' THEN 0 ELSE NULL END AS reduceOnly,
+            o.close_position AS closePosition,
             o.executed_quantity AS orderExecutedQuantity,
             t.quantity,
             t.price,

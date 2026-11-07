@@ -19,6 +19,7 @@ public class TradeCycleSourceFill {
     private String fillRole;
     private String positionCycleKey;
     private Boolean reduceOnly;
+    private Boolean closePosition;
     private BigDecimal orderExecutedQuantity;
     private BigDecimal quantity;
     private BigDecimal price;

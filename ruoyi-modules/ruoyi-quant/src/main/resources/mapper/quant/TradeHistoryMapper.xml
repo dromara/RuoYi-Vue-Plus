@@ -24,7 +24,8 @@
           AND (
               o.id IS NULL
               OR NULLIF(TRIM(o.position_side), '') IS NULL
-              OR o.reduce_only IS NULL
+              OR o.reduce_only_source IS NULL
+              OR o.reduce_only_source='LEGACY_UNKNOWN'
               OR (o.id IS NOT NULL AND (o.client_order_id IS NULL OR o.client_order_id = CONCAT('EXCHANGE:', t.exchange_order_id)))
           )
         ORDER BY t.exchange_order_id

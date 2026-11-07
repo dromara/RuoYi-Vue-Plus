@@ -174,21 +174,22 @@ public interface ExchangeGateway extends ExchangeMarketPort, ExchangeAccountPort
     record OrderSnapshot(String symbol,
                          @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class) Long orderId,
                          String clientOrderId, String side, String type, String status, BigDecimal price, BigDecimal originalQuantity, BigDecimal executedQuantity,
-                         Instant updateTime, BigDecimal averagePrice, String positionSide, Boolean reduceOnly, Instant createTime) {
+                         Instant updateTime, BigDecimal averagePrice, String positionSide, Boolean reduceOnly, Instant createTime,
+                         Boolean closePosition) {
         public OrderSnapshot(String symbol, Long orderId, String clientOrderId, String side, String type, String status, BigDecimal price, BigDecimal originalQuantity,
                              BigDecimal executedQuantity, Instant updateTime, BigDecimal averagePrice, String positionSide, Boolean reduceOnly) {
             this(symbol, orderId, clientOrderId, side, type, status, price, originalQuantity, executedQuantity, updateTime,
-                averagePrice, positionSide, reduceOnly, null);
+                averagePrice, positionSide, reduceOnly, null, null);
         }
 
         public OrderSnapshot(String symbol, Long orderId, String clientOrderId, String side, String type, String status, BigDecimal price, BigDecimal originalQuantity,
                              BigDecimal executedQuantity, Instant updateTime, BigDecimal averagePrice) {
-            this(symbol, orderId, clientOrderId, side, type, status, price, originalQuantity, executedQuantity, updateTime, averagePrice, null, null, null);
+            this(symbol, orderId, clientOrderId, side, type, status, price, originalQuantity, executedQuantity, updateTime, averagePrice, null, null, null, null);
         }
 
         public OrderSnapshot(String symbol, Long orderId, String clientOrderId, String side, String type, String status, BigDecimal price, BigDecimal originalQuantity,
                              BigDecimal executedQuantity, Instant updateTime) {
-            this(symbol, orderId, clientOrderId, side, type, status, price, originalQuantity, executedQuantity, updateTime, null, null, null, null);
+            this(symbol, orderId, clientOrderId, side, type, status, price, originalQuantity, executedQuantity, updateTime, null, null, null, null, null);
         }
     }
 
