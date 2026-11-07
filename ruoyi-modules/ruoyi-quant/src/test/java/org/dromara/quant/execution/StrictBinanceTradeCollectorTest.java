@@ -29,25 +29,27 @@ class StrictBinanceTradeCollectorTest {
     }
 
     @Test
-    void collectsFillsByOrderIdAndContinuesFullPagesWithFromId() {
+    void splitsSaturatedPerOrderFillWindowAndCollectsEveryFill() {
         var order = new ExchangeGateway.OrderSnapshot("BTCUSDT", 11L, "client-11", "BUY", "MARKET", "FILLED",
-            BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, end, BigDecimal.TEN);
-        var firstPage = java.util.stream.LongStream.rangeClosed(1, 1000).mapToObj(this::trade).toList();
-        when(gateway.queryTradesByOrder(credential, "BTCUSDT", 11L, null, 1000L)).thenReturn(firstPage);
-        when(gateway.queryTradesByOrder(credential, "BTCUSDT", 11L, 1001L, 1000L)).thenReturn(List.of(trade(1001L)));
+            BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, end, BigDecimal.TEN, "BOTH", false, start);
+        var fullPage = java.util.stream.LongStream.rangeClosed(1, 1000).mapToObj(this::trade).toList();
+        when(gateway.queryTradesByOrder(eq(credential), eq("BTCUSDT"), eq(11L), any(), eq(1000L))).thenAnswer(call -> {
+            var range = call.<ExchangeGateway.TimeRange>getArgument(3);
+            return fullPage.stream().filter(value -> !value.time().isBefore(range.from()) && !value.time().isAfter(range.to())).toList();
+        });
 
-        var result = collector.collectByOrders(credential, "BTCUSDT", List.of(order));
+        var result = collector.collectByOrders(credential, "BTCUSDT", List.of(order), start, end);
 
-        assertEquals(1001, result.size());
+        assertEquals(1000, result.size());
         assertEquals(1L, result.getFirst().tradeId());
-        assertEquals(1001L, result.getLast().tradeId());
+        assertEquals(1000L, result.getLast().tradeId());
     }
 
     @Test
     void skipsOrdersThatCannotHaveFills() {
         var order = new ExchangeGateway.OrderSnapshot("BTCUSDT", 12L, "client-12", "BUY", "LIMIT", "CANCELED",
             BigDecimal.TEN, BigDecimal.ONE, BigDecimal.ZERO, end);
-        assertEquals(List.of(), collector.collectByOrders(credential, "BTCUSDT", List.of(order)));
+        assertEquals(List.of(), collector.collectByOrders(credential, "BTCUSDT", List.of(order), start, end));
         org.mockito.Mockito.verifyNoInteractions(gateway);
     }
 
