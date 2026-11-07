@@ -60,7 +60,7 @@ class StrictBinanceTradeCollectorTest {
         when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(11L), any(), anyLong())).thenReturn(List.of(
             new ExchangeGateway.TradeSnapshot("BTCUSDT", 1L, 12L, "BUY", BigDecimal.ONE, BigDecimal.TEN,
                 BigDecimal.ZERO, BigDecimal.ZERO, start, "USDT")));
-        assertThrows(IllegalStateException.class, () -> collector.collectByOrders(credential, "BTCUSDT", List.of(order)));
+        assertThrows(IllegalStateException.class, () -> collector.collectByOrders(credential, "BTCUSDT", List.of(order), start, end));
     }
 
     @Test
