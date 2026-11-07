@@ -493,6 +493,14 @@ public class StrategyRuntimeService {
         }
     }
 
+    /** Invalidate cached position facts atomically with the in-flight reconciliation fence. */
+    private void invalidatePositionFacts(ActiveRuntime runtime) {
+        synchronized (runtime) {
+            runtime.positionFactsInvalidationGeneration.incrementAndGet();
+            runtime.positionFactsReady = false;
+        }
+    }
+
     /**
      * 将账户事实刷新请求合并排队，避免每条行情事件都发起 REST 查询。
      */
@@ -845,12 +853,12 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             }
             recordError(runtime.instance, ex);
         } finally {
-            boolean positionFactsStillCurrent = positionFactsInvalidationGeneration == runtime.positionFactsInvalidationGeneration.get();
-            if (reconciliationCompleted && !positionFactsStillCurrent) {
-                reconciliationCompleted = false;
-                runtime.positionReconciliationBlockReason = "POSITION_FACTS_INVALIDATED_DURING_RECONCILIATION";
-            }
             synchronized (runtime) {
+                boolean positionFactsStillCurrent = positionFactsInvalidationGeneration == runtime.positionFactsInvalidationGeneration.get();
+                if (reconciliationCompleted && !positionFactsStillCurrent) {
+                    reconciliationCompleted = false;
+                    runtime.positionReconciliationBlockReason = "POSITION_FACTS_INVALIDATED_DURING_RECONCILIATION";
+                }
                 runtime.positionReconciling = false;
                 if (reconciliationCompleted) {
                     runtime.stateRefreshRequired = false;
@@ -1044,8 +1052,7 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
                 if (!"PAPER".equalsIgnoreCase(credential.getRunMode())) {
                     runtime.userSubscription = userDataStreamHub.subscribe(credential, event -> {
                         if (event != null) {
-                            runtime.positionFactsInvalidationGeneration.incrementAndGet();
-                                        runtime.positionFactsReady = false;
+                            invalidatePositionFacts(runtime);
                             invalidateEntryProtectionCleanup(runtime);
                             reconciliationService.invalidateRuntimePositionSnapshot(credential.getId());
                             requestReconciliation(runtime);
@@ -3511,8 +3518,7 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                                         // 冻结落库未确认时不能派发，也不能把内存值当成已持久化；先重载以处理提交结果不明。
                                         runtime.state.setStopLossPrice(null);
                                         runtime.stateRefreshRequired = true;
-                                        runtime.positionFactsInvalidationGeneration.incrementAndGet();
-                                        runtime.positionFactsReady = false;
+                                        invalidatePositionFacts(runtime);
                                         runtime.nextReconcileAt = 0L;
                                         requestReconciliation(runtime);
                                         throw ex;
@@ -3807,8 +3813,7 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                             replaceRuntimeStatePreservingExtrema(runtime, latestState);
                         }
                         runtime.stateRefreshRequired = true;
-                        runtime.positionFactsInvalidationGeneration.incrementAndGet();
-                                        runtime.positionFactsReady = false;
+                        invalidatePositionFacts(runtime);
                         runtime.protectionCleanupPending = true;
                         runtime.nextReconcileAt = System.currentTimeMillis() + 1_000L;
                         runtime.reconcileRequested.set(true);
@@ -3995,8 +4000,7 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
             } catch (org.dromara.quant.runtime.service.StrategyPositionStateService.StateConflictException ex) {
                 // 状态竞争不属于行情传输故障：保留本周期极值，暂停决策并由已有恢复线程重新取证。
                 runtime.stateRefreshRequired = true;
-                runtime.positionFactsInvalidationGeneration.incrementAndGet();
-                                        runtime.positionFactsReady = false;
+                invalidatePositionFacts(runtime);
                 runtime.nextReconcileAt = 0L;
                 log.warn("持仓极值保存遇到状态版本冲突，保留行情连接并等待持仓重核 instanceId={} symbol={} version={}",
                     runtime.instance.getId(), runtime.symbol.getSymbol(), runtime.state.getVersion());
