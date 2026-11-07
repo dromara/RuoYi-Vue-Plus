@@ -1023,6 +1023,7 @@ public class TradingReconciliationService {
             entity.setOrderType(s.type());
             entity.setStatus(s.status());
             entity.setPrice(s.price());
+            entity.setAveragePrice(s.averagePrice());
             entity.setOriginalQuantity(nvl(s.originalQuantity()));
             entity.setExecutedQuantity(nvl(s.executedQuantity()));
             entity.setUpdatedAt(s.updateTime() == null ? LocalDateTime.now(ZoneOffset.UTC) : LocalDateTime.ofInstant(s.updateTime(), ZoneOffset.UTC));
