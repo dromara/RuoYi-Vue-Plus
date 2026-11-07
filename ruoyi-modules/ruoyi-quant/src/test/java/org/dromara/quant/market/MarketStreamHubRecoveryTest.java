@@ -84,6 +84,54 @@ class MarketStreamHubRecoveryTest {
     }
 
     @Test
+    void slowClockOffsetLookupDoesNotHoldSharedStreamMonitor() throws Exception {
+        AtomicInteger clockCalls = new AtomicInteger();
+        CountDownLatch slowLookupStarted = new CountDownLatch(1);
+        CountDownLatch releaseSlowLookup = new CountDownLatch(1);
+        when(gateway.exchangeTimeOffsetMillis("LIVE")).thenAnswer(invocation -> {
+            if (clockCalls.incrementAndGet() == 3) {
+                slowLookupStarted.countDown();
+                assertTrue(releaseSlowLookup.await(3, TimeUnit.SECONDS));
+            }
+            return 0L;
+        });
+        MarketStreamHub hub = hub(List.of(candle(open.minusSeconds(120), true), candle(open.minusSeconds(60), true), candle(open, false)));
+        CountDownLatch ready = new CountDownLatch(1);
+        AutoCloseable firstSubscription = null;
+        AutoCloseable secondSubscription = null;
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            try {
+                firstSubscription = hub.subscribe("LIVE", "BTCUSDT", "1m", ignored -> {
+                }, isReady -> {
+                    if (isReady) {
+                        ready.countDown();
+                    }
+                });
+                callback.get().accept(new ExchangeGateway.MarketEvent("MARK", "BTCUSDT", "1m", BigDecimal.TEN, null, Instant.now()));
+                assertTrue(ready.await(2, TimeUnit.SECONDS));
+
+                callback.get().accept(new ExchangeGateway.MarketEvent("MARK", "BTCUSDT", "1m", BigDecimal.TEN, null, Instant.now()));
+                assertTrue(slowLookupStarted.await(2, TimeUnit.SECONDS));
+
+                Future<AutoCloseable> secondSubscriptionFuture = executor.submit(() -> hub.subscribe("LIVE", "BTCUSDT", "1m", ignored -> {
+                }));
+                secondSubscription = secondSubscriptionFuture.get(1, TimeUnit.SECONDS);
+                assertNotNull(secondSubscription, "a slow exchange-time lookup must not hold the shared-stream monitor");
+            } finally {
+                releaseSlowLookup.countDown();
+                if (secondSubscription != null) {
+                    secondSubscription.close();
+                }
+                if (firstSubscription != null) {
+                    firstSubscription.close();
+                }
+                hub.close();
+                scheduler.shutdownNow();
+            }
+        }
+    }
+
+    @Test
     void unsupportedSymbolPublishesErrorAndDoesNotReconnectForever() throws Exception {
         properties.getMarket().setReconnectDelaySeconds(1);
         when(gateway.subscribeMarket(anyString(), anyString(), anyString(), any())).thenReturn(mock(ExchangeGateway.MarketStreamSession.class));
