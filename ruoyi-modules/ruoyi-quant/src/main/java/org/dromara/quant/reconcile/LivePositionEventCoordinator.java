@@ -53,13 +53,13 @@ public class LivePositionEventCoordinator {
         String type = event.eventType();
         if ("DISCONNECTED".equalsIgnoreCase(type) || "listenKeyExpired".equalsIgnoreCase(type)) {
             if (freshness != null) {
-                freshness.invalidate(credentialId);
+                freshness.invalidate(credentialId, "STREAM_DISCONNECTED");
             }
             return;
         }
         if ("CONNECTED".equalsIgnoreCase(type)) {
             protectionRecoveryPending.add(new ProtectionRecoveryRequest(credentialId, null));
-            request(credentialId);
+            queueRefresh(credentialId);
             return;
         }
         if ("ALGO_UPDATE".equalsIgnoreCase(type)) {
@@ -70,18 +70,18 @@ public class LivePositionEventCoordinator {
         }
         if ("ACCOUNT_UPDATE".equalsIgnoreCase(type)) {
             if (mayChangeAccountPosition(event.rawJson())) {
-                request(credentialId);
+                request(credentialId, "ACCOUNT_POSITION_UPDATE");
             }
             return;
         }
         if ("ORDER_TRADE_UPDATE".equalsIgnoreCase(type)) {
             if (mayChangePosition(event.rawJson())) {
-                request(credentialId);
+                request(credentialId, "ORDER_TRADE_EXECUTION");
             }
             return;
         }
         // Unknown event types retain fail-closed behavior, but also queue a refresh so the gate can recover.
-        request(credentialId);
+        request(credentialId, "UNKNOWN_EVENT");
     }
 
     private static String algoEventSymbol(String rawJson) {
@@ -141,12 +141,23 @@ public class LivePositionEventCoordinator {
      * 合并同一账户的重复刷新请求并安排持仓事实对账。
      */
     public void request(Long credentialId) {
+        request(credentialId, "EXPLICIT_REFRESH");
+    }
+
+    public void request(Long credentialId, String reason) {
         if (credentialId != null) {
             // A stream event may make the previously verified snapshot stale.
             // No further LIVE opening until a full REST snapshot commits.
             if (freshness != null) {
-                freshness.invalidate(credentialId);
+                freshness.invalidate(credentialId, reason);
             }
+            queueRefresh(credentialId);
+        }
+    }
+
+    /** 排队刷新已失效的快照，不再次推进 generation。 */
+    public void queueRefresh(Long credentialId) {
+        if (credentialId != null) {
             pending.add(credentialId);
         }
     }
