@@ -553,11 +553,10 @@ class TradingReconciliationTransactionTest {
 
     private void stubManualSyncQueries(String symbol, ExchangeGateway.TradeSnapshot fill) {
         when(gateway.queryOrderHistory(any(), eq(symbol), any(), anyLong())).thenReturn(List.of());
-        when(gateway.queryTrades(any(), eq(symbol), any())).thenAnswer(invocation -> {
-            ExchangeGateway.TimeRange range = invocation.getArgument(2);
-            return !fill.time().isBefore(range.from()) && !fill.time().isAfter(range.to())
-                ? List.of(fill) : List.of();
-        });
+        when(gateway.queryOrderHistory(any(), eq(symbol), any(), anyLong())).thenReturn(List.of(
+            new ExchangeGateway.OrderSnapshot(symbol, fill.orderId(), "client-" + fill.orderId(), "BUY", "MARKET", "FILLED",
+                BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, fill.time(), BigDecimal.TEN, "BOTH", false)));
+        when(gateway.queryTradesByOrder(any(), eq(symbol), eq(fill.orderId()), isNull(), anyLong())).thenReturn(List.of(fill));
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq(symbol), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
             .thenReturn(List.of());
         when(orders.selectList(any())).thenReturn(List.of());
@@ -570,7 +569,7 @@ class TradingReconciliationTransactionTest {
             "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
             Instant.now().minusSeconds(60), BigDecimal.TEN, "BOTH", false);
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of(historicalOrder));
-        when(gateway.queryTrades(any(), eq("BTCUSDT"), any())).thenReturn(List.of());
+        when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(303L), isNull(), anyLong())).thenReturn(List.of());
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
             .thenReturn(List.of());
         when(orders.selectOne(any())).thenReturn(null);
@@ -587,8 +586,7 @@ class TradingReconciliationTransactionTest {
     }
 
     @Test
-    void manualHistoricalOrdersAndTradesShareWindowInsideBinanceNinetyDayLimit() {
-        when(gateway.queryTrades(any(), eq("BTCUSDT"), any())).thenReturn(List.of());
+    void manualSyncQueriesOrdersAcrossNinetyDaysThenUsesOrderIdsForFills() {
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
             .thenReturn(List.of());
@@ -597,18 +595,15 @@ class TradingReconciliationTransactionTest {
         service().syncTradingData(credential(), "BTCUSDT");
 
         var orderRanges = org.mockito.ArgumentCaptor.forClass(ExchangeGateway.TimeRange.class);
-        var tradeRanges = org.mockito.ArgumentCaptor.forClass(ExchangeGateway.TimeRange.class);
         verify(gateway, atLeastOnce()).queryOrderHistory(any(), eq("BTCUSDT"), orderRanges.capture(), anyLong());
-        verify(gateway, atLeastOnce()).queryTrades(any(), eq("BTCUSDT"), tradeRanges.capture());
-
-        ExchangeGateway.TimeRange firstOrderRange = orderRanges.getAllValues().getFirst();
-        ExchangeGateway.TimeRange lastOrderRange = orderRanges.getAllValues().getLast();
-        ExchangeGateway.TimeRange firstTradeRange = tradeRanges.getAllValues().getFirst();
-        assertTrue(firstOrderRange.from().isAfter(beforeSync.minus(java.time.Duration.ofDays(90)).plusSeconds(50)));
-        assertEquals(firstOrderRange.from().toEpochMilli(), firstTradeRange.from().toEpochMilli());
-        assertEquals(lastOrderRange.to().toEpochMilli(), tradeRanges.getAllValues().getLast().to().toEpochMilli());
-        assertEquals(java.time.Duration.ofDays(90).minusMinutes(1).toMillis(),
-            java.time.Duration.between(firstOrderRange.from(), lastOrderRange.to()).toMillis());
+        verify(gateway, never()).queryTrades(any(), any(), any());
+        verify(gateway, never()).queryTradesByOrder(any(), any(), any(), any(), any());
+        List<ExchangeGateway.TimeRange> queriedRanges = orderRanges.getAllValues();
+        assertTrue(queriedRanges.getFirst().from().isAfter(beforeSync.minus(java.time.Duration.ofDays(90)).plusSeconds(50)));
+        assertTrue(queriedRanges.stream().allMatch(range ->
+            java.time.Duration.between(range.from(), range.to()).compareTo(java.time.Duration.ofDays(7)) < 0));
+        assertTrue(java.time.Duration.between(queriedRanges.getFirst().from(),
+            queriedRanges.getLast().to()).compareTo(java.time.Duration.ofDays(89)) > 0);
     }
 
     @Test
@@ -814,7 +809,7 @@ class TradingReconciliationTransactionTest {
     @Test
     void manualSyncProjectsTradeRecordsAfterSourceTransactionCommits() {
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
-        when(gateway.queryTrades(any(), eq("BTCUSDT"), any())).thenReturn(List.of());
+        when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of());
         when(tradeHistory.selectOrderIdsMissingOrderFacts(eq(1L), eq("BTCUSDT"), any(java.time.LocalDateTime.class), anyLong(), eq(200)))
             .thenReturn(List.of());
         doAnswer(invocation -> {
