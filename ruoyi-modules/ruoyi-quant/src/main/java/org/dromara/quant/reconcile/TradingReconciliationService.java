@@ -240,7 +240,7 @@ public class TradingReconciliationService {
                     earliestOrderUpdateTime, latestOrderUpdateTime);
 
                 List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
-                    tradeCollector.collectByOrders(exchangeCredential, symbol, List.copyOf(ordersById.values()));
+                    tradeCollector.collectByOrders(exchangeCredential, symbol, List.copyOf(ordersById.values()), historyStart, historyEnd);
                 log.info("手动历史订单关联成交收集完成 credentialId={} symbol={} historyOrderCount={} tradeCount={} mode=ORDER_ID",
                     credential.getId(), symbol, ordersById.size(), tradeSnapshots.size());
 
