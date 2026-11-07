@@ -78,6 +78,9 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
      */
     private final Map<String, Object> clockOffsetRefreshLocks = new ConcurrentHashMap<>();
     private final Map<String, Long> clockOffsetWarningTimes = new ConcurrentHashMap<>();
+    private final Map<String, java.util.concurrent.atomic.AtomicBoolean> clockOffsetRefreshInFlight = new ConcurrentHashMap<>();
+    private final Map<String, Long> clockOffsetRefreshAttempts = new ConcurrentHashMap<>();
+    private final java.util.concurrent.ExecutorService clockOffsetRefreshExecutor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor();
     private final Map<String, TradingRules> tradingRules = new ConcurrentHashMap<>();
     /**
      * 进程内共享的 REST 请求节流时间点，避免同一出口 IP 触发 Binance 权重限制。
@@ -1623,6 +1626,14 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     @Override
     public long exchangeTimeOffsetMillis(String runMode) {
         String baseUrl = marketBaseUrl(runMode);
+        long now = System.currentTimeMillis();
+        ClockOffset cached = clockOffsets.get(baseUrl);
+        if (cached != null && isMarketClockOffsetCacheUsable(cached.updatedAt(), now)) {
+            if (isClockOffsetRefreshDue(cached.updatedAt(), now)) {
+                scheduleClockOffsetRefresh(baseUrl, cached.updatedAt());
+            }
+            return cached.value();
+        }
         try {
             return clockOffset(baseUrl);
         } catch (RuntimeException ex) {
@@ -1630,24 +1641,85 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
                 ex instanceof ExchangeMarketPort.RateLimitException)) {
                 throw ex;
             }
-            ClockOffset cached = clockOffsets.get(baseUrl);
-            long now = System.currentTimeMillis();
-            if (cached == null || now - cached.updatedAt() > MAX_STALE_MARKET_CLOCK_OFFSET_MILLIS) {
+            cached = clockOffsets.get(baseUrl);
+            now = System.currentTimeMillis();
+            if (cached == null || !isMarketClockOffsetCacheUsable(cached.updatedAt(), now)) {
                 throw ex;
             }
-            java.util.concurrent.atomic.AtomicBoolean shouldWarn = new java.util.concurrent.atomic.AtomicBoolean();
-            clockOffsetWarningTimes.compute(baseUrl, (ignored, lastWarning) -> {
-                if (lastWarning == null || now - lastWarning >= 30_000L) {
-                    shouldWarn.set(true);
-                    return now;
-                }
-                return lastWarning;
-            });
-            if (shouldWarn.get()) {
-                log.warn("Binance时间同步受限，暂用最近一次有效偏移并等待恢复: baseUrl={}, cacheAgeMs={}", baseUrl, now - cached.updatedAt());
-            }
+            warnClockOffsetCacheFallback(baseUrl, cached, now);
+            scheduleClockOffsetRefresh(baseUrl, cached.updatedAt());
             return cached.value();
         }
+    }
+
+    static boolean isMarketClockOffsetCacheUsable(long updatedAtMillis, long nowMillis) {
+        long ageMillis = nowMillis - updatedAtMillis;
+        return ageMillis >= 0L && ageMillis <= MAX_STALE_MARKET_CLOCK_OFFSET_MILLIS;
+    }
+
+    static boolean isClockOffsetRefreshDue(long updatedAtMillis, long nowMillis) {
+        return nowMillis - updatedAtMillis >= CLOCK_OFFSET_REFRESH_MILLIS;
+    }
+
+    private void scheduleClockOffsetRefresh(String baseUrl, long observedUpdatedAt) {
+        java.util.concurrent.atomic.AtomicBoolean inFlight = clockOffsetRefreshInFlight.computeIfAbsent(baseUrl,
+            ignored -> new java.util.concurrent.atomic.AtomicBoolean());
+        if (!inFlight.compareAndSet(false, true)) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        Long lastAttempt = clockOffsetRefreshAttempts.get(baseUrl);
+        if (lastAttempt != null && now - lastAttempt < CLOCK_OFFSET_REFRESH_MILLIS) {
+            inFlight.set(false);
+            return;
+        }
+        clockOffsetRefreshAttempts.put(baseUrl, now);
+        try {
+            clockOffsetRefreshExecutor.execute(() -> {
+                try {
+                    refreshClockOffset(baseUrl, observedUpdatedAt);
+                } catch (RuntimeException ex) {
+                    long failedAt = System.currentTimeMillis();
+                    java.util.concurrent.atomic.AtomicBoolean shouldWarn = new java.util.concurrent.atomic.AtomicBoolean();
+                    clockOffsetWarningTimes.compute(baseUrl, (ignored, lastWarning) -> {
+                        if (lastWarning == null || failedAt - lastWarning >= CLOCK_OFFSET_REFRESH_MILLIS) {
+                            shouldWarn.set(true);
+                            return failedAt;
+                        }
+                        return lastWarning;
+                    });
+                    if (shouldWarn.get()) {
+                        log.warn("Binance服务器时间偏移异步刷新失败，继续使用有效缓存: baseUrl={}, errorType={}",
+                            baseUrl, ex.getClass().getSimpleName());
+                    }
+                } finally {
+                    inFlight.set(false);
+                }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException ex) {
+            inFlight.set(false);
+            log.warn("Binance服务器时间偏移异步刷新任务未能提交: baseUrl={}", baseUrl);
+        }
+    }
+
+    private void warnClockOffsetCacheFallback(String baseUrl, ClockOffset cached, long now) {
+        java.util.concurrent.atomic.AtomicBoolean shouldWarn = new java.util.concurrent.atomic.AtomicBoolean();
+        clockOffsetWarningTimes.compute(baseUrl, (ignored, lastWarning) -> {
+            if (lastWarning == null || now - lastWarning >= CLOCK_OFFSET_REFRESH_MILLIS) {
+                shouldWarn.set(true);
+                return now;
+            }
+            return lastWarning;
+        });
+        if (shouldWarn.get()) {
+            log.warn("Binance时间同步受限，暂用最近一次有效偏移并等待恢复: baseUrl={}, cacheAgeMs={}",
+                baseUrl, now - cached.updatedAt());
+        }
+    }
+
+    @jakarta.annotation.PreDestroy
+    public void shutdownClockOffsetRefreshExecutor() {
+        clockOffsetRefreshExecutor.shutdownNow();
     }
 
     private DerivativesTradingUsdsFuturesRestApi api(Credential credential) {
