@@ -95,7 +95,10 @@ public class MarketStreamHub {
     private record Key(String runMode, String symbol, String interval) {
     }
 
-    private record Incoming(long generation, ExchangeGateway.MarketEvent event) {
+    private record Incoming(long generation, ExchangeGateway.MarketEvent event, long enqueuedAtNanos) {
+        private Incoming(long generation, ExchangeGateway.MarketEvent event) {
+            this(generation, event, System.nanoTime());
+        }
     }
 
     private final class SharedStream {
@@ -134,6 +137,7 @@ public class MarketStreamHub {
         private long nextMetricsAt;
         private long nextClockSkewWarningAt;
         private long nextClockSyncWarningAt;
+        private long nextQueueLagWarningAt;
         /**
          * MARK freshness measured at event consumption, not at the watchdog sample.
          */
@@ -145,8 +149,10 @@ public class MarketStreamHub {
 
         private SharedStream(Key key) {
             this.key = key;
-            ingress = new StreamEventConsumer<>(properties.getMarket().getQueueCapacity(), incoming -> onEvent(incoming.generation(), incoming.event()), ex -> disconnect(ex),
-                () -> scheduleDisconnect("上游消费队列溢出，行情存在缺口"));
+            ingress = new StreamEventConsumer<>(properties.getMarket().getQueueCapacity(), incoming -> {
+                long dequeuedAtNanos = System.nanoTime();
+                onEvent(incoming.generation(), incoming.event(), incoming.enqueuedAtNanos(), dequeuedAtNanos);
+            }, ex -> disconnect(ex), () -> scheduleDisconnect("上游消费队列溢出，行情存在缺口"));
         }
 
         private synchronized void add(UUID id, Consumer<ExchangeGateway.MarketEvent> listener, Consumer<Boolean> health) {
@@ -561,6 +567,14 @@ public class MarketStreamHub {
          * 接收上游事件，过滤旧代次消息并更新连续性与新鲜度状态。
          */
         private synchronized void onEvent(long attempt, ExchangeGateway.MarketEvent event) {
+            long nowNanos = System.nanoTime();
+            onEvent(attempt, event, nowNanos, nowNanos);
+        }
+
+        private synchronized void onEvent(long attempt, ExchangeGateway.MarketEvent event, long enqueuedAtNanos, long dequeuedAtNanos) {
+            long processingStartedNanos = System.nanoTime();
+            long ingressQueueWaitMs = Math.max(0L, TimeUnit.NANOSECONDS.toMillis(dequeuedAtNanos - enqueuedAtNanos));
+            long monitorWaitMs = Math.max(0L, TimeUnit.NANOSECONDS.toMillis(processingStartedNanos - dequeuedAtNanos));
             if (closed || attempt != generation || event == null) {
                 return;
             }
@@ -615,6 +629,11 @@ public class MarketStreamHub {
             long queueLag = Math.max(0, java.time.Duration.between(receivedAt, now).toMillis());
             maxNetworkLag.accumulate(networkLag);
             maxQueueLag.accumulate(queueLag);
+            if (queueLag >= 1_000L && System.currentTimeMillis() >= nextQueueLagWarningAt) {
+                nextQueueLagWarningAt = System.currentTimeMillis() + 10_000L;
+                log.warn("行情入口处理延迟拆分: mode={} symbol={} interval={} type={} queueLagMs={} ingressQueueWaitMs={} monitorWaitMs={} recovering={}",
+                    key.runMode(), key.symbol(), key.interval(), event.type(), queueLag, ingressQueueWaitMs, monitorWaitMs, recovering);
+            }
             lastReceived.put(event.type(), receivedAt);
             long maxEventAgeMillis = Math.max(1, properties.getMarket().getMaxEventAgeMillis());
             boolean fresh = MarketEventFreshness.isFresh(processingEventTime, receivedAt, now, exchangeNow, maxEventAgeMillis);
