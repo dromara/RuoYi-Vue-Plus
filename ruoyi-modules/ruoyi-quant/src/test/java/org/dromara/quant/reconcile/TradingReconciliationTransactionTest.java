@@ -76,7 +76,7 @@ class TradingReconciliationTransactionTest {
     }
 
     private void stubCommonFacts() {
-        when(gateway.queryAccount(any())).thenAnswer(invocation -> {
+        when(gateway.queryAccountForPosition(any())).thenAnswer(invocation -> {
             assertFalse(TransactionSynchronizationManager.isActualTransactionActive(), "Binance called inside DB transaction");
             return new ExchangeGateway.AccountSnapshot(BigDecimal.TEN, BigDecimal.TEN, BigDecimal.TEN, BigDecimal.ZERO);
         });
@@ -97,7 +97,7 @@ class TradingReconciliationTransactionTest {
     void deferredPositionSnapshotSchedulesOneCoalescedReadOnlyRetry() {
         TradingReconciliationService reconciliation = service();
         try {
-            when(gateway.queryAccount(any())).thenThrow(new org.dromara.quant.exchange.ExchangeMarketPort.RequestDeferredException(60_000L));
+            when(gateway.queryAccountForPosition(any())).thenThrow(new org.dromara.quant.exchange.ExchangeMarketPort.RequestDeferredException(60_000L));
 
             assertThrows(org.dromara.quant.exchange.ExchangeMarketPort.RequestDeferredException.class,
                 () -> reconciliation.refreshPositionsOnly(credential()));
@@ -360,7 +360,7 @@ class TradingReconciliationTransactionTest {
         var reconciliation = service();
         var fetchStarted = new java.util.concurrent.CountDownLatch(1);
         var releaseFetch = new java.util.concurrent.CountDownLatch(1);
-        when(gateway.queryAccount(any())).thenAnswer(invocation -> {
+        when(gateway.queryAccountForPosition(any())).thenAnswer(invocation -> {
             fetchStarted.countDown();
             assertTrue(releaseFetch.await(3, java.util.concurrent.TimeUnit.SECONDS));
             return new ExchangeGateway.AccountSnapshot(BigDecimal.TEN, BigDecimal.TEN, BigDecimal.TEN, BigDecimal.ZERO);
