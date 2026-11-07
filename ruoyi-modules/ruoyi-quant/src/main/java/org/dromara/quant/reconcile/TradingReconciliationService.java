@@ -533,9 +533,29 @@ public class TradingReconciliationService {
             return snapshot;
         }
         try {
-            // Capture generations only after becoming the account's in-flight query owner.
+            // Another refresh may have completed after the initial cache check but before
+            // this thread became the in-flight owner. Reuse that committed position fact
+            // instead of issuing a second queryPositions request.
             generation = positionGeneration(credentialId);
             runtimeGeneration = runtimeSnapshotGeneration(credentialId);
+            cached = runtimePositionSnapshots.get(credentialId);
+            if (reuseFresh && cached != null && cached.positionGeneration() == generation
+                && cached.runtimeGeneration() == runtimeGeneration
+                && Duration.between(cached.fetchedAt(), Instant.now()).compareTo(RUNTIME_POSITION_CACHE_AGE) <= 0
+                && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
+                ExchangeGateway.AccountSnapshot account = refreshAccount
+                    ? java.util.Objects.requireNonNull(gateway.queryAccount(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
+                        credential.getSignatureType(), credential.getRunMode())), "Binance account snapshot missing")
+                    : cached.account();
+                if (positionGeneration(credentialId) == generation && runtimeSnapshotGeneration(credentialId) == runtimeGeneration
+                    && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
+                    AccountPositionSnapshot snapshot = new AccountPositionSnapshot(account, cached.positions(), generation, runtimeGeneration);
+                    log.debug("复用并发刷新已提交的账户持仓快照 credentialId={} trigger={} ageMs={}", credentialId, trigger,
+                        Duration.between(cached.fetchedAt(), Instant.now()).toMillis());
+                    created.complete(snapshot);
+                    return snapshot;
+                }
+            }
             LocalDateTime fetchStartedAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai"));
             ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(),
                 credential.getRunMode());
