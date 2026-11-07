@@ -502,7 +502,7 @@ public class TradingReconciliationService {
             && Duration.between(cached.fetchedAt(), Instant.now()).compareTo(RUNTIME_POSITION_CACHE_AGE) <= 0
             && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
             ExchangeGateway.AccountSnapshot account = refreshAccount
-                ? java.util.Objects.requireNonNull(gateway.queryAccount(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
+                ? java.util.Objects.requireNonNull(gateway.queryAccountForPosition(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
                     credential.getSignatureType(), credential.getRunMode())), "Binance account snapshot missing")
                 : cached.account();
             AccountPositionSnapshot snapshot = new AccountPositionSnapshot(account, cached.positions(), generation, runtimeGeneration);
@@ -526,7 +526,7 @@ public class TradingReconciliationService {
             }
             if (refreshAccount) {
                 ExchangeGateway.AccountSnapshot account = java.util.Objects.requireNonNull(
-                    gateway.queryAccount(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
+                    gateway.queryAccountForPosition(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
                         credential.getSignatureType(), credential.getRunMode())), "Binance account snapshot missing");
                 return new AccountPositionSnapshot(account, snapshot.positions(), snapshot.positionGeneration(), snapshot.runtimeGeneration());
             }
@@ -544,7 +544,7 @@ public class TradingReconciliationService {
                 && Duration.between(cached.fetchedAt(), Instant.now()).compareTo(RUNTIME_POSITION_CACHE_AGE) <= 0
                 && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
                 ExchangeGateway.AccountSnapshot account = refreshAccount
-                    ? java.util.Objects.requireNonNull(gateway.queryAccount(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
+                    ? java.util.Objects.requireNonNull(gateway.queryAccountForPosition(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
                         credential.getSignatureType(), credential.getRunMode())), "Binance account snapshot missing")
                     : cached.account();
                 if (positionGeneration(credentialId) == generation && runtimeSnapshotGeneration(credentialId) == runtimeGeneration
