@@ -63,6 +63,8 @@ public class QuantOrder {
      * 订单或成交价格。
      */
     private BigDecimal price;
+    /** 实际累计成交均价；未成交或交易所未提供时为空。 */
+    private BigDecimal averagePrice;
     /**
      * 订单原始数量。
      */
