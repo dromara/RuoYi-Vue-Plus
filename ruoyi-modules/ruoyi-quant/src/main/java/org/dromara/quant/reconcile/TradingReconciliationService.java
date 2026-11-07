@@ -258,6 +258,10 @@ public class TradingReconciliationService {
                 validateSyncOrderSnapshot(order, null);
                 symbols.add(normalizeTradingSymbol(order.symbol()));
             }
+            if (discovery.size() >= 1000) {
+                log.warn("Binance 账户级订单发现结果达到单页上限，未出现在发现页且本地也无记录的交易对可能无法被自动发现 credentialId={}",
+                    credentialId);
+            }
             for (String knownSymbol : orderMapper.selectHistoricalSymbolsByCredential(credentialId)) {
                 if (knownSymbol != null && !knownSymbol.isBlank()) {
                     symbols.add(normalizeTradingSymbol(knownSymbol));
