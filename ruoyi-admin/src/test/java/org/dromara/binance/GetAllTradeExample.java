@@ -78,6 +78,7 @@ public class GetAllTradeExample {
 
         AccountTradeListResponse trades = response.getData();
 
+        System.out.println(trades.get(0).toJson());
         int index = 1;
         for (var trade : trades) {
             String time = trade.getTime() == null ? "-" :

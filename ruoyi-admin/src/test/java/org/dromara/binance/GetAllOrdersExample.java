@@ -60,7 +60,7 @@ public class GetAllOrdersExample {
         int diff = 60 * 60 * 24 * 1000 * 30;
         String symbol = "BRUSDT";
         symbol = "";
-        Long orderId = 283194212L;
+        Long orderId = 0L;
         String origClientOrderId = "myOrder1";
         Long endTime = DateUtils.current();
         Long startTime = DateUtils.date(endTime - diff).getTime();
@@ -70,7 +70,7 @@ public class GetAllOrdersExample {
 //        System.out.println(startTime);
         startTime = null;
         endTime= null;
-        Long limit = 50L;
+        Long limit = 100L;
         Long recvWindow = 5000L;
         ApiResponse<AllOrdersResponse> response = getApi().allOrders(symbol, orderId, startTime, endTime, limit, recvWindow);
         AllOrdersResponse allOrders = response.getData();
@@ -84,6 +84,7 @@ public class GetAllOrdersExample {
             "累计成交额(U)", "只减仓", "客户端订单ID");
         System.out.println(TABLE_SEPARATOR);
 
+        System.out.println(allOrders.get(0).toJson());
         // ===== 数据行 =====
         int index = 1;
         for (var order : allOrders) {
