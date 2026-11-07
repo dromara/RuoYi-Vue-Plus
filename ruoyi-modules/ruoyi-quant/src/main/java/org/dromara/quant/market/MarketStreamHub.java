@@ -638,8 +638,9 @@ public class MarketStreamHub {
                     beginRecovery("上一根K线收盘状态未确认", null);
                     return;
                 }
-                if (!kline.closed() && (event.eventTime().isBefore(kline.openTime()) || event.eventTime().isAfter(kline.closeTime()))) {
-                    throw new IllegalStateException("形成中K线与事件周期不一致");
+                if (!kline.closed() && !isEventTimeWithinKlinePeriod(event.eventTime(), kline.openTime(), nextOpen(kline.openTime()))) {
+                    beginRecovery("形成中K线与事件周期不一致，校验当前周期", null);
+                    return;
                 }
                 rememberReference(kline);
                 lastKlineOpen = kline.openTime();
@@ -673,6 +674,11 @@ public class MarketStreamHub {
                 publish(status("CONNECTED"));
             }
             publish(event);
+        }
+
+        static boolean isEventTimeWithinKlinePeriod(Instant eventTime, Instant openTime, Instant nextOpen) {
+            return eventTime != null && openTime != null && nextOpen != null
+                && !eventTime.isBefore(openTime) && eventTime.isBefore(nextOpen);
         }
 
         /**
