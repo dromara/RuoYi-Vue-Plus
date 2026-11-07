@@ -1089,8 +1089,10 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         System.out.println(symbol + "   "  + range.from() + "   ***********************   " + range.to());
         Long start = range == null || range.from() == null ? null : range.from().toEpochMilli();
         Long end = range == null || range.to() == null ? null : range.to().toEpochMilli();
+        String querySymbol = symbol == null ? "" : symbol.trim();
+        Long orderId = querySymbol.isEmpty() ? 0L : null;
         var data = signedRead(credential, RestRequestScheduler.Kind.BACKGROUND,
-            client -> client.allOrders(symbol, null, start, end, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS).getData());
+            client -> client.allOrders(querySymbol, orderId, start, end, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS).getData());
         if (data == null) {
             throw new IllegalStateException("Binance 历史订单响应缺少数据载荷，无法确认查询完整性");
         }
