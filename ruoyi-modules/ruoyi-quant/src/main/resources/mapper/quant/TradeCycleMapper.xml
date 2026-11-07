@@ -43,7 +43,7 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
             UPPER(t.side) AS side,
             COALESCE(NULLIF(UPPER(t.position_side),'BOTH'),NULLIF(UPPER(j.position_side),'BOTH'),
                 soi.position_side,pre.position_side,NULLIF(UPPER(o.position_side),'BOTH')) AS positionSide,
-            COALESCE(NULLIF(UPPER(t.position_side),'BOTH'),NULLIF(UPPER(j.position_side),'BOTH'),o.position_side) AS exchangePositionSide,
+            COALESCE(NULLIF(UPPER(t.position_side),''),NULLIF(UPPER(j.position_side),''),o.position_side) AS exchangePositionSide,
             COALESCE(soi.fill_role,pre.operation_type,execution.operation_type) AS fillRole,
             COALESCE(soi.position_cycle_key,pre.position_cycle_key) AS positionCycleKey,
             CASE WHEN o.reduce_only='1' THEN 1 WHEN o.reduce_only='0' THEN 0 ELSE NULL END AS reduceOnly,
@@ -69,9 +69,12 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
                     AND soi.position_side<>pre.position_side)
                 OR (soi.position_cycle_key IS NOT NULL AND pre.position_cycle_key IS NOT NULL
                     AND soi.position_cycle_key<>pre.position_cycle_key)
-                OR (NULLIF(UPPER(t.position_side),'BOTH') IS NOT NULL AND j.position_side IS NOT NULL
-                    AND NULLIF(UPPER(j.position_side),'BOTH') IS NOT NULL
+                OR (NULLIF(UPPER(t.position_side),'') IS NOT NULL AND NULLIF(UPPER(j.position_side),'') IS NOT NULL
                     AND UPPER(t.position_side)<>UPPER(j.position_side))
+                OR (NULLIF(UPPER(t.position_side),'') IS NOT NULL AND NULLIF(UPPER(o.position_side),'') IS NOT NULL
+                    AND UPPER(t.position_side)<>UPPER(o.position_side))
+                OR (NULLIF(UPPER(j.position_side),'') IS NOT NULL AND NULLIF(UPPER(o.position_side),'') IS NOT NULL
+                    AND UPPER(j.position_side)<>UPPER(o.position_side))
                 OR (NULLIF(UPPER(t.position_side),'BOTH') IS NOT NULL AND soi.position_side IS NOT NULL
                     AND UPPER(t.position_side)<>UPPER(soi.position_side))
                 OR (NULLIF(UPPER(t.position_side),'BOTH') IS NOT NULL AND pre.position_side IS NOT NULL
