@@ -321,7 +321,7 @@ public class TradingReconciliationService {
 
     private static String normalizeTradingSymbol(String symbol) {
         String normalized = symbol == null ? "" : symbol.trim().toUpperCase(Locale.ROOT);
-        if (!normalized.matches("[A-Z0-9]{2,32}")) {
+        if (!normalized.matches("[\\p{L}\\p{N}_]{2,32}")) {
             throw new IllegalArgumentException("无效的 Binance 交易对");
         }
         return normalized;
