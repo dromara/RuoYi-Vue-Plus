@@ -792,8 +792,17 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
      */
     @Override
     public AccountSnapshot queryAccountFresh(Credential credential) {
+        return queryAccount(credential, RestRequestScheduler.Kind.ACCOUNT);
+    }
+
+    @Override
+    public AccountSnapshot queryAccountForPosition(Credential credential) {
+        return queryAccount(credential, RestRequestScheduler.Kind.POSITION_VERIFY);
+    }
+
+    private AccountSnapshot queryAccount(Credential credential, RestRequestScheduler.Kind kind) {
         try {
-            AccountInformationV3Response data = signedRead(credential, RestRequestScheduler.Kind.ACCOUNT,
+            AccountInformationV3Response data = signedRead(credential, kind,
                 client -> client.accountInformationV3(RECV_WINDOW_MILLIS).getData());
             return new AccountSnapshot(decimal(data.getTotalWalletBalance()), decimal(data.getAvailableBalance()), decimal(data.getTotalMarginBalance()),
                 decimal(data.getTotalUnrealizedProfit()));
@@ -928,7 +937,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
      */
     @Override
     public List<PositionSnapshot> queryPositions(Credential credential, String symbol) {
-        return signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> queryPositions(client, symbol));
+        return signedRead(credential, RestRequestScheduler.Kind.POSITION_VERIFY, client -> queryPositions(client, symbol));
     }
 
     private List<PositionSnapshot> queryPositions(DerivativesTradingUsdsFuturesRestApi client, String symbol) {
@@ -1519,8 +1528,12 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     }
 
     ApiClient accountRestClient(ApiClient client) {
+        return accountRestClient(client, RestRequestScheduler.Kind.ACCOUNT);
+    }
+
+    private ApiClient accountRestClient(ApiClient client, RestRequestScheduler.Kind kind) {
         client.setHttpClient(restHttpClient(client.getHttpClient(), ACCOUNT_REST_CONNECT_TIMEOUT_SECONDS, ACCOUNT_REST_READ_TIMEOUT_SECONDS,
-            ACCOUNT_REST_CALL_TIMEOUT_SECONDS, RestRequestScheduler.Kind.ACCOUNT));
+            ACCOUNT_REST_CALL_TIMEOUT_SECONDS, kind));
         return client;
     }
 
@@ -1538,7 +1551,14 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             // Some SDK API objects issue multiple requests, so client-construction throttling is insufficient.
             .addInterceptor(chain -> {
                 long queueStarted = System.nanoTime();
-                restScheduler.acquire(kind);
+                try {
+                    restScheduler.acquire(kind);
+                } catch (ExchangeMarketPort.RequestDeferredException deferred) {
+                    log.warn("Binance REST 请求延期 kind={} reason={} queueSize={} queueSizes={} waitedMs={} retryAfterMs={}",
+                        deferred.kind(), deferred.reason(), deferred.queueSize(), java.util.Arrays.toString(deferred.queueSizes()),
+                        deferred.waitedMillis(), deferred.retryAfterMillis());
+                    throw deferred;
+                }
                 long queueMillis = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - queueStarted);
                 ClockSyncTiming syncTiming = clockSyncTiming.get();
                 log.debug("Binance REST 获准执行 kind={} queueMillis={} clockSync={}", kind, queueMillis, syncTiming != null);
@@ -1648,7 +1668,8 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             config.setSignatureConfiguration(signature);
             long offset = clockOffset(config.getUrl());
             ApiClient client = new ApiClient(config, new OffsetAuthenticationFactory(offset));
-            return new DerivativesTradingUsdsFuturesRestApi(kind == RestRequestScheduler.Kind.ACCOUNT ? accountRestClient(client) : restClient(client, kind));
+            return new DerivativesTradingUsdsFuturesRestApi(kind == RestRequestScheduler.Kind.ACCOUNT || kind == RestRequestScheduler.Kind.POSITION_VERIFY
+                ? accountRestClient(client, kind) : restClient(client, kind));
         }
         ApiClient client = new ApiClient(config);
         return new DerivativesTradingUsdsFuturesRestApi(kind == RestRequestScheduler.Kind.ACCOUNT ? accountRestClient(client) : restClient(client, kind));
