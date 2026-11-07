@@ -97,7 +97,7 @@ public class TradingReconciliationService {
     private final StrategyPositionStateService strategyPositionStateService;
     private final TransactionTemplate transaction;
     private final ConcurrentHashMap<Long, ReentrantLock> positionLocks = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Long, CompletableFuture<List<ExchangeGateway.PositionSnapshot>>> positionRefreshes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, CompletableFuture<AccountPositionSnapshot>> positionRefreshes = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, CachedPositionSnapshot> runtimePositionSnapshots = new ConcurrentHashMap<>();
     private final Set<Long> balanceSnapshotTasks = ConcurrentHashMap.newKeySet();
     /** Retry read-only snapshot refreshes after REST deferral/rate limits; never retry order mutations. */
@@ -430,7 +430,7 @@ public class TradingReconciliationService {
                 // a fresh runtime cache entry or release the LIVE entry gate.
                 throw new SnapshotSupersededException("Position snapshot changed before freshness verification");
             }
-            runtimePositionSnapshots.put(credential.getId(), new CachedPositionSnapshot(eventGeneration, runtimeGeneration, Instant.now(), positions));
+            runtimePositionSnapshots.put(credential.getId(), new CachedPositionSnapshot(eventGeneration, runtimeGeneration, Instant.now(), account, positions));
         } finally {
             accountLock.unlock();
         }
@@ -468,16 +468,7 @@ public class TradingReconciliationService {
         if (credential == null || credential.getId() == null) {
             throw new IllegalArgumentException("Credential is required for a runtime position snapshot");
         }
-        CachedPositionSnapshot cached = runtimePositionSnapshots.get(credential.getId());
-        long generation = positionGeneration(credential.getId());
-        long runtimeGeneration = runtimeSnapshotGeneration(credential.getId());
-        if (cached != null && cached.positionGeneration() == generation && cached.runtimeGeneration() == runtimeGeneration && Duration.between(cached.fetchedAt(), Instant.now()).compareTo(RUNTIME_POSITION_CACHE_AGE) <= 0
-            && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credential.getId()))) {
-            log.debug("运行时复用账户级持仓快照 credentialId={} generation={} ageMs={}", credential.getId(), generation,
-                Duration.between(cached.fetchedAt(), Instant.now()).toMillis());
-            return cached.positions();
-        }
-        return refreshAccountPositionSnapshot(credential, "runtime-reconcile");
+        return loadAccountPositionSnapshot(credential, "runtime-reconcile", true).positions();
     }
 
     /** Invalidate the in-memory account snapshot after a private-stream event. */
@@ -495,22 +486,46 @@ public class TradingReconciliationService {
     }
 
     private List<ExchangeGateway.PositionSnapshot> refreshAccountPositionSnapshot(QuantCredential credential, String trigger) {
+        return loadAccountPositionSnapshot(credential, trigger, false).positions();
+    }
+
+    private AccountPositionSnapshot loadAccountPositionSnapshot(QuantCredential credential, String trigger, boolean reuseFresh) {
         if (credential == null || credential.getId() == null) {
             throw new IllegalArgumentException("Credential is required for an account position snapshot");
         }
         long credentialId = credential.getId();
-        CompletableFuture<List<ExchangeGateway.PositionSnapshot>> created = new CompletableFuture<>();
-        CompletableFuture<List<ExchangeGateway.PositionSnapshot>> existing = positionRefreshes.putIfAbsent(credentialId, created);
+        long generation = positionGeneration(credentialId);
+        long runtimeGeneration = runtimeSnapshotGeneration(credentialId);
+        CachedPositionSnapshot cached = runtimePositionSnapshots.get(credentialId);
+        if (reuseFresh && cached != null && cached.positionGeneration() == generation
+            && cached.runtimeGeneration() == runtimeGeneration
+            && Duration.between(cached.fetchedAt(), Instant.now()).compareTo(RUNTIME_POSITION_CACHE_AGE) <= 0
+            && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
+            AccountPositionSnapshot snapshot = new AccountPositionSnapshot(cached.account(), cached.positions(), generation, runtimeGeneration);
+            if (positionGeneration(credentialId) == generation && runtimeSnapshotGeneration(credentialId) == runtimeGeneration
+                && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
+                log.debug("复用可信账户持仓快照 credentialId={} trigger={} ageMs={}", credentialId, trigger,
+                    Duration.between(cached.fetchedAt(), Instant.now()).toMillis());
+                return snapshot;
+            }
+        }
+        CompletableFuture<AccountPositionSnapshot> created = new CompletableFuture<>();
+        CompletableFuture<AccountPositionSnapshot> existing = positionRefreshes.putIfAbsent(credentialId, created);
         if (existing != null) {
             long waitStartedAt = System.nanoTime();
-            List<ExchangeGateway.PositionSnapshot> snapshots = joinPositionRefresh(existing);
-            log.debug("运行时等待共享账户持仓快照 credentialId={} trigger={} waitMs={}", credentialId, trigger,
+            AccountPositionSnapshot snapshot = joinPositionRefresh(existing);
+            log.debug("等待共享账户持仓快照 credentialId={} trigger={} waitMs={}", credentialId, trigger,
                 java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - waitStartedAt));
-            return snapshots;
+            if (positionGeneration(credentialId) != snapshot.positionGeneration()
+                || runtimeSnapshotGeneration(credentialId) != snapshot.runtimeGeneration()) {
+                throw new SnapshotSupersededException("Shared account position snapshot was invalidated before use");
+            }
+            return snapshot;
         }
         try {
-            long generation = positionGeneration(credentialId);
-            long runtimeGeneration = runtimeSnapshotGeneration(credentialId);
+            // Capture generations only after becoming the account's in-flight query owner.
+            generation = positionGeneration(credentialId);
+            runtimeGeneration = runtimeSnapshotGeneration(credentialId);
             LocalDateTime fetchStartedAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai"));
             ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(),
                 credential.getRunMode());
@@ -518,8 +533,9 @@ public class TradingReconciliationService {
             var account = java.util.Objects.requireNonNull(gateway.queryAccount(exchangeCredential), "Binance account snapshot missing");
             var snapshots = List.copyOf(java.util.Objects.requireNonNull(gateway.queryPositions(exchangeCredential, null), "Binance full position snapshot missing"));
             commitPositionSnapshot(credential, account, snapshots, fetchStartedAt, generation, runtimeGeneration, trigger);
-            created.complete(snapshots);
-            return snapshots;
+            AccountPositionSnapshot result = new AccountPositionSnapshot(account, snapshots, generation, runtimeGeneration);
+            created.complete(result);
+            return result;
         } catch (SnapshotSupersededException ex) {
             // 私有流事件/其他更新已使本次快照过期：不能提交旧快照，也不能把它当成交易所故障。
             // 同时安排一个按 credential 合并的只读刷新，避免仅依赖策略行情事件触发恢复，
@@ -587,7 +603,7 @@ public class TradingReconciliationService {
         }
     }
 
-    private List<ExchangeGateway.PositionSnapshot> joinPositionRefresh(CompletableFuture<List<ExchangeGateway.PositionSnapshot>> refresh) {
+    private AccountPositionSnapshot joinPositionRefresh(CompletableFuture<AccountPositionSnapshot> refresh) {
         try {
             return refresh.join();
         } catch (CompletionException ex) {
@@ -709,19 +725,11 @@ public class TradingReconciliationService {
      */
     public void reconcileCredential(QuantCredential credential, int historyHours) {
         try {
-            long positionGeneration = positionGeneration(credential.getId());
-            long runtimeGeneration = runtimeSnapshotGeneration(credential.getId());
-            LocalDateTime fetchStartedAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Shanghai"));
             ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(),
                 credential.getRunMode());
-            // Collect a complete account position snapshot before any DB writes.
-            // Commit it independently BEFORE querying order/fill/income history:
-            // a failing history endpoint must not keep already-closed Binance
-            // positions counted as open indefinitely.
-            var account = java.util.Objects.requireNonNull(gateway.queryAccount(exchangeCredential), "Binance account snapshot missing");
-            var positions = List.copyOf(java.util.Objects.requireNonNull(gateway.queryPositions(exchangeCredential, null), "Binance full position snapshot missing"));
-            commitPositionSnapshot(credential, account, positions, fetchStartedAt, positionGeneration, runtimeGeneration, "full-reconcile");
-            ExchangeFacts facts = collectExchangeFacts(credential, historyHours, exchangeCredential, account, positions);
+            // 完整对账继续独立同步订单、成交、保护单和财务事件；账户快照复用统一协调器。
+            AccountPositionSnapshot snapshot = loadAccountPositionSnapshot(credential, "full-reconcile", true);
+            ExchangeFacts facts = collectExchangeFacts(credential, historyHours, exchangeCredential, snapshot.account(), snapshot.positions());
             transaction.executeWithoutResult(status -> applyExchangeFacts(credential, facts));
         } catch (SnapshotSupersededException ex) {
             // The account snapshot lost the generation fence to a newer private-stream fact.
@@ -1531,6 +1539,11 @@ public class TradingReconciliationService {
                                  List<ExchangeGateway.IncomeSnapshot> income, LocalDateTime incomeCursorEnd, boolean incomeHistoryBacklog) {
     }
 
-    private record CachedPositionSnapshot(long positionGeneration, long runtimeGeneration, Instant fetchedAt, List<ExchangeGateway.PositionSnapshot> positions) {
+    private record AccountPositionSnapshot(ExchangeGateway.AccountSnapshot account, List<ExchangeGateway.PositionSnapshot> positions,
+                                           long positionGeneration, long runtimeGeneration) {
+    }
+
+    private record CachedPositionSnapshot(long positionGeneration, long runtimeGeneration, Instant fetchedAt,
+                                          ExchangeGateway.AccountSnapshot account, List<ExchangeGateway.PositionSnapshot> positions) {
     }
 }
