@@ -176,250 +176,100 @@ public class TradingReconciliationService {
 
         ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
             credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
-        Set<String> symbols = new TreeSet<>();
-
-        if (requestedSymbol == null || requestedSymbol.isBlank()) {
-            fillSyncCursors.selectSymbols(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
-            orderMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
-            tradeHistoryMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
-
-            List<ExchangeGateway.PositionSnapshot> positions = Objects.requireNonNull(
-                gateway.queryPositions(exchangeCredential, null), "Binance 全账户持仓快照缺失");
-            for (ExchangeGateway.PositionSnapshot position : positions) {
-                if (position == null || position.symbol() == null || position.symbol().isBlank()) {
-                    throw new IllegalStateException("Binance 全账户持仓快照缺少交易对，无法确定同步范围");
-                }
-                symbols.add(normalizeTradingSymbol(position.symbol()));
-            }
-        } else {
-            symbols.add(normalizeTradingSymbol(requestedSymbol));
-        }
-
+        Set<String> symbols = resolveManualSyncSymbols(credential, exchangeCredential, requestedSymbol);
         if (symbols.isEmpty()) {
             return new TradingDataSyncResult(0, 0, 0);
         }
 
         Instant historyEnd = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
-        // Use the same safe rolling-90-day start for both order and trade history queries.
         Instant historyStart = ExchangeHistoryCollector.recent90DaysStart(historyEnd);
-        log.info("手动历史同步使用完整回溯范围 credentialId={} requestedSymbol={} historyStart={} historyEnd={} retentionDays=90",
-            credential.getId(), requestedSymbol, historyStart, historyEnd);
         int orderCount = 0;
         int tradeCount = 0;
+
         for (String symbol : symbols) {
             try {
-                Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
-                log.info("手动历史订单同步开始 credentialId={} symbol={} historyStart={} historyEnd={} retentionDays=90 startBoundaryAdjusted=true",
-                    credential.getId(), symbol, historyStart, historyEnd);
-                List<ExchangeGateway.OrderSnapshot> historyOrders = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
-                    log.info("手动历史订单查询窗口 credentialId={} symbol={} rangeStart={} rangeEnd={} mode=MANUAL_90D",
-                        credential.getId(), symbol, range.from(), range.to());
-                    List<ExchangeGateway.OrderSnapshot> page =
-                        gateway.queryOrderHistory(exchangeCredential, symbol, range, 1000L);
-                    log.debug("手动历史订单查询窗口结果 credentialId={} symbol={} rangeStart={} rangeEnd={} returnedOrderCount={}",
-                        credential.getId(), symbol, range.from(), range.to(), page == null ? null : page.size());
-                    return page;
-                });
-                System.out.println(symbol + "   &&&&&&&&&&&&&&&&&& "  + historyOrders.size());
-                Instant earliestOrderUpdateTime = historyOrders.stream()
-                    .map(ExchangeGateway.OrderSnapshot::updateTime)
-                    .filter(Objects::nonNull)
-                    .min(Comparator.naturalOrder())
-                    .orElse(null);
-                Instant latestOrderUpdateTime = historyOrders.stream()
-                    .map(ExchangeGateway.OrderSnapshot::updateTime)
-                    .filter(Objects::nonNull)
-                    .max(Comparator.naturalOrder())
-                    .orElse(null);
-                for (ExchangeGateway.OrderSnapshot snapshot : historyOrders) {
-                    validateSyncOrderSnapshot(snapshot, symbol);
-                    ordersById.put(snapshot.orderId(), snapshot);
-                }
-                log.info("手动历史订单数据覆盖范围 credentialId={} symbol={} queryStart={} queryEnd={} responseCount={} distinctOrderCount={} earliestExchangeUpdateTime={} latestExchangeUpdateTime={}",
-                    credential.getId(), symbol, historyStart, historyEnd, historyOrders.size(), ordersById.size(),
-                    earliestOrderUpdateTime, latestOrderUpdateTime);
+                List<ExchangeGateway.OrderSnapshot> orders = collectManualOrderHistory(
+                    exchangeCredential, credential.getId(), symbol, historyStart, historyEnd);
+                List<ExchangeGateway.TradeSnapshot> trades = tradeCollector.collectByOrders(
+                    exchangeCredential, symbol, orders, historyStart, historyEnd);
 
-                List<ExchangeGateway.TradeSnapshot> tradeSnapshots =
-                    tradeCollector.collectByOrders(exchangeCredential, symbol, List.copyOf(ordersById.values()), historyStart, historyEnd);
-                log.info("手动历史订单关联成交收集完成 credentialId={} symbol={} historyOrderCount={} tradeCount={} mode=ORDER_ID",
-                    credential.getId(), symbol, ordersById.size(), tradeSnapshots.size());
-
-                // Collect every order referenced by the new fills or by persisted fills whose
-                // source order is absent/incomplete. Page the database query so no fixed 200-row
-                // limit can silently leave later order IDs unchecked.
-                Set<Long> fillOrderIds = new TreeSet<>();
-                for (ExchangeGateway.TradeSnapshot trade : tradeSnapshots) {
-                    if (trade != null && trade.orderId() != null && trade.orderId() > 0) {
-                        fillOrderIds.add(trade.orderId());
-                    }
-                }
-
-                Set<Long> orderIdsToCheck = new TreeSet<>();
-                for (Long orderId : fillOrderIds) {
-                    if (!hasCompleteOrderSourceFacts(ordersById.get(orderId))) {
-                        orderIdsToCheck.add(orderId);
-                    }
-                }
-
-                LocalDateTime earliestTradeTime = LocalDateTime.ofInstant(historyStart, ZoneOffset.UTC);
-                long afterOrderId = 0L;
-                while (true) {
-                    List<Long> missingOrderPage = tradeHistoryMapper.selectOrderIdsMissingOrderFacts(
-                        credential.getId(), symbol, earliestTradeTime, afterOrderId, 200);
-                    if (missingOrderPage == null) {
-                        throw new IllegalStateException("本地成交关联订单检查未返回结果，无法确认订单完整性");
-                    }
-                    if (missingOrderPage.isEmpty()) {
-                        break;
-                    }
-                    Long nextAfterOrderId = missingOrderPage.getLast();
-                    if (nextAfterOrderId == null || nextAfterOrderId <= afterOrderId) {
-                        throw new IllegalStateException("本地成交关联订单检查游标未前进，拒绝使用不完整结果同步");
-                    }
-                    for (Long orderId : missingOrderPage) {
-                        if (orderId != null && orderId > 0
-                            && !hasCompleteOrderSourceFacts(ordersById.get(orderId))) {
-                            orderIdsToCheck.add(orderId);
-                        }
-                    }
-                    afterOrderId = nextAfterOrderId;
-                    if (missingOrderPage.size() < 200) {
-                        break;
-                    }
-                }
-
-                // Check the local order ledger before issuing exact REST lookups. A complete
-                // local order is already a valid source fact even if allOrders omits that row.
-                Map<Long, QuantOrder> localOrdersById = new HashMap<>();
-                List<Long> orderIdsToCheckList = List.copyOf(orderIdsToCheck);
-                for (int offset = 0; offset < orderIdsToCheckList.size(); offset += 200) {
-                    List<Long> batch = orderIdsToCheckList.subList(offset, Math.min(offset + 200, orderIdsToCheckList.size()));
-                    List<QuantOrder> localOrders = orderMapper.selectList(new LambdaQueryWrapper<QuantOrder>()
-                        .eq(QuantOrder::getCredentialId, credential.getId())
-                        .eq(QuantOrder::getSymbol, symbol)
-                        .in(QuantOrder::getExchangeOrderId, batch));
-                    for (QuantOrder localOrder : localOrders) {
-                        if (localOrder != null && localOrder.getExchangeOrderId() != null) {
-                            localOrdersById.put(localOrder.getExchangeOrderId(), localOrder);
-                        }
-                    }
-                }
-
-                // Resolve absent orders and incomplete source metadata outside the write
-                // transaction. A null result is tolerated only when a real local/history order
-                // already exists; a fill with no order anywhere must block this symbol's commit.
-                int recoveredOrderCount = 0;
-                Set<Long> unresolvedOrderIds = new TreeSet<>();
-                for (Long orderId : orderIdsToCheck) {
-                    ExchangeGateway.OrderSnapshot existing = ordersById.get(orderId);
-                    QuantOrder localOrder = localOrdersById.get(orderId);
-                    if (hasCompleteOrderSourceFacts(existing) || hasCompleteOrderSourceFacts(localOrder)) {
-                        continue;
-                    }
-
-                    ExchangeGateway.OrderSnapshot recovered = gateway.queryOrder(exchangeCredential, symbol, orderId, null);
-                    if (recovered == null) {
-                        if (existing == null && localOrder == null) {
-                            unresolvedOrderIds.add(orderId);
-                        } else {
-                            log.warn("成交关联订单来源字段未能补齐，保留已核实订单原始事实 credentialId={} symbol={} orderId={}",
-                                credential.getId(), symbol, orderId);
-                        }
-                        continue;
-                    }
-                    validateSyncOrderSnapshot(recovered, symbol);
-                    ordersById.put(orderId, mergeOrderSourceFacts(existing, recovered));
-                    recoveredOrderCount++;
-                }
-
-                // Final fail-closed check covers both this round's fills and persisted fills.
-                for (Long orderId : fillOrderIds) {
-                    if (!ordersById.containsKey(orderId) && !localOrdersById.containsKey(orderId)) {
-                        unresolvedOrderIds.add(orderId);
-                    }
-                }
-                for (Long orderId : orderIdsToCheck) {
-                    if (!ordersById.containsKey(orderId) && !localOrdersById.containsKey(orderId)) {
-                        unresolvedOrderIds.add(orderId);
-                    }
-                }
-                if (!unresolvedOrderIds.isEmpty()) {
-                    String orderIdSample = unresolvedOrderIds.stream().limit(20)
-                        .map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
-                    log.error("交易数据同步发现成交关联订单缺失 credentialId={} symbol={} tradeCount={} uniqueFillOrderCount={} unresolvedOrderCount={} orderIds={}",
-                        credential.getId(), symbol, tradeSnapshots.size(), fillOrderIds.size(), unresolvedOrderIds.size(), orderIdSample);
-                    throw new IllegalStateException("成交关联订单无法从历史订单或精确订单查询恢复；已阻止本交易对订单与成交提交"
-                        + "，未补齐订单数=" + unresolvedOrderIds.size() + "，订单ID=" + orderIdSample);
-                }
-
-                log.info("交易数据同步订单关联校验完成 credentialId={} symbol={} historyOrderCount={} tradeCount={} uniqueFillOrderCount={} checkedOrderCount={} recoveredOrderCount={} unresolvedOrderCount=0",
-                    credential.getId(), symbol, historyOrders.size(), tradeSnapshots.size(), fillOrderIds.size(),
-                    orderIdsToCheck.size(), recoveredOrderCount);
-
-                List<ExchangeGateway.OrderSnapshot> orderSnapshots = List.copyOf(ordersById.values());
-
-                // Order sources are committed first so syncTrades can attribute fills
-                // from the exact order, all within the same account-symbol transaction.
                 transaction.executeWithoutResult(status -> {
-                    syncOrders(credential, orderSnapshots);
-                    syncTrades(credential, tradeSnapshots);
+                    syncOrders(credential, orders);
+                    syncTrades(credential, trades);
                     if (tradeCycleProjectionService != null) {
                         tradeCycleProjectionService.markDirty(credential.getId(), symbol);
                     }
                 });
 
-                orderCount += orderSnapshots.size();
-                tradeCount += tradeSnapshots.size();
+                orderCount += orders.size();
+                tradeCount += trades.size();
             } catch (RuntimeException failure) {
                 String reason = failure.getMessage();
-                throw new IllegalStateException(
-                    "/////////////交易对 " + symbol + " 的订单与成交同步失败"
-                        + (reason == null || reason.isBlank() ? "" : "：" + reason)
-                        + "；此前已完成交易对的数据已提交，可安全重试补齐", failure);
+                throw new IllegalStateException("交易对 " + symbol + " 的历史订单/成交同步失败"
+                    + (reason == null || reason.isBlank() ? "" : "：" + reason), failure);
             }
 
             if (tradeCycleProjectionService != null) {
                 try {
-                    // Source facts are committed above. Rebuild now so the manual-sync response
-                    // is not returned while the trade-record projection is still stale.
                     tradeCycleProjectionService.projectNow(credential.getId(), symbol);
                 } catch (RuntimeException failure) {
                     String reason = failure.getMessage();
-                    throw new IllegalStateException(
-                        "交易对 " + symbol + " 的订单与成交已同步，但交易记录生成失败"
-                            + (reason == null || reason.isBlank() ? "" : "：" + reason)
-                            + "；可重试同步以重新生成交易记录", failure);
+                    throw new IllegalStateException("交易对 " + symbol + " 的订单与成交已提交，但交易记录重建失败"
+                        + (reason == null || reason.isBlank() ? "" : "：" + reason) + "；可重试同步重新生成交易记录", failure);
                 }
             }
         }
 
         if ("LIVE".equalsIgnoreCase(credential.getRunMode())) {
-            int retried = transaction.execute(status -> {
-                int count = fillJournal.retryPending(credential.getId());
-                if (count > 0 && tradeCycleProjectionService != null) {
-                    symbols.forEach(symbol -> tradeCycleProjectionService.markDirty(credential.getId(), symbol));
-                }
-                return count;
-            });
+            int retried = transaction.execute(status -> fillJournal.retryPending(credential.getId()));
             if (retried > 0 && tradeCycleProjectionService != null) {
                 for (String symbol : symbols) {
-                    try {
-                        tradeCycleProjectionService.projectNow(credential.getId(), symbol);
-                    } catch (RuntimeException failure) {
-                        String reason = failure.getMessage();
-                        throw new IllegalStateException(
-                            "交易对 " + symbol + " 的补录成交已提交，但交易记录重新生成失败"
-                                + (reason == null || reason.isBlank() ? "" : "：" + reason)
-                                + "；可重试同步以重新生成交易记录", failure);
-                    }
+                    tradeCycleProjectionService.markDirty(credential.getId(), symbol);
+                    tradeCycleProjectionService.projectNow(credential.getId(), symbol);
                 }
             }
         }
-        log.info("手动历史同步完成 credentialId={} symbolCount={} orderCount={} tradeCount={} mode=MANUAL_90D",
-            credential.getId(), symbols.size(), orderCount, tradeCount);
+
+        log.info("手动历史同步完成 credentialId={} symbolCount={} orderCount={} tradeCount={} historyStart={} historyEnd={} mode=ORDER_FIRST_90D",
+            credential.getId(), symbols.size(), orderCount, tradeCount, historyStart, historyEnd);
         return new TradingDataSyncResult(symbols.size(), orderCount, tradeCount);
     }
 
+    private Set<String> resolveManualSyncSymbols(QuantCredential credential, ExchangeGateway.Credential exchangeCredential, String requestedSymbol) {
+        Set<String> symbols = new TreeSet<>();
+        if (requestedSymbol != null && !requestedSymbol.isBlank()) {
+            symbols.add(normalizeTradingSymbol(requestedSymbol));
+            return symbols;
+        }
+        fillSyncCursors.selectSymbols(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
+        orderMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
+        tradeHistoryMapper.selectHistoricalSymbolsByCredential(credential.getId()).forEach(symbol -> addNormalizedTradingSymbol(symbols, symbol));
+        List<ExchangeGateway.PositionSnapshot> positions = Objects.requireNonNull(
+            gateway.queryPositions(exchangeCredential, null), "Binance 全账户持仓快照缺失");
+        for (ExchangeGateway.PositionSnapshot position : positions) {
+            if (position == null || position.symbol() == null || position.symbol().isBlank()) {
+                throw new IllegalStateException("Binance 全账户持仓快照缺少交易对，无法确定同步范围");
+            }
+            symbols.add(normalizeTradingSymbol(position.symbol()));
+        }
+        return symbols;
+    }
+
+    private List<ExchangeGateway.OrderSnapshot> collectManualOrderHistory(ExchangeGateway.Credential credential, Long credentialId,
+                                                                            String symbol, Instant historyStart, Instant historyEnd) {
+        List<ExchangeGateway.OrderSnapshot> history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
+            log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}", credentialId, symbol, range.from(), range.to());
+            return gateway.queryOrderHistory(credential, symbol, range, 1000L);
+        });
+        Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
+        for (ExchangeGateway.OrderSnapshot order : history) {
+            validateSyncOrderSnapshot(order, symbol);
+            ordersById.put(order.orderId(), order);
+        }
+        log.info("手动历史订单获取完成 credentialId={} symbol={} returnedCount={} distinctOrderCount={}",
+            credentialId, symbol, history.size(), ordersById.size());
+        return List.copyOf(ordersById.values());
+    }
     private static void addNormalizedTradingSymbol(Set<String> symbols, String symbol) {
         if (symbol != null && !symbol.isBlank()) {
             symbols.add(normalizeTradingSymbol(symbol));
@@ -440,57 +290,6 @@ public class TradingReconciliationService {
             || expectedSymbol != null && !expectedSymbol.equalsIgnoreCase(snapshot.symbol())) {
             throw new IllegalStateException("Binance 订单快照缺少有效身份或交易对不匹配，拒绝同步");
         }
-    }
-
-    private static boolean hasCompleteOrderSourceFacts(ExchangeGateway.OrderSnapshot snapshot) {
-        return snapshot != null
-            && snapshot.positionSide() != null && !snapshot.positionSide().isBlank()
-            && snapshot.reduceOnly() != null
-            && snapshot.clientOrderId() != null && !snapshot.clientOrderId().isBlank()
-            && !snapshot.clientOrderId().startsWith("EXCHANGE:");
-    }
-
-    private static boolean hasCompleteOrderSourceFacts(QuantOrder order) {
-        return order != null
-            && order.getPositionSide() != null && !order.getPositionSide().isBlank()
-            && order.getReduceOnly() != null
-            && order.getClientOrderId() != null && !order.getClientOrderId().isBlank()
-            && !order.getClientOrderId().startsWith("EXCHANGE:");
-    }
-
-    private static ExchangeGateway.OrderSnapshot mergeOrderSourceFacts(
-        ExchangeGateway.OrderSnapshot existing, ExchangeGateway.OrderSnapshot recovered) {
-        if (existing == null) {
-            return recovered;
-        }
-        if (existing.side() != null && recovered.side() != null
-            && !existing.side().equalsIgnoreCase(recovered.side())
-            || existing.positionSide() != null && !existing.positionSide().isBlank()
-                && recovered.positionSide() != null && !existing.positionSide().equalsIgnoreCase(recovered.positionSide())
-            || existing.reduceOnly() != null && recovered.reduceOnly() != null
-                && !existing.reduceOnly().equals(recovered.reduceOnly())
-            || existing.clientOrderId() != null && !existing.clientOrderId().isBlank()
-                && !existing.clientOrderId().startsWith("EXCHANGE:")
-                && recovered.clientOrderId() != null && !existing.clientOrderId().equals(recovered.clientOrderId())) {
-            throw new IllegalStateException("订单来源事实冲突，拒绝覆盖已有订单记录");
-        }
-        String clientOrderId = existing.clientOrderId();
-        if (clientOrderId == null || clientOrderId.isBlank() || clientOrderId.startsWith("EXCHANGE:")) {
-            clientOrderId = recovered.clientOrderId();
-        }
-        return new ExchangeGateway.OrderSnapshot(
-            existing.symbol(), existing.orderId(), clientOrderId,
-            existing.side() == null ? recovered.side() : existing.side(),
-            existing.type() == null ? recovered.type() : existing.type(),
-            existing.status() == null ? recovered.status() : existing.status(),
-            existing.price() == null ? recovered.price() : existing.price(),
-            existing.originalQuantity() == null ? recovered.originalQuantity() : existing.originalQuantity(),
-            existing.executedQuantity() == null ? recovered.executedQuantity() : existing.executedQuantity(),
-            existing.updateTime() == null ? recovered.updateTime() : existing.updateTime(),
-            existing.averagePrice() == null ? recovered.averagePrice() : existing.averagePrice(),
-            existing.positionSide() == null || existing.positionSide().isBlank() ? recovered.positionSide() : existing.positionSide(),
-            existing.reduceOnly() == null ? recovered.reduceOnly() : existing.reduceOnly(),
-            existing.createTime() == null ? recovered.createTime() : existing.createTime());
     }
 
     /**
