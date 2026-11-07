@@ -125,7 +125,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
                 // A new stream ownership generation cannot inherit a position
                 // snapshot verified under the previous WebSocket/lease. Block
                 // LIVE entries until a fresh authenticated REST snapshot wins.
-                freshness.invalidate(id);
+                freshness.invalidate(id, "STREAM_SUBSCRIPTION_CREATED");
                 AutoCloseable reference = hub.subscribe(credential, event -> {
                     // Hub centrally forwards events into the coordinator; this
                     // listener exists only to hold an active subscription.
@@ -133,7 +133,7 @@ public class LivePositionStreamTriggers implements org.springframework.boot.Appl
                 subscriptions.put(id, reference);
                 nextLeaseConflictLogAt.remove(id);
                 log.info("LIVE私有流租约已获取并注册共享订阅 credentialId={}，允许本节点策略运行时继续初始化", id);
-                coordinator.request(id);
+                coordinator.queueRefresh(id);
             } catch (RuntimeException ex) {
                 closeSubscription(id);
                 freshness.invalidate(id);
