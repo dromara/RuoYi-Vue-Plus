@@ -108,7 +108,8 @@ public final class TradeCycleAssembler {
         if (role == null) {
             role = openSide.equals(side) ? "OPEN" : "CLOSE";
         }
-        if ("OPEN".equals(role) != openSide.equals(side) || Boolean.TRUE.equals(fill.getReduceOnly()) && "OPEN".equals(role)) {
+        if ("OPEN".equals(role) != openSide.equals(side)
+            || (Boolean.TRUE.equals(fill.getReduceOnly()) || Boolean.TRUE.equals(fill.getClosePosition())) && "OPEN".equals(role)) {
             throw new IllegalStateException("持仓方向、成交方向和开平仓意图冲突");
         }
 
