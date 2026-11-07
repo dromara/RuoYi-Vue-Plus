@@ -10,7 +10,6 @@ import org.dromara.quant.account.domain.QuantTrade;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class TradeHistoryFill extends QuantTrade {
-    private String positionSide;
     private Boolean reduceOnly;
     private String operationType;
     private Boolean positionCycleConflict;

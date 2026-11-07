@@ -180,16 +180,8 @@ public class TradingReconciliationService {
             ? "" : normalizeTradingSymbol(requestedSymbol);
         Instant historyEnd = Instant.now().plusMillis(gateway.exchangeTimeOffsetMillis(credential.getRunMode()));
         Instant historyStart = ExchangeHistoryCollector.recent90DaysStart(historyEnd);
-        List<ExchangeGateway.OrderSnapshot> historyOrders = collectManualOrderHistory(
+        Map<String, List<ExchangeGateway.OrderSnapshot>> ordersBySymbol = collectManualOrderHistory(
             exchangeCredential, credential.getId(), symbolFilter, historyStart, historyEnd);
-        Map<String, List<ExchangeGateway.OrderSnapshot>> ordersBySymbol = new TreeMap<>();
-        for (ExchangeGateway.OrderSnapshot order : historyOrders) {
-            String symbol = normalizeTradingSymbol(order.symbol());
-            ordersBySymbol.computeIfAbsent(symbol, ignored -> new ArrayList<>()).add(order);
-        }
-        if (!symbolFilter.isEmpty()) {
-            ordersBySymbol.putIfAbsent(symbolFilter, new ArrayList<>());
-        }
         if (ordersBySymbol.isEmpty()) {
             return new TradingDataSyncResult(0, 0, 0);
         }
@@ -215,6 +207,12 @@ public class TradingReconciliationService {
 
                 orderCount += orders.size();
                 tradeCount += trades.size();
+                int recoveredOrders = backfillMissingOrderFacts(exchangeCredential, credential, symbol, historyStart);
+                if (recoveredOrders > 0) {
+                    orderCount += recoveredOrders;
+                    log.info("历史成交缺失订单事实已补齐 credentialId={} symbol={} recoveredOrderCount={}",
+                        credential.getId(), symbol, recoveredOrders);
+                }
             } catch (RuntimeException failure) {
                 String reason = failure.getMessage();
                 throw new IllegalStateException("交易对 " + symbol + " 的历史订单/成交同步失败"
@@ -247,28 +245,101 @@ public class TradingReconciliationService {
         return new TradingDataSyncResult(ordersBySymbol.size(), orderCount, tradeCount);
     }
 
-    private List<ExchangeGateway.OrderSnapshot> collectManualOrderHistory(ExchangeGateway.Credential credential, Long credentialId,
-                                                                            String symbol, Instant historyStart, Instant historyEnd) {
-        List<ExchangeGateway.OrderSnapshot> history;
+    private Map<String, List<ExchangeGateway.OrderSnapshot>> collectManualOrderHistory(ExchangeGateway.Credential credential, Long credentialId,
+                                                                                              String symbol, Instant historyStart, Instant historyEnd) {
+        Set<String> symbols = new TreeSet<>();
         if (symbol == null || symbol.isBlank()) {
-            log.info("手动账户级历史订单查询 credentialId={} symbolFilter=ALL limit=1000", credentialId);
-            history = gateway.queryOrderHistory(credential, "", null, 1000L);
+            log.info("手动账户级历史订单交易对发现 credentialId={} discoveryLimit=1000", credentialId);
+            List<ExchangeGateway.OrderSnapshot> discovery = gateway.queryOrderHistory(credential, "", null, 1000L);
+            if (discovery == null) {
+                throw new IllegalStateException("Binance 账户级订单发现响应缺少数据载荷");
+            }
+            for (ExchangeGateway.OrderSnapshot order : discovery) {
+                validateSyncOrderSnapshot(order, null);
+                symbols.add(normalizeTradingSymbol(order.symbol()));
+            }
+            for (String knownSymbol : orderMapper.selectHistoricalSymbolsByCredential(credentialId)) {
+                if (knownSymbol != null && !knownSymbol.isBlank()) {
+                    symbols.add(normalizeTradingSymbol(knownSymbol));
+                }
+            }
+            for (String knownSymbol : tradeHistoryMapper.selectHistoricalSymbolsByCredential(credentialId)) {
+                if (knownSymbol != null && !knownSymbol.isBlank()) {
+                    symbols.add(normalizeTradingSymbol(knownSymbol));
+                }
+            }
+            List<QuantPosition> localPositions = positionMapper.selectList(
+                new LambdaQueryWrapper<QuantPosition>().eq(QuantPosition::getCredentialId, credentialId));
+            for (QuantPosition position : localPositions) {
+                if (position.getSymbol() != null && !position.getSymbol().isBlank()) {
+                    symbols.add(normalizeTradingSymbol(position.getSymbol()));
+                }
+            }
         } else {
-            history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
-                log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}", credentialId, symbol, range.from(), range.to());
-                return gateway.queryOrderHistory(credential, symbol, range, 1000L);
+            symbols.add(normalizeTradingSymbol(symbol));
+        }
+
+        Map<String, List<ExchangeGateway.OrderSnapshot>> result = new TreeMap<>();
+        for (String querySymbol : symbols) {
+            List<ExchangeGateway.OrderSnapshot> history = ExchangeHistoryCollector.collect(historyStart, historyEnd, range -> {
+                log.info("手动历史订单查询 credentialId={} symbol={} from={} to={}", credentialId, querySymbol, range.from(), range.to());
+                return gateway.queryOrderHistory(credential, querySymbol, range, 1000L);
             });
+            Map<Long, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
+            for (ExchangeGateway.OrderSnapshot order : history) {
+                validateSyncOrderSnapshot(order, querySymbol);
+                ExchangeGateway.OrderSnapshot previous = ordersById.putIfAbsent(order.orderId(), order);
+                if (previous != null && !previous.equals(order)) {
+                    throw new IllegalStateException("Binance 历史订单分页返回冲突的订单事实 orderId=" + order.orderId());
+                }
+            }
+            result.put(querySymbol, List.copyOf(ordersById.values()));
+            log.info("手动历史订单获取完成 credentialId={} symbol={} returnedCount={} distinctOrderCount={} scope=SYMBOL_90D",
+                credentialId, querySymbol, history.size(), ordersById.size());
         }
-        Map<String, ExchangeGateway.OrderSnapshot> ordersById = new LinkedHashMap<>();
-        for (ExchangeGateway.OrderSnapshot order : history) {
-            validateSyncOrderSnapshot(order, symbol);
-            String identity = normalizeTradingSymbol(order.symbol()) + ":" + order.orderId();
-            ordersById.put(identity, order);
+        log.info("手动历史订单交易对发现完成 credentialId={} symbolFilter={} symbolCount={} discoveryMode={}",
+            credentialId, symbol, result.size(), symbol == null || symbol.isBlank() ? "ACCOUNT_PAGE_PLUS_LOCAL_LEDGER" : "EXPLICIT_SYMBOL");
+        return result;
+    }
+
+    private int backfillMissingOrderFacts(ExchangeGateway.Credential exchangeCredential, QuantCredential credential, String symbol,
+                                          Instant historyStart) {
+        final int pageSize = 100;
+        LocalDateTime fromTime = LocalDateTime.ofInstant(historyStart, ZoneOffset.UTC);
+        long afterOrderId = 0L;
+        int recovered = 0;
+        while (true) {
+            List<Long> missingOrderIds = tradeHistoryMapper.selectOrderIdsMissingOrderFacts(
+                credential.getId(), symbol, fromTime, afterOrderId, pageSize);
+            if (missingOrderIds == null || missingOrderIds.isEmpty()) {
+                return recovered;
+            }
+            List<ExchangeGateway.OrderSnapshot> recoveredOrders = new ArrayList<>();
+            for (Long missingOrderId : missingOrderIds) {
+                if (missingOrderId == null || missingOrderId <= afterOrderId) {
+                    throw new IllegalStateException("成交缺失订单事实查询返回无效或非递增的订单 ID");
+                }
+                afterOrderId = missingOrderId;
+                ExchangeGateway.OrderSnapshot order = gateway.queryOrder(exchangeCredential, symbol, missingOrderId, null);
+                if (order == null) {
+                    log.warn("Binance 精确订单查询未返回成交关联订单 credentialId={} symbol={} orderId={}",
+                        credential.getId(), symbol, missingOrderId);
+                    continue;
+                }
+                validateSyncOrderSnapshot(order, symbol);
+                if (!missingOrderId.equals(order.orderId())) {
+                    throw new IllegalStateException("Binance 精确订单查询返回了不匹配的订单 ID");
+                }
+                recoveredOrders.add(order);
+            }
+            if (!recoveredOrders.isEmpty()) {
+                transaction.executeWithoutResult(status -> syncOrders(credential, recoveredOrders));
+                recovered += recoveredOrders.size();
+            }
+            if (missingOrderIds.size() < pageSize) {
+                return recovered;
+            }
         }
-        log.info("手动历史订单获取完成 credentialId={} symbolFilter={} returnedCount={} distinctOrderCount={} scope={}",
-            credentialId, symbol, history.size(), ordersById.size(),
-            symbol == null || symbol.isBlank() ? "ACCOUNT_SINGLE_PAGE" : "SYMBOL_90D");
-        return List.copyOf(ordersById.values());
     }
 
     private static String normalizeTradingSymbol(String symbol) {
@@ -1057,6 +1128,7 @@ public class TradingReconciliationService {
                 entity.setExchangeTradeId(s.tradeId());
                 entity.setExchangeOrderId(s.orderId());
                 entity.setSide(s.side());
+                entity.setPositionSide(s.positionSide() == null ? null : s.positionSide().toUpperCase(Locale.ROOT));
                 entity.setQuantity(s.quantity());
                 entity.setPrice(s.price());
                 entity.setCommission(s.commission());
@@ -1082,10 +1154,12 @@ public class TradingReconciliationService {
                     }
                     boolean attributionChanged;
                     boolean commissionAssetChanged;
+                    boolean positionSideChanged;
                     try {
                         assertImmutableTradeFacts(raced, s);
                         attributionChanged = mergeStrategyAttribution(raced, sourceOrder);
                         commissionAssetChanged = mergeCommissionAsset(raced, s);
+                        positionSideChanged = mergePositionSide(raced, s);
                     } catch (IllegalStateException conflict) {
                         if (!live) {
                             throw conflict;
@@ -1095,20 +1169,22 @@ public class TradingReconciliationService {
                             credential.getId(), s.symbol(), s.tradeId());
                         continue;
                     }
-                    if ((attributionChanged || commissionAssetChanged) && tradeMapper.updateById(raced) != 1) {
+                    if ((attributionChanged || commissionAssetChanged || positionSideChanged) && tradeMapper.updateById(raced) != 1) {
                         throw new IllegalStateException("Concurrent Binance fill attribution could not be enriched safely", concurrentInsert);
                     }
-                    projectionDirty |= attributionChanged || commissionAssetChanged;
+                    projectionDirty |= attributionChanged || commissionAssetChanged || positionSideChanged;
                     log.debug("并发对账已写入相同成交事实，跳过重复插入 credentialId={} symbol={} exchangeTradeId={}",
                         credential.getId(), s.symbol(), s.tradeId());
                 }
             } else {
                 boolean attributionChanged;
                 boolean commissionAssetChanged;
+                boolean positionSideChanged;
                 try {
                     assertImmutableTradeFacts(entity, s);
                     attributionChanged = mergeStrategyAttribution(entity, sourceOrder);
                     commissionAssetChanged = mergeCommissionAsset(entity, s);
+                    positionSideChanged = mergePositionSide(entity, s);
                 } catch (IllegalStateException conflict) {
                     if (!live) {
                         throw conflict;
@@ -1118,11 +1194,11 @@ public class TradingReconciliationService {
                         credential.getId(), s.symbol(), s.tradeId());
                     continue;
                 }
-                if ((attributionChanged || commissionAssetChanged) && tradeMapper.updateById(entity) != 1) {
+                if ((attributionChanged || commissionAssetChanged || positionSideChanged) && tradeMapper.updateById(entity) != 1) {
                     throw new IllegalStateException("Binance fill attribution could not be enriched safely: credentialId="
                         + credential.getId() + ", symbol=" + s.symbol() + ", exchangeTradeId=" + s.tradeId());
                 }
-                projectionDirty |= attributionChanged || commissionAssetChanged;
+                projectionDirty |= attributionChanged || commissionAssetChanged || positionSideChanged;
             }
 
             if (live && sourceOrder != null && sourceOrder.getStrategyId() != null && sourceOrder.getStrategyInstanceId() != null) {
@@ -1146,6 +1222,8 @@ public class TradingReconciliationService {
         List<String> conflictingFields = new ArrayList<>();
         if (!Objects.equals(stored.getExchangeOrderId(), incoming.orderId())) conflictingFields.add("exchangeOrderId");
         if (!sameText(stored.getSymbol(), incoming.symbol())) conflictingFields.add("symbol");
+        if (stored.getPositionSide() != null && incoming.positionSide() != null
+            && !sameText(stored.getPositionSide(), incoming.positionSide())) conflictingFields.add("positionSide");
         if (!sameText(stored.getSide(), incoming.side())) conflictingFields.add("side");
         if (!sameDecimal(stored.getQuantity(), incoming.quantity())) conflictingFields.add("quantity");
         if (!sameDecimal(stored.getPrice(), incoming.price())) conflictingFields.add("price");
@@ -1193,6 +1271,21 @@ public class TradingReconciliationService {
             changed = true;
         }
         return changed;
+    }
+
+    private static boolean mergePositionSide(QuantTrade trade, ExchangeGateway.TradeSnapshot incoming) {
+        if (incoming.positionSide() == null || incoming.positionSide().isBlank()) {
+            return false;
+        }
+        String positionSide = incoming.positionSide().trim().toUpperCase(Locale.ROOT);
+        if (trade.getPositionSide() != null && !trade.getPositionSide().isBlank()) {
+            if (!trade.getPositionSide().equalsIgnoreCase(positionSide)) {
+                throw new IllegalStateException("Binance成交持仓方向与本地不可变事实冲突");
+            }
+            return false;
+        }
+        trade.setPositionSide(positionSide);
+        return true;
     }
 
     private static boolean mergeCommissionAsset(QuantTrade trade, ExchangeGateway.TradeSnapshot incoming) {

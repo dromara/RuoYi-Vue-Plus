@@ -26,7 +26,7 @@ class StrategyFillJournalMapperTest {
         jdbc.execute("""
             CREATE TABLE quant_strategy_fill_journal (
               id BIGINT PRIMARY KEY, credential_id BIGINT NOT NULL, symbol VARCHAR(32) NOT NULL,
-              exchange_trade_id BIGINT NOT NULL, exchange_order_id BIGINT NULL, side VARCHAR(10) NULL,
+              exchange_trade_id BIGINT NOT NULL, exchange_order_id BIGINT NULL, side VARCHAR(10) NULL, position_side VARCHAR(20) NULL,
               quantity DECIMAL(32,16) NULL, price DECIMAL(32,16) NULL, commission DECIMAL(32,16) NULL,
               commission_asset VARCHAR(20) NULL, realized_pnl DECIMAL(32,16) NULL, trade_time DATETIME(3) NULL,
               attribution_status VARCHAR(24) NOT NULL, status_reason VARCHAR(500) NULL,
@@ -48,6 +48,7 @@ class StrategyFillJournalMapperTest {
         raw.setExchangeTradeId(3L);
         raw.setExchangeOrderId(4L);
         raw.setSide("BUY");
+        raw.setPositionSide("SHORT");
         raw.setQuantity(BigDecimal.ONE);
         raw.setPrice(BigDecimal.TEN);
         raw.setCommission(null);
@@ -59,6 +60,7 @@ class StrategyFillJournalMapperTest {
         var stored = mapper.selectByKey(2L, "BTCUSDT", 3L);
         assertNull(stored.getCommission());
         assertNull(stored.getRealizedPnl());
+        assertEquals("SHORT", stored.getPositionSide());
         assertEquals("CAPTURED", stored.getAttributionStatus());
         assertEquals(1, mapper.selectPending(2L, 100).size());
         assertEquals(1, mapper.updateStatus(1L, "WAITING_ORDER", "missing local order"));

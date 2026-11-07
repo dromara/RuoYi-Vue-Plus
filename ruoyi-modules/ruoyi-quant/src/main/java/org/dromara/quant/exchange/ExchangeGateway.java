@@ -203,18 +203,29 @@ public interface ExchangeGateway extends ExchangeMarketPort, ExchangeAccountPort
      * @param price       订单或成交价格
      * @param commission  交易手续费
      * @param realizedPnl 已实现盈亏
-     * @param time        交易所事实发生时间
+     * @param time         交易所事实发生时间
+     * @param commissionAsset 手续费资产
+     * @param positionSide 币安返回的持仓方向，例如 LONG/SHORT/BOTH
      */
     record TradeSnapshot(String symbol,
                          @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class) Long tradeId,
                          @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class) Long orderId,
-                         String side, BigDecimal quantity, BigDecimal price, BigDecimal commission, BigDecimal realizedPnl, Instant time, String commissionAsset) {
+                         String side, BigDecimal quantity, BigDecimal price, BigDecimal commission, BigDecimal realizedPnl, Instant time, String commissionAsset,
+                         String positionSide) {
         /**
-         * Legacy callers have unknown fee asset and MUST NOT project as settled PnL.
+         * Legacy callers have unknown fee asset and position side.
          */
-        public TradeSnapshot(String symbol, Long tradeId, Long orderId, String side, BigDecimal quantity, BigDecimal price, BigDecimal commission, BigDecimal realizedPnl,
-                             Instant time) {
-            this(symbol, tradeId, orderId, side, quantity, price, commission, realizedPnl, time, null);
+        public TradeSnapshot(String symbol, Long tradeId, Long orderId, String side, BigDecimal quantity, BigDecimal price, BigDecimal commission,
+                             BigDecimal realizedPnl, Instant time, String commissionAsset) {
+            this(symbol, tradeId, orderId, side, quantity, price, commission, realizedPnl, time, commissionAsset, null);
+        }
+
+        /**
+         * Legacy callers have unknown fee asset and position side.
+         */
+        public TradeSnapshot(String symbol, Long tradeId, Long orderId, String side, BigDecimal quantity, BigDecimal price, BigDecimal commission,
+                             BigDecimal realizedPnl, Instant time) {
+            this(symbol, tradeId, orderId, side, quantity, price, commission, realizedPnl, time, null, null);
         }
     }
 

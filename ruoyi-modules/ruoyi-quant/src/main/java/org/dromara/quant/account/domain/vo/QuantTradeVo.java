@@ -58,6 +58,10 @@ public class QuantTradeVo implements Serializable {
      */
     private String side;
     /**
+     * Binance 成交返回的持仓方向，例如 LONG/SHORT/BOTH。
+     */
+    private String positionSide;
+    /**
      * 数量。
      */
     private BigDecimal quantity;

@@ -176,6 +176,7 @@ public class StrategyFillJournalService {
         if (!Objects.equals(record.getExchangeTradeId(), fill.tradeId())) conflicts.add("exchangeTradeId");
         if (bothKnown(record.getExchangeOrderId(), fill.orderId()) && !Objects.equals(record.getExchangeOrderId(), fill.orderId())) conflicts.add("exchangeOrderId");
         if (bothKnown(record.getSide(), fill.side()) && !equalText(record.getSide(), fill.side(), true)) conflicts.add("side");
+        if (bothKnown(record.getPositionSide(), fill.positionSide()) && !equalText(record.getPositionSide(), fill.positionSide(), true)) conflicts.add("positionSide");
         if (bothKnown(record.getQuantity(), fill.quantity()) && !equalDecimal(record.getQuantity(), fill.quantity())) conflicts.add("quantity");
         if (bothKnown(record.getPrice(), fill.price()) && !equalDecimal(record.getPrice(), fill.price())) conflicts.add("price");
         if (bothKnown(record.getCommission(), fill.commission()) && !equalDecimal(record.getCommission(), fill.commission())) conflicts.add("commission");
@@ -211,6 +212,7 @@ public class StrategyFillJournalService {
         record.setExchangeTradeId(fill.tradeId());
         record.setExchangeOrderId(fill.orderId());
         record.setSide(fill.side() == null ? null : fill.side().toUpperCase(Locale.ROOT));
+        record.setPositionSide(fill.positionSide() == null ? null : fill.positionSide().toUpperCase(Locale.ROOT));
         record.setQuantity(fill.quantity());
         record.setPrice(fill.price());
         record.setCommission(fill.commission());
@@ -223,12 +225,12 @@ public class StrategyFillJournalService {
     private static ExchangeGateway.TradeSnapshot toSnapshot(StrategyFillJournalRecord record) {
         Instant time = record.getTradeTime() == null ? null : record.getTradeTime().toInstant(ZoneOffset.UTC);
         return new ExchangeGateway.TradeSnapshot(record.getSymbol(), record.getExchangeTradeId(), record.getExchangeOrderId(), record.getSide(), record.getQuantity(),
-            record.getPrice(), record.getCommission(), record.getRealizedPnl(), time, record.getCommissionAsset());
+            record.getPrice(), record.getCommission(), record.getRealizedPnl(), time, record.getCommissionAsset(), record.getPositionSide());
     }
 
     private static UnresolvedFill toUnresolved(StrategyFillJournalRecord record) {
         return new UnresolvedFill(record.getCredentialId().toString(), record.getSymbol(), record.getExchangeTradeId().toString(),
-            record.getExchangeOrderId() == null ? null : record.getExchangeOrderId().toString(), record.getSide(), decimal(record.getQuantity()), decimal(record.getPrice()),
+            record.getExchangeOrderId() == null ? null : record.getExchangeOrderId().toString(), record.getSide(), record.getPositionSide(), decimal(record.getQuantity()), decimal(record.getPrice()),
             decimal(record.getCommission()), record.getCommissionAsset(), decimal(record.getRealizedPnl()), record.getTradeTime(), record.getAttributionStatus(),
             record.getStatusReason(), record.getAttemptCount(), record.getLastAttemptAt());
     }
@@ -246,7 +248,7 @@ public class StrategyFillJournalService {
     }
 
     /** Lossless review view for raw fills that are not yet attributed. */
-    public record UnresolvedFill(String credentialId, String symbol, String exchangeTradeId, String exchangeOrderId, String side, String quantity, String price,
+    public record UnresolvedFill(String credentialId, String symbol, String exchangeTradeId, String exchangeOrderId, String side, String positionSide, String quantity, String price,
                                  String commission, String commissionAsset, String realizedPnl, LocalDateTime tradeTime, String attributionStatus, String statusReason,
                                  Integer attemptCount, LocalDateTime lastAttemptAt) {
     }

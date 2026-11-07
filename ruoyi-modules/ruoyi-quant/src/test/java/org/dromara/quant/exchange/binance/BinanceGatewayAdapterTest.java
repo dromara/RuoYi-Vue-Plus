@@ -11,6 +11,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BinanceGatewayAdapterTest {
     @Test
+    void mapsPositionSideFromBinanceAccountTradeResponse() {
+        var raw = new com.binance.connector.client.derivatives_trading_usds_futures.rest.model.AccountTradeListResponseInner()
+            .symbol("BTCUSDT").id(123L).orderId(456L).side("SELL").qty("0.5").price("100")
+            .commission("0.01").commissionAsset("USDT").realizedPnl("0").time(1_762_000_000_000L)
+            .positionSide("SHORT");
+
+        ExchangeGateway.TradeSnapshot snapshot = BinanceGatewayAdapter.tradeSnapshot(raw);
+
+        assertEquals("SHORT", snapshot.positionSide());
+        assertEquals(456L, snapshot.orderId());
+    }
+
+    @Test
     void localRestDeferralIsClassifiedAsDefinitelyNotSent() {
         var deferred = new org.dromara.quant.exchange.ExchangeMarketPort.RequestDeferredException(5_000L);
         RuntimeException classified = BinanceGatewayAdapter.classifyOrderDispatchFailure(deferred);
