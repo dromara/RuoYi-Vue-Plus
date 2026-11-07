@@ -55,6 +55,9 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     private static final long ACCOUNT_REST_CALL_TIMEOUT_SECONDS = 20L;
     private static final int ALGO_HISTORY_PAGE_SIZE = 1000;
     private static final int ALGO_HISTORY_MAX_QUERIES = 4096;
+    private static final int MAX_NETWORK_RETRIES = 3;
+    private static final long NETWORK_RETRY_BASE_DELAY_MILLIS = 500L;
+    private static final long NETWORK_RETRY_JITTER_MILLIS = 250L;
     /**
      * 量化模块配置。
      */
@@ -948,26 +951,71 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     }
 
     /**
-     * 对只读签名请求遇到 Binance 时间戳拒绝时，刷新服务端偏移并最多重试一次。
-     * 写操作不经过此方法，避免请求结果未知时重复提交交易或撤单。
+     * 只读签名请求允许对明确的瞬时网络故障进行有限重试；写请求不经过此方法。
+     * Binance 时间戳错误仍单独刷新服务器时间，最多重试一次。
      */
     private <T> T signedRead(Credential credential, RestRequestScheduler.Kind kind, Function<DerivativesTradingUsdsFuturesRestApi, T> request) {
-        DerivativesTradingUsdsFuturesRestApi client = api(credential, kind);
         String runMode = credential == null ? "LIVE" : credential.runMode();
         String baseUrl = "TESTNET".equalsIgnoreCase(runMode) ? properties.getBinance().getTestnetUrl() : properties.getBinance().getBaseUrl();
         ClockOffset usedOffset = clockOffsets.get(baseUrl);
         long usedOffsetUpdatedAt = usedOffset == null ? Long.MIN_VALUE : usedOffset.updatedAt();
-        try {
-            return request.apply(client);
-        } catch (RuntimeException ex) {
-            var error = apiError(ex);
-            if (error == null || !Integer.valueOf(-1021).equals(errorCode(error))) {
-                throw ex;
+        boolean clockRetried = false;
+        while (true) {
+            try {
+                return executeWithNetworkRetries(() -> request.apply(api(credential, kind)), kind, runMode);
+            } catch (RuntimeException ex) {
+                var error = apiError(ex);
+                if (clockRetried || error == null || !Integer.valueOf(-1021).equals(errorCode(error))) {
+                    throw ex;
+                }
+                clockRetried = true;
+                refreshClockOffset(baseUrl, usedOffsetUpdatedAt);
+                log.warn("Binance 只读请求因时间戳被拒绝，已刷新服务器时间并重试一次: kind={}, runMode={}, binanceCode=-1021", kind, runMode);
             }
-            refreshClockOffset(baseUrl, usedOffsetUpdatedAt);
-            log.warn("Binance 只读请求因时间戳被拒绝，已刷新服务器时间并重试一次: kind={}, runMode={}, binanceCode=-1021", kind, runMode);
-            return request.apply(api(credential, kind));
         }
+    }
+
+    static <T> T executeWithNetworkRetries(java.util.function.Supplier<T> request,
+                                            RestRequestScheduler.Kind kind, String runMode) {
+        for (int attempt = 0; ; attempt++) {
+            try {
+                return request.get();
+            } catch (RuntimeException ex) {
+                if (attempt >= MAX_NETWORK_RETRIES || !isTransientNetworkFailure(ex)) {
+                    throw ex;
+                }
+                long delay = NETWORK_RETRY_BASE_DELAY_MILLIS * (1L << attempt)
+                    + java.util.concurrent.ThreadLocalRandom.current().nextLong(NETWORK_RETRY_JITTER_MILLIS + 1L);
+                log.warn("Binance REST 网络连接异常，准备重试: kind={}, runMode={}, attempt={}/{}, delay={}ms, errorType={}",
+                    kind, runMode, attempt + 1, MAX_NETWORK_RETRIES, delay, ex.getClass().getSimpleName());
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw ex;
+                }
+            }
+        }
+    }
+
+    static boolean isTransientNetworkFailure(Throwable failure) {
+        boolean transportFailure = false;
+        for (Throwable current = failure; current != null; current = current.getCause()) {
+            if (current instanceof ExchangeMarketPort.RequestDeferredException
+                || current instanceof javax.net.ssl.SSLPeerUnverifiedException
+                || current instanceof java.security.cert.CertificateException
+                || current instanceof java.security.cert.CertPathValidatorException
+                || current instanceof java.security.cert.CertPathBuilderException) {
+                return false;
+            }
+            if (current instanceof java.io.EOFException
+                || current instanceof java.net.SocketException
+                || current instanceof java.net.SocketTimeoutException
+                || current instanceof java.net.ConnectException) {
+                transportFailure = true;
+            }
+        }
+        return transportFailure;
     }
 
     /**
