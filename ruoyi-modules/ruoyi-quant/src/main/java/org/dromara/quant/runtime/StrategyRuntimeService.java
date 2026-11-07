@@ -1761,14 +1761,20 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             return;
         }
         if (runtime.protectionRule != null) {
+            BigDecimal firstCloseQuantity = null;
             try {
                 quantity = org.dromara.quant.exchange.QuantityNormalizer.quantity(quantity, runtime.protectionRule, "MARKET");
                 if (runtime.plugin instanceof KlineSlopeRateStrategy) {
-                    org.dromara.quant.exchange.QuantityNormalizer.quantity(quantity.multiply(KlineSlopeRateStrategy.firstClosePositionRate(runtime.params)),
-                     runtime.protectionRule, "MARKET");
+                    firstCloseQuantity = quantity.multiply(KlineSlopeRateStrategy.firstClosePositionRate(runtime.params));
+                    org.dromara.quant.exchange.QuantityNormalizer.quantity(firstCloseQuantity, runtime.protectionRule, "MARKET");
                 }
             } catch (IllegalArgumentException ex) {
-                logEntryDecision(runtime, context, "PROTECTION_QUANTITY_INVALID", "开仓或首次止盈数量不满足交易步长：" + ex.getMessage());
+                String reason = "开仓或首次止盈数量不满足交易规则：" + ex.getMessage();
+                logEntryDecision(runtime, context, "PROTECTION_QUANTITY_INVALID", reason + "；计划开仓数量=" + quantity.toPlainString()
+                    + "；首次止盈计划数量=" + (firstCloseQuantity == null ? "N/A" : firstCloseQuantity.toPlainString()));
+                log.warn("策略开仓数量不符合交易所过滤器 instanceId={} symbol={} plannedQuantity={} firstCloseQuantity={} lotMaxQty={} marketMaxQty={} reason={}",
+                    runtime.instance.getId(), runtime.symbol.getSymbol(), quantity, firstCloseQuantity, runtime.protectionRule.maxQuantity(),
+                    runtime.protectionRule.marketMaxQuantity(), ex.getMessage());
                 return;
             }
         }
