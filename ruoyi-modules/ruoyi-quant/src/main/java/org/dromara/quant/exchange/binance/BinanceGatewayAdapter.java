@@ -983,7 +983,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             }
             return response.getData().stream().map(item -> new OrderSnapshot(item.getSymbol(), item.getOrderId(), item.getClientOrderId(), item.getSide(), item.getType(),
                 item.getStatus(), decimal(item.getPrice()), decimal(item.getOrigQty()), decimal(item.getExecutedQty()), instant(item.getUpdateTime()), decimal(string(item,
-                "getAvgPrice")), string(item, "getPositionSide"), nullableBoolean(item, "getReduceOnly"), instant(item.getTime()))).toList();
+                "getAvgPrice")), string(item, "getPositionSide"), nullableBoolean(item, "getReduceOnly"))).toList();
         });
     }
 
@@ -1058,7 +1058,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     }
 
     /**
-     * 按交易对和订单 ID 查询成交，支持使用 fromId 继续读取后续成交页。
+     * 按交易对、订单 ID 和订单生命周期时间范围查询成交。
      */
     @Override
     public List<TradeSnapshot> queryTradesByOrder(Credential credential, String symbol, Long orderId, TimeRange range, Long limit) {
