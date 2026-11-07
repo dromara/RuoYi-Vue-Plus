@@ -221,6 +221,8 @@ class LivePositionEventCoordinatorTest {
         var reconciliation = mock(TradingReconciliationService.class);
         var protection = mock(org.dromara.quant.protection.ProtectionOrderService.class);
         var coordinator = new LivePositionEventCoordinator(credentials, reconciliation);
+        var freshness = new LivePositionFreshness();
+        org.springframework.test.util.ReflectionTestUtils.setField(coordinator, "freshness", freshness);
         coordinator.setProtectionOrderService(protection);
         QuantCredential account = new QuantCredential();
         account.setId(89L);
