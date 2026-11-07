@@ -187,6 +187,9 @@ public class TradingReconciliationService {
             String symbol = normalizeTradingSymbol(order.symbol());
             ordersBySymbol.computeIfAbsent(symbol, ignored -> new ArrayList<>()).add(order);
         }
+        if (!symbolFilter.isEmpty()) {
+            ordersBySymbol.putIfAbsent(symbolFilter, new ArrayList<>());
+        }
         if (ordersBySymbol.isEmpty()) {
             return new TradingDataSyncResult(0, 0, 0);
         }
