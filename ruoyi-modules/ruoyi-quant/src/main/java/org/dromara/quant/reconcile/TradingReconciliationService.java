@@ -104,6 +104,7 @@ public class TradingReconciliationService {
     private final ScheduledExecutorService positionRetryExecutor = Executors.newSingleThreadScheduledExecutor(
         Thread.ofPlatform().daemon().name("quant-position-snapshot-retry").factory());
     private final Map<Long, ScheduledFuture<?>> positionRetryTasks = new HashMap<>();
+    private final Map<Long, Integer> positionRetryAttempts = new HashMap<>();
     private final ConcurrentHashMap<Long, java.util.concurrent.atomic.AtomicLong> runtimeSnapshotGenerations = new ConcurrentHashMap<>();
     private static final Duration RUNTIME_POSITION_CACHE_AGE = Duration.ofSeconds(20);
     @Autowired
@@ -563,6 +564,9 @@ public class TradingReconciliationService {
             var account = java.util.Objects.requireNonNull(gateway.queryAccountForPosition(exchangeCredential), "Binance account snapshot missing");
             var snapshots = List.copyOf(java.util.Objects.requireNonNull(gateway.queryPositions(exchangeCredential, null), "Binance full position snapshot missing"));
             commitPositionSnapshot(credential, account, snapshots, fetchStartedAt, generation, runtimeGeneration, trigger);
+            synchronized (positionRetryTasks) {
+                positionRetryAttempts.remove(credentialId);
+            }
             AccountPositionSnapshot result = new AccountPositionSnapshot(account, snapshots, generation, runtimeGeneration);
             created.complete(result);
             return result;
@@ -605,12 +609,16 @@ public class TradingReconciliationService {
             return;
         }
         long credentialId = credential.getId();
-        long delay = Math.max(1_000L, retryAfterMillis);
         synchronized (positionRetryTasks) {
             ScheduledFuture<?> current = positionRetryTasks.get(credentialId);
             if (current != null && !current.isDone()) {
                 return;
             }
+            int retryAttempt = trigger != null && trigger.contains("superseded")
+                ? 0 : positionRetryAttempts.merge(credentialId, 1, Integer::sum);
+            long backoffMillis = retryAttempt == 0 ? 1_000L
+                : Math.min(30_000L, 1_000L << Math.min(retryAttempt - 1, 5));
+            long delay = Math.max(Math.max(1_000L, retryAfterMillis), backoffMillis);
             ScheduledFuture<?> scheduled = positionRetryExecutor.schedule(() -> {
                 synchronized (positionRetryTasks) {
                     positionRetryTasks.remove(credentialId);
@@ -623,7 +631,8 @@ public class TradingReconciliationService {
                 }
             }, delay, TimeUnit.MILLISECONDS);
             positionRetryTasks.put(credentialId, scheduled);
-            log.info("已安排账户持仓快照延迟重试 credentialId={} trigger={} retryAfterMs={}", credentialId, trigger, delay);
+            log.info("已安排账户持仓快照延迟重试 credentialId={} trigger={} retryAfterMs={} retryAttempt={}",
+                credentialId, trigger, delay, retryAttempt);
         }
     }
 
@@ -633,6 +642,7 @@ public class TradingReconciliationService {
         synchronized (positionRetryTasks) {
             positionRetryTasks.values().forEach(task -> task.cancel(false));
             positionRetryTasks.clear();
+            positionRetryAttempts.clear();
         }
     }
 
