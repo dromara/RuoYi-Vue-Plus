@@ -1058,6 +1058,27 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     }
 
     /**
+     * 按交易对和订单 ID 查询成交，支持使用 fromId 继续读取后续成交页。
+     */
+    @Override
+    public List<TradeSnapshot> queryTradesByOrder(Credential credential, String symbol, Long orderId, Long fromId, Long limit) {
+        requireCredential(credential);
+        if (symbol == null || symbol.isBlank() || orderId == null || orderId <= 0) {
+            throw new IllegalArgumentException("按订单查询成交必须指定交易对和有效订单 ID");
+        }
+        return signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
+            ApiResponse<AccountTradeListResponse> response = client.accountTradeList(
+                symbol.trim(), orderId, null, null, fromId, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS);
+            if (response == null || response.getData() == null) {
+                throw new IllegalStateException("Binance 指定订单成交响应缺少数据载荷，无法确认查询完整性");
+            }
+            return response.getData().stream().map(item -> new TradeSnapshot(item.getSymbol(), item.getId(), item.getOrderId(), item.getSide(),
+                decimal(item.getQty()), decimal(item.getPrice()), decimal(item.getCommission()), decimal(item.getRealizedPnl()),
+                instant(item.getTime()), string(item, "getCommissionAsset"))).toList();
+        });
+    }
+
+    /**
      * 查询历史订单。
      */
     @Override
