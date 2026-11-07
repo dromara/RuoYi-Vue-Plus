@@ -109,7 +109,7 @@ final class RestRequestScheduler {
     }
 
     /**
-     * REST 请求优先级：交易请求优先于账户和后台补偿查询。
+     * REST 请求优先级：交易请求 > 持仓事实核验 > 账户余额校准 > 后台补偿查询。
      */
     enum Kind {TRADE, POSITION_VERIFY, ACCOUNT, BACKGROUND}
 }
