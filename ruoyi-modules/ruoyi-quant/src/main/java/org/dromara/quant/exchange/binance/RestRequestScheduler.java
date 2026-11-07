@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 final class RestRequestScheduler {
     private final ArrayDeque<Object>[] queues;
     private final int[] rotation = {0, 1, 0, 2, 0, 0, 1, 3};
-    private static final long MANUAL_BLOCK_RETRY_HINT_MILLIS = TimeUnit.HOURS.toMillis(24);
     private final long interval;
     private long nextStart;
     private long blockedUntil;
@@ -27,7 +26,7 @@ final class RestRequestScheduler {
     synchronized void acquire(Kind kind) {
         long initialNow = System.nanoTime();
         if (manualBlock) {
-            throw deferred("MANUAL_BLOCK", kind, 0L, MANUAL_BLOCK_RETRY_HINT_MILLIS);
+            throw deferred("MANUAL_BLOCK", kind, 0L, 0L);
         }
         if (initialNow < blockedUntil) {
             throw deferred("BLOCKED_UNTIL", kind, 0L, TimeUnit.NANOSECONDS.toMillis(blockedUntil - initialNow) + 1L);
@@ -45,7 +44,7 @@ final class RestRequestScheduler {
                     throw deferred("INTERRUPTED", kind, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - initialNow), 0L);
                 }
                 if (manualBlock) {
-                    throw deferred("MANUAL_BLOCK", kind, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - initialNow), MANUAL_BLOCK_RETRY_HINT_MILLIS);
+                    throw deferred("MANUAL_BLOCK", kind, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - initialNow), 0L);
                 }
                 long now = System.nanoTime();
                 if (now < blockedUntil) {
