@@ -1034,7 +1034,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         }
         return new OrderSnapshot(actualSymbol, actualOrderId, actualClientOrderId, string(data, "getSide"), type, status, decimal(string(data, "getPrice")), decimal(string(data,
             "getOrigQty")), decimal(string(data, "getExecutedQty")), instant(number(data, "getUpdateTime")), decimal(string(data, "getAvgPrice")), string(data, "getPositionSide"),
-            nullableBoolean(data, "getReduceOnly"));
+            nullableBoolean(data, "getReduceOnly"), instant(number(data, "getTime")));
     }
 
     /**
@@ -1061,14 +1061,16 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
      * 按交易对和订单 ID 查询成交，支持使用 fromId 继续读取后续成交页。
      */
     @Override
-    public List<TradeSnapshot> queryTradesByOrder(Credential credential, String symbol, Long orderId, Long fromId, Long limit) {
+    public List<TradeSnapshot> queryTradesByOrder(Credential credential, String symbol, Long orderId, TimeRange range, Long limit) {
         requireCredential(credential);
-        if (symbol == null || symbol.isBlank() || orderId == null || orderId <= 0) {
-            throw new IllegalArgumentException("按订单查询成交必须指定交易对和有效订单 ID");
+        if (symbol == null || symbol.isBlank() || orderId == null || orderId <= 0
+            || range == null || range.from() == null || range.to() == null || range.from().isAfter(range.to())) {
+            throw new IllegalArgumentException("按订单查询成交必须指定交易对、订单 ID 和有效时间范围");
         }
         return signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
             ApiResponse<AccountTradeListResponse> response = client.accountTradeList(
-                symbol.trim(), orderId, null, null, fromId, limit == null ? 1000L : limit, RECV_WINDOW_MILLIS);
+                symbol.trim(), orderId, range.from().toEpochMilli(), range.to().toEpochMilli(), null,
+                limit == null ? 1000L : limit, RECV_WINDOW_MILLIS);
             if (response == null || response.getData() == null) {
                 throw new IllegalStateException("Binance 指定订单成交响应缺少数据载荷，无法确认查询完整性");
             }
@@ -1094,7 +1096,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         }
         return data.stream().map(item -> new OrderSnapshot(item.getSymbol(), item.getOrderId(), item.getClientOrderId(), item.getSide(), item.getType(), item.getStatus(),
             decimal(item.getPrice()), decimal(item.getOrigQty()), decimal(item.getExecutedQty()), instant(item.getUpdateTime()), decimal(string(item, "getAvgPrice")),
-            string(item, "getPositionSide"), nullableBoolean(item, "getReduceOnly"))).toList();
+            string(item, "getPositionSide"), nullableBoolean(item, "getReduceOnly"), instant(number(item, "getTime")))).toList();
     }
 
     /**
