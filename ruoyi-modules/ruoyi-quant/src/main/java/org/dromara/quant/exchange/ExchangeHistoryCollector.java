@@ -15,6 +15,8 @@ public final class ExchangeHistoryCollector {
     private static final long WINDOW_MILLIS = Duration.ofDays(7).toMillis();
     private static final int PAGE_LIMIT = 1000;
     private static final int MAX_REQUESTS = 256;
+    private static final int MAX_DEFERRED_RETRIES = 5;
+    private static final long MAX_DEFERRED_RETRY_DELAY_MILLIS = Duration.ofSeconds(5).toMillis();
 
     private ExchangeHistoryCollector() {
     }
@@ -47,11 +49,35 @@ public final class ExchangeHistoryCollector {
         return List.copyOf(result);
     }
 
+    /**
+     * 本地调度器延后请求时，GET 历史查询尚未发送且没有副作用，可以在短暂退避后重试。
+     * 长冷却（例如 Binance 限流或人工封禁）不在同步 HTTP 请求中等待，直接交由上层处理。
+     */
+    private static <T> List<T> queryWithDeferredRetry(Function<ExchangeGateway.TimeRange, List<T>> query,
+                                                       ExchangeGateway.TimeRange range) {
+        for (int attempt = 0; ; attempt++) {
+            try {
+                return query.apply(range);
+            } catch (ExchangeMarketPort.RequestDeferredException deferred) {
+                if (attempt >= MAX_DEFERRED_RETRIES
+                    || deferred.retryAfterMillis() > MAX_DEFERRED_RETRY_DELAY_MILLIS) {
+                    throw deferred;
+                }
+                try {
+                    Thread.sleep(deferred.retryAfterMillis());
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw deferred;
+                }
+            }
+        }
+    }
+
     private static <T> void collectRange(long start, long end, Function<ExchangeGateway.TimeRange, List<T>> query, List<T> result, int[] requests) {
         if (++requests[0] > MAX_REQUESTS) {
             throw new IllegalStateException("交易所历史查询超过请求预算，拒绝使用不完整结果更新本地账本");
         }
-        List<T> page = query.apply(new ExchangeGateway.TimeRange(Instant.ofEpochMilli(start), Instant.ofEpochMilli(end)));
+        List<T> page = queryWithDeferredRetry(query, new ExchangeGateway.TimeRange(Instant.ofEpochMilli(start), Instant.ofEpochMilli(end)));
         if (page == null || page.size() < PAGE_LIMIT) {
             if (page != null) result.addAll(page);
             return;
