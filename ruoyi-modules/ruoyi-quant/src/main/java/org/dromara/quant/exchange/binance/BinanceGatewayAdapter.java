@@ -462,6 +462,8 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
                 BigDecimal priceTick = BigDecimal.ZERO;
                 BigDecimal step = BigDecimal.ZERO;
                 BigDecimal marketStep = BigDecimal.ZERO;
+                BigDecimal maxQuantity = BigDecimal.ZERO;
+                BigDecimal marketMaxQuantity = BigDecimal.ZERO;
                 BigDecimal minNotional = BigDecimal.ZERO;
                 if (symbol.getFilters() == null) {
                     continue;
@@ -472,9 +474,11 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
                     }
                     if ("LOT_SIZE".equals(filter.getFilterType())) {
                         step = decimal(filter.getStepSize());
+                        maxQuantity = decimal(filter.getMaxQty());
                     }
                     if ("MARKET_LOT_SIZE".equals(filter.getFilterType())) {
                         marketStep = decimal(filter.getStepSize());
+                        marketMaxQuantity = decimal(filter.getMaxQty());
                     }
                     if ("MIN_NOTIONAL".equals(filter.getFilterType()) || "NOTIONAL".equals(filter.getFilterType())) {
                         minNotional = decimal(filter.getNotional());
@@ -487,7 +491,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
                     continue;
                 }
                 rules.add(new SymbolRule(symbol.getSymbol(), symbol.getQuoteAsset(), symbol.getPricePrecision().intValue(), symbol.getQuantityPrecision().intValue(), priceTick,
-                    step, marketStep, minNotional, symbol.getStatus()));
+                    step, marketStep, maxQuantity, marketMaxQuantity, minNotional, symbol.getStatus()));
             }
             return new ExchangeInfo(rules);
         } catch (RuntimeException ex) {
