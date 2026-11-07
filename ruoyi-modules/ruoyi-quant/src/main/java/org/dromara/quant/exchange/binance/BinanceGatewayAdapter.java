@@ -1804,11 +1804,13 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             }
             long refreshStartedAt = System.currentTimeMillis();
             ClockSyncResult sync = synchronizeClock(baseUrl);
-            clockOffsets.put(baseUrl, new ClockOffset(sync.offsetMillis(), sync.responseReceivedAtMillis()));
+            ClockOffset refreshed = new ClockOffset(sync.offsetMillis(), sync.responseReceivedAtMillis());
+            ClockOffset effective = clockOffsets.compute(baseUrl, (ignored, current) ->
+                current == null || current.updatedAt() < refreshed.updatedAt() ? refreshed : current);
             log.info("Binance 服务端时间偏移已刷新: baseUrl={}, offsetMillis={}, recvWindowMillis={}, syncElapsedMillis={}, schedulerQueueMillis={}, requestElapsedMillis={}",
-                baseUrl, sync.offsetMillis(), RECV_WINDOW_MILLIS, sync.responseReceivedAtMillis() - refreshStartedAt,
+                baseUrl, effective.value(), RECV_WINDOW_MILLIS, sync.responseReceivedAtMillis() - refreshStartedAt,
                 sync.schedulerQueueMillis(), sync.responseReceivedAtMillis() - sync.requestStartedAtMillis());
-            return sync.offsetMillis();
+            return effective.value();
         }
     }
 
@@ -1839,9 +1841,11 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             }
             long refreshStartedAt = System.currentTimeMillis();
             ClockSyncResult sync = synchronizeClock(baseUrl);
-            clockOffsets.put(baseUrl, new ClockOffset(sync.offsetMillis(), sync.responseReceivedAtMillis()));
+            ClockOffset refreshed = new ClockOffset(sync.offsetMillis(), sync.responseReceivedAtMillis());
+            ClockOffset effective = clockOffsets.compute(baseUrl, (ignored, current) ->
+                current == null || current.updatedAt() < refreshed.updatedAt() ? refreshed : current);
             log.info("Binance 服务端时间偏移已强制刷新: baseUrl={}, offsetMillis={}, syncElapsedMillis={}, schedulerQueueMillis={}, requestElapsedMillis={}",
-                baseUrl, sync.offsetMillis(), sync.responseReceivedAtMillis() - refreshStartedAt,
+                baseUrl, effective.value(), sync.responseReceivedAtMillis() - refreshStartedAt,
                 sync.schedulerQueueMillis(), sync.responseReceivedAtMillis() - sync.requestStartedAtMillis());
         }
     }
