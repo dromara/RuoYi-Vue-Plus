@@ -162,6 +162,7 @@ public class QuantAccountQueryController {
             row.put("positionSide", item.getPositionSide());
             row.put("reduceOnly", item.getReduceOnly());
             row.put("price", item.getPrice());
+            row.put("averagePrice", item.getAveragePrice());
             row.put("originalQuantity", item.getOriginalQuantity());
             row.put("executedQuantity", item.getExecutedQuantity());
             row.put("tradeCount", fillCounts.getOrDefault(item.getCredentialId() + ":" + item.getSymbol() + ":" + item.getExchangeOrderId(), 0L));
