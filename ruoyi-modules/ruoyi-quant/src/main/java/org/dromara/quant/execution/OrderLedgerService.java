@@ -84,6 +84,7 @@ public class OrderLedgerService {
         entity.setStatus(snapshot.status());
         entity.setPositionSide(snapshot.positionSide());
         entity.setPrice(snapshot.price());
+        entity.setAveragePrice(snapshot.averagePrice());
         entity.setOriginalQuantity(snapshot.originalQuantity());
         entity.setExecutedQuantity(snapshot.executedQuantity());
         entity.setReduceOnly(snapshot.reduceOnly());
