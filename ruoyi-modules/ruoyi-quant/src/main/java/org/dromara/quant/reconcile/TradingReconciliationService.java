@@ -468,7 +468,7 @@ public class TradingReconciliationService {
         if (credential == null || credential.getId() == null) {
             throw new IllegalArgumentException("Credential is required for a runtime position snapshot");
         }
-        return loadAccountPositionSnapshot(credential, "runtime-reconcile", true).positions();
+        return loadAccountPositionSnapshot(credential, "runtime-reconcile", true, false).positions();
     }
 
     /** Invalidate the in-memory account snapshot after a private-stream event. */
@@ -486,10 +486,10 @@ public class TradingReconciliationService {
     }
 
     private List<ExchangeGateway.PositionSnapshot> refreshAccountPositionSnapshot(QuantCredential credential, String trigger) {
-        return loadAccountPositionSnapshot(credential, trigger, false).positions();
+        return loadAccountPositionSnapshot(credential, trigger, false, false).positions();
     }
 
-    private AccountPositionSnapshot loadAccountPositionSnapshot(QuantCredential credential, String trigger, boolean reuseFresh) {
+    private AccountPositionSnapshot loadAccountPositionSnapshot(QuantCredential credential, String trigger, boolean reuseFresh, boolean refreshAccount) {
         if (credential == null || credential.getId() == null) {
             throw new IllegalArgumentException("Credential is required for an account position snapshot");
         }
@@ -501,7 +501,11 @@ public class TradingReconciliationService {
             && cached.runtimeGeneration() == runtimeGeneration
             && Duration.between(cached.fetchedAt(), Instant.now()).compareTo(RUNTIME_POSITION_CACHE_AGE) <= 0
             && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
-            AccountPositionSnapshot snapshot = new AccountPositionSnapshot(cached.account(), cached.positions(), generation, runtimeGeneration);
+            ExchangeGateway.AccountSnapshot account = refreshAccount
+                ? java.util.Objects.requireNonNull(gateway.queryAccount(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
+                    credential.getSignatureType(), credential.getRunMode())), "Binance account snapshot missing")
+                : cached.account();
+            AccountPositionSnapshot snapshot = new AccountPositionSnapshot(account, cached.positions(), generation, runtimeGeneration);
             if (positionGeneration(credentialId) == generation && runtimeSnapshotGeneration(credentialId) == runtimeGeneration
                 && (!"LIVE".equalsIgnoreCase(credential.getRunMode()) || positionFreshness == null || positionFreshness.fresh(credentialId))) {
                 log.debug("复用可信账户持仓快照 credentialId={} trigger={} ageMs={}", credentialId, trigger,
@@ -519,6 +523,12 @@ public class TradingReconciliationService {
             if (positionGeneration(credentialId) != snapshot.positionGeneration()
                 || runtimeSnapshotGeneration(credentialId) != snapshot.runtimeGeneration()) {
                 throw new SnapshotSupersededException("Shared account position snapshot was invalidated before use");
+            }
+            if (refreshAccount) {
+                ExchangeGateway.AccountSnapshot account = java.util.Objects.requireNonNull(
+                    gateway.queryAccount(new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(),
+                        credential.getSignatureType(), credential.getRunMode())), "Binance account snapshot missing");
+                return new AccountPositionSnapshot(account, snapshot.positions(), snapshot.positionGeneration(), snapshot.runtimeGeneration());
             }
             return snapshot;
         }
@@ -728,7 +738,7 @@ public class TradingReconciliationService {
             ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(),
                 credential.getRunMode());
             // 完整对账继续独立同步订单、成交、保护单和财务事件；账户快照复用统一协调器。
-            AccountPositionSnapshot snapshot = loadAccountPositionSnapshot(credential, "full-reconcile", true);
+            AccountPositionSnapshot snapshot = loadAccountPositionSnapshot(credential, "full-reconcile", true, true);
             ExchangeFacts facts = collectExchangeFacts(credential, historyHours, exchangeCredential, snapshot.account(), snapshot.positions());
             transaction.executeWithoutResult(status -> applyExchangeFacts(credential, facts));
         } catch (SnapshotSupersededException ex) {
