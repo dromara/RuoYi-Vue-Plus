@@ -6,7 +6,7 @@ import java.util.ArrayDeque;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 有界轮转队列；交易占两个轮次，账户校准与后台查询各占一个，避免饥饿。
+ * 有界加权轮转队列；交易和持仓核验优先，余额校准及后台补偿保留固定执行份额。
  */
 final class RestRequestScheduler {
     private final ArrayDeque<Object>[] queues;
