@@ -14,7 +14,7 @@ public interface ExchangeTradingPort {
 
     List<ExchangeGateway.TradeSnapshot> queryTrades(ExchangeGateway.Credential credential, String symbol, ExchangeGateway.TimeRange range);
 
-    List<ExchangeGateway.TradeSnapshot> queryTradesByOrder(ExchangeGateway.Credential credential, String symbol, Long orderId, Long fromId, Long limit);
+    List<ExchangeGateway.TradeSnapshot> queryTradesByOrder(ExchangeGateway.Credential credential, String symbol, Long orderId, ExchangeGateway.TimeRange range, Long limit);
 
     ExchangeGateway.OrderResult placeOrder(ExchangeGateway.OrderRequest request);
 
