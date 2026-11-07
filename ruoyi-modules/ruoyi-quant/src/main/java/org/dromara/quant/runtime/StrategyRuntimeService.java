@@ -1593,6 +1593,41 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             && context.eventTime() != null && context.eventTime().isAfter(runtime.entryProtectionCleanupConfirmedAt);
     }
 
+    /** 返回历史保护清理门禁的具体阻塞原因；仅读取本地状态，不触发 REST 或状态变更。 */
+    private String entryProtectionBlockReason(ActiveRuntime runtime, StrategyContext context) {
+        synchronized (runtime) {
+            if (runtime.closed) {
+                return "RUNTIME_CLOSED";
+            }
+            if (runtime.position != null) {
+                return "POSITION_EXISTS";
+            }
+            if (runtime.hasPendingAction()) {
+                return "PENDING_ACTION";
+            }
+            if (!runtime.positionFactsReady) {
+                return "POSITION_FACTS_NOT_READY";
+            }
+            if (runtime.entryProtectionCleanupRunning) {
+                return "CLEANUP_PENDING";
+            }
+            if (!runtime.entryProtectionCleanupReady) {
+                return System.currentTimeMillis() < runtime.nextEntryProtectionCleanupAt
+                    ? "CLEANUP_RETRY_BACKOFF" : "CLEANUP_REQUIRED";
+            }
+            if (runtime.entryProtectionCleanupConfirmedAt == null) {
+                return "CLEANUP_CONFIRMATION_MISSING";
+            }
+            if (context.eventTime() == null) {
+                return "EVENT_TIME_MISSING";
+            }
+            if (!context.eventTime().isAfter(runtime.entryProtectionCleanupConfirmedAt)) {
+                return "WAITING_POST_CLEANUP_MARKET_EVENT";
+            }
+            return "CLEANUP_PROOF_INVALID";
+        }
+    }
+
     /** 在原有准入门禁后核实历史保护清理证明，再使用当前有效行情开仓。 */
     private void evaluateEntry(ActiveRuntime runtime, StrategyContext context) {
         Long strategySymbolId = runtime.strategySymbol == null ? null : runtime.strategySymbol.getId();
@@ -1768,7 +1803,12 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
         }
         // 准备期间的私有事件或租约转移会使清理证明失效，不能沿用旧证明开仓。
         if (!entryProtectionReadyForEvent(runtime, context)) {
-            logEntryDecision(runtime, context, "ENTRY_PROTECTION_CLEANUP", "历史保护清理或清理后的新行情尚未就绪");
+            String blockReason = entryProtectionBlockReason(runtime, context);
+            logEntryDecision(runtime, context, "ENTRY_PROTECTION_" + blockReason, "开仓前保护清理门禁未放行：" + blockReason);
+            log.info("策略开仓被保护清理门禁拦截 instanceId={} symbol={} reason={} cleanupReady={} cleanupRunning={} cleanupGeneration={} proofGeneration={} cleanupConfirmedAt={} eventTime={} positionFactsReady={} hasPendingAction={}",
+                runtime.instance.getId(), runtime.symbol.getSymbol(), blockReason, runtime.entryProtectionCleanupReady, runtime.entryProtectionCleanupRunning,
+                runtime.entryProtectionCleanupGeneration.get(), runtime.entryProtectionCleanupProofGeneration, runtime.entryProtectionCleanupConfirmedAt,
+                context.eventTime(), runtime.positionFactsReady, runtime.hasPendingAction());
             return;
         }
         // 开仓前重新读取持久化开关，避免其他节点/监督周期尚未刷新缓存时沿用旧状态。
