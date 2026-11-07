@@ -27,7 +27,8 @@ BEGIN
             MODIFY COLUMN reduce_only char(1) NULL DEFAULT NULL COMMENT '只减仓标记；未知时保留NULL';
         UPDATE quant_order
         SET reduce_only=NULL, reduce_only_source='LEGACY_UNKNOWN'
-        WHERE reduce_only_source IS NULL;
+        WHERE reduce_only_source IS NULL
+          AND updated_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 90 DAY);
     END IF;
 END$
 CALL migrate_quant_order_reduce_only_provenance()$
