@@ -87,6 +87,11 @@ public class MarketStreamHub {
         recoveryExecutor.shutdownNow();
     }
 
+    static boolean isEventTimeWithinKlinePeriod(Instant eventTime, Instant openTime, Instant nextOpen) {
+        return eventTime != null && openTime != null && nextOpen != null
+            && !eventTime.isBefore(openTime) && eventTime.isBefore(nextOpen);
+    }
+
     private record Key(String runMode, String symbol, String interval) {
     }
 
@@ -674,11 +679,6 @@ public class MarketStreamHub {
                 publish(status("CONNECTED"));
             }
             publish(event);
-        }
-
-        static boolean isEventTimeWithinKlinePeriod(Instant eventTime, Instant openTime, Instant nextOpen) {
-            return eventTime != null && openTime != null && nextOpen != null
-                && !eventTime.isBefore(openTime) && eventTime.isBefore(nextOpen);
         }
 
         /**
