@@ -119,6 +119,8 @@ class MarketStreamHubRecoveryTest {
                 }));
                 secondSubscription = secondSubscriptionFuture.get(1, TimeUnit.SECONDS);
                 assertNotNull(secondSubscription, "a slow exchange-time lookup must not hold the shared-stream monitor");
+                releaseSlowLookup.countDown();
+                slowHealthCheck.get(2, TimeUnit.SECONDS);
             } finally {
                 releaseSlowLookup.countDown();
                 if (secondSubscription != null) {
