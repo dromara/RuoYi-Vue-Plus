@@ -98,7 +98,8 @@ public class StrictBinanceTradeCollector {
             for (ExchangeGateway.TradeSnapshot trade : orderTrades) {
                 if (trade == null || trade.tradeId() == null || trade.tradeId() <= 0
                     || trade.orderId() == null || !order.orderId().equals(trade.orderId())
-                    || trade.symbol() == null || !symbol.equalsIgnoreCase(trade.symbol()) || trade.time() == null) {
+                    || trade.symbol() == null || !symbol.equalsIgnoreCase(trade.symbol()) || trade.time() == null
+                    || trade.time().isBefore(orderStart) || trade.time().isAfter(orderEnd)) {
                     throw new IllegalStateException("Binance per-order trade page contains invalid or mismatched identity");
                 }
                 ExchangeGateway.TradeSnapshot prior = unique.putIfAbsent(trade.tradeId(), trade);
