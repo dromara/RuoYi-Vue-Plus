@@ -868,10 +868,30 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
                         runtime.position == null ? "FLAT" : runtime.position.getQuantity(), java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - reconcileStartedAt), entryReadiness);
                 }
             }
+            if (reconciliationCompleted) {
+                schedulePositionFactsRefresh(runtime, runtime.positionFactsVerifiedAt);
+            }
             if (!reconciliationCompleted || "RECOVERY_OR_PROTECTION_STILL_REQUIRED".equals(runtime.positionReconciliationBlockReason)) {
                 scheduleReconciliationRetry(runtime);
             }
         }
+    }
+
+    /**
+     * 在快照有效期结束前主动核验，避免策略先进入过期阻断再等待 REST 刷新。
+     * 同一 Runtime 的旧定时任务通过 verifiedAt 比较自动失效。
+     */
+    private void schedulePositionFactsRefresh(ActiveRuntime runtime, long verifiedAt) {
+        long maxAgeMillis = Math.max(1, properties.getReconcile().getIntervalSeconds()) * 1_000L + 15_000L;
+        long refreshAfterMillis = Math.max(1_000L, maxAgeMillis - Math.min(10_000L, maxAgeMillis / 4));
+        java.util.concurrent.CompletableFuture.delayedExecutor(refreshAfterMillis, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .execute(() -> {
+                if (!runtime.closed && runtime.positionFactsReady && runtime.positionFactsVerifiedAt == verifiedAt) {
+                    log.debug("策略账户持仓事实即将过期，提前触发核验 instanceId={} credentialId={} symbol={}",
+                        runtime.instance.getId(), runtime.credential.getId(), runtime.symbol.getSymbol());
+                    requestReconciliation(runtime);
+                }
+            });
     }
 
     /**
@@ -990,6 +1010,7 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
         runtime.position = loadPosition(credential, symbol.getSymbol(), executionService.toCredential(credential), startupPositionSnapshot);
         runtime.positionFactsReady = true;
         runtime.positionFactsVerifiedAt = System.currentTimeMillis();
+        schedulePositionFactsRefresh(runtime, runtime.positionFactsVerifiedAt);
         if (runtime.position == null && runtime.state != null && !runtime.hasPendingAction()
             && (Boolean.TRUE.equals(runtime.state.getRecoveryRequired()) || Boolean.TRUE.equals(runtime.state.getUnsafeRecovery())
                 || "PROTECTION_CLEANUP".equals(runtime.state.getStatus()))) {
