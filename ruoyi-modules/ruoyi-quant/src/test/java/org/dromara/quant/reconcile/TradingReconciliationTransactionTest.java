@@ -563,7 +563,7 @@ class TradingReconciliationTransactionTest {
         initializeManualSyncMapperMetadata();
         ExchangeGateway.OrderSnapshot historicalOrder = new ExchangeGateway.OrderSnapshot("BTCUSDT", 303L, "client-303",
             "BUY", "MARKET", "FILLED", BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE,
-            Instant.now().minusSeconds(60), BigDecimal.TEN, "BOTH", false);
+            Instant.now(), BigDecimal.TEN, "BOTH", false);
         when(gateway.queryOrderHistory(any(), eq("BTCUSDT"), any(), anyLong())).thenReturn(List.of(historicalOrder));
         when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(303L), any(), anyLong())).thenAnswer(invocation -> {
             var fill = manualSyncFill("BTCUSDT", 303L);
