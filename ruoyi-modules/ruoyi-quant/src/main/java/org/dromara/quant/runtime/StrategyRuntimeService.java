@@ -230,8 +230,16 @@ public class StrategyRuntimeService {
     private void notifyCloseSafely(ActiveRuntime runtime, String direction, BigDecimal quantity, BigDecimal entryPrice, BigDecimal closePrice,
                                    BigDecimal profitAmount, BigDecimal profitRate, String closeType, String reason) {
         try {
-            notificationService.notifyClose(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity, entryPrice, closePrice,
-                profitAmount, profitRate, closeType, reason);
+            if ("PAPER".equalsIgnoreCase(runtime.credential.getRunMode())) {
+                var account = paperTradingService.find(runtime.credential.getId());
+                notificationService.notifyClosePaper(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity, entryPrice,
+                    closePrice, profitAmount, runtime.symbol.getQuoteAsset(), account == null ? null : account.getBalance(),
+                    account == null ? null : account.getAvailableBalance(), account == null ? null : account.getUnrealizedPnl(), closeType, reason);
+            } else {
+                Long orderId = runtime.state == null ? null : runtime.state.getPendingOrderId();
+                notificationService.notifyCloseByOrder(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity,
+                    entryPrice, orderId, runtime.symbol.getQuoteAsset(), closeType, reason);
+            }
         } catch (RuntimeException ex) {
             log.error("已确认平仓通知处理失败 instanceId={} symbol={} closeType={}", runtime.instance.getId(), runtime.symbol.getSymbol(), closeType, ex);
         }

@@ -73,6 +73,8 @@ public class TradeExecutionApplicationService {
     private AccountPositionCache positionCache;
     @Autowired
     private OpenCapacityService openCapacityService;
+    @Autowired
+    private org.dromara.quant.notification.QuantTradeNotificationService notificationService;
 
     /**
      * 由用户手工发起统一平仓执行。
@@ -107,10 +109,15 @@ public class TradeExecutionApplicationService {
             String closeSide = "SHORT".equalsIgnoreCase(position.getPositionSide()) ? "BUY" : "SELL";
             ExecutionResult result = executionPort.close(new ClosePositionCommand(credential.getId(), null, null, exchangeCredential, request.getSymbol(), closeSide, "MARKET",
                 request.getQuantity(), null, position.getPositionSide(), request.getIdempotencyKey(), credential.getRunMode(), symbolRule(symbol), safety(credential, null, true)));
-            paperTradingService.settlePaperExecution(credential.getId(), request.getIdempotencyKey(), position.getId(), request.getQuantity(), position.getMarkPrice() == null ?
-                position.getEntryPrice() : position.getMarkPrice());
-            recordManualClose(request, credential, "FILLED", "手动平仓", position.getPositionSide(), position.getMarkPrice() == null ? position.getEntryPrice() :
-                position.getMarkPrice(), true);
+            BigDecimal closePrice = position.getMarkPrice() == null ? position.getEntryPrice() : position.getMarkPrice();
+            PaperTradingService.PaperCloseSettlement settlement = paperTradingService.settlePaperExecution(
+                credential.getId(), request.getIdempotencyKey(), position.getId(), request.getQuantity(), closePrice);
+            var paperAccount = paperTradingService.find(credential.getId());
+            notificationService.notifyClosePaper(null, credential, request.getSymbol(), position.getPositionSide(), request.getQuantity(),
+                position.getEntryPrice(), closePrice, settlement.realizedPnl(), symbol.getQuoteAsset(),
+                paperAccount == null ? null : paperAccount.getBalance(), paperAccount == null ? null : paperAccount.getAvailableBalance(),
+                paperAccount == null ? null : paperAccount.getUnrealizedPnl(), "MANUAL", "手动平仓");
+            recordManualClose(request, credential, "FILLED", "手动平仓", position.getPositionSide(), closePrice, true);
             return result;
         }
         ExchangeGateway.PositionSnapshot position =
@@ -122,8 +129,13 @@ public class TradeExecutionApplicationService {
         String closeSide = position.quantity().signum() < 0 || "SHORT".equalsIgnoreCase(position.side()) ? "BUY" : "SELL";
         String positionSide = normalizePositionSide(exchangeCredential, closeSide, position.side());
         QuantRiskConfig risk = riskMapper.selectOne(new LambdaQueryWrapper<QuantRiskConfig>().eq(QuantRiskConfig::getCredentialId, credential.getId()));
-        return executionPort.close(new ClosePositionCommand(credential.getId(), null, null, exchangeCredential, request.getSymbol(), closeSide, "MARKET", request.getQuantity(),
+        ExecutionResult result = executionPort.close(new ClosePositionCommand(credential.getId(), null, null, exchangeCredential, request.getSymbol(), closeSide, "MARKET", request.getQuantity(),
             null, positionSide, request.getIdempotencyKey(), credential.getRunMode(), symbolRule(symbol), safety(credential, risk, true)));
+        if (result.orderId() != null) {
+            notificationService.notifyCloseByOrder(null, credential, request.getSymbol(), position.side(), request.getQuantity(),
+                position.entryPrice(), result.orderId(), symbol.getQuoteAsset(), "MANUAL", "手动平仓");
+        }
+        return result;
     }
 
     private void recordManualClose(ClosePositionRequest request, QuantCredential credential, String status, String reason, String direction, BigDecimal price, boolean filled) {

@@ -1,6 +1,7 @@
 package org.dromara.quant.notification;
 
 import org.dromara.quant.config.QuantProperties;
+import org.dromara.quant.exchange.ExchangeGateway;
 import org.dromara.quant.notification.domain.QuantNotification;
 import org.dromara.quant.notification.mapper.QuantNotificationMapper;
 import org.dromara.quant.risk.mapper.QuantRiskConfigMapper;
@@ -28,7 +29,7 @@ class QuantTradeNotificationServiceTest {
         var properties = new QuantProperties();
         properties.getNotification().setDefaultEmails("test@example.invalid");
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties,
-            mock(MessageService.class), mock(JdbcTemplate.class));
+            mock(MessageService.class), mock(JdbcTemplate.class), mock(ExchangeGateway.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId((long) invocation.getArgument(0, QuantNotification.class).getChannel().hashCode());
             return 1;
@@ -58,7 +59,7 @@ class QuantTradeNotificationServiceTest {
         var jdbc = mock(JdbcTemplate.class);
         var messageService = mock(MessageService.class);
         var properties = new QuantProperties();
-        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties, messageService, jdbc);
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties, messageService, jdbc, mock(ExchangeGateway.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId(42L);
             return 1;
@@ -69,8 +70,8 @@ class QuantTradeNotificationServiceTest {
         doThrow(new IllegalStateException("temporary message bus failure"))
             .when(messageService).publishMessage(anyList(), any());
 
-        assertDoesNotThrow(() -> service.notifyClose(null, null, "BTCUSDT", "LONG", BigDecimal.ONE, BigDecimal.TEN,
-            BigDecimal.valueOf(11), BigDecimal.ONE, BigDecimal.valueOf(0.1), "STOP", "test"));
+        assertDoesNotThrow(() -> service.notifyClosePaper(null, null, "BTCUSDT", "LONG", BigDecimal.ONE, BigDecimal.TEN,
+            BigDecimal.valueOf(11), BigDecimal.ONE, "USDT", BigDecimal.valueOf(101), BigDecimal.valueOf(90), BigDecimal.ZERO, "STOP", "test"));
 
         var rows = ArgumentCaptor.forClass(QuantNotification.class);
         verify(mapper).insert(rows.capture());

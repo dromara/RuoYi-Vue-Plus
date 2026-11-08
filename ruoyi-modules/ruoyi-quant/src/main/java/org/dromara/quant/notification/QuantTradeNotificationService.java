@@ -7,6 +7,7 @@ import org.dromara.common.core.enums.PushTypeEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mail.core.MailBuilder;
 import org.dromara.quant.config.QuantProperties;
+import org.dromara.quant.exchange.ExchangeGateway;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.notification.domain.QuantNotification;
 import org.dromara.quant.notification.mapper.QuantNotificationMapper;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -46,18 +49,20 @@ public class QuantTradeNotificationService {
     private final QuantProperties properties;
     private final MessageService messageService;
     private final JdbcTemplate jdbcTemplate;
+    private final ExchangeGateway gateway;
     private final java.util.concurrent.ConcurrentHashMap<String, Long> blockedNoticeTimes = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * 创建 QuantTradeNotificationService 实例并初始化其依赖。
      */
     public QuantTradeNotificationService(QuantRiskConfigMapper riskConfigMapper, QuantNotificationMapper notificationMapper, QuantProperties properties,
-                                         MessageService messageService, JdbcTemplate jdbcTemplate) {
+                                         MessageService messageService, JdbcTemplate jdbcTemplate, ExchangeGateway gateway) {
         this.riskConfigMapper = riskConfigMapper;
         this.notificationMapper = notificationMapper;
         this.properties = properties;
         this.messageService = messageService;
         this.jdbcTemplate = jdbcTemplate;
+        this.gateway = gateway;
     }
 
     /**
@@ -139,13 +144,104 @@ public class QuantTradeNotificationService {
     }
 
     /**
-     * 发布平仓站内消息并持久化待发送邮件，由后台 Outbox 任务投递。
+     * 按交易所订单成交明细核算平仓结果；成交事实不完整时不发送估算通知。
      */
-    public void notifyClose(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity, BigDecimal entryPrice,
-                            BigDecimal closePrice, BigDecimal profitAmount, BigDecimal profitRate, String closeType, String reason) {
+    public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
+                                  BigDecimal entryPrice, Long orderId, String quoteAsset, String closeType, String reason) {
+        if (credential == null || orderId == null || entryPrice == null || entryPrice.signum() <= 0) {
+            log.warn("平仓成交通知暂缓：缺少账户、订单或开仓价 credentialId={} symbol={} orderId={}",
+                credential == null ? null : credential.getId(), symbol, orderId);
+            return;
+        }
+        Instant to = Instant.now().plusSeconds(1);
+        Instant from = to.minus(Duration.ofDays(6));
+        List<ExchangeGateway.TradeSnapshot> fills = gateway.queryTradesByOrder(
+            new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode()),
+            symbol, orderId, new ExchangeGateway.TimeRange(from, to), 1000L);
+        if (fills == null || fills.isEmpty() || fills.size() >= 1000) {
+            log.warn("平仓成交明细未完整确认，暂不发送估算通知 credentialId={} symbol={} orderId={} fillCount={}",
+                credential.getId(), symbol, orderId, fills == null ? null : fills.size());
+            return;
+        }
+        BigDecimal filledQuantity = BigDecimal.ZERO;
+        BigDecimal quoteAmount = BigDecimal.ZERO;
+        BigDecimal realizedPnl = BigDecimal.ZERO;
+        java.util.Map<String, BigDecimal> commissions = new java.util.TreeMap<>();
+        for (ExchangeGateway.TradeSnapshot fill : fills) {
+            if (fill == null || !symbol.equalsIgnoreCase(fill.symbol()) || !orderId.equals(fill.orderId())
+                || fill.quantity() == null || fill.quantity().signum() <= 0 || fill.price() == null || fill.price().signum() <= 0
+                || fill.realizedPnl() == null) {
+                log.warn("平仓成交明细字段不完整，暂不发送估算通知 credentialId={} symbol={} orderId={}",
+                    credential.getId(), symbol, orderId);
+                return;
+            }
+            filledQuantity = filledQuantity.add(fill.quantity());
+            quoteAmount = quoteAmount.add(fill.quantity().multiply(fill.price()));
+            realizedPnl = realizedPnl.add(fill.realizedPnl());
+            if (fill.commission() != null && fill.commissionAsset() != null && !fill.commissionAsset().isBlank()) {
+                commissions.merge(fill.commissionAsset(), fill.commission(), BigDecimal::add);
+            }
+        }
+        BigDecimal averageClosePrice = quoteAmount.divide(filledQuantity, 18, RoundingMode.HALF_UP);
+        String feeText = commissions.isEmpty() ? "N/A（成交手续费字段未返回）" :
+            commissions.entrySet().stream().map(entry -> plain(entry.getValue()) + " " + entry.getKey()).collect(java.util.stream.Collectors.joining(", "));
+        ExchangeGateway.AccountSnapshot account = null;
+        try {
+            account = gateway.queryAccountFresh(new ExchangeGateway.Credential(
+                credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode()));
+        } catch (RuntimeException ex) {
+            log.warn("平仓后账户资金快照获取失败 credentialId={} orderId={}，通知将标记资金待核实",
+                credential.getId(), orderId, ex);
+        }
+        String asset = safe(quoteAsset);
         String subject = "量化平仓通知 - " + symbol + " " + cnDirection(direction);
-        String content = "【量化平仓通知】\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\n" + "账户: " + safe(credential == null ? null :
-            credential.getAccountName()) + "\n" + "交易对: " + symbol + "\n" + "方向: " + cnDirection(direction) + "\n" + "平仓类型: " + safe(closeType) + "\n" + "触发条件: " + safe(reason) + "\n" + "平仓数量: " + plain(quantity) + "\n" + "开仓价格: " + plain(entryPrice) + "\n" + "平仓价格: " + plain(closePrice) + "\n" + "收益金额: " + (profitAmount == null ? "N/A" : profitAmount.setScale(2, RoundingMode.HALF_UP).toPlainString()) + " USDT\n" + "收益率: " + (profitRate == null ? "N/A" : profitRate.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP) + "%") + "\n" + "时间: " + LocalDateTime.now();
+        String content = "【量化平仓通知】\n"
+            + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\n"
+            + "账户: " + safe(credential.getAccountName()) + "\n"
+            + "交易对: " + symbol + "\n"
+            + "方向: " + cnDirection(direction) + "\n"
+            + "平仓类型: " + safe(closeType) + "\n"
+            + "触发条件: " + safe(reason) + "\n"
+            + "平仓订单: " + orderId + "\n"
+            + "平仓数量: " + plain(filledQuantity) + "\n"
+            + "开仓价格: " + plain(entryPrice) + "\n"
+            + "实际平仓均价: " + plain(averageClosePrice) + "\n"
+            + "交易所已实现盈亏: " + plain(realizedPnl) + " " + asset + "\n"
+            + "手续费: " + feeText + "\n"
+            + "平仓后账户资金\n"
+            + "钱包余额: " + (account == null ? "待核实" : plain(account.walletBalance()) + " " + asset) + "\n"
+            + "账户权益: " + (account == null ? "待核实" : plain(account.marginBalance()) + " " + asset) + "\n"
+            + "可用余额: " + (account == null ? "待核实" : plain(account.availableBalance()) + " " + asset) + "\n"
+            + "时间: " + LocalDateTime.now();
+        send(credential.getId(), subject, content);
+    }
+
+    /**
+     * PAPER 平仓按模拟账本结算结果通知，不使用行情估算替代结算金额。
+     */
+    public void notifyClosePaper(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
+                                 BigDecimal entryPrice, BigDecimal closePrice, BigDecimal realizedPnl, String quoteAsset,
+                                 BigDecimal walletBalance, BigDecimal availableBalance, BigDecimal unrealizedPnl, String closeType, String reason) {
+        String asset = safe(quoteAsset);
+        BigDecimal marginBalance = walletBalance == null || unrealizedPnl == null ? null : walletBalance.add(unrealizedPnl);
+        String subject = "量化平仓通知 - " + symbol + " " + cnDirection(direction);
+        String content = "【量化平仓通知】\n"
+            + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\n"
+            + "账户: " + safe(credential == null ? null : credential.getAccountName()) + "\n"
+            + "交易对: " + symbol + "\n"
+            + "方向: " + cnDirection(direction) + "\n"
+            + "平仓类型: " + safe(closeType) + "\n"
+            + "触发条件: " + safe(reason) + "\n"
+            + "平仓数量: " + plain(quantity) + "\n"
+            + "开仓价格: " + plain(entryPrice) + "\n"
+            + "实际平仓价格: " + plain(closePrice) + "\n"
+            + "模拟账本已实现盈亏: " + plain(realizedPnl) + " " + asset + "\n"
+            + "手续费: PAPER 模式未计入交易所手续费\n"
+            + "平仓后账户资金\n"
+            + "钱包余额: " + plain(walletBalance) + " " + asset + "\n"
+            + "账户权益: " + plain(marginBalance) + " " + asset + "\n"
+            + "可用余额: " + plain(availableBalance) + " " + asset + "\n"
+            + "时间: " + LocalDateTime.now();
         send(credential == null ? null : credential.getId(), subject, content);
     }
 
