@@ -629,6 +629,9 @@ public class QuantTradeNotificationService {
         if (notification == null) {
             throw new ServiceException("通知不存在");
         }
+        if ("FACT_PENDING".equalsIgnoreCase(notification.getChannel())) {
+            throw new ServiceException("该记录为平仓成交核验任务，由后台自动处理");
+        }
         if (claimAndDeliver(notification)) {
             return;
         }
