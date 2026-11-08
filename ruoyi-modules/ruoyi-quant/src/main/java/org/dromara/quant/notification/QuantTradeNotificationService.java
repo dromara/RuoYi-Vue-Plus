@@ -260,7 +260,7 @@ public class QuantTradeNotificationService {
             + "开仓价格: " + plain(entryPrice) + "\n"
             + "实际平仓均价: " + plain(averageClosePrice) + "\n"
             + "最大回报率: " + percentage(maximumReturnRate) + "\n"
-            + "交易所已实现盈亏: " + plain(realizedPnl) + " " + asset + "\n"
+            + "交易所已实现盈亏（未扣手续费）: " + plain(realizedPnl) + " " + asset + "\n"
             + "手续费: " + feeText + "\n"
             + "平仓后账户资金\n"
             + "钱包余额: " + (account == null ? "待核实" : plain(account.walletBalance()) + " " + asset) + "\n"
