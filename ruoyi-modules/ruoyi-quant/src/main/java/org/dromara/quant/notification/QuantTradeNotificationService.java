@@ -75,6 +75,10 @@ public class QuantTradeNotificationService {
     /**
      * 安全转换可能为空的通知文本。
      */
+    private static String percentage(BigDecimal value) {
+        return value == null ? "待核实" : value.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
+    }
+
     private static String plain(BigDecimal value) {
         return value == null ? "N/A" : value.stripTrailingZeros().toPlainString();
     }
@@ -148,6 +152,11 @@ public class QuantTradeNotificationService {
      */
     public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                   BigDecimal entryPrice, Long orderId, String quoteAsset, String closeType, String reason) {
+        notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset, null, closeType, reason);
+    }
+
+    public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
+                                  BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate, String closeType, String reason) {
         if (credential == null || orderId == null || entryPrice == null || entryPrice.signum() <= 0) {
             log.warn("平仓成交通知暂缓：缺少账户、订单或开仓价 credentialId={} symbol={} orderId={}",
                 credential == null ? null : credential.getId(), symbol, orderId);
@@ -223,6 +232,7 @@ public class QuantTradeNotificationService {
             + "平仓数量: " + plain(filledQuantity) + "\n"
             + "开仓价格: " + plain(entryPrice) + "\n"
             + "实际平仓均价: " + plain(averageClosePrice) + "\n"
+            + "最大回报率: " + percentage(maximumReturnRate) + "\n"
             + "交易所已实现盈亏: " + plain(realizedPnl) + " " + asset + "\n"
             + "手续费: " + feeText + "\n"
             + "平仓后账户资金\n"
@@ -239,6 +249,14 @@ public class QuantTradeNotificationService {
     public void notifyClosePaper(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
                                  BigDecimal entryPrice, BigDecimal closePrice, BigDecimal realizedPnl, String quoteAsset,
                                  BigDecimal walletBalance, BigDecimal availableBalance, BigDecimal unrealizedPnl, String closeType, String reason) {
+        notifyClosePaper(strategy, credential, symbol, direction, quantity, entryPrice, closePrice, realizedPnl, quoteAsset,
+            walletBalance, availableBalance, unrealizedPnl, null, closeType, reason);
+    }
+
+    public void notifyClosePaper(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
+                                 BigDecimal entryPrice, BigDecimal closePrice, BigDecimal realizedPnl, String quoteAsset,
+                                 BigDecimal walletBalance, BigDecimal availableBalance, BigDecimal unrealizedPnl, BigDecimal maximumReturnRate,
+                                 String closeType, String reason) {
         String asset = safe(quoteAsset);
         BigDecimal marginBalance = walletBalance == null || unrealizedPnl == null ? null : walletBalance.add(unrealizedPnl);
         String subject = "量化平仓通知 - " + symbol + " " + cnDirection(direction);
@@ -252,6 +270,7 @@ public class QuantTradeNotificationService {
             + "平仓数量: " + plain(quantity) + "\n"
             + "开仓价格: " + plain(entryPrice) + "\n"
             + "实际平仓价格: " + plain(closePrice) + "\n"
+            + "最大回报率: " + percentage(maximumReturnRate) + "\n"
             + "模拟账本已实现盈亏: " + plain(realizedPnl) + " " + asset + "\n"
             + "手续费: PAPER 模式未计入交易所手续费\n"
             + "平仓后账户资金\n"
