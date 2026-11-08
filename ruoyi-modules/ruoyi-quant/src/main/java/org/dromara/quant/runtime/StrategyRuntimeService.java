@@ -2515,8 +2515,11 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
                 syncPluginProtections(runtime, buildContext(runtime, context.currentPrice(), new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
                     runtime.strategySymbol.getIntervalCode(), context.currentPrice(), null, context.eventTime())));
             }
-            log.info("实时策略平仓 instanceId={} symbol={} type={} price={} quantity={} reason={}", runtime.instance.getId(), runtime.symbol.getSymbol(), exit.type(),
-            context.currentPrice(), quantity, exit.reason());
+            BigDecimal maximumReturnRate = runtime.state == null ? null : runtime.state.getMaximumReturnRate();
+            log.info("实时策略平仓 instanceId={} symbol={} type={} price={} quantity={} maximumReturnRate={} reason={}", runtime.instance.getId(),
+                runtime.symbol.getSymbol(), exit.type(), context.currentPrice(), quantity,
+                maximumReturnRate == null ? "N/A" : maximumReturnRate.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%",
+                exit.reason());
         } catch (RuntimeException ex) {
             QuantExecutionRecordStatus status = findExecutionStatus(runtime.credential.getId(), idempotencyKey);
             recordTradeDecision(runtime, context, "CLOSE", direction, quantity, null, idempotencyKey, "FAILED".equals(status.value()) ? "FAILED" : "UNKNOWN", "EXECUTION_FAILURE"
