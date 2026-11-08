@@ -10,6 +10,8 @@ import org.dromara.quant.config.QuantProperties;
 import org.dromara.quant.exchange.ExchangeGateway;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.credential.mapper.QuantCredentialMapper;
+import org.dromara.quant.order.domain.QuantOrder;
+import org.dromara.quant.order.mapper.QuantOrderMapper;
 import org.dromara.quant.notification.domain.QuantNotification;
 import org.dromara.quant.notification.mapper.QuantNotificationMapper;
 import org.dromara.quant.risk.domain.QuantRiskConfig;
@@ -57,6 +59,8 @@ public class QuantTradeNotificationService {
     private final ExchangeGateway gateway;
     @Autowired
     private QuantCredentialMapper credentialMapper;
+    @Autowired
+    private QuantOrderMapper orderMapper;
     private final java.util.concurrent.ConcurrentHashMap<String, Long> blockedNoticeTimes = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
@@ -157,6 +161,45 @@ public class QuantTradeNotificationService {
     /**
      * 按交易所订单成交明细核算平仓结果；成交事实不完整时不发送估算通知。
      */
+    public void notifyCloseByStrategyOrder(QuantStrategy strategy, QuantCredential credential, Long strategyInstanceId, String positionCycleKey,
+                                           String symbol, String direction, BigDecimal requestedQuantity, BigDecimal entryPrice, String quoteAsset,
+                                           BigDecimal maximumReturnRate, String closeType, String reason) {
+        Long orderId = resolveStrategyCloseOrderId(credential == null ? null : credential.getId(), strategyInstanceId, symbol, direction, requestedQuantity);
+        if (orderId != null) {
+            notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
+                maximumReturnRate, closeType, reason);
+            return;
+        }
+        enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, null, strategyInstanceId,
+            positionCycleKey, quoteAsset, maximumReturnRate, closeType, reason);
+    }
+
+    private Long resolveStrategyCloseOrderId(Long credentialId, Long strategyInstanceId, String symbol, String direction, BigDecimal quantity) {
+        if (orderMapper == null || credentialId == null || strategyInstanceId == null || symbol == null || direction == null
+            || quantity == null || quantity.signum() <= 0) {
+            return null;
+        }
+        String closeSide = "SHORT".equalsIgnoreCase(direction) ? "BUY" : "SELL";
+        List<QuantOrder> matches = orderMapper.selectList(new LambdaQueryWrapper<QuantOrder>()
+            .eq(QuantOrder::getCredentialId, credentialId)
+            .eq(QuantOrder::getStrategyInstanceId, strategyInstanceId)
+            .eq(QuantOrder::getSymbol, symbol)
+            .in(QuantOrder::getPositionSide, direction, "BOTH")
+            .eq(QuantOrder::getReduceOnly, true)
+            .eq(QuantOrder::getSide, closeSide)
+            .in(QuantOrder::getStatus, "FILLED", "CANCELED", "EXPIRED", "REJECTED")
+            .gt(QuantOrder::getExecutedQuantity, BigDecimal.ZERO)
+            .ge(QuantOrder::getUpdatedAt, LocalDateTime.now(java.time.ZoneOffset.UTC).minusDays(6))
+            .orderByDesc(QuantOrder::getUpdatedAt).last("LIMIT 20")).stream()
+            .filter(order -> order.getExchangeOrderId() != null && order.getExecutedQuantity() != null
+                && order.getExecutedQuantity().compareTo(quantity) == 0)
+            .toList();
+        if (matches.size() != 1) {
+            return null;
+        }
+        return matches.getFirst().getExchangeOrderId();
+    }
+
     public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                   BigDecimal entryPrice, Long orderId, String quoteAsset, String closeType, String reason) {
         notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset, null, closeType, reason);
@@ -325,26 +368,40 @@ public class QuantTradeNotificationService {
 
     private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                          BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate, String closeType, String reason) {
-        if (credential == null || credential.getId() == null || orderId == null || entryPrice == null || entryPrice.signum() <= 0) {
-            log.error("平仓通知无法建立待核验任务：缺少持久化任务身份 credentialId={} symbol={} orderId={}",
-                credential == null ? null : credential.getId(), symbol, orderId);
+        enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, null, null, quoteAsset,
+            maximumReturnRate, closeType, reason);
+    }
+
+    private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
+                                         BigDecimal entryPrice, Long orderId, Long strategyInstanceId, String positionCycleKey, String quoteAsset,
+                                         BigDecimal maximumReturnRate, String closeType, String reason) {
+        if (credential == null || credential.getId() == null || entryPrice == null || entryPrice.signum() <= 0
+            || orderId == null && strategyInstanceId == null) {
+            log.error("平仓通知无法建立待核验任务：缺少账户、订单或策略身份 credentialId={} symbol={} orderId={} strategyInstanceId={}",
+                credential == null ? null : credential.getId(), symbol, orderId, strategyInstanceId);
             return;
         }
+        String taskKey = orderId == null
+            ? "STRATEGY:" + strategyInstanceId + ":" + (positionCycleKey == null ? "UNKNOWN" : positionCycleKey) + ":" + symbol + ":" + direction
+                + ":" + (requestedQuantity == null ? "UNKNOWN" : requestedQuantity.toPlainString()) + ":" + closeType
+            : String.valueOf(orderId);
         try {
             long existing = notificationMapper.selectCount(new LambdaQueryWrapper<QuantNotification>()
                 .eq(QuantNotification::getCredentialId, credential.getId()).eq(QuantNotification::getChannel, "FACT_PENDING")
-                .eq(QuantNotification::getRecipient, String.valueOf(orderId)));
+                .eq(QuantNotification::getRecipient, taskKey));
             if (existing > 0) {
                 return;
             }
             Map<String, Object> task = new LinkedHashMap<>();
             task.put("credentialId", String.valueOf(credential.getId()));
             task.put("strategyName", strategy == null ? null : strategy.getStrategyName());
+            task.put("strategyInstanceId", strategyInstanceId == null ? null : String.valueOf(strategyInstanceId));
+            task.put("positionCycleKey", positionCycleKey);
             task.put("symbol", symbol);
             task.put("direction", direction);
             task.put("requestedQuantity", requestedQuantity == null ? null : requestedQuantity.toPlainString());
             task.put("entryPrice", entryPrice.toPlainString());
-            task.put("orderId", String.valueOf(orderId));
+            task.put("orderId", orderId == null ? null : String.valueOf(orderId));
             task.put("quoteAsset", quoteAsset);
             task.put("maximumReturnRate", maximumReturnRate == null ? null : maximumReturnRate.toPlainString());
             task.put("closeType", closeType);
@@ -352,7 +409,7 @@ public class QuantTradeNotificationService {
             QuantNotification pending = new QuantNotification();
             pending.setCredentialId(credential.getId());
             pending.setChannel("FACT_PENDING");
-            pending.setRecipient(String.valueOf(orderId));
+            pending.setRecipient(taskKey);
             pending.setSubject("平仓成交事实待核验");
             pending.setContent(QuantJsonMapper.writeMap(task));
             pending.setStatus("PENDING");
@@ -360,9 +417,11 @@ public class QuantTradeNotificationService {
             pending.setNextRetryAt(LocalDateTime.now().plusSeconds(30));
             pending.setCreatedAt(LocalDateTime.now());
             notificationMapper.insert(pending);
-            log.warn("平仓通知已进入持久化待核验队列 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId);
+            log.warn("平仓通知已进入持久化待核验队列 credentialId={} symbol={} orderId={} strategyInstanceId={}",
+                credential.getId(), symbol, orderId, strategyInstanceId);
         } catch (Exception ex) {
-            log.error("平仓通知待核验任务持久化失败 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId, ex);
+            log.error("平仓通知待核验任务持久化失败 credentialId={} symbol={} orderId={} strategyInstanceId={}",
+                credential.getId(), symbol, orderId, strategyInstanceId, ex);
         }
     }
 
@@ -395,9 +454,16 @@ public class QuantTradeNotificationService {
                     strategy = new QuantStrategy();
                     strategy.setStrategyName(String.valueOf(data.get("strategyName")));
                 }
-                boolean sent = tryNotifyCloseByOrder(strategy, credential, String.valueOf(data.get("symbol")),
-                    String.valueOf(data.get("direction")), decimal(data.get("requestedQuantity")), decimal(data.get("entryPrice")),
-                    Long.valueOf(String.valueOf(data.get("orderId"))), String.valueOf(data.get("quoteAsset")),
+                String symbol = String.valueOf(data.get("symbol"));
+                String direction = String.valueOf(data.get("direction"));
+                BigDecimal requestedQuantity = decimal(data.get("requestedQuantity"));
+                Long orderId = data.get("orderId") == null ? null : Long.valueOf(String.valueOf(data.get("orderId")));
+                if (orderId == null && data.get("strategyInstanceId") != null) {
+                    orderId = resolveStrategyCloseOrderId(credentialId, Long.valueOf(String.valueOf(data.get("strategyInstanceId"))),
+                        symbol, direction, requestedQuantity);
+                }
+                boolean sent = orderId != null && tryNotifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity,
+                    decimal(data.get("entryPrice")), orderId, String.valueOf(data.get("quoteAsset")),
                     decimal(data.get("maximumReturnRate")), String.valueOf(data.get("closeType")), String.valueOf(data.get("reason")));
                 if (sent) {
                     task.setStatus("SENT");
