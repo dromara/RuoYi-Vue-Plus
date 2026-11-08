@@ -132,4 +132,73 @@ class QuantTradeNotificationServiceTest {
         assertTrue(content.contains("可用余额: 900 USDT"));
     }
 
+
+    @Test
+    void canceledStrategyCloseWithPartialFillUsesConfirmedFillFacts() {
+        com.baomidou.mybatisplus.core.metadata.TableInfoHelper.initTableInfo(
+            new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-partial-close-test"), QuantNotification.class);
+        var mapper = mock(QuantNotificationMapper.class);
+        var gateway = mock(ExchangeGateway.class);
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway);
+        when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
+            ((QuantNotification) invocation.getArgument(0)).setId(43L);
+            return 1;
+        });
+        var credential = new QuantCredential();
+        credential.setId(10L);
+        credential.setAccountName("test-account");
+        credential.setApiKey("test-key");
+        credential.setSecretKey("test-secret");
+        credential.setSignatureType("HMAC");
+        credential.setRunMode("TESTNET");
+        when(gateway.queryOrder(any(), eq("BTCUSDT"), eq(100L), isNull())).thenReturn(
+            new ExchangeGateway.OrderSnapshot("BTCUSDT", 100L, "client-close", "SELL", "MARKET", "CANCELED",
+                BigDecimal.ZERO, BigDecimal.valueOf(2), BigDecimal.ONE, Instant.now(), BigDecimal.valueOf(102)));
+        when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(100L), any(), eq(1000L))).thenReturn(List.of(
+            new ExchangeGateway.TradeSnapshot("BTCUSDT", 11L, 100L, "SELL", BigDecimal.ONE, BigDecimal.valueOf(102),
+                new BigDecimal("0.01"), BigDecimal.ONE, Instant.now(), "USDT", "LONG")));
+
+        service.notifyCloseByOrder(null, credential, "BTCUSDT", "LONG", BigDecimal.valueOf(2), BigDecimal.valueOf(100),
+            100L, "USDT", "STOP", "partial close");
+
+        var rows = ArgumentCaptor.forClass(QuantNotification.class);
+        verify(mapper).insert(rows.capture());
+        assertEquals("SYSTEM", rows.getValue().getChannel());
+        assertTrue(rows.getValue().getContent().contains("平仓数量: 1"));
+        assertTrue(rows.getValue().getContent().contains("实际平仓均价: 102"));
+    }
+
+    @Test
+    void incompleteCloseFactsArePersistedForBackgroundReconciliation() {
+        com.baomidou.mybatisplus.core.metadata.TableInfoHelper.initTableInfo(
+            new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-fact-pending-test"), QuantNotification.class);
+        var mapper = mock(QuantNotificationMapper.class);
+        var gateway = mock(ExchangeGateway.class);
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway);
+        when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
+            ((QuantNotification) invocation.getArgument(0)).setId(44L);
+            return 1;
+        });
+        var credential = new QuantCredential();
+        credential.setId(10L);
+        credential.setApiKey("test-key");
+        credential.setSecretKey("test-secret");
+        credential.setSignatureType("HMAC");
+        credential.setRunMode("TESTNET");
+        when(gateway.queryOrder(any(), eq("BTCUSDT"), eq(101L), isNull())).thenReturn(
+            new ExchangeGateway.OrderSnapshot("BTCUSDT", 101L, "client-close", "SELL", "MARKET", "PARTIALLY_FILLED",
+                BigDecimal.ZERO, BigDecimal.valueOf(2), BigDecimal.ONE, Instant.now(), BigDecimal.valueOf(102)));
+
+        service.notifyCloseByOrder(null, credential, "BTCUSDT", "LONG", BigDecimal.valueOf(2), BigDecimal.valueOf(100),
+            101L, "USDT", "STOP", "pending close");
+
+        var rows = ArgumentCaptor.forClass(QuantNotification.class);
+        verify(mapper).insert(rows.capture());
+        assertEquals("FACT_PENDING", rows.getValue().getChannel());
+        assertTrue(rows.getValue().getContent().contains("\"orderId\":\"101\""));
+        assertFalse(rows.getValue().getContent().contains("test-secret"));
+    }
+
 }

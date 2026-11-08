@@ -24,6 +24,8 @@ import org.dromara.quant.notification.QuantTradeNotificationService;
 import org.dromara.quant.paper.PaperTradingService;
 import org.dromara.quant.position.domain.QuantPosition;
 import org.dromara.quant.position.mapper.QuantPositionMapper;
+import org.dromara.quant.order.domain.QuantOrder;
+import org.dromara.quant.order.mapper.QuantOrderMapper;
 import org.dromara.quant.protection.ProtectionOrderService;
 import org.dromara.quant.protection.ProtectionTargetCoordinator;
 import org.dromara.quant.reconcile.TradingReconciliationService;
@@ -177,6 +179,8 @@ public class StrategyRuntimeService {
     private org.dromara.quant.decision.TradeDecisionLogService decisionLogs;
     @Autowired
     private StrategyPositionPerformanceHub positionPerformanceHub;
+    @Autowired
+    private QuantOrderMapper orderMapper;
 
     /**
      * 返回运行时生效的保证金模式；交易对覆盖优先于策略默认值。
@@ -238,12 +242,45 @@ public class StrategyRuntimeService {
                     account == null ? null : account.getAvailableBalance(), account == null ? null : account.getUnrealizedPnl(), maximumReturnRate, closeType, reason);
             } else {
                 Long orderId = runtime.state == null ? null : runtime.state.getPendingOrderId();
+                if (orderId == null) {
+                    orderId = resolveStrategyCloseOrderId(runtime, direction, quantity);
+                }
                 notificationService.notifyCloseByOrder(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity,
                     entryPrice, orderId, runtime.symbol.getQuoteAsset(), maximumReturnRate, closeType, reason);
             }
         } catch (RuntimeException ex) {
             log.error("已确认平仓通知处理失败 instanceId={} symbol={} closeType={}", runtime.instance.getId(), runtime.symbol.getSymbol(), closeType, ex);
         }
+    }
+
+    /**
+     * 保护单触发后，按已冻结的策略实例归属查找唯一实际减仓子订单；不按价格或数量跨账户猜测。
+     */
+    private Long resolveStrategyCloseOrderId(ActiveRuntime runtime, String direction, BigDecimal quantity) {
+        if (orderMapper == null || runtime.instance.getId() == null || quantity == null || quantity.signum() <= 0) {
+            return null;
+        }
+        String closeSide = "SHORT".equalsIgnoreCase(direction) ? "BUY" : "SELL";
+        List<QuantOrder> matches = orderMapper.selectList(new LambdaQueryWrapper<QuantOrder>()
+            .eq(QuantOrder::getCredentialId, runtime.credential.getId())
+            .eq(QuantOrder::getStrategyInstanceId, runtime.instance.getId())
+            .eq(QuantOrder::getSymbol, runtime.symbol.getSymbol())
+            .in(QuantOrder::getPositionSide, direction, "BOTH")
+            .eq(QuantOrder::getReduceOnly, true)
+            .eq(QuantOrder::getSide, closeSide)
+            .in(QuantOrder::getStatus, "FILLED", "CANCELED", "EXPIRED")
+            .gt(QuantOrder::getExecutedQuantity, BigDecimal.ZERO)
+            .ge(QuantOrder::getUpdatedAt, LocalDateTime.now(java.time.ZoneOffset.UTC).minusDays(6))
+            .orderByDesc(QuantOrder::getUpdatedAt).last("LIMIT 20")).stream()
+            .filter(order -> order.getExchangeOrderId() != null && order.getExecutedQuantity() != null
+                && order.getExecutedQuantity().compareTo(quantity) == 0)
+            .toList();
+        if (matches.size() != 1) {
+            log.warn("策略保护单平仓通知无法唯一匹配实际子订单 instanceId={} credentialId={} symbol={} direction={} quantity={} matches={}",
+                runtime.instance.getId(), runtime.credential.getId(), runtime.symbol.getSymbol(), direction, quantity, matches.size());
+            return null;
+        }
+        return matches.getFirst().getExchangeOrderId();
     }
 
     /**
@@ -3146,6 +3183,8 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                     if ("FIRST_TAKE_PROFIT".equalsIgnoreCase(completedAction)) {
                         PositionProtectionState.confirmLocalFirstProfit(runtime.state, executedQty);
                     }
+                    notifyCloseSafely(runtime, runtime.state.getDirection(), executedQty, runtime.state.getEntryPrice(),
+                        order.averagePrice(), null, null, completedAction, "策略平仓订单经异步恢复确认成交");
                     runtime.state.setPositionQty(runtime.position.getQuantity());
                     clearPending(runtime.state);
                     runtime.state.setStatus("OPEN");
@@ -3173,6 +3212,10 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                 runtime.state.setUnsafeRecovery(true);
                 stateService.save(runtime.state);
                 return true;
+            }
+            if (runtime.state.getPositionQty() != null && order.executedQuantity() != null && order.executedQuantity().signum() > 0) {
+                notifyCloseSafely(runtime, runtime.state.getDirection(), order.executedQuantity(), runtime.state.getEntryPrice(),
+                    order.averagePrice(), null, null, runtime.state.getPendingAction(), "策略平仓订单经异步恢复确认全部成交");
             }
             if (!cancelStaleProtection(runtime)) {
                 return true;
@@ -3230,6 +3273,10 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                     stateService.save(runtime.state);
                     return true;
                 }
+            }
+            if (!"OPEN".equalsIgnoreCase(runtime.state.getPendingAction()) && executed.signum() > 0) {
+                notifyCloseSafely(runtime, runtime.state.getDirection(), executed, runtime.state.getEntryPrice(),
+                    order.averagePrice(), null, null, runtime.state.getPendingAction(), "策略平仓订单部分成交后终止，经交易所确认");
             }
             clearPending(runtime.state);
             runtime.partialOpenProtectionVerified = false;
