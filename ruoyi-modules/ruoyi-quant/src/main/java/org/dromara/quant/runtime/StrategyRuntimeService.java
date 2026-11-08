@@ -268,7 +268,7 @@ public class StrategyRuntimeService {
             .in(QuantOrder::getPositionSide, direction, "BOTH")
             .eq(QuantOrder::getReduceOnly, true)
             .eq(QuantOrder::getSide, closeSide)
-            .in(QuantOrder::getStatus, "FILLED", "CANCELED", "EXPIRED")
+            .in(QuantOrder::getStatus, "FILLED", "CANCELED", "EXPIRED", "REJECTED")
             .gt(QuantOrder::getExecutedQuantity, BigDecimal.ZERO)
             .ge(QuantOrder::getUpdatedAt, LocalDateTime.now(java.time.ZoneOffset.UTC).minusDays(6))
             .orderByDesc(QuantOrder::getUpdatedAt).last("LIMIT 20")).stream()
@@ -3183,6 +3183,9 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                     if ("FIRST_TAKE_PROFIT".equalsIgnoreCase(completedAction)) {
                         PositionProtectionState.confirmLocalFirstProfit(runtime.state, executedQty);
                     }
+                    if (runtime.state.getPendingOrderId() == null) {
+                        runtime.state.setPendingOrderId(order.orderId());
+                    }
                     notifyCloseSafely(runtime, runtime.state.getDirection(), executedQty, runtime.state.getEntryPrice(),
                         order.averagePrice(), null, null, completedAction, "策略平仓订单经异步恢复确认成交");
                     runtime.state.setPositionQty(runtime.position.getQuantity());
@@ -3214,6 +3217,9 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                 return true;
             }
             if (runtime.state.getPositionQty() != null && order.executedQuantity() != null && order.executedQuantity().signum() > 0) {
+                if (runtime.state.getPendingOrderId() == null) {
+                    runtime.state.setPendingOrderId(order.orderId());
+                }
                 notifyCloseSafely(runtime, runtime.state.getDirection(), order.executedQuantity(), runtime.state.getEntryPrice(),
                     order.averagePrice(), null, null, runtime.state.getPendingAction(), "策略平仓订单经异步恢复确认全部成交");
             }
@@ -3275,6 +3281,9 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                 }
             }
             if (!"OPEN".equalsIgnoreCase(runtime.state.getPendingAction()) && executed.signum() > 0) {
+                if (runtime.state.getPendingOrderId() == null) {
+                    runtime.state.setPendingOrderId(order.orderId());
+                }
                 notifyCloseSafely(runtime, runtime.state.getDirection(), executed, runtime.state.getEntryPrice(),
                     order.averagePrice(), null, null, runtime.state.getPendingAction(), "策略平仓订单部分成交后终止，经交易所确认");
             }
