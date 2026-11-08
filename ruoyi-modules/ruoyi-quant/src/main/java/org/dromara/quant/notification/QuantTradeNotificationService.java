@@ -158,8 +158,9 @@ public class QuantTradeNotificationService {
         ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
             credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
         ExchangeGateway.OrderSnapshot order = gateway.queryOrder(exchangeCredential, symbol, orderId, null);
-        if (order == null || !orderId.equals(order.orderId()) || !"FILLED".equalsIgnoreCase(order.status())
-            || order.executedQuantity() == null || order.executedQuantity().signum() <= 0) {
+        if (order == null || !orderId.equals(order.orderId()) || !symbol.equalsIgnoreCase(order.symbol())
+            || !"FILLED".equalsIgnoreCase(order.status()) || order.executedQuantity() == null || order.executedQuantity().signum() <= 0
+            || requestedQuantity == null || order.executedQuantity().compareTo(requestedQuantity) > 0) {
             log.warn("平仓订单尚未确认全部成交，暂不发送通知 credentialId={} symbol={} orderId={} status={}",
                 credential.getId(), symbol, orderId, order == null ? null : order.status());
             return;
