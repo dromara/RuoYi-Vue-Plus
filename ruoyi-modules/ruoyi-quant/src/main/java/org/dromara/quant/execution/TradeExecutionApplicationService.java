@@ -134,8 +134,15 @@ public class TradeExecutionApplicationService {
             null, positionSide, request.getIdempotencyKey(), credential.getRunMode(), symbolRule(symbol), safety(credential, risk, true)));
         if (result.orderId() != null) {
             String direction = position.quantity().signum() < 0 || "SHORT".equalsIgnoreCase(position.side()) ? "SHORT" : "LONG";
-            notificationService.notifyCloseByOrder(null, credential, request.getSymbol(), direction, request.getQuantity(),
-                position.entryPrice(), result.orderId(), symbol.getQuoteAsset(), "MANUAL", "手动平仓");
+            try {
+                notificationService.notifyCloseByOrder(null, credential, request.getSymbol(), direction, request.getQuantity(),
+                    position.entryPrice(), result.orderId(), symbol.getQuoteAsset(), "MANUAL", "手动平仓");
+            } catch (RuntimeException ex) {
+                // 平仓事实已提交，通知查询失败不得把成功的交易伪装成执行失败。
+                org.slf4j.LoggerFactory.getLogger(TradeExecutionApplicationService.class)
+                    .error("手动平仓已提交，但成交通知核算失败 credentialId={} symbol={} orderId={}",
+                        credential.getId(), request.getSymbol(), result.orderId(), ex);
+            }
         }
         return result;
     }
