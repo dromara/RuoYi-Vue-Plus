@@ -2424,6 +2424,7 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
         recordTradeDecision(runtime, context, "CLOSE", direction, quantity, null, idempotencyKey, "REQUESTED", exit.type(), exit.reason(), null, false);
         BigDecimal entryPriceBeforeClose = runtime.position.getEntryPrice();
         String directionBeforeClose = runtime.position.getPositionSide();
+        BigDecimal maximumReturnRateBeforeClose = state.getMaximumReturnRate();
         ExecutionResult executionResult = null;
         try {
             executionResult = executionService.closeByRuntime(runtime.credential.getId(), runtime.strategy.getId(), runtime.instance.getId(), runtime.symbol.getSymbol(), side,
@@ -2515,10 +2516,9 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
                 syncPluginProtections(runtime, buildContext(runtime, context.currentPrice(), new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
                     runtime.strategySymbol.getIntervalCode(), context.currentPrice(), null, context.eventTime())));
             }
-            BigDecimal maximumReturnRate = runtime.state == null ? null : runtime.state.getMaximumReturnRate();
             log.info("实时策略平仓 instanceId={} symbol={} type={} price={} quantity={} maximumReturnRate={} reason={}", runtime.instance.getId(),
                 runtime.symbol.getSymbol(), exit.type(), context.currentPrice(), quantity,
-                maximumReturnRate == null ? "N/A" : maximumReturnRate.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%",
+                maximumReturnRateBeforeClose == null ? "N/A" : maximumReturnRateBeforeClose.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%",
                 exit.reason());
         } catch (RuntimeException ex) {
             QuantExecutionRecordStatus status = findExecutionStatus(runtime.credential.getId(), idempotencyKey);
