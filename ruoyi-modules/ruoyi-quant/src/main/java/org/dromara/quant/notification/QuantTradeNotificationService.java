@@ -382,8 +382,7 @@ public class QuantTradeNotificationService {
             return;
         }
         String taskKey = orderId == null
-            ? "STRATEGY:" + strategyInstanceId + ":" + (positionCycleKey == null ? "UNKNOWN" : positionCycleKey) + ":" + symbol + ":" + direction
-                + ":" + (requestedQuantity == null ? "UNKNOWN" : requestedQuantity.toPlainString()) + ":" + closeType
+            ? "STRATEGY:" + strategyInstanceId + ":" + (positionCycleKey == null ? "UNKNOWN" : positionCycleKey) + ":" + UUID.randomUUID()
             : String.valueOf(orderId);
         try {
             long existing = notificationMapper.selectCount(new LambdaQueryWrapper<QuantNotification>()
@@ -434,6 +433,14 @@ public class QuantTradeNotificationService {
                 .or().eq(QuantNotification::getStatus, "SENDING").lt(QuantNotification::getLeaseUntil, now))
             .orderByAsc(QuantNotification::getCreatedAt).last("LIMIT 50"));
         for (QuantNotification task : pending) {
+            if (task.getCreatedAt() != null && task.getCreatedAt().isBefore(now.minusDays(5))) {
+                task.setStatus("FAILED");
+                task.setNextRetryAt(null);
+                task.setLastError("超过 Binance 成交明细可查询窗口，无法继续自动核验");
+                notificationMapper.updateById(task);
+                log.error("平仓通知待核验任务超过可查询窗口，停止自动重试 notificationId={} recipient={}", task.getId(), task.getRecipient());
+                continue;
+            }
             String ownerToken = UUID.randomUUID().toString();
             LocalDateTime leaseUntil = LocalDateTime.now().plusMinutes(2);
             if (notificationMapper.claim(task.getId(), ownerToken, leaseUntil) != 1) {
