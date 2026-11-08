@@ -73,11 +73,13 @@ class QuantTradeNotificationServiceTest {
             .when(messageService).publishMessage(anyList(), any());
 
         assertDoesNotThrow(() -> service.notifyClosePaper(null, null, "BTCUSDT", "LONG", BigDecimal.ONE, BigDecimal.TEN,
-            BigDecimal.valueOf(11), BigDecimal.ONE, "USDT", BigDecimal.valueOf(101), BigDecimal.valueOf(90), BigDecimal.ZERO, "STOP", "test"));
+            BigDecimal.valueOf(11), BigDecimal.ONE, "USDT", BigDecimal.valueOf(101), BigDecimal.valueOf(90), BigDecimal.ZERO,
+            new BigDecimal("0.08"), "STOP", "test"));
 
         var rows = ArgumentCaptor.forClass(QuantNotification.class);
         verify(mapper).insert(rows.capture());
         assertEquals("SYSTEM", rows.getValue().getChannel());
+        assertTrue(rows.getValue().getContent().contains("最大回报率: 8%"));
         var updated = ArgumentCaptor.forClass(QuantNotification.class);
         verify(mapper).updateById(updated.capture());
         assertEquals("RETRY", updated.getValue().getStatus());
@@ -116,12 +118,13 @@ class QuantTradeNotificationServiceTest {
             new ExchangeGateway.AccountSnapshot(new BigDecimal("1000"), new BigDecimal("900"), new BigDecimal("1003"), new BigDecimal("3")));
 
         service.notifyCloseByOrder(null, credential, "BTCUSDT", "LONG", BigDecimal.valueOf(2), BigDecimal.valueOf(100),
-            99L, "USDT", "MANUAL", "test close");
+            99L, "USDT", new BigDecimal("0.125"), "MANUAL", "test close");
 
         var rows = ArgumentCaptor.forClass(QuantNotification.class);
         verify(mapper).insert(rows.capture());
         String content = rows.getValue().getContent();
         assertTrue(content.contains("实际平仓均价: 102"));
+        assertTrue(content.contains("最大回报率: 12.5%"));
         assertTrue(content.contains("交易所已实现盈亏（未扣手续费）: 3 USDT"));
         assertTrue(content.contains("手续费: 0.03 USDT"));
         assertTrue(content.contains("钱包余额: 1000 USDT"));
