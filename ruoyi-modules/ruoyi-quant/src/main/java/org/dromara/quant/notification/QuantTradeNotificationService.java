@@ -155,9 +155,17 @@ public class QuantTradeNotificationService {
         }
         Instant to = Instant.now().plusSeconds(1);
         Instant from = to.minus(Duration.ofDays(6));
+        ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
+            credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
+        ExchangeGateway.OrderSnapshot order = gateway.queryOrder(exchangeCredential, symbol, orderId, null);
+        if (order == null || !orderId.equals(order.orderId()) || !"FILLED".equalsIgnoreCase(order.status())
+            || order.executedQuantity() == null || order.executedQuantity().signum() <= 0) {
+            log.warn("平仓订单尚未确认全部成交，暂不发送通知 credentialId={} symbol={} orderId={} status={}",
+                credential.getId(), symbol, orderId, order == null ? null : order.status());
+            return;
+        }
         List<ExchangeGateway.TradeSnapshot> fills = gateway.queryTradesByOrder(
-            new ExchangeGateway.Credential(credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode()),
-            symbol, orderId, new ExchangeGateway.TimeRange(from, to), 1000L);
+            exchangeCredential, symbol, orderId, new ExchangeGateway.TimeRange(from, to), 1000L);
         if (fills == null || fills.isEmpty() || fills.size() >= 1000) {
             log.warn("平仓成交明细未完整确认，暂不发送估算通知 credentialId={} symbol={} orderId={} fillCount={}",
                 credential.getId(), symbol, orderId, fills == null ? null : fills.size());
@@ -167,6 +175,7 @@ public class QuantTradeNotificationService {
         BigDecimal quoteAmount = BigDecimal.ZERO;
         BigDecimal realizedPnl = BigDecimal.ZERO;
         java.util.Map<String, BigDecimal> commissions = new java.util.TreeMap<>();
+        boolean commissionComplete = true;
         for (ExchangeGateway.TradeSnapshot fill : fills) {
             if (fill == null || !symbol.equalsIgnoreCase(fill.symbol()) || !orderId.equals(fill.orderId())
                 || fill.quantity() == null || fill.quantity().signum() <= 0 || fill.price() == null || fill.price().signum() <= 0
@@ -178,12 +187,19 @@ public class QuantTradeNotificationService {
             filledQuantity = filledQuantity.add(fill.quantity());
             quoteAmount = quoteAmount.add(fill.quantity().multiply(fill.price()));
             realizedPnl = realizedPnl.add(fill.realizedPnl());
-            if (fill.commission() != null && fill.commissionAsset() != null && !fill.commissionAsset().isBlank()) {
+            if (fill.commission() == null || fill.commissionAsset() == null || fill.commissionAsset().isBlank()) {
+                commissionComplete = false;
+            } else {
                 commissions.merge(fill.commissionAsset(), fill.commission(), BigDecimal::add);
             }
         }
+        if (order.executedQuantity().compareTo(filledQuantity) != 0) {
+            log.warn("平仓订单累计成交量与成交明细不一致，暂不发送通知 credentialId={} symbol={} orderId={} orderExecuted={} tradeExecuted={}",
+                credential.getId(), symbol, orderId, order.executedQuantity(), filledQuantity);
+            return;
+        }
         BigDecimal averageClosePrice = quoteAmount.divide(filledQuantity, 18, RoundingMode.HALF_UP);
-        String feeText = commissions.isEmpty() ? "N/A（成交手续费字段未返回）" :
+        String feeText = !commissionComplete || commissions.isEmpty() ? "N/A（成交手续费字段不完整）" :
             commissions.entrySet().stream().map(entry -> plain(entry.getValue()) + " " + entry.getKey()).collect(java.util.stream.Collectors.joining(", "));
         ExchangeGateway.AccountSnapshot account = null;
         try {

@@ -113,7 +113,8 @@ public class TradeExecutionApplicationService {
             PaperTradingService.PaperCloseSettlement settlement = paperTradingService.settlePaperExecution(
                 credential.getId(), request.getIdempotencyKey(), position.getId(), request.getQuantity(), closePrice);
             var paperAccount = paperTradingService.find(credential.getId());
-            notificationService.notifyClosePaper(null, credential, request.getSymbol(), position.getPositionSide(), request.getQuantity(),
+            String direction = position.quantity().signum() < 0 || "SHORT".equalsIgnoreCase(position.getPositionSide()) ? "SHORT" : "LONG";
+            notificationService.notifyClosePaper(null, credential, request.getSymbol(), direction, request.getQuantity(),
                 position.getEntryPrice(), closePrice, settlement.realizedPnl(), symbol.getQuoteAsset(),
                 paperAccount == null ? null : paperAccount.getBalance(), paperAccount == null ? null : paperAccount.getAvailableBalance(),
                 paperAccount == null ? null : paperAccount.getUnrealizedPnl(), "MANUAL", "手动平仓");
@@ -132,7 +133,8 @@ public class TradeExecutionApplicationService {
         ExecutionResult result = executionPort.close(new ClosePositionCommand(credential.getId(), null, null, exchangeCredential, request.getSymbol(), closeSide, "MARKET", request.getQuantity(),
             null, positionSide, request.getIdempotencyKey(), credential.getRunMode(), symbolRule(symbol), safety(credential, risk, true)));
         if (result.orderId() != null) {
-            notificationService.notifyCloseByOrder(null, credential, request.getSymbol(), position.side(), request.getQuantity(),
+            String direction = position.quantity().signum() < 0 || "SHORT".equalsIgnoreCase(position.side()) ? "SHORT" : "LONG";
+            notificationService.notifyCloseByOrder(null, credential, request.getSymbol(), direction, request.getQuantity(),
                 position.entryPrice(), result.orderId(), symbol.getQuoteAsset(), "MANUAL", "手动平仓");
         }
         return result;

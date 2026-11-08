@@ -2,6 +2,7 @@ package org.dromara.quant.notification;
 
 import org.dromara.quant.config.QuantProperties;
 import org.dromara.quant.exchange.ExchangeGateway;
+import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.notification.domain.QuantNotification;
 import org.dromara.quant.notification.mapper.QuantNotificationMapper;
 import org.dromara.quant.risk.mapper.QuantRiskConfigMapper;
