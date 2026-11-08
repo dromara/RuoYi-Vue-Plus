@@ -201,4 +201,39 @@ class QuantTradeNotificationServiceTest {
         assertFalse(rows.getValue().getContent().contains("test-secret"));
     }
 
+
+    @Test
+    void protectionCloseWithoutJournaledChildOrderIsPersistedForResolution() throws Exception {
+        com.baomidou.mybatisplus.core.metadata.TableInfoHelper.initTableInfo(
+            new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-unresolved-child-test"), QuantNotification.class);
+        var mapper = mock(QuantNotificationMapper.class);
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
+            mock(MessageService.class), mock(JdbcTemplate.class), mock(ExchangeGateway.class));
+        var orderMapper = mock(org.dromara.quant.order.mapper.QuantOrderMapper.class);
+        var orderMapperField = QuantTradeNotificationService.class.getDeclaredField("orderMapper");
+        orderMapperField.setAccessible(true);
+        orderMapperField.set(service, orderMapper);
+        when(orderMapper.selectList(any())).thenReturn(List.of());
+        when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
+            ((QuantNotification) invocation.getArgument(0)).setId(45L);
+            return 1;
+        });
+        var credential = new QuantCredential();
+        credential.setId(10L);
+        credential.setApiKey("test-key");
+        credential.setSecretKey("test-secret");
+        credential.setSignatureType("HMAC");
+        credential.setRunMode("TESTNET");
+
+        service.notifyCloseByStrategyOrder(null, credential, 21L, "cycle-abc", "BTCUSDT", "LONG",
+            BigDecimal.ONE, BigDecimal.valueOf(100), "USDT", null, "EXCHANGE_PROTECTION_OR_EXTERNAL", "protection close");
+
+        var rows = ArgumentCaptor.forClass(QuantNotification.class);
+        verify(mapper).insert(rows.capture());
+        assertEquals("FACT_PENDING", rows.getValue().getChannel());
+        assertTrue(rows.getValue().getRecipient().contains("STRATEGY:21:cycle-abc"));
+        assertTrue(rows.getValue().getContent().contains("\"strategyInstanceId\":\"21\""));
+        assertFalse(rows.getValue().getContent().contains("test-secret"));
+    }
+
 }
