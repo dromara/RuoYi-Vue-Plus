@@ -122,7 +122,7 @@ class QuantTradeNotificationServiceTest {
         verify(mapper).insert(rows.capture());
         String content = rows.getValue().getContent();
         assertTrue(content.contains("实际平仓均价: 102"));
-        assertTrue(content.contains("交易所已实现盈亏: 3 USDT"));
+        assertTrue(content.contains("交易所已实现盈亏（未扣手续费）: 3 USDT"));
         assertTrue(content.contains("手续费: 0.03 USDT"));
         assertTrue(content.contains("钱包余额: 1000 USDT"));
         assertTrue(content.contains("账户权益: 1003 USDT"));
