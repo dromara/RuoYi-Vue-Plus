@@ -522,8 +522,9 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     public List<Kline> queryKlinesFrom(String runMode, String symbol, String interval, Instant from, int limit) {
         try {
             var sdkInterval = Interval.fromValue(interval);
-            ApiResponse<KlineCandlestickDataResponse> response = marketApi(runMode).klineCandlestickData(symbol.trim(), sdkInterval, from == null ? null : from.toEpochMilli(),
-                null, (long) Math.min(1000, limit));
+            ApiResponse<KlineCandlestickDataResponse> response = executeWithNetworkRetries(
+                () -> marketApi(runMode).klineCandlestickData(symbol.trim(), sdkInterval, from == null ? null : from.toEpochMilli(),
+                    null, (long) Math.min(1000, limit)), RestRequestScheduler.Kind.BACKGROUND, runMode);
             List<Kline> result = new ArrayList<>(response.getData().size());
             long now = System.currentTimeMillis();
             for (var row : response.getData()) {
