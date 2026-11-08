@@ -24,8 +24,6 @@ import org.dromara.quant.notification.QuantTradeNotificationService;
 import org.dromara.quant.paper.PaperTradingService;
 import org.dromara.quant.position.domain.QuantPosition;
 import org.dromara.quant.position.mapper.QuantPositionMapper;
-import org.dromara.quant.order.domain.QuantOrder;
-import org.dromara.quant.order.mapper.QuantOrderMapper;
 import org.dromara.quant.protection.ProtectionOrderService;
 import org.dromara.quant.protection.ProtectionTargetCoordinator;
 import org.dromara.quant.reconcile.TradingReconciliationService;
@@ -179,8 +177,6 @@ public class StrategyRuntimeService {
     private org.dromara.quant.decision.TradeDecisionLogService decisionLogs;
     @Autowired
     private StrategyPositionPerformanceHub positionPerformanceHub;
-    @Autowired
-    private QuantOrderMapper orderMapper;
 
     /**
      * 返回运行时生效的保证金模式；交易对覆盖优先于策略默认值。
@@ -242,46 +238,20 @@ public class StrategyRuntimeService {
                     account == null ? null : account.getAvailableBalance(), account == null ? null : account.getUnrealizedPnl(), maximumReturnRate, closeType, reason);
             } else {
                 Long orderId = runtime.state == null ? null : runtime.state.getPendingOrderId();
-                if (orderId == null) {
-                    orderId = resolveStrategyCloseOrderId(runtime, direction, quantity);
+                if (orderId != null) {
+                    notificationService.notifyCloseByOrder(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity,
+                        entryPrice, orderId, runtime.symbol.getQuoteAsset(), maximumReturnRate, closeType, reason);
+                } else {
+                    notificationService.notifyCloseByStrategyOrder(runtime.strategy, runtime.credential, runtime.instance.getId(),
+                        runtime.state == null ? null : runtime.state.getPositionCycleKey(), runtime.symbol.getSymbol(), direction, quantity,
+                        entryPrice, runtime.symbol.getQuoteAsset(), maximumReturnRate, closeType, reason);
                 }
-                notificationService.notifyCloseByOrder(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity,
-                    entryPrice, orderId, runtime.symbol.getQuoteAsset(), maximumReturnRate, closeType, reason);
             }
         } catch (RuntimeException ex) {
             log.error("已确认平仓通知处理失败 instanceId={} symbol={} closeType={}", runtime.instance.getId(), runtime.symbol.getSymbol(), closeType, ex);
         }
     }
 
-    /**
-     * 保护单触发后，按已冻结的策略实例归属查找唯一实际减仓子订单；不按价格或数量跨账户猜测。
-     */
-    private Long resolveStrategyCloseOrderId(ActiveRuntime runtime, String direction, BigDecimal quantity) {
-        if (orderMapper == null || runtime.instance.getId() == null || quantity == null || quantity.signum() <= 0) {
-            return null;
-        }
-        String closeSide = "SHORT".equalsIgnoreCase(direction) ? "BUY" : "SELL";
-        List<QuantOrder> matches = orderMapper.selectList(new LambdaQueryWrapper<QuantOrder>()
-            .eq(QuantOrder::getCredentialId, runtime.credential.getId())
-            .eq(QuantOrder::getStrategyInstanceId, runtime.instance.getId())
-            .eq(QuantOrder::getSymbol, runtime.symbol.getSymbol())
-            .in(QuantOrder::getPositionSide, direction, "BOTH")
-            .eq(QuantOrder::getReduceOnly, true)
-            .eq(QuantOrder::getSide, closeSide)
-            .in(QuantOrder::getStatus, "FILLED", "CANCELED", "EXPIRED", "REJECTED")
-            .gt(QuantOrder::getExecutedQuantity, BigDecimal.ZERO)
-            .ge(QuantOrder::getUpdatedAt, LocalDateTime.now(java.time.ZoneOffset.UTC).minusDays(6))
-            .orderByDesc(QuantOrder::getUpdatedAt).last("LIMIT 20")).stream()
-            .filter(order -> order.getExchangeOrderId() != null && order.getExecutedQuantity() != null
-                && order.getExecutedQuantity().compareTo(quantity) == 0)
-            .toList();
-        if (matches.size() != 1) {
-            log.warn("策略保护单平仓通知无法唯一匹配实际子订单 instanceId={} credentialId={} symbol={} direction={} quantity={} matches={}",
-                runtime.instance.getId(), runtime.credential.getId(), runtime.symbol.getSymbol(), direction, quantity, matches.size());
-            return null;
-        }
-        return matches.getFirst().getExchangeOrderId();
-    }
 
     /**
      * 清理已确认完成的待执行动作。
