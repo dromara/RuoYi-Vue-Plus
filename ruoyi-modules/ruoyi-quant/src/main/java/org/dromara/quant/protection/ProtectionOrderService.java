@@ -704,6 +704,7 @@ public class ProtectionOrderService {
         String clientAlgoId = prefix + UUID.randomUUID().toString().replace("-", "").substring(0, 28);
         QuantProtectionOrder entity = new QuantProtectionOrder();
         entity.setCredentialId(credentialId);
+        entity.setCreatedAtEpochMillis(System.currentTimeMillis());
         entity.setPositionId(position.getId());
         entity.setPositionCycleKey(position.getProtectionCycleKey());
         entity.setExecutedQuantity(BigDecimal.ZERO);
@@ -1336,7 +1337,7 @@ public class ProtectionOrderService {
      * 条件单触发后，普通子订单也必须确认终态；不能仅凭算法订单 FINISHED 再发减仓。
      */
     private ExchangeGateway.ProtectionOrderSnapshot readProtectionSnapshot(ExchangeGateway.Credential credential, QuantProtectionOrder order) {
-        ExchangeGateway.ProtectionOrderSnapshot actual = gateway.queryProtectionOrder(credential, order.getExchangeOrderId(), order.getClientOrderId(), order.getSymbol());
+        ExchangeGateway.ProtectionOrderSnapshot actual = gateway.queryProtectionOrder(credential, order.getExchangeOrderId(), order.getClientOrderId(), order.getSymbol(), order.getCreatedAtEpochMillis());
         if (actual == null || actual.actualOrderId() == null || actual.actualOrderId() <= 0) {
             return actual;
         }
