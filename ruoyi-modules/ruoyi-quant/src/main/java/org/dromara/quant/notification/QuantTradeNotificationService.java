@@ -87,7 +87,8 @@ public class QuantTradeNotificationService {
      * 安全转换可能为空的通知文本。
      */
     private static String percentage(BigDecimal value) {
-        return value == null ? "待核实" : value.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
+        // maximumReturnRate is persisted as a percentage value (for example, 5.86 means 5.86%).
+        return value == null ? "待核实" : value.stripTrailingZeros().toPlainString() + "%";
     }
 
     private static String plain(BigDecimal value) {
