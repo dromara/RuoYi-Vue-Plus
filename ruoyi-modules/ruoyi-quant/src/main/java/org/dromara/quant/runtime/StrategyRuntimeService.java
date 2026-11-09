@@ -2946,9 +2946,8 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             : Instant.ofEpochMilli(expectedState.getPendingOrderTime());
         Instant executionCreatedAtInstant = execution == null || execution.getCreatedAt() == null ? null
             : execution.getCreatedAt().toInstant(java.time.ZoneOffset.UTC);
-        // pendingOrderTime is an epoch-millisecond timestamp captured immediately before dispatch.
-        // Prefer it over LocalDateTime from the execution row, whose JDBC/session timezone mapping
-        // can shift the apparent instant even though the database value looks correct.
+        // openedAt is persisted as Beijing local time. Query from one minute before it so the
+        // opening fill is included even when state persistence follows the exchange fill.
         Instant from = resolveCloseProofStartTime(expectedState.getOpenedAt(), expectedState.getPendingOrderTime(),
             execution == null ? null : execution.getCreatedAt());
         String closeProofTimeSource = expectedState.getOpenedAt() != null ? "POSITION_OPENED_AT_SHANGHAI_MINUS_60S"
@@ -3005,9 +3004,10 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
         }
         int closeProofConfirmations = expectedState.getPendingNotFoundConfirmations() == null ? 0 : expectedState.getPendingNotFoundConfirmations();
         if (order == null && "TESTNET".equalsIgnoreCase(runtime.credential.getRunMode()) && closeProofConfirmations % 6 == 0) {
-            log.warn("未知退出恢复核验诊断 instanceId={} symbol={} reason={} flatSnapshot={} tradeCount={} closeQty={} increaseQty={} remainingQty={} pendingOrderId={} clientOrderId={} executionId={} timeSource={} pendingOrderTime={} executionCreatedAt={} from={} to={} cutoff={} windowAgeMillis={}",
+            log.warn("未知退出恢复核验诊断 instanceId={} symbol={} reason={} flatSnapshot={} tradeCount={} closeQty={} increaseQty={} remainingQty={} expectedCycleQty={} positionOpenedAt={} pendingOrderId={} clientOrderId={} executionId={} timeSource={} pendingOrderTime={} executionCreatedAt={} from={} to={} cutoff={} windowAgeMillis={}",
                 runtime.instance.getId(), runtime.symbol.getSymbol(), closeProofReason, exchangeFlatSnapshot, closeProofTradeCount,
-                closeProofCloseQuantity, closeProofIncreaseQuantity, closeProofRemainingQuantity, orderId, clientOrderId,
+                closeProofCloseQuantity, closeProofIncreaseQuantity, closeProofRemainingQuantity,
+                expectedState.getInitialPositionQty(), expectedState.getOpenedAt(), orderId, clientOrderId,
                 execution == null ? null : execution.getId(), closeProofTimeSource, pendingOrderInstant, executionCreatedAtInstant,
                 from, to, Instant.ofEpochMilli(closeProofCutoffEpochMillis), closeProofWindowAgeMillis);
         }
