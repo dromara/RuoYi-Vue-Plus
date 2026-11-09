@@ -25,6 +25,18 @@ import static org.mockito.Mockito.*;
 @org.junit.jupiter.api.Tag("dev")
 class StrategyRuntimeSafetyTest {
     @Test
+    void identifiesStaleOrUnavailableTradeFeedForProtectionFallback() {
+        Instant now = Instant.parse("2026-11-09T12:00:00Z");
+
+        assertTrue(StrategyRuntimeService.isMarketPriceStale(false, true, now, now, 5_000L));
+        assertTrue(StrategyRuntimeService.isMarketPriceStale(true, false, now, now, 5_000L));
+        assertTrue(StrategyRuntimeService.isMarketPriceStale(true, true, null, now, 5_000L));
+        assertTrue(StrategyRuntimeService.isMarketPriceStale(true, true, now.minusMillis(5_001), now, 5_000L));
+        assertTrue(StrategyRuntimeService.isMarketPriceStale(true, true, now.plusMillis(1), now, 5_000L));
+        assertFalse(StrategyRuntimeService.isMarketPriceStale(true, true, now.minusMillis(5_000), now, 5_000L));
+    }
+
+    @Test
     void mapsExchangeCloseTimeToTheOwningKlineForSupportedIntervals() {
         assertEquals(Instant.parse("2026-10-17T08:00:00Z"), StrategyRuntimeService.klineOpenAt(Instant.parse("2026-10-17T08:14:59.999Z"), "15m"));
         assertEquals(Instant.parse("2026-10-17T00:00:00Z"), StrategyRuntimeService.klineOpenAt(Instant.parse("2026-10-17T23:59:59Z"), "1d"));
