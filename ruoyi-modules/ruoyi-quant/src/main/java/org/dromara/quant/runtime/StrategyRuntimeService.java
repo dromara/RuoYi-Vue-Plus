@@ -2052,15 +2052,15 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             runtime.state = state;
             StrategyContext openedContext = buildContext(runtime, context.currentPrice(), new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
             runtime.strategySymbol.getIntervalCode(), context.currentPrice(), null, context.eventTime()));
+            notificationService.notifyOpen(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, runtime.position.getQuantity(),
+             runtime.position.getEntryPrice(), leverage, openRatio, signal.get().reason());
+            log.info("实时策略开仓 instanceId={} symbol={} direction={} price={} quantity={} reason={}", runtime.instance.getId(), runtime.symbol.getSymbol(), direction,
+             context.currentPrice(), quantity, signal.get().reason());
             // 开仓成交后先用最新行情检查本地镜像止损，避免提交已穿价的 Binance 条件单。
             evaluateExit(runtime, openedContext);
             if (!runtime.exitCoordinating.get()) {
                 syncPluginProtections(runtime, openedContext);   // 内部会 requestProtectionSync(runtime, true)
             }
-            notificationService.notifyOpen(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, runtime.position.getQuantity(),
-             runtime.position.getEntryPrice(), leverage, openRatio, signal.get().reason());
-            log.info("实时策略开仓 instanceId={} symbol={} direction={} price={} quantity={} reason={}", runtime.instance.getId(), runtime.symbol.getSymbol(), direction,
-             context.currentPrice(), quantity, signal.get().reason());
         } catch (RuntimeException ex) {
             QuantExecutionRecordStatus status = findExecutionStatus(runtime.credential.getId(), idempotencyKey);
             if (executionResult != null && executionResult.accepted()) {
@@ -4087,7 +4087,7 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                         if (hardStopAlreadyTriggered && !obsolete) {
                             StrategyContext emergencyContext = null;
                             synchronized (runtime) {
-                                if (!runtime.closed && runtime.state == work.state() && runtime.position != null
+                                if (!runtime.closed && runtime.state != null && runtime.state == work.state() && runtime.position != null
                                     && Objects.equals(runtime.position.getId(), work.position().getId())
                                     && Objects.equals(runtime.state.getPositionCycleKey(), work.position().getProtectionCycleKey())
                                     && !runtime.hasPendingAction()) {
