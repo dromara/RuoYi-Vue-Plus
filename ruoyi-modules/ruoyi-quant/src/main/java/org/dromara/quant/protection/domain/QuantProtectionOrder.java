@@ -3,6 +3,7 @@ package org.dromara.quant.protection.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -39,6 +40,7 @@ public class QuantProtectionOrder {
      */
     private Long targetVersion;
     /** 本地保护意图首次持久化时间，Unix epoch 毫秒；历史数据为空时不得推断订单不存在。 */
+    @TableField("created_at_epoch_ms")
     private Long createdAtEpochMillis;
     /**
      * 保护意图覆盖的最高台阶，非阶梯保护为0。
