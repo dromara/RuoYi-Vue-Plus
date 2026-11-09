@@ -18,24 +18,43 @@ class PendingCloseExecutionRecoveryTest {
     private static final Instant TO = Instant.parse("2026-11-09T03:00:00Z");
 
     @Test
-    void prefersEpochPendingOrderTimeOverExecutionLocalDateTime() {
-        Instant expected = Instant.ofEpochMilli(1794163595403L);
-        LocalDateTime executionCreatedAt = LocalDateTime.of(2026, 11, 8, 18, 46, 36);
+    void startsTradeHistoryBeforePositionOpenedAtToIncludeOpeningFill() {
+        LocalDateTime openedAt = LocalDateTime.of(2026, 11, 9, 2, 46, 0);
+        Instant expected = openedAt.minusSeconds(60).atZone(java.time.ZoneId.of("Asia/Shanghai")).toInstant();
 
-        assertEquals(expected, StrategyRuntimeService.resolveCloseProofStartTime(1794163595403L, executionCreatedAt));
+        assertEquals(expected, StrategyRuntimeService.resolveCloseProofStartTime(
+            openedAt, 1794163595403L, LocalDateTime.of(2026, 11, 8, 18, 46, 36)));
     }
 
     @Test
-    void fallsBackToUtcExecutionCreatedAtWhenPendingEpochIsMissing() {
+    void usesEarlierPendingEpochWhenItPrecedesPositionOpenTimeMargin() {
+        LocalDateTime openedAt = LocalDateTime.of(2026, 11, 9, 2, 46, 0);
+        long pendingEpoch = Instant.parse("2026-11-08T18:44:00Z").toEpochMilli();
+
+        assertEquals(Instant.ofEpochMilli(pendingEpoch),
+            StrategyRuntimeService.resolveCloseProofStartTime(openedAt, pendingEpoch, null));
+    }
+
+    @Test
+    void fallsBackToPendingEpochWhenPositionOpenTimeIsMissing() {
+        Instant expected = Instant.ofEpochMilli(1794163595403L);
+
+        assertEquals(expected, StrategyRuntimeService.resolveCloseProofStartTime(null, 1794163595403L, null));
+    }
+
+    @Test
+    void fallsBackToUtcExecutionCreatedAtWhenBothEpochTimesAreMissing() {
         LocalDateTime executionCreatedAt = LocalDateTime.of(2026, 11, 8, 18, 46, 36);
 
         assertEquals(executionCreatedAt.toInstant(ZoneOffset.UTC),
-            StrategyRuntimeService.resolveCloseProofStartTime(null, executionCreatedAt));
+            StrategyRuntimeService.resolveCloseProofStartTime(null, null, executionCreatedAt));
     }
 
     @Test
     void provesShortPositionClosedByExactBuyFillQuantity() {
-        var trades = List.of(trade(1L, "BUY", "0.4", "BOTH"), trade(2L, "BUY", "0.6", "BOTH"));
+        var trades = List.of(tradeAt(1L, "SELL", "1.0", "BOTH", FROM.plusSeconds(1)),
+            tradeAt(2L, "BUY", "0.4", "BOTH", FROM.plusSeconds(2)),
+            tradeAt(3L, "BUY", "0.6", "BOTH", FROM.plusSeconds(3)));
 
         assertTrue(StrategyRuntimeService.closedPendingCloseProven(
             "JCTUSDT", "SHORT", new BigDecimal("1.0"), new ExchangeGateway.PositionMode(false), trades, FROM, TO));
@@ -43,7 +62,8 @@ class PendingCloseExecutionRecoveryTest {
 
     @Test
     void provesLongPositionClosedByExactSellFillQuantity() {
-        var trades = List.of(trade(1L, "SELL", "1.0", "BOTH"));
+        var trades = List.of(tradeAt(1L, "BUY", "1.0", "BOTH", FROM.plusSeconds(1)),
+            tradeAt(2L, "SELL", "1.0", "BOTH", FROM.plusSeconds(2)));
 
         assertTrue(StrategyRuntimeService.closedPendingCloseProven(
             "JCTUSDT", "LONG", new BigDecimal("1.0"), new ExchangeGateway.PositionMode(false), trades, FROM, TO));
@@ -51,8 +71,9 @@ class PendingCloseExecutionRecoveryTest {
 
     @Test
     void rejectsQuantityMismatchOrWrongCloseSide() {
-        assertFalse(proven(List.of(trade(1L, "BUY", "0.9", "BOTH")), "SHORT", "1.0"));
-        assertFalse(proven(List.of(trade(1L, "SELL", "1.0", "BOTH")), "SHORT", "1.0"));
+        assertFalse(proven(List.of(tradeAt(1L, "SELL", "1.0", "BOTH", FROM.plusSeconds(1)),
+            tradeAt(2L, "BUY", "0.9", "BOTH", FROM.plusSeconds(2))), "SHORT", "1.0"));
+        assertFalse(proven(List.of(tradeAt(1L, "SELL", "1.0", "BOTH", FROM.plusSeconds(1))), "SHORT", "1.0"));
     }
 
     @Test
@@ -67,9 +88,10 @@ class PendingCloseExecutionRecoveryTest {
     @Test
     void netsMixedDirectionTradesInChronologicalOrder() {
         var mixed = List.of(
-            tradeAt(1L, "BUY", "0.5", "BOTH", FROM.plusSeconds(1)),
-            tradeAt(2L, "SELL", "0.2", "BOTH", FROM.plusSeconds(2)),
-            tradeAt(3L, "BUY", "0.7", "BOTH", FROM.plusSeconds(3)));
+            tradeAt(1L, "SELL", "1.0", "BOTH", FROM.plusSeconds(1)),
+            tradeAt(2L, "BUY", "0.5", "BOTH", FROM.plusSeconds(2)),
+            tradeAt(3L, "SELL", "0.2", "BOTH", FROM.plusSeconds(3)),
+            tradeAt(4L, "BUY", "0.7", "BOTH", FROM.plusSeconds(4)));
 
         var proof = StrategyRuntimeService.evaluatePendingCloseProof(
             "JCTUSDT", "SHORT", new BigDecimal("1.0"), new ExchangeGateway.PositionMode(false), mixed, FROM, TO);
@@ -83,8 +105,9 @@ class PendingCloseExecutionRecoveryTest {
     @Test
     void rejectsMixedDirectionHistoryThatLeavesNetExposure() {
         var mixed = List.of(
-            tradeAt(1L, "BUY", "0.5", "BOTH", FROM.plusSeconds(1)),
-            tradeAt(2L, "SELL", "0.2", "BOTH", FROM.plusSeconds(2)));
+            tradeAt(1L, "SELL", "1.0", "BOTH", FROM.plusSeconds(1)),
+            tradeAt(2L, "BUY", "0.5", "BOTH", FROM.plusSeconds(2)),
+            tradeAt(3L, "SELL", "0.2", "BOTH", FROM.plusSeconds(3)));
 
         var proof = StrategyRuntimeService.evaluatePendingCloseProof(
             "JCTUSDT", "SHORT", new BigDecimal("1.0"), new ExchangeGateway.PositionMode(false), mixed, FROM, TO);
@@ -97,8 +120,9 @@ class PendingCloseExecutionRecoveryTest {
     @Test
     void rejectsTradeSequenceThatCrossesThroughZeroPosition() {
         var mixed = List.of(
-            tradeAt(1L, "BUY", "1.1", "BOTH", FROM.plusSeconds(1)),
-            tradeAt(2L, "SELL", "0.1", "BOTH", FROM.plusSeconds(2)));
+            tradeAt(1L, "SELL", "1.0", "BOTH", FROM.plusSeconds(1)),
+            tradeAt(2L, "BUY", "1.1", "BOTH", FROM.plusSeconds(2)),
+            tradeAt(3L, "SELL", "0.1", "BOTH", FROM.plusSeconds(3)));
 
         var proof = StrategyRuntimeService.evaluatePendingCloseProof(
             "JCTUSDT", "SHORT", new BigDecimal("1.0"), new ExchangeGateway.PositionMode(false), mixed, FROM, TO);
@@ -110,8 +134,9 @@ class PendingCloseExecutionRecoveryTest {
     @Test
     void ignoresTheOtherPositionSideInHedgeMode() {
         var mixed = List.of(
-            tradeAt(1L, "BUY", "1.0", "SHORT", FROM.plusSeconds(1)),
-            tradeAt(2L, "SELL", "4.0", "LONG", FROM.plusSeconds(2)));
+            tradeAt(1L, "SELL", "1.0", "SHORT", FROM.plusSeconds(1)),
+            tradeAt(2L, "SELL", "4.0", "LONG", FROM.plusSeconds(2)),
+            tradeAt(3L, "BUY", "1.0", "SHORT", FROM.plusSeconds(3)));
 
         var proof = StrategyRuntimeService.evaluatePendingCloseProof(
             "JCTUSDT", "SHORT", new BigDecimal("1.0"), new ExchangeGateway.PositionMode(true), mixed, FROM, TO);
