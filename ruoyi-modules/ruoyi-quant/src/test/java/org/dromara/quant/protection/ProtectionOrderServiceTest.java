@@ -1097,6 +1097,32 @@ class ProtectionOrderServiceTest {
     }
 
     @Test
+    void replacesHardStopWithRemainingPositionQuantityAfterPartialExit() {
+        position.setQuantity(new BigDecimal("0.8"));
+        var old = scopedStop("HARD_STOP", "99");
+        old.setClientOrderId("QHARD_old");
+        old.setQuantity(BigDecimal.ONE);
+        java.util.concurrent.atomic.AtomicInteger oldOrderQueries = new java.util.concurrent.atomic.AtomicInteger();
+        when(mapper.selectList(any())).thenAnswer(call -> "WORKING".equals(old.getStatus()) ? List.of(old) : List.of());
+        when(gateway.queryProtectionOrder(any(), any(), any(), any(), any())).thenAnswer(call -> {
+            String clientOrderId = call.getArgument(2);
+            if (old.getClientOrderId().equals(clientOrderId)) {
+                boolean firstQuery = oldOrderQueries.getAndIncrement() == 0;
+                return snapshot(55L, clientOrderId, BigDecimal.ONE, firstQuery ? "NEW" : "CANCELED", BigDecimal.ZERO);
+            }
+            return snapshot(66L, clientOrderId, new BigDecimal("0.8"), "NEW", BigDecimal.ZERO);
+        });
+        when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
+            call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
+
+        QuantProtectionOrder replacement = service.ensureMarginHardStop(1L, position, new BigDecimal("0.1"), true);
+
+        assertEquals(0, new BigDecimal("0.8").compareTo(replacement.getQuantity()));
+        verify(gateway).placeProtectionOrder(argThat(request -> new BigDecimal("0.8").compareTo(request.quantity()) == 0));
+        assertEquals("CANCELED", old.getStatus());
+    }
+
+    @Test
     void unifiedStopPriceRoundsLongUpAndKeepsLegacyFloor() {
         position.setEntryPrice(new BigDecimal("100.003"));
         position.setLeverage(5);
