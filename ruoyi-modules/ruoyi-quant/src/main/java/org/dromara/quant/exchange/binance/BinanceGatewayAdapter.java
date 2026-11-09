@@ -1124,20 +1124,70 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
      */
     @Override
     public List<TradeSnapshot> queryTrades(Credential credential, String symbol, TimeRange range) {
-//        if (symbol == null || symbol.isBlank()) {
-//            throw new IllegalArgumentException("查询成交记录必须指定交易对");
-//        }
-        Long from = range == null || range.from() == null ? null : range.from().toEpochMilli();
-        Long to = range == null || range.to() == null ? null : range.to().toEpochMilli();
-        return signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
-            ApiResponse<AccountTradeListResponse> response = client.accountTradeList(symbol.trim(), null, from, to, null, 1000L, RECV_WINDOW_MILLIS);
-            if (response == null || response.getData() == null) {
-                throw new IllegalStateException("Binance 历史成交响应缺少数据载荷，无法确认查询完整性");
-            }
-            return response.getData().stream().map(BinanceGatewayAdapter::tradeSnapshot).toList();
-        });
+        requireCredential(credential);
+        if (symbol == null || symbol.isBlank() || range == null || range.from() == null || range.to() == null
+            || range.from().isAfter(range.to())) {
+            throw new IllegalArgumentException("查询成交记录必须指定交易对和有效时间范围");
+        }
+        long from = range.from().toEpochMilli();
+        long to = range.to().toEpochMilli();
+        TradeHistoryResult result = collectCompleteTradeHistory(from, to, (startTime, endTime) ->
+            signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
+                ApiResponse<AccountTradeListResponse> response = client.accountTradeList(
+                    symbol.trim(), null, startTime, endTime, null, (long) ALGO_HISTORY_PAGE_SIZE, RECV_WINDOW_MILLIS);
+                return response == null || response.getData() == null ? null
+                    : response.getData().stream().map(BinanceGatewayAdapter::tradeSnapshot).toList();
+            }));
+        if (!result.complete()) {
+            throw new IllegalStateException("Binance 历史成交查询无法证明完整：时间窗口分页达到查询上限或单毫秒窗口仍被截断");
+        }
+        return result.trades();
     }
 
+    static TradeHistoryResult collectCompleteTradeHistory(long startTime, long endTime,
+                                                            java.util.function.BiFunction<Long, Long, List<TradeSnapshot>> query) {
+        if (startTime < 0 || endTime < startTime || query == null) {
+            return new TradeHistoryResult(List.of(), false, 0);
+        }
+        List<TradeSnapshot> trades = new ArrayList<>();
+        int[] queryCount = {0};
+        boolean complete = collectTradeHistoryRange(startTime, endTime, query, trades, queryCount);
+        if (!complete) {
+            return new TradeHistoryResult(List.of(), false, queryCount[0]);
+        }
+        Map<Long, TradeSnapshot> unique = new LinkedHashMap<>();
+        for (TradeSnapshot trade : trades) {
+            if (trade == null || trade.tradeId() == null || unique.putIfAbsent(trade.tradeId(), trade) != null) {
+                return new TradeHistoryResult(List.of(), false, queryCount[0]);
+            }
+        }
+        return new TradeHistoryResult(List.copyOf(unique.values()), true, queryCount[0]);
+    }
+
+    private static boolean collectTradeHistoryRange(long startTime, long endTime,
+                                                      java.util.function.BiFunction<Long, Long, List<TradeSnapshot>> query,
+                                                      List<TradeSnapshot> trades, int[] queryCount) {
+        if (++queryCount[0] > ALGO_HISTORY_MAX_QUERIES) {
+            return false;
+        }
+        List<TradeSnapshot> page = query.apply(startTime, endTime);
+        if (page == null) {
+            return false;
+        }
+        if (page.size() < ALGO_HISTORY_PAGE_SIZE) {
+            trades.addAll(page);
+            return true;
+        }
+        if (startTime == endTime) {
+            return false;
+        }
+        long middle = startTime + (endTime - startTime) / 2;
+        return collectTradeHistoryRange(startTime, middle, query, trades, queryCount)
+            && collectTradeHistoryRange(middle + 1, endTime, query, trades, queryCount);
+    }
+
+    record TradeHistoryResult(List<TradeSnapshot> trades, boolean complete, int queryCount) {
+    }
     /**
      * 按交易对、订单 ID 和订单生命周期时间范围查询成交。
      */
