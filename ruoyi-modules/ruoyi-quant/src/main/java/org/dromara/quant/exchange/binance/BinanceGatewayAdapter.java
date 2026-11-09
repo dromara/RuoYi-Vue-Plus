@@ -1220,11 +1220,11 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             }
             // Binance 的精确查询可能已不返回已结束的 Algo 单；仅在明确 -2013 时查近 7 天历史，
             // 必须按 clientAlgoId 和 symbol 精确匹配。历史查询失败或未匹配仍返回未知，由上层保持阻断。
-            return queryProtectionOrderHistory(credential, orderId, clientOrderId, symbol);
+            return queryProtectionOrderHistory(credential, orderId, clientOrderId, symbol, intentCreatedAtEpochMillis);
         }
         if (data == null) {
             // 成功响应也可能没有 data；先查有限时间范围的算法单历史，再由上层决定是否仍未知。
-            return queryProtectionOrderHistory(credential, orderId, clientOrderId, symbol);
+            return queryProtectionOrderHistory(credential, orderId, clientOrderId, symbol, intentCreatedAtEpochMillis);
         }
         String status = normalizeAlgoStatus(string(data, "getAlgoStatus"));
         return new ProtectionOrderSnapshot(string(data, "getSymbol"), number(data, "getAlgoId"), string(data, "getClientAlgoId"), status, string(data, "getSide"), string(data,
@@ -1233,7 +1233,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             decimal(string(data, "getActualPrice")));
     }
 
-    private ProtectionOrderSnapshot queryProtectionOrderHistory(Credential credential, Long orderId, String clientOrderId, String symbol) {
+    private ProtectionOrderSnapshot queryProtectionOrderHistory(Credential credential, Long orderId, String clientOrderId, String symbol, Long intentCreatedAtEpochMillis) {
         if (symbol == null || symbol.isBlank()) {
             return null;
         }
