@@ -1675,11 +1675,12 @@ public class ProtectionOrderService {
                     return false;
                 }
             }
-            if ("FIRST_TP".equals(protectionType)) {
-                for (var order : orders) {
-                    if ("FIRST_TP".equals(order.getProtectionType()) && ACTIVE_STATUSES.contains(order.getStatus()) && !cancelOne(credentialId, order, true)) {
-                        return false;
-                    }
+            // 本地接管哪个保护目标，就先撤销并精确确认同类型交易所条件单；
+            // 其它类型保护继续保留，尤其不能因止盈回退而撤掉整仓硬止损。
+            for (var order : orders) {
+                if (Objects.equals(protectionType, order.getProtectionType()) && ACTIVE_STATUSES.contains(order.getStatus())
+                    && !cancelOne(credentialId, order, true, true)) {
+                    return false;
                 }
             }
             return true;
