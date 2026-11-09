@@ -190,6 +190,7 @@ CREATE TABLE `quant_protection_order`
     `position_side`     varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '持仓方向',
     `exchange_order_id` bigint NULL DEFAULT NULL COMMENT '交易所条件单ID',
     `client_order_id`   varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '客户端条件单ID',
+    `created_at_epoch_ms` bigint NULL DEFAULT NULL COMMENT '本地保护意图创建时间(epoch毫秒)，历史未知保持NULL',
     `protection_type`   varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL COMMENT '保护单类型',
     `order_type`        varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '条件单类型',
     `quantity`          decimal(32, 16) NULL DEFAULT NULL COMMENT '条件单数量',
