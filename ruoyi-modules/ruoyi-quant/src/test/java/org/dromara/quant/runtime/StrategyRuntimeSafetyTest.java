@@ -45,6 +45,28 @@ class StrategyRuntimeSafetyTest {
     }
 
     @Test
+    void staleMarketRestPriceEvaluatesOnlyExistingPositionExitSignals() throws Exception {
+        Fixture f = fixture();
+        try {
+            var gateway = (ExchangeGateway) ReflectionTestUtils.getField(f.service, "gateway");
+            ReflectionTestUtils.setField(f.runtime, "marketHealthy", false);
+            ReflectionTestUtils.setField(f.runtime, "marketStreamReady", false);
+            ReflectionTestUtils.setField(f.runtime, "latestTradeEventAt", null);
+            ReflectionTestUtils.setField(f.runtime, "nextRestProtectionPollAt", 0L);
+            when(gateway.queryLastTradePrice("LIVE", "BTCUSDT")).thenReturn(
+                new ExchangeGateway.PriceSnapshot("BTCUSDT", new BigDecimal("99"), null, Instant.now()));
+
+            f.service.checkStaleMarketProtectionPrices();
+
+            verify(gateway, timeout(2_000)).queryLastTradePrice("LIVE", "BTCUSDT");
+            verify(f.plugin, timeout(2_000)).evaluateExit(any(), anyMap());
+            verify(f.plugin, never()).evaluateEntry(any(), anyMap());
+        } finally {
+            f.service.destroy();
+        }
+    }
+
+    @Test
     void publishesNewPositionPeakOnlyAfterStateSave() throws Exception {
         Fixture f = fixture();
         try {
