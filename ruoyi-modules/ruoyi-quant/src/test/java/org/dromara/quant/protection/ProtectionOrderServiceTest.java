@@ -94,7 +94,7 @@ class ProtectionOrderServiceTest {
     void acceptedProtectionWithInconclusiveLookupRemainsPendingInsteadOfBeingReportedAsCreateFailure() {
         when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(55L,
             call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
-        when(gateway.queryProtectionOrder(any(), eq(55L), any(), eq("BTCUSDT"))).thenReturn(null);
+        when(gateway.queryProtectionOrder(any(), eq(55L), any(), eq("BTCUSDT"), any())).thenReturn(null);
 
         var failure = assertThrows(ProtectionOrderService.ProtectionConfirmationPendingException.class,
             () -> service.placeMarginHardStop(1L, position, new BigDecimal("0.1"), true));
@@ -301,7 +301,7 @@ class ProtectionOrderServiceTest {
         QuantProtectionOrder local = order();
         local.setStatus("UNKNOWN");
         when(mapper.selectOne(any())).thenReturn(local);
-        when(gateway.queryProtectionOrder(any(), eq(55L), eq("QFTP_test"), eq("BTCUSDT"))).thenReturn(snapshot(55L, "QFTP_test", BigDecimal.ONE, "NEW", null));
+        when(gateway.queryProtectionOrder(any(), eq(55L), eq("QFTP_test"), eq("BTCUSDT"), any())).thenReturn(snapshot(55L, "QFTP_test", BigDecimal.ONE, "NEW", null));
         when(dispatcher.recoverVerifiedProtection(1L, "BTCUSDT", "QFTP_test", "PROTECT_CREATE", 55L)).thenReturn(true);
         assertSame(local, service.ensureMarginHardStop(1L, position, new BigDecimal("0.1"), true));
         verify(dispatcher).recoverVerifiedProtection(1L, "BTCUSDT", "QFTP_test", "PROTECT_CREATE", 55L);
@@ -339,19 +339,19 @@ class ProtectionOrderServiceTest {
         QuantProtectionOrder old = order();
         old.setQuantity(new BigDecimal("2"));
         when(mapper.selectOne(any())).thenReturn(old);
-        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any())).thenReturn(snapshot(55L, old.getClientOrderId(), new BigDecimal("2"), "NEW", null), snapshot(55L,
+        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any(), any())).thenReturn(snapshot(55L, old.getClientOrderId(), new BigDecimal("2"), "NEW", null), snapshot(55L,
             old.getClientOrderId(), new BigDecimal("2"), "CANCELED", BigDecimal.ZERO));
         final ExchangeGateway.ProtectionOrderRequest[] request = new ExchangeGateway.ProtectionOrderRequest[1];
         when(gateway.placeProtectionOrder(any())).thenAnswer(invocation -> {
             request[0] = invocation.getArgument(0);
             return new ExchangeGateway.ProtectionOrderResult(66L, request[0].clientOrderId(), "NEW");
         });
-        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any())).thenAnswer(invocation -> snapshot(66L, request[0].clientOrderId(), BigDecimal.ONE, "NEW", null));
+        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any(), any())).thenAnswer(invocation -> snapshot(66L, request[0].clientOrderId(), BigDecimal.ONE, "NEW", null));
         service.ensureMarginHardStop(1L, position, new BigDecimal("0.1"), true);
         var sequence = inOrder(gateway);
-        sequence.verify(gateway).queryProtectionOrder(any(), eq(55L), any(), any());
+        sequence.verify(gateway).queryProtectionOrder(any(), eq(55L), any(), any(), any());
         sequence.verify(gateway).placeProtectionOrder(any());
-        sequence.verify(gateway).queryProtectionOrder(any(), eq(66L), any(), any());
+        sequence.verify(gateway).queryProtectionOrder(any(), eq(66L), any(), any(), any());
         sequence.verify(gateway).cancelProtectionOrder(any());
     }
 
@@ -610,8 +610,8 @@ class ProtectionOrderServiceTest {
         two.setExchangeOrderId(56L);
         two.setExecutedQuantity(BigDecimal.ZERO);
         when(mapper.selectList(any())).thenReturn(List.of(one, two));
-        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any())).thenReturn(snapshot(55L, "one", BigDecimal.ONE, "CANCELED", new BigDecimal("0.2")));
-        when(gateway.queryProtectionOrder(any(), eq(56L), any(), any())).thenReturn(snapshot(56L, "two", BigDecimal.ONE, "FINISHED", new BigDecimal("0.3")));
+        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any(), any())).thenReturn(snapshot(55L, "one", BigDecimal.ONE, "CANCELED", new BigDecimal("0.2")));
+        when(gateway.queryProtectionOrder(any(), eq(56L), any(), any(), any())).thenReturn(snapshot(56L, "two", BigDecimal.ONE, "FINISHED", new BigDecimal("0.3")));
         assertEquals(0, new BigDecimal("0.5").compareTo(service.firstTakeProfitExecutedQuantity(1L, position)));
         assertEquals(0, new BigDecimal("0.5").compareTo(service.firstTakeProfitExecutedQuantity(1L, position)));
     }
@@ -690,7 +690,7 @@ class ProtectionOrderServiceTest {
         local.setStatus("MISSING");
         when(mapper.selectList(any())).thenReturn(List.of(local));
         when(dispatcher.activeProtectionTicket(1L, "BTCUSDT", local.getClientOrderId(), "PROTECT_CANCEL")).thenReturn("pending-protection-cancel");
-        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT")))
+        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT"), any()))
             .thenReturn(snapshot(55L, local.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
         when(dispatcher.recoveredFromExchange(1L, "BTCUSDT", "pending-protection-cancel", local.getClientOrderId(), 55L)).thenReturn(true);
 
@@ -711,7 +711,7 @@ class ProtectionOrderServiceTest {
 
         assertFalse(service.cancelActiveProtectionOrders(1L, 10L, true));
 
-        verify(gateway).queryProtectionOrder(any(), eq(local.getExchangeOrderId()), eq(local.getClientOrderId()), eq("BTCUSDT"));
+        verify(gateway).queryProtectionOrder(any(), eq(local.getExchangeOrderId()), eq(local.getClientOrderId()), eq("BTCUSDT"), any());
         verify(dispatcher).unknown(any(LiveOrderDispatcher.Ticket.class));
         verify(dispatcher, never()).acknowledged(any(), any());
     }
@@ -739,7 +739,7 @@ class ProtectionOrderServiceTest {
         var active = new LiveOrderDispatcher.ActiveDispatch(1L, "BTCUSDT", "cancel-key", "PROTECT_CANCEL", local.getClientOrderId(), "UNKNOWN", null);
         when(dispatcher.activeDispatch(1L, "BTCUSDT")).thenReturn(active);
         when(mapper.selectOne(any())).thenReturn(local);
-        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT")))
+        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT"), any()))
             .thenReturn(snapshot(55L, local.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
         when(dispatcher.recoveredFromExchange(1L, "BTCUSDT", "cancel-key", local.getClientOrderId(), 55L)).thenReturn(true);
 
@@ -774,7 +774,7 @@ class ProtectionOrderServiceTest {
         when(mapper.selectOne(any())).thenReturn(local);
         when(dispatcher.activeDispatch(1L, "BTCUSDT")).thenReturn(
             new LiveOrderDispatcher.ActiveDispatch(1L, "BTCUSDT", "cancel-key", "PROTECT_CANCEL", local.getClientOrderId(), "UNKNOWN", null));
-        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT")))
+        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT"), any()))
             .thenReturn(snapshot(55L, local.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO),
                 snapshot(55L, local.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
         when(dispatcher.recoveredFromExchange(1L, "BTCUSDT", "cancel-key", local.getClientOrderId(), 55L)).thenReturn(true);
@@ -796,7 +796,7 @@ class ProtectionOrderServiceTest {
         var active = new LiveOrderDispatcher.ActiveDispatch(1L, "BTCUSDT", "create-key", "PROTECT_CREATE", local.getClientOrderId(), "UNKNOWN", 55L);
         when(dispatcher.activeDispatch(1L, "BTCUSDT")).thenReturn(active, (LiveOrderDispatcher.ActiveDispatch) null);
         when(mapper.selectOne(any())).thenReturn(local);
-        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT")))
+        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT"), any()))
             .thenReturn(snapshot(55L, local.getClientOrderId(), BigDecimal.ONE, "NEW", null));
         when(dispatcher.recoverVerifiedProtection(1L, "BTCUSDT", local.getClientOrderId(), "PROTECT_CREATE", 55L)).thenReturn(true);
 
@@ -814,7 +814,7 @@ class ProtectionOrderServiceTest {
         var active = new LiveOrderDispatcher.ActiveDispatch(1L, "BTCUSDT", "create-key", "PROTECT_CREATE", local.getClientOrderId(), "UNKNOWN", 55L);
         when(dispatcher.activeDispatch(1L, "BTCUSDT")).thenReturn(active, (LiveOrderDispatcher.ActiveDispatch) null);
         when(mapper.selectOne(any())).thenReturn(local);
-        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT")))
+        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT"), any()))
             .thenReturn(snapshot(55L, local.getClientOrderId(), BigDecimal.ONE, "NEW", null));
         when(dispatcher.recoverVerifiedProtection(1L, "BTCUSDT", local.getClientOrderId(), "PROTECT_CREATE", 55L)).thenReturn(true);
 
@@ -846,7 +846,7 @@ class ProtectionOrderServiceTest {
         when(dispatcher.activeDispatch(1L, "BTCUSDT")).thenReturn(
             new LiveOrderDispatcher.ActiveDispatch(1L, "BTCUSDT", "create-key", "PROTECT_CREATE", local.getClientOrderId(), "UNKNOWN", 55L));
         when(mapper.selectOne(any())).thenReturn(local);
-        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT")))
+        when(gateway.queryProtectionOrder(any(), eq(55L), eq(local.getClientOrderId()), eq("BTCUSDT"), any()))
             .thenReturn(snapshot(55L, local.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
         when(mapper.updateById(local)).thenReturn(0);
 
@@ -941,7 +941,7 @@ class ProtectionOrderServiceTest {
         when(mapper.selectList(any())).thenAnswer(call -> selectedStops(call, List.of(step)));
         when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
             call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
-        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any())).thenAnswer(call -> snapshot(66L, call.getArgument(2), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
+        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any(), any())).thenAnswer(call -> snapshot(66L, call.getArgument(2), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
 
         assertNotSame(step, service.ensureMarginHardStop(1L, position, new BigDecimal("0.1"), true));
 
@@ -969,7 +969,7 @@ class ProtectionOrderServiceTest {
         when(mapper.selectList(any())).thenAnswer(call -> selectedStops(call, List.of(hard)));
         when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
             call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
-        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any())).thenReturn(null);
+        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any(), any())).thenReturn(null);
 
         assertThrows(IllegalStateException.class, () -> service.syncStrategyProtections(1L, position, BigDecimal.ONE, List.of(stopSignal("STEP_TP", "100")), true));
 
@@ -983,7 +983,7 @@ class ProtectionOrderServiceTest {
         when(mapper.selectList(any())).thenAnswer(call -> selectedStops(call, List.of(hard)));
         when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
             call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
-        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderSnapshot(
+        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any(), any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderSnapshot(
             "BTCUSDT", 66L, call.getArgument(2), "NEW", "SELL", "BOTH", "TAKE_PROFIT_MARKET", new BigDecimal("0.5"), new BigDecimal("101"), Instant.now(), BigDecimal.ZERO));
         var first = new org.dromara.quant.strategy.ProtectionSignal("FIRST_TP", "TAKE_PROFIT_MARKET", new BigDecimal("0.5"),
             org.dromara.quant.strategy.ProtectionSignal.QuantityBase.INITIAL, new BigDecimal("101"), "first profit");
@@ -1028,10 +1028,10 @@ class ProtectionOrderServiceTest {
         var hard = scopedStop("HARD_STOP", "99");
         var first = scopedStop("FIRST_TP", "101");
         when(mapper.selectList(any())).thenReturn(List.of(hard, first));
-        when(gateway.queryProtectionOrder(any(), any(), eq(hard.getClientOrderId()), any())).thenReturn(
+        when(gateway.queryProtectionOrder(any(), any(), eq(hard.getClientOrderId()), any(), any())).thenReturn(
             snapshot(55L, hard.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO),
             snapshot(55L, hard.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
-        when(gateway.queryProtectionOrder(any(), any(), eq(first.getClientOrderId()), any())).thenReturn(
+        when(gateway.queryProtectionOrder(any(), any(), eq(first.getClientOrderId()), any(), any())).thenReturn(
             snapshot(56L, first.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
 
         assertTrue(service.prepareLocalExit(1L, position, "HARD_STOP"));
@@ -1045,9 +1045,9 @@ class ProtectionOrderServiceTest {
         var hard = scopedStop("HARD_STOP", "99");
         var step = scopedStop("STEP_TP", "101");
         when(mapper.selectList(any())).thenReturn(List.of(hard, step));
-        when(gateway.queryProtectionOrder(any(), any(), eq(hard.getClientOrderId()), any())).thenReturn(
+        when(gateway.queryProtectionOrder(any(), any(), eq(hard.getClientOrderId()), any(), any())).thenReturn(
             snapshot(55L, hard.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
-        when(gateway.queryProtectionOrder(any(), any(), eq(step.getClientOrderId()), any())).thenReturn(
+        when(gateway.queryProtectionOrder(any(), any(), eq(step.getClientOrderId()), any(), any())).thenReturn(
             snapshot(56L, step.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO),
             snapshot(56L, step.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
 
@@ -1076,7 +1076,7 @@ class ProtectionOrderServiceTest {
         when(mapper.selectList(any())).thenAnswer(call -> selectedStops(call, List.of(step)));
         when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
             call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
-        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any())).thenAnswer(call -> snapshot(66L, call.getArgument(2), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
+        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any(), any())).thenAnswer(call -> snapshot(66L, call.getArgument(2), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
         var hard = service.ensureMarginHardStop(1L, position, new BigDecimal("0.1"), true);
         assertEquals("HARD_STOP", hard.getProtectionType());
         verify(gateway).placeProtectionOrder(any());
@@ -1130,12 +1130,12 @@ class ProtectionOrderServiceTest {
         old.setQuantity(new BigDecimal(exchangeFilled));
         old.setExecutedQuantity(new BigDecimal(exchangeFilled));
         when(mapper.selectList(any())).thenAnswer(call -> selectedStops(call, List.of(old)));
-        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any())).thenReturn(new ExchangeGateway.ProtectionOrderSnapshot(
+        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any(), any())).thenReturn(new ExchangeGateway.ProtectionOrderSnapshot(
             "BTCUSDT", 55L, old.getClientOrderId(), "FINISHED", "SELL", "BOTH", "TAKE_PROFIT_MARKET", old.getQuantity(),
             new BigDecimal("101"), Instant.now(), new BigDecimal(exchangeFilled)));
         when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
             call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
-        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderSnapshot(
+        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any(), any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderSnapshot(
             "BTCUSDT", 66L, call.getArgument(2), "NEW", "SELL", "BOTH", "TAKE_PROFIT_MARKET", new BigDecimal("0.5"),
             new BigDecimal("101"), Instant.now(), BigDecimal.ZERO));
         var first = new org.dromara.quant.strategy.ProtectionSignal("FIRST_TP", "TAKE_PROFIT_MARKET", new BigDecimal("0.5"),
@@ -1163,12 +1163,12 @@ class ProtectionOrderServiceTest {
             }
             return selectedStops(call, List.of(old));
         });
-        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any())).thenReturn(new ExchangeGateway.ProtectionOrderSnapshot(
+        when(gateway.queryProtectionOrder(any(), eq(55L), any(), any(), any())).thenReturn(new ExchangeGateway.ProtectionOrderSnapshot(
             "BTCUSDT", 55L, old.getClientOrderId(), "NEW", "SELL", "BOTH", "TAKE_PROFIT_MARKET", BigDecimal.ONE,
             new BigDecimal("101"), Instant.now(), BigDecimal.ZERO));
         when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
             call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
-        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderSnapshot(
+        when(gateway.queryProtectionOrder(any(), eq(66L), any(), any(), any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderSnapshot(
             "BTCUSDT", 66L, call.getArgument(2), "NEW", "SELL", "BOTH", "TAKE_PROFIT_MARKET", BigDecimal.ONE,
             new BigDecimal("101"), Instant.now(), BigDecimal.ZERO));
         var first = new org.dromara.quant.strategy.ProtectionSignal("FIRST_TP", "TAKE_PROFIT_MARKET", new BigDecimal("0.5"),
