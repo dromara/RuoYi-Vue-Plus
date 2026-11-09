@@ -2442,6 +2442,7 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
                         Thread.sleep(Math.max(0, properties.getProtection().getConfirmationWaitMillis()));
                     }
                     java.util.concurrent.Future<?> inFlightProtection = runtime.protectionTask;
+                    // forceHardStop 仅由 Binance -2021 明确拒绝触发：本轮保护请求已明确未建立，且已跳过后续保护单提交。
                     if (inFlightProtection != null && !forceHardStop) {
                         try {
                             inFlightProtection.get(Math.max(1, properties.getProtection().getSyncWaitMillis()), java.util.concurrent.TimeUnit.MILLISECONDS);
