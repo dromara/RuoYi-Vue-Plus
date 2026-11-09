@@ -2442,7 +2442,7 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
                         Thread.sleep(Math.max(0, properties.getProtection().getConfirmationWaitMillis()));
                     }
                     java.util.concurrent.Future<?> inFlightProtection = runtime.protectionTask;
-                    if (inFlightProtection != null) {
+                    if (inFlightProtection != null && !forceHardStop) {
                         try {
                             inFlightProtection.get(Math.max(1, properties.getProtection().getSyncWaitMillis()), java.util.concurrent.TimeUnit.MILLISECONDS);
                         } catch (java.util.concurrent.ExecutionException ex) { /* 失败事实由保护任务记录，兜底继续精确核验。 */ } catch (java.util.concurrent.TimeoutException ex) {
