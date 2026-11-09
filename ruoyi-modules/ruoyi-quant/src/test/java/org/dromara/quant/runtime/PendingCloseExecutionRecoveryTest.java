@@ -5,14 +5,33 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PendingCloseExecutionRecoveryTest {
     private static final Instant FROM = Instant.parse("2026-11-09T02:00:00Z");
     private static final Instant TO = Instant.parse("2026-11-09T03:00:00Z");
+
+    @Test
+    void prefersEpochPendingOrderTimeOverExecutionLocalDateTime() {
+        Instant expected = Instant.ofEpochMilli(1794163595403L);
+        LocalDateTime executionCreatedAt = LocalDateTime.of(2026, 11, 8, 18, 46, 36);
+
+        assertEquals(expected, StrategyRuntimeService.resolveCloseProofStartTime(1794163595403L, executionCreatedAt));
+    }
+
+    @Test
+    void fallsBackToUtcExecutionCreatedAtWhenPendingEpochIsMissing() {
+        LocalDateTime executionCreatedAt = LocalDateTime.of(2026, 11, 8, 18, 46, 36);
+
+        assertEquals(executionCreatedAt.toInstant(ZoneOffset.UTC),
+            StrategyRuntimeService.resolveCloseProofStartTime(null, executionCreatedAt));
+    }
 
     @Test
     void provesShortPositionClosedByExactBuyFillQuantity() {
