@@ -37,4 +37,12 @@ public class StrategyRuntimeScheduler {
     public void reconcilePositions() {
         runtime.reconcileRunningPositions();
     }
+
+    /**
+     * 行情流异常时独立运行本地止盈止损价格兜底，不参与开仓决策。
+     */
+    @Scheduled(fixedDelay = 1000, initialDelay = 10000)
+    public void checkStaleMarketProtectionPrices() {
+        runtime.checkStaleMarketProtectionPrices();
+    }
 }
