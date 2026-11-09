@@ -496,8 +496,9 @@ public class StrategyRuntimeService {
                         Instant observedAt = snapshot == null ? null : snapshot.observedAt();
                         BigDecimal price = snapshot == null ? null : snapshot.lastTradePrice();
                         Instant completedAt = Instant.now();
+                        Instant exchangeNow = completedAt.plusMillis(gateway.exchangeTimeOffsetMillis(runtime.credential.getRunMode()));
                         long snapshotAgeMillis = observedAt == null ? Long.MAX_VALUE
-                            : java.time.Duration.between(observedAt, completedAt).toMillis();
+                            : java.time.Duration.between(observedAt, exchangeNow).toMillis();
                         if (snapshot == null || !runtime.symbol.getSymbol().equalsIgnoreCase(snapshot.symbol())
                             || price == null || price.signum() <= 0 || observedAt == null
                             || requestDurationMillis > maxEventAgeMillis || snapshotAgeMillis < 0 || snapshotAgeMillis > maxEventAgeMillis) {
@@ -514,9 +515,8 @@ public class StrategyRuntimeService {
                                 return;
                             }
                             updateRuntimeMaximumReturnRate(runtime, price);
-                            long offsetMillis = gateway.exchangeTimeOffsetMillis(runtime.credential.getRunMode());
                             ExchangeGateway.MarketEvent event = new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
-                                runtime.strategySymbol.getIntervalCode(), price, null, observedAt.plusMillis(offsetMillis));
+                                runtime.strategySymbol.getIntervalCode(), price, null, observedAt);
                             context = buildContext(runtime, price, event);
                         }
                         // 只调用退出判断，不进入 evaluate()，因此不会触发开仓或普通策略信号。
