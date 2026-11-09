@@ -2056,8 +2056,10 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
              runtime.position.getEntryPrice(), leverage, openRatio, signal.get().reason());
             log.info("实时策略开仓 instanceId={} symbol={} direction={} price={} quantity={} reason={}", runtime.instance.getId(), runtime.symbol.getSymbol(), direction,
              context.currentPrice(), quantity, signal.get().reason());
-            // 开仓成交后先用最新行情检查本地镜像止损，避免提交已穿价的 Binance 条件单。
-            evaluateExit(runtime, openedContext);
+            // kline_slope_rate 开仓成交后先检查本地镜像保护，避免提交已穿价的 Binance 条件单。
+            if (runtime.plugin instanceof KlineSlopeRateStrategy) {
+                evaluateExit(runtime, openedContext);
+            }
             if (!runtime.exitCoordinating.get()) {
                 syncPluginProtections(runtime, openedContext);   // 内部会 requestProtectionSync(runtime, true)
             }
