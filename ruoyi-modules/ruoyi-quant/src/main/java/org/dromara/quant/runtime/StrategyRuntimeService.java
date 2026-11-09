@@ -4136,6 +4136,12 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
             return new ProtectionCleanupResult(false, false);
         }
         boolean cleaned = protectionOrderService.cancelActiveProtectionOrders(runtime.credential.getId(), positionId, cycleKey, live);
+        if (cleaned && live) {
+            // Local journal cleanup alone cannot prove that no unmatched exchange-side algo order remains.
+            List<ExchangeGateway.ProtectionOrderSnapshot> remaining = gateway.queryProtectionOrders(
+                executionService.toCredential(runtime.credential), runtime.symbol.getSymbol());
+            cleaned = remaining != null && remaining.isEmpty();
+        }
         return new ProtectionCleanupResult(true, cleaned);
     }
 
