@@ -589,6 +589,20 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
     }
 
     /**
+     * 行情流断开时的本地保护兜底只使用成交价，避免为标记价增加第二次 REST 请求。
+     */
+    @Override
+    public PriceSnapshot queryLastTradePrice(String runMode, String symbol) {
+        try {
+            String normalizedSymbol = symbol.trim();
+            JsonObject trade = publicJson(runMode, "/fapi/v2/ticker/price", normalizedSymbol);
+            return new PriceSnapshot(normalizedSymbol, jsonDecimal(trade, "price"), null, Instant.now());
+        } catch (RuntimeException ex) {
+            throw new IllegalStateException("查询 Binance 最新成交价失败", ex);
+        }
+    }
+
+    /**
      * SDK 12.1.1 的 ticker/mark oneOf 解码会返回 actualInstance=null；保留 SDK 的请求、代理和超时配置，按原始 JSON 读取。
      */
     private JsonObject publicJson(String runMode, String path, String symbol) {
