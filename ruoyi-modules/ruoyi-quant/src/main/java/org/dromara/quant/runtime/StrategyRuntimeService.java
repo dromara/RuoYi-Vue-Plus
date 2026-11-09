@@ -52,6 +52,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -2044,7 +2045,7 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             freezeOrderEntryPrice(state, filledOpen);
             state.setStatus("OPEN");
             if (state.getOpenedAt() == null) {
-                state.setOpenedAt(LocalDateTime.now());
+                state.setOpenedAt(LocalDateTime.now(ZoneId.of("Asia/Shanghai")));
             }
             clearPending(state);
             stateService.save(state);
@@ -2948,9 +2949,10 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
         // pendingOrderTime is an epoch-millisecond timestamp captured immediately before dispatch.
         // Prefer it over LocalDateTime from the execution row, whose JDBC/session timezone mapping
         // can shift the apparent instant even though the database value looks correct.
-        Instant from = resolveCloseProofStartTime(expectedState.getPendingOrderTime(),
+        Instant from = resolveCloseProofStartTime(expectedState.getOpenedAt(), expectedState.getPendingOrderTime(),
             execution == null ? null : execution.getCreatedAt());
-        String closeProofTimeSource = pendingOrderInstant != null ? "PENDING_ORDER_EPOCH"
+        String closeProofTimeSource = expectedState.getOpenedAt() != null ? "POSITION_OPENED_AT_SHANGHAI_MINUS_60S"
+            : pendingOrderInstant != null ? "PENDING_ORDER_EPOCH"
             : executionCreatedAtInstant != null ? "EXECUTION_CREATED_AT_UTC" : "MISSING";
         Instant to = Instant.now();
         long closeProofWindowAgeMillis = from == null ? -1L : to.toEpochMilli() - from.toEpochMilli();
@@ -2977,8 +2979,10 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                     } else {
                         List<ExchangeGateway.TradeSnapshot> trades = gateway.queryTrades(credential, runtime.symbol.getSymbol(),
                             new ExchangeGateway.TimeRange(from, to));
+                        BigDecimal expectedCycleQuantity = expectedState.getInitialPositionQty() != null
+                            ? expectedState.getInitialPositionQty() : expectedState.getPositionQty();
                         CloseProofResult proof = evaluatePendingCloseProof(runtime.symbol.getSymbol(), expectedDirection,
-                            expectedState.getPositionQty(), positionMode, trades, from, to);
+                            expectedCycleQuantity, positionMode, trades, from, to);
                         closedCloseProven = proof.proven();
                         closeProofReason = proof.reason();
                         closeProofTradeCount = proof.tradeCount();
@@ -3109,29 +3113,46 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
      * 证明未知退出订单对应的仓位已由交易所成交记录完全平掉。
      * Binance 成交接口单次最多返回 1000 条；达到上限视为可能截断，不作为恢复依据。
      */
-    static Instant resolveCloseProofStartTime(Long pendingOrderTime, java.time.LocalDateTime executionCreatedAt) {
-        if (pendingOrderTime != null && pendingOrderTime > 0) {
-            return Instant.ofEpochMilli(pendingOrderTime);
+    static Instant resolveCloseProofStartTime(LocalDateTime openedAt, Long pendingOrderTime,
+                                                 LocalDateTime executionCreatedAt) {
+        Instant openedAtInstant = openedAt == null ? null
+            : openedAt.minusSeconds(60).atZone(ZoneId.of("Asia/Shanghai")).toInstant();
+        Instant pendingInstant = pendingOrderTime == null || pendingOrderTime <= 0 ? null
+            : Instant.ofEpochMilli(pendingOrderTime);
+        if (openedAtInstant != null && pendingInstant != null) {
+            return openedAtInstant.isBefore(pendingInstant) ? openedAtInstant : pendingInstant;
+        }
+        if (openedAtInstant != null) {
+            return openedAtInstant;
+        }
+        if (pendingInstant != null) {
+            return pendingInstant;
         }
         return executionCreatedAt == null ? null : executionCreatedAt.toInstant(java.time.ZoneOffset.UTC);
     }
 
-    static boolean closedPendingCloseProven(String symbol, String direction, BigDecimal beforeQuantity,
+    static boolean closedPendingCloseProven(String symbol, String direction, BigDecimal expectedCycleQuantity,
                                             ExchangeGateway.PositionMode positionMode,
                                             List<ExchangeGateway.TradeSnapshot> trades, Instant from, Instant to) {
-        return evaluatePendingCloseProof(symbol, direction, beforeQuantity, positionMode, trades, from, to).proven();
+        return evaluatePendingCloseProof(symbol, direction, expectedCycleQuantity, positionMode, trades, from, to).proven();
     }
 
-    static CloseProofResult evaluatePendingCloseProof(String symbol, String direction, BigDecimal beforeQuantity,
+    static CloseProofResult evaluatePendingCloseProof(String symbol, String direction, BigDecimal expectedCycleQuantity,
                                                        ExchangeGateway.PositionMode positionMode,
                                                        List<ExchangeGateway.TradeSnapshot> trades, Instant from, Instant to) {
         if (symbol == null || symbol.isBlank() || !Set.of("LONG", "SHORT").contains(direction == null ? "" : direction)
-            || beforeQuantity == null || beforeQuantity.signum() <= 0 || positionMode == null
-            || trades == null || trades.isEmpty() || from == null || to == null || from.isAfter(to)) {
-            return new CloseProofResult(false, "INVALID_OR_EMPTY_INPUT", trades == null ? 0 : trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+            || expectedCycleQuantity == null || expectedCycleQuantity.signum() <= 0 || positionMode == null
+            || from == null || to == null || from.isAfter(to)) {
+            return new CloseProofResult(false, "INVALID_INPUT", trades == null ? 0 : trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        }
+        if (trades == null) {
+            return new CloseProofResult(false, "TRADE_HISTORY_NULL", 0, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        }
+        if (trades.isEmpty()) {
+            return new CloseProofResult(false, "TRADE_HISTORY_EMPTY", 0, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         }
         if (trades.size() >= 1000) {
-            return new CloseProofResult(false, "TRADE_HISTORY_SATURATED", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+            return new CloseProofResult(false, "TRADE_HISTORY_SATURATED", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         }
         Set<Long> seen = new HashSet<>();
         List<ExchangeGateway.TradeSnapshot> relevant = new ArrayList<>();
@@ -3140,44 +3161,54 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                 || trade.time() == null || trade.time().isBefore(from) || trade.time().isAfter(to)
                 || !symbol.equalsIgnoreCase(trade.symbol()) || trade.quantity() == null || trade.quantity().signum() <= 0
                 || !("BUY".equalsIgnoreCase(trade.side()) || "SELL".equalsIgnoreCase(trade.side()))) {
-                return new CloseProofResult(false, "INVALID_OR_DUPLICATE_TRADE", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+                return new CloseProofResult(false, "INVALID_OR_DUPLICATE_TRADE", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
             }
             if (positionMode.hedgeMode()) {
                 if (trade.positionSide() == null || trade.positionSide().isBlank()) {
-                    return new CloseProofResult(false, "HEDGE_POSITION_SIDE_MISSING", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+                    return new CloseProofResult(false, "HEDGE_POSITION_SIDE_MISSING", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                 }
                 if (!direction.equalsIgnoreCase(trade.positionSide())) {
                     continue;
                 }
             } else if (trade.positionSide() != null && !trade.positionSide().isBlank()
                 && !"BOTH".equalsIgnoreCase(trade.positionSide())) {
-                return new CloseProofResult(false, "ONE_WAY_POSITION_SIDE_MISMATCH", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+                return new CloseProofResult(false, "ONE_WAY_POSITION_SIDE_MISMATCH", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
             }
             relevant.add(trade);
         }
         if (relevant.isEmpty()) {
-            return new CloseProofResult(false, "NO_RELEVANT_TRADES", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+            return new CloseProofResult(false, "NO_RELEVANT_TRADES", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         }
-        String closeSide = "LONG".equals(direction) ? "SELL" : "BUY";
+        String increaseSide = "LONG".equals(direction) ? "BUY" : "SELL";
         BigDecimal closeQuantity = BigDecimal.ZERO;
         BigDecimal increaseQuantity = BigDecimal.ZERO;
-        BigDecimal remaining = beforeQuantity;
+        BigDecimal remaining = BigDecimal.ZERO;
+        BigDecimal maximumExposure = BigDecimal.ZERO;
         List<ExchangeGateway.TradeSnapshot> ordered = relevant.stream()
             .sorted(Comparator.comparing(ExchangeGateway.TradeSnapshot::time).thenComparing(ExchangeGateway.TradeSnapshot::tradeId)).toList();
         for (ExchangeGateway.TradeSnapshot trade : ordered) {
-            if (closeSide.equalsIgnoreCase(trade.side())) {
+            if (increaseSide.equalsIgnoreCase(trade.side())) {
+                increaseQuantity = increaseQuantity.add(trade.quantity());
+                remaining = remaining.add(trade.quantity());
+                maximumExposure = maximumExposure.max(remaining);
+            } else {
                 closeQuantity = closeQuantity.add(trade.quantity());
                 remaining = remaining.subtract(trade.quantity());
                 if (remaining.signum() < 0) {
-                    return new CloseProofResult(false, "CLOSE_QUANTITY_EXCEEDS_POSITION", trades.size(), closeQuantity, increaseQuantity, remaining);
+                    return new CloseProofResult(false, "CLOSE_QUANTITY_EXCEEDS_POSITION", trades.size(),
+                        closeQuantity, increaseQuantity, remaining);
                 }
-            } else {
-                increaseQuantity = increaseQuantity.add(trade.quantity());
-                remaining = remaining.add(trade.quantity());
             }
         }
-        return new CloseProofResult(remaining.signum() == 0, remaining.signum() == 0 ? "PROVEN" : "NET_POSITION_NOT_ZERO",
-            trades.size(), closeQuantity, increaseQuantity, remaining);
+        if (remaining.signum() != 0) {
+            return new CloseProofResult(false, "NET_POSITION_NOT_ZERO", trades.size(),
+                closeQuantity, increaseQuantity, remaining);
+        }
+        if (maximumExposure.compareTo(expectedCycleQuantity) < 0) {
+            return new CloseProofResult(false, "OPEN_QUANTITY_NOT_REACHED", trades.size(),
+                closeQuantity, increaseQuantity, remaining);
+        }
+        return new CloseProofResult(true, "PROVEN", trades.size(), closeQuantity, increaseQuantity, remaining);
     }
 
     record CloseProofResult(boolean proven, String reason, int tradeCount, BigDecimal closeQuantity,
