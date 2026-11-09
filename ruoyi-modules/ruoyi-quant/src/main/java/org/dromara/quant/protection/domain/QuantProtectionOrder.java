@@ -38,6 +38,8 @@ public class QuantProtectionOrder {
      * 所属保护目标版本。
      */
     private Long targetVersion;
+    /** 本地保护意图首次持久化时间，Unix epoch 毫秒；历史数据为空时不得推断订单不存在。 */
+    private Long createdAtEpochMillis;
     /**
      * 保护意图覆盖的最高台阶，非阶梯保护为0。
      */
