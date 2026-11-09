@@ -145,6 +145,30 @@ class PendingCloseExecutionRecoveryTest {
     }
 
     @Test
+    void distinguishesEmptyAndNullTradeHistory() {
+        var empty = StrategyRuntimeService.evaluatePendingCloseProof(
+            "JCTUSDT", "SHORT", BigDecimal.ONE, new ExchangeGateway.PositionMode(false), List.of(), FROM, TO);
+        var missing = StrategyRuntimeService.evaluatePendingCloseProof(
+            "JCTUSDT", "SHORT", BigDecimal.ONE, new ExchangeGateway.PositionMode(false), null, FROM, TO);
+
+        assertEquals("TRADE_HISTORY_EMPTY", empty.reason());
+        assertEquals("TRADE_HISTORY_NULL", missing.reason());
+    }
+
+    @Test
+    void rejectsHistoryThatNeverReachesTheRecordedInitialPositionQuantity() {
+        var trades = List.of(
+            tradeAt(1L, "SELL", "0.5", "BOTH", FROM.plusSeconds(1)),
+            tradeAt(2L, "BUY", "0.5", "BOTH", FROM.plusSeconds(2)));
+
+        var proof = StrategyRuntimeService.evaluatePendingCloseProof(
+            "JCTUSDT", "SHORT", BigDecimal.ONE, new ExchangeGateway.PositionMode(false), trades, FROM, TO);
+
+        assertFalse(proof.proven());
+        assertEquals("OPEN_QUANTITY_NOT_REACHED", proof.reason());
+    }
+
+    @Test
     void rejectsTruncatedOrOutOfWindowTradeHistory() {
         var truncated = java.util.stream.LongStream.range(0, 1000)
             .mapToObj(id -> trade(id, "BUY", "0.001", "BOTH")).toList();
