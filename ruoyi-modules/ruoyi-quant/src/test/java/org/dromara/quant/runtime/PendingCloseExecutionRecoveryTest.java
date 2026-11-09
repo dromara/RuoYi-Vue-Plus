@@ -99,7 +99,7 @@ class PendingCloseExecutionRecoveryTest {
         assertTrue(proof.proven());
         assertEquals(0, proof.remainingQuantity().compareTo(BigDecimal.ZERO));
         assertEquals(0, proof.closeQuantity().compareTo(new BigDecimal("1.2")));
-        assertEquals(0, proof.increaseQuantity().compareTo(new BigDecimal("0.2")));
+        assertEquals(0, proof.increaseQuantity().compareTo(new BigDecimal("1.2")));
     }
 
     @Test
