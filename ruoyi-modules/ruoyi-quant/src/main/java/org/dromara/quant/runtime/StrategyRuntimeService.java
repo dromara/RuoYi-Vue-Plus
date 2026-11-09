@@ -2933,6 +2933,29 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                 }
             }
         }
+        boolean closedCloseProven = false;
+        if (order == null && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0))
+            && snapshots != null && snapshots.stream().allMatch(p -> p.quantity() != null && p.quantity().signum() == 0)
+            && expectedState.getPositionQty() != null && expectedState.getPositionQty().signum() > 0
+            && expectedState.getPendingOrderTime() != null) {
+            try {
+                Instant from = Instant.ofEpochMilli(expectedState.getPendingOrderTime());
+                Instant to = Instant.now();
+                ExchangeGateway.PositionMode positionMode = gateway.queryPositionMode(credential);
+                List<ExchangeGateway.OrderSnapshot> openOrders = gateway.queryOrders(credential, runtime.symbol.getSymbol());
+                List<ExchangeGateway.ProtectionOrderSnapshot> protections = gateway.queryProtectionOrders(credential, runtime.symbol.getSymbol());
+                if (from.isAfter(to.minusSeconds(6 * 24 * 3600L)) && !from.isAfter(to)
+                    && positionMode != null && openOrders != null && protections != null && openOrders.isEmpty()) {
+                    List<ExchangeGateway.TradeSnapshot> trades = gateway.queryTrades(credential, runtime.symbol.getSymbol(),
+                        new ExchangeGateway.TimeRange(from, to));
+                    closedCloseProven = closedPendingCloseProven(runtime.symbol.getSymbol(), expectedDirection,
+                        expectedState.getPositionQty(), positionMode, trades, from, to);
+                }
+            } catch (RuntimeException ex) {
+                // Any incomplete exchange read leaves the close UNKNOWN; a failed read is never a flat-position proof.
+                orderQueryFailure = "closeFlatProof " + ex.getClass().getSimpleName();
+            }
+        }
         runtime.lastPendingOrderQueryFailure = orderQueryFailure;
         if (decisionLogs != null && order != null) {
             decisionLogs.order(runtime.credential.getId(), order);
@@ -2945,7 +2968,7 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             if (!leaseService.acquireOrRenew(runtime.instance.getId(), runtime.credential.getId(), runtime.symbol.getSymbol())) {
                 return true;
             }
-            return applyPendingExecution(runtime, execution, order, snapshots, closedOpenProven);
+            return applyPendingExecution(runtime, execution, order, snapshots, closedOpenProven, closedCloseProven);
         }
     }
 
@@ -3032,6 +3055,41 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
     }
 
     /**
+     * 证明未知退出订单对应的仓位已由交易所成交记录完全平掉。
+     * Binance 成交接口单次最多返回 1000 条；达到上限视为可能截断，不作为恢复依据。
+     */
+    static boolean closedPendingCloseProven(String symbol, String direction, BigDecimal beforeQuantity,
+                                            ExchangeGateway.PositionMode positionMode,
+                                            List<ExchangeGateway.TradeSnapshot> trades, Instant from, Instant to) {
+        if (symbol == null || symbol.isBlank() || !Set.of("LONG", "SHORT").contains(direction == null ? "" : direction)
+            || beforeQuantity == null || beforeQuantity.signum() <= 0 || positionMode == null
+            || trades == null || trades.isEmpty() || trades.size() >= 1000 || from == null || to == null || from.isAfter(to)) {
+            return false;
+        }
+        String closeSide = "LONG".equals(direction) ? "SELL" : "BUY";
+        Set<Long> seen = new HashSet<>();
+        BigDecimal closedQuantity = BigDecimal.ZERO;
+        for (ExchangeGateway.TradeSnapshot trade : trades) {
+            if (trade == null || trade.tradeId() == null || !seen.add(trade.tradeId()) || trade.orderId() == null
+                || trade.time() == null || trade.time().isBefore(from) || trade.time().isAfter(to)
+                || !symbol.equalsIgnoreCase(trade.symbol()) || !closeSide.equalsIgnoreCase(trade.side())
+                || trade.quantity() == null || trade.quantity().signum() <= 0) {
+                return false;
+            }
+            if (positionMode.hedgeMode()) {
+                if (!direction.equalsIgnoreCase(trade.positionSide())) {
+                    return false;
+                }
+            } else if (trade.positionSide() != null && !"BOTH".equalsIgnoreCase(trade.positionSide())
+                && !direction.equalsIgnoreCase(trade.positionSide())) {
+                return false;
+            }
+            closedQuantity = closedQuantity.add(trade.quantity());
+        }
+        return closedQuantity.compareTo(beforeQuantity) == 0;
+    }
+
+    /**
      * 完整单向开平仓成交证明；不接受缺失、截断或其他开仓订单混入的历史。
      */
     private boolean closedPendingOpenProven(ExchangeGateway.OrderSnapshot order, String direction, List<ExchangeGateway.TradeSnapshot> trades) {
@@ -3082,6 +3140,12 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
 
     private boolean applyPendingExecution(ActiveRuntime runtime, QuantExecutionRecord execution, ExchangeGateway.OrderSnapshot order,
                                           List<ExchangeGateway.PositionSnapshot> snapshots, boolean closedOpenProven) {
+        return applyPendingExecution(runtime, execution, order, snapshots, closedOpenProven, false);
+    }
+
+    private boolean applyPendingExecution(ActiveRuntime runtime, QuantExecutionRecord execution, ExchangeGateway.OrderSnapshot order,
+                                          List<ExchangeGateway.PositionSnapshot> snapshots, boolean closedOpenProven,
+                                          boolean closedCloseProven) {
         if (!runtime.hasPendingAction() || runtime.state == null) {
             return false;
         }
@@ -3132,6 +3196,41 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             return true;
         }
         if (order == null) {
+            if (closedCloseProven && snapshots != null && snapshots.stream().allMatch(p -> p.quantity() != null && p.quantity().signum() == 0)) {
+                // 仅在账户空仓、完整成交数量与原持仓完全吻合且普通活动订单为空后，才允许结束未知退出。
+                if (!cancelStaleProtection(runtime)) {
+                    return true;
+                }
+                try {
+                    List<ExchangeGateway.ProtectionOrderSnapshot> remainingProtections =
+                        gateway.queryProtectionOrders(credential, runtime.symbol.getSymbol());
+                    if (remainingProtections == null || !remainingProtections.isEmpty()) {
+                        runtime.protectionCleanupPending = true;
+                        runtime.state.setRecoveryRequired(true);
+                        runtime.state.setUnsafeRecovery(true);
+                        stateService.save(runtime.state);
+                        log.warn("未知退出已核实空仓，但交易所仍有活动保护单，继续阻断策略 instanceId={} symbol={} remainingProtections={}",
+                            runtime.instance.getId(), runtime.symbol.getSymbol(), remainingProtections == null ? "UNKNOWN" : remainingProtections.size());
+                        return true;
+                    }
+                } catch (RuntimeException ex) {
+                    runtime.protectionCleanupPending = true;
+                    runtime.state.setRecoveryRequired(true);
+                    runtime.state.setUnsafeRecovery(true);
+                    stateService.save(runtime.state);
+                    log.warn("未知退出已核实空仓，但保护单最终核查失败，继续阻断策略 instanceId={} symbol={} errorType={}",
+                        runtime.instance.getId(), runtime.symbol.getSymbol(), ex.getClass().getSimpleName());
+                    return true;
+                }
+                runtime.position = null;
+                blockCloseCandleAtExchangeTime(runtime, Instant.now());
+                stateService.markClosed(runtime.state);
+                runtime.state = stateService.findByInstance(runtime.instance.getId());
+                log.warn("未知退出恢复完成：交易所空仓、成交数量匹配且无活动订单/保护单 instanceId={} symbol={} pendingAction={} positionQty={}",
+                    runtime.instance.getId(), runtime.symbol.getSymbol(), runtime.state == null ? null : runtime.state.getPendingAction(),
+                    expectedState.getPositionQty());
+                return true;
+            }
             if (snapshots != null && !snapshots.isEmpty()) {
                 // 查不到订单不代表没有敞口：刷新实际持仓，外层继续挂载硬止损，保留待确认身份。
                 runtime.position = loadPosition(runtime.credential, runtime.symbol.getSymbol(), credential, snapshots);
