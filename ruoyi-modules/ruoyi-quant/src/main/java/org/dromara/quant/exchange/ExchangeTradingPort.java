@@ -39,6 +39,12 @@ public interface ExchangeTradingPort {
         return queryProtectionOrders(credential, symbol).stream().filter(item -> orderId != null && orderId.equals(item.algoId()) || clientOrderId != null && clientOrderId.equals(item.clientAlgoId())).findFirst().orElse(null);
     }
 
+    /** 带本地意图创建时间的精确查询；网关无法证明历史完整时必须返回未知。 */
+    default ExchangeGateway.ProtectionOrderSnapshot queryProtectionOrder(ExchangeGateway.Credential credential, Long orderId, String clientOrderId, String symbol,
+                                                                          Long intentCreatedAtEpochMillis) {
+        return queryProtectionOrder(credential, orderId, clientOrderId, symbol);
+    }
+
     /**
      * 可安全展示的执行诊断，不保留 SDK 原始请求和异常。
      */
