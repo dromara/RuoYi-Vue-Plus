@@ -2934,8 +2934,8 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             }
         }
         boolean closedCloseProven = false;
-        if (order == null && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0))
-            && snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol())
+        if (order == null && "TESTNET".equalsIgnoreCase(runtime.credential.getRunMode())
+            && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0)) && snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol())
                 && p.quantity() != null && p.quantity().signum() == 0)
             && expectedState.getPositionQty() != null && expectedState.getPositionQty().signum() > 0
             && expectedState.getPendingOrderTime() != null) {
