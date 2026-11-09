@@ -67,6 +67,14 @@ public interface ExchangeMarketPort {
         return queryPrice(symbol);
     }
 
+    /**
+     * 查询最新成交价；策略保护兜底不需要额外请求标记价格。
+     */
+    default ExchangeGateway.PriceSnapshot queryLastTradePrice(String runMode, String symbol) {
+        ExchangeGateway.PriceSnapshot snapshot = queryPrice(runMode, symbol);
+        return snapshot == null ? null : new ExchangeGateway.PriceSnapshot(snapshot.symbol(), snapshot.lastTradePrice(), null, snapshot.observedAt());
+    }
+
     default ExchangeGateway.MarketStreamSession subscribeMarket(String runMode, String symbol, String interval, Consumer<ExchangeGateway.MarketEvent> listener) {
         requireSupportedMarket(runMode);
         return subscribeMarket(symbol, interval, listener);
