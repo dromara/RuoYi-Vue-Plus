@@ -1626,8 +1626,8 @@ public class ProtectionOrderService {
     }
 
     /**
-     * 本地兜底只停止首平委托，整仓止损继续留在交易所。精确核实整个周期的在途条件单与子订单，
-     * 触发中或结果未知时不允许补平；返回后仍须刷新持仓并由持久化派发门禁提交只减仓订单。
+     * 本地兜底接管时只撤销本次触发的同类型交易所保护单，其它保护继续保留。
+     * 精确核实整个周期的在途条件单与子订单；触发中或结果未知时不允许补平，返回后仍须刷新持仓并由持久化派发门禁提交只减仓订单。
      */
     public boolean prepareLocalExit(Long credentialId, QuantPosition position, String protectionType) {
         if (position == null || position.getId() == null || position.getProtectionCycleKey() == null) {
