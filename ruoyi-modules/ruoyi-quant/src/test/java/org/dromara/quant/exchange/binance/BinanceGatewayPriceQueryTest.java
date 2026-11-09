@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Tag("dev")
 class BinanceGatewayPriceQueryTest {
@@ -32,7 +33,7 @@ class BinanceGatewayPriceQueryTest {
             properties.getBinance().setBaseUrl("http://127.0.0.1:" + server.getAddress().getPort());
             var snapshot = new BinanceGatewayAdapter(properties).queryLastTradePrice("LIVE", "BTCUSDT");
             assertEquals("112345.6", snapshot.lastTradePrice().toPlainString());
-            assertEquals(null, snapshot.markPrice());
+            assertNull(snapshot.markPrice());
         } finally {
             server.stop(0);
         }
