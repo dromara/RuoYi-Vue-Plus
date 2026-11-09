@@ -1123,6 +1123,32 @@ class ProtectionOrderServiceTest {
     }
 
     @Test
+    void replacesStepTakeProfitWithRemainingPositionQuantityAfterPartialExit() {
+        position.setQuantity(new BigDecimal("0.8"));
+        var old = scopedStop("STEP_TP", "105");
+        old.setClientOrderId("QSTEP_old");
+        old.setQuantity(BigDecimal.ONE);
+        old.setStepIndex(1);
+        java.util.concurrent.atomic.AtomicInteger oldOrderQueries = new java.util.concurrent.atomic.AtomicInteger();
+        when(mapper.selectList(any())).thenAnswer(call -> "WORKING".equals(old.getStatus()) ? List.of(old) : List.of());
+        when(gateway.queryProtectionOrder(any(), any(), any(), any(), any())).thenAnswer(call -> {
+            String clientOrderId = call.getArgument(2);
+            boolean previous = old.getClientOrderId().equals(clientOrderId);
+            boolean firstQuery = !previous || oldOrderQueries.getAndIncrement() == 0;
+            return new ExchangeGateway.ProtectionOrderSnapshot("BTCUSDT", previous ? 55L : 66L, clientOrderId,
+                previous && !firstQuery ? "CANCELED" : "NEW", "SELL", "BOTH", "STOP_MARKET",
+                previous ? BigDecimal.ONE : new BigDecimal("0.8"), new BigDecimal("105"), Instant.now(), BigDecimal.ZERO);
+        });
+        when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
+            call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
+
+        service.syncStrategyProtections(1L, position, BigDecimal.ONE, List.of(stopSignal("STEP_TP", "105")), null, true);
+
+        verify(gateway).placeProtectionOrder(argThat(request -> new BigDecimal("0.8").compareTo(request.quantity()) == 0));
+        assertEquals("CANCELED", old.getStatus());
+    }
+
+    @Test
     void unifiedStopPriceRoundsLongUpAndKeepsLegacyFloor() {
         position.setEntryPrice(new BigDecimal("100.003"));
         position.setLeverage(5);
