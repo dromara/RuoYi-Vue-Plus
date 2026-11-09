@@ -181,6 +181,47 @@ class BinanceGatewayAdapterTest {
     }
 
     @Test
+    void splitsSaturatedTradeHistoryWindowsUntilEachWindowIsBelowLimit() {
+        var queried = new java.util.ArrayList<String>();
+        var result = BinanceGatewayAdapter.collectCompleteTradeHistory(0L, 3L, (start, end) -> {
+            queried.add(start + ":" + end);
+            if (end - start >= 1) {
+                return java.util.Collections.nCopies(1000, trade(start + 1000, "BUY"));
+            }
+            return List.of(trade(start + 1, "BUY"));
+        });
+
+        assertTrue(result.complete());
+        assertEquals(4, result.trades().size());
+        assertEquals(7, result.queryCount());
+        assertEquals(List.of("0:3", "0:1", "0:0", "1:1", "2:3", "2:2", "3:3"), queried);
+    }
+
+    @Test
+    void keepsTradeHistoryIncompleteWhenSingleMillisecondWindowIsStillSaturated() {
+        var result = BinanceGatewayAdapter.collectCompleteTradeHistory(100L, 100L,
+            (start, end) -> java.util.Collections.nCopies(1000, trade(start, "BUY")));
+
+        assertFalse(result.complete());
+        assertTrue(result.trades().isEmpty());
+    }
+
+    @Test
+    void rejectsDuplicateTradeIdsAcrossTradeHistoryWindows() {
+        var duplicate = trade(1L, "BUY");
+        var result = BinanceGatewayAdapter.collectCompleteTradeHistory(0L, 1L,
+            (start, end) -> end - start >= 1 ? java.util.Collections.nCopies(1000, duplicate) : List.of(duplicate));
+
+        assertFalse(result.complete());
+        assertTrue(result.trades().isEmpty());
+    }
+
+    private static ExchangeGateway.TradeSnapshot trade(long id, String side) {
+        return new ExchangeGateway.TradeSnapshot("JCTUSDT", id, id + 10, side, java.math.BigDecimal.ONE,
+            java.math.BigDecimal.ONE, java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO, Instant.ofEpochMilli(id), null, "BOTH");
+    }
+
+    @Test
     void latchesRestClosedWhenHttp418HasNoTrustworthyBanExpiry() {
         var adapter = new BinanceGatewayAdapter(new org.dromara.quant.config.QuantProperties());
         var apiException = new ApiException(418, "I'm a teapot", java.util.Map.of(),
