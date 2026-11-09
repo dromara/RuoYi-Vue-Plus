@@ -2941,16 +2941,31 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
         BigDecimal closeProofRemainingQuantity = expectedState.getPositionQty();
         boolean exchangeFlatSnapshot = snapshots != null && snapshots.stream().allMatch(p ->
             runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol()) && p.quantity() != null && p.quantity().signum() == 0);
+        Instant pendingOrderInstant = expectedState.getPendingOrderTime() == null ? null
+            : Instant.ofEpochMilli(expectedState.getPendingOrderTime());
+        Instant executionCreatedAtInstant = execution == null || execution.getCreatedAt() == null ? null
+            : execution.getCreatedAt().toInstant(java.time.ZoneOffset.UTC);
+        // pendingOrderTime is an epoch-millisecond timestamp captured immediately before dispatch.
+        // Prefer it over LocalDateTime from the execution row, whose JDBC/session timezone mapping
+        // can shift the apparent instant even though the database value looks correct.
+        Instant from = resolveCloseProofStartTime(expectedState.getPendingOrderTime(),
+            execution == null ? null : execution.getCreatedAt());
+        String closeProofTimeSource = pendingOrderInstant != null ? "PENDING_ORDER_EPOCH"
+            : executionCreatedAtInstant != null ? "EXECUTION_CREATED_AT_UTC" : "MISSING";
+        Instant to = Instant.now();
+        long closeProofWindowAgeMillis = from == null ? -1L : to.toEpochMilli() - from.toEpochMilli();
+        long closeProofCutoffEpochMillis = to.minusSeconds(6 * 24 * 3600L).toEpochMilli();
+        if (pendingOrderInstant != null && executionCreatedAtInstant != null
+            && Math.abs(pendingOrderInstant.toEpochMilli() - executionCreatedAtInstant.toEpochMilli()) > 60_000L) {
+            log.warn("待确认退出时间字段不一致，优先使用 epoch 时间 instanceId={} symbol={} pendingOrderTime={} executionCreatedAt={} differenceMillis={}",
+                runtime.instance.getId(), runtime.symbol.getSymbol(), pendingOrderInstant, executionCreatedAtInstant,
+                pendingOrderInstant.toEpochMilli() - executionCreatedAtInstant.toEpochMilli());
+        }
         if (order == null && "TESTNET".equalsIgnoreCase(runtime.credential.getRunMode())
             && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0)) && exchangeFlatSnapshot
-            && expectedState.getPositionQty() != null && expectedState.getPositionQty().signum() > 0
-            && (execution != null && execution.getCreatedAt() != null || expectedState.getPendingOrderTime() != null)) {
+            && expectedState.getPositionQty() != null && expectedState.getPositionQty().signum() > 0 && from != null) {
             try {
-                Instant from = execution != null && execution.getCreatedAt() != null
-                    ? execution.getCreatedAt().toInstant(java.time.ZoneOffset.UTC)
-                    : Instant.ofEpochMilli(expectedState.getPendingOrderTime());
-                Instant to = Instant.now();
-                if (!from.isAfter(to.minusSeconds(6 * 24 * 3600L)) && !from.isAfter(to)) {
+                if (from.toEpochMilli() >= closeProofCutoffEpochMillis && !from.isAfter(to)) {
                     ExchangeGateway.PositionMode positionMode = gateway.queryPositionMode(credential);
                     List<ExchangeGateway.OrderSnapshot> openOrders = gateway.queryOrders(credential, runtime.symbol.getSymbol());
                     if (positionMode == null) {
@@ -2982,14 +2997,15 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             closeProofReason = !exchangeFlatSnapshot ? "POSITION_NOT_CONFIRMED_FLAT"
                 : expectedState.getPositionQty() == null || expectedState.getPositionQty().signum() <= 0 ? "LOCAL_POSITION_QUANTITY_INVALID"
                 : expectedPending.get(0) == null || "OPEN".equalsIgnoreCase(String.valueOf(expectedPending.get(0))) ? "NOT_A_CLOSE_ACTION"
-                : "EXECUTION_TIME_MISSING";
+                : from == null ? "EXECUTION_TIME_MISSING" : "NOT_ELIGIBLE";
         }
         int closeProofConfirmations = expectedState.getPendingNotFoundConfirmations() == null ? 0 : expectedState.getPendingNotFoundConfirmations();
         if (order == null && "TESTNET".equalsIgnoreCase(runtime.credential.getRunMode()) && closeProofConfirmations % 6 == 0) {
-            log.warn("未知退出恢复核验诊断 instanceId={} symbol={} reason={} flatSnapshot={} tradeCount={} closeQty={} increaseQty={} remainingQty={} pendingOrderId={} clientOrderId={} executionId={}",
+            log.warn("未知退出恢复核验诊断 instanceId={} symbol={} reason={} flatSnapshot={} tradeCount={} closeQty={} increaseQty={} remainingQty={} pendingOrderId={} clientOrderId={} executionId={} timeSource={} pendingOrderTime={} executionCreatedAt={} from={} to={} cutoff={} windowAgeMillis={}",
                 runtime.instance.getId(), runtime.symbol.getSymbol(), closeProofReason, exchangeFlatSnapshot, closeProofTradeCount,
                 closeProofCloseQuantity, closeProofIncreaseQuantity, closeProofRemainingQuantity, orderId, clientOrderId,
-                execution == null ? null : execution.getId());
+                execution == null ? null : execution.getId(), closeProofTimeSource, pendingOrderInstant, executionCreatedAtInstant,
+                from, to, Instant.ofEpochMilli(closeProofCutoffEpochMillis), closeProofWindowAgeMillis);
         }
         runtime.lastPendingOrderQueryFailure = orderQueryFailure;
         if (decisionLogs != null && order != null) {
@@ -3093,6 +3109,13 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
      * 证明未知退出订单对应的仓位已由交易所成交记录完全平掉。
      * Binance 成交接口单次最多返回 1000 条；达到上限视为可能截断，不作为恢复依据。
      */
+    static Instant resolveCloseProofStartTime(Long pendingOrderTime, java.time.LocalDateTime executionCreatedAt) {
+        if (pendingOrderTime != null && pendingOrderTime > 0) {
+            return Instant.ofEpochMilli(pendingOrderTime);
+        }
+        return executionCreatedAt == null ? null : executionCreatedAt.toInstant(java.time.ZoneOffset.UTC);
+    }
+
     static boolean closedPendingCloseProven(String symbol, String direction, BigDecimal beforeQuantity,
                                             ExchangeGateway.PositionMode positionMode,
                                             List<ExchangeGateway.TradeSnapshot> trades, Instant from, Instant to) {
