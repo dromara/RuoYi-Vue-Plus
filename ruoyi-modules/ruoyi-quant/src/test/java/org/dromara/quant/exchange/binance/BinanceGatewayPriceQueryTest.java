@@ -23,6 +23,22 @@ class BinanceGatewayPriceQueryTest {
     }
 
     @Test
+    void queriesOnlyLastTradePriceForProtectionFallback() throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/fapi/v2/ticker/price", exchange -> respond(exchange, "{\"symbol\":\"BTCUSDT\",\"price\":\"112345.6\",\"time\":1750000000000}"));
+        server.start();
+        try {
+            QuantProperties properties = new QuantProperties();
+            properties.getBinance().setBaseUrl("http://127.0.0.1:" + server.getAddress().getPort());
+            var snapshot = new BinanceGatewayAdapter(properties).queryLastTradePrice("LIVE", "BTCUSDT");
+            assertEquals("112345.6", snapshot.lastTradePrice().toPlainString());
+            assertEquals(null, snapshot.markPrice());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
     void readsTickerV2AndMarkPriceThroughOfficialSdkModels() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext("/fapi/v2/ticker/price", exchange -> respond(exchange, "{\"symbol\":\"BTCUSDT\",\"price\":\"112345.6\",\"time\":1750000000000}"));
