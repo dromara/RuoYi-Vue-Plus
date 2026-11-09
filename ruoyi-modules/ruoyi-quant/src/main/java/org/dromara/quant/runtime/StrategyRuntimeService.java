@@ -547,12 +547,17 @@ public class StrategyRuntimeService {
     }
 
     private boolean isMarketPriceStale(ActiveRuntime runtime, Instant localNow, long maxAgeMillis) {
-        if (!runtime.marketHealthy || !runtime.marketStreamReady || runtime.latestTradeEventAt == null) {
+        Instant exchangeNow = localNow.plusMillis(gateway.exchangeTimeOffsetMillis(runtime.credential.getRunMode()));
+        return isMarketPriceStale(runtime.marketHealthy, runtime.marketStreamReady, runtime.latestTradeEventAt, exchangeNow, maxAgeMillis);
+    }
+
+    static boolean isMarketPriceStale(boolean marketHealthy, boolean marketStreamReady, Instant latestTradeEventAt, Instant exchangeNow,
+                                      long maxAgeMillis) {
+        if (!marketHealthy || !marketStreamReady || latestTradeEventAt == null) {
             return true;
         }
-        Instant exchangeNow = localNow.plusMillis(gateway.exchangeTimeOffsetMillis(runtime.credential.getRunMode()));
-        java.time.Duration age = java.time.Duration.between(runtime.latestTradeEventAt, exchangeNow);
-        return age.isNegative() || age.toMillis() > maxAgeMillis;
+        java.time.Duration age = java.time.Duration.between(latestTradeEventAt, exchangeNow);
+        return age.isNegative() || age.toMillis() > Math.max(1, maxAgeMillis);
     }
 
 
