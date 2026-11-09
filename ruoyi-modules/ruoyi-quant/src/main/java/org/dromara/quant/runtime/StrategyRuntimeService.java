@@ -514,7 +514,6 @@ public class StrategyRuntimeService {
                             if (!updateRuntimeExtrema(runtime, price)) {
                                 return;
                             }
-                            updateRuntimeMaximumReturnRate(runtime, price);
                             ExchangeGateway.MarketEvent event = new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
                                 runtime.strategySymbol.getIntervalCode(), price, null, observedAt);
                             context = buildContext(runtime, price, event);
