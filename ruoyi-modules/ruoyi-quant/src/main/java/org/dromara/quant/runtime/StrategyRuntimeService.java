@@ -2400,8 +2400,15 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
      * 根据当前持仓和实时价格计算退出信号。
      */
     private void evaluateExit(ActiveRuntime runtime, StrategyContext context) {
+        evaluateExit(runtime, context, false);
+    }
+
+    private void evaluateExit(ActiveRuntime runtime, StrategyContext context, boolean forceHardStop) {
         synchronized (runtime) {
-            List<ExitSignal> evaluated = protectionExits(runtime, context);
+            List<ExitSignal> evaluated = forceHardStop
+                ? List.of(new ExitSignal("HARD_STOP_LOSS", BigDecimal.ONE, "Binance -2021 明确拒绝硬止损，按已穿价事实强制本地接管",
+                    false, "HARD_STOP", ExitSignal.QuantityBase.CURRENT))
+                : protectionExits(runtime, context);
             if (runtime.position == null || runtime.hasPendingAction() || evaluated.isEmpty() || !runtime.exitCoordinating.compareAndSet(false, true)) {
                 return;
             }
@@ -2452,7 +2459,7 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
                         return;
                     }
                     // 触发事实已经锁定；确认窗口中即便价格反弹仍完成该保护意图，不追用旧信号开仓。
-                    executeProtectedExit(runtime, context, leaseHeld);
+                    executeProtectedExit(runtime, context, leaseHeld, evaluated.getFirst());
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 } catch (RuntimeException ex) {
@@ -2504,12 +2511,10 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
     /**
      * 在持仓租约和新鲜账户事实有效时提交保护退出。
      */
-    private void executeProtectedExit(ActiveRuntime runtime, StrategyContext context, AtomicBoolean leaseHeld) {
-        List<ExitSignal> exits = protectionExits(runtime, context);
-        if (exits.isEmpty() || runtime.position == null || runtime.hasPendingAction()) {
+    private void executeProtectedExit(ActiveRuntime runtime, StrategyContext context, AtomicBoolean leaseHeld, ExitSignal exit) {
+        if (exit == null || runtime.position == null || runtime.hasPendingAction()) {
             return;
         }
-        ExitSignal exit = exits.get(0);
         // 部分退出不能与仍在挂载的快照保护并行，否则撤掉旧条件单后可能被异步重新挂回。
         if (exit.quantityRate() != null && exit.quantityRate().compareTo(BigDecimal.ONE) < 0 && runtime.protectionSyncing.get()) {
             return;
@@ -4093,7 +4098,8 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                                     && Objects.equals(runtime.position.getId(), work.position().getId())
                                     && Objects.equals(runtime.state.getPositionCycleKey(), work.position().getProtectionCycleKey())
                                     && !runtime.hasPendingAction()) {
-                                    BigDecimal emergencyPrice = runtime.currentPrice() != null ? runtime.currentPrice() : runtime.position.getMarkPrice();
+                                    BigDecimal emergencyPrice = runtime.currentPrice() != null ? runtime.currentPrice()
+                                        : runtime.position.getMarkPrice() != null ? runtime.position.getMarkPrice() : runtime.position.getEntryPrice();
                                     if (emergencyPrice != null && emergencyPrice.signum() > 0) {
                                         emergencyContext = buildContext(runtime, emergencyPrice, new ExchangeGateway.MarketEvent("HARD_STOP_REJECTED",
                                             runtime.symbol.getSymbol(), runtime.strategySymbol.getIntervalCode(), emergencyPrice, null, Instant.now()));
@@ -4101,7 +4107,7 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                                 }
                             }
                             if (emergencyContext != null) {
-                                evaluateExit(runtime, emergencyContext);
+                                evaluateExit(runtime, emergencyContext, true);
                             }
                         }
                         if (obsolete) {
