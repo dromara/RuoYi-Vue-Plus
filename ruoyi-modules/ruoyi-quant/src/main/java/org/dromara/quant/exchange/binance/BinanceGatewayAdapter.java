@@ -1135,11 +1135,23 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
                 ApiResponse<AccountTradeListResponse> response = client.accountTradeList(
                     symbol.trim(), null, startTime, endTime, null, (long) ALGO_HISTORY_PAGE_SIZE, RECV_WINDOW_MILLIS);
-                return response == null || response.getData() == null ? null
+                List<TradeSnapshot> page = response == null || response.getData() == null ? null
                     : response.getData().stream().map(BinanceGatewayAdapter::tradeSnapshot).toList();
+                log.debug("Binance 账户成交历史分段查询 symbol={} startTime={} endTime={} returnedCount={}",
+                    symbol.trim(), startTime, endTime, page == null ? -1 : page.size());
+                return page;
             }));
         if (!result.complete()) {
+            log.warn("Binance 账户成交历史查询不完整 symbol={} startTime={} endTime={} queryCount={}",
+                symbol.trim(), from, to, result.queryCount());
             throw new IllegalStateException("Binance 历史成交查询无法证明完整：时间窗口分页达到查询上限或单毫秒窗口仍被截断");
+        }
+        if (result.trades().isEmpty()) {
+            log.warn("Binance 账户成交历史查询完整但结果为空 symbol={} startTime={} endTime={} queryCount={}",
+                symbol.trim(), from, to, result.queryCount());
+        } else {
+            log.debug("Binance 账户成交历史查询完成 symbol={} startTime={} endTime={} queryCount={} tradeCount={}",
+                symbol.trim(), from, to, result.queryCount(), result.trades().size());
         }
         return result.trades();
     }
