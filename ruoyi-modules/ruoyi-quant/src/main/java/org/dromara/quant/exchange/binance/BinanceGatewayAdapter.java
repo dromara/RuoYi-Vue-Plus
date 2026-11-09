@@ -596,7 +596,10 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         try {
             String normalizedSymbol = symbol.trim();
             JsonObject trade = publicJson(runMode, "/fapi/v2/ticker/price", normalizedSymbol);
-            return new PriceSnapshot(normalizedSymbol, jsonDecimal(trade, "price"), null, Instant.now());
+            Instant observedAt = trade.has("time") && !trade.get("time").isJsonNull()
+                ? Instant.ofEpochMilli(trade.get("time").getAsLong())
+                : Instant.now().plusMillis(exchangeTimeOffsetMillis(runMode));
+            return new PriceSnapshot(normalizedSymbol, jsonDecimal(trade, "price"), null, observedAt);
         } catch (RuntimeException ex) {
             throw new IllegalStateException("查询 Binance 最新成交价失败", ex);
         }
