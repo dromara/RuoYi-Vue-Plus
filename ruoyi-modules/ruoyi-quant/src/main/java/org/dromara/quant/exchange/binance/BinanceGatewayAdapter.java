@@ -1235,8 +1235,8 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             if (!isProtectionOrderAbsent(ex)) {
                 throw ex;
             }
-            // Binance 的精确查询可能已不返回已结束的 Algo 单；仅在明确 -2013 时查近 7 天历史，
-            // 必须按 clientAlgoId 和 symbol 精确匹配。历史查询失败或未匹配仍返回未知，由上层保持阻断。
+            // Binance 的精确查询可能已不返回已结束的 Algo 单；历史记录必须按订单身份精确匹配。
+            // 未命中只有在本地创建时间处于 3 天完整保留窗口且分页完整时才确认不存在，否则保持未知。
             return queryProtectionOrderHistory(credential, orderId, clientOrderId, symbol, intentCreatedAtEpochMillis);
         }
         if (data == null) {
