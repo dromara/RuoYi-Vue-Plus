@@ -1251,7 +1251,8 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         if (symbol == null || symbol.isBlank()) {
             return null;
         }
-        long endTime = System.currentTimeMillis();
+        long exchangeOffsetMillis = exchangeTimeOffsetMillis(credential.runMode());
+        long endTime = System.currentTimeMillis() + exchangeOffsetMillis;
         long recentStartTime = endTime - java.time.Duration.ofDays(7).toMillis() + 1;
         if (orderId != null && orderId > 0) {
             var response = signedRead(credential, RestRequestScheduler.Kind.ACCOUNT,
@@ -1265,7 +1266,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         }
         // 仅在本地意图创建于最近 3 天内时，历史接口未命中才足以证明不存在。
         // 超出该窗口的已撤销/过期无成交 Algo 单可能已被 Binance 清理，必须保持 UNKNOWN。
-        long intentStartTime = intentCreatedAtEpochMillis == null ? -1L : intentCreatedAtEpochMillis;
+        long intentStartTime = intentCreatedAtEpochMillis == null ? -1L : intentCreatedAtEpochMillis + exchangeOffsetMillis;
         boolean absenceCanBeProven = isProtectionHistoryAbsenceProvable(intentStartTime, endTime);
         long startTime = absenceCanBeProven ? intentStartTime : recentStartTime;
         AlgoHistoryResult result = collectCompleteAlgoHistory(startTime, endTime, (from, to) -> {
