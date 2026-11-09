@@ -282,7 +282,7 @@ CREATE TABLE flow_user
     processed_by varchar(80) NULL,
     associated   int8        NOT NULL,
     create_time  timestamp   NULL,
-    create_by    varchar(80)  NULL:: character varying,
+    create_by    varchar(80)  NULL,
     update_time  timestamp   NULL,
     update_by    varchar(64)  NULL DEFAULT '':: character varying,
     del_flag     bpchar(1)   NULL DEFAULT '0':: character varying,
