@@ -2935,7 +2935,8 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
         }
         boolean closedCloseProven = false;
         if (order == null && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0))
-            && snapshots != null && snapshots.stream().allMatch(p -> p.quantity() != null && p.quantity().signum() == 0)
+            && snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol())
+                && p.quantity() != null && p.quantity().signum() == 0)
             && expectedState.getPositionQty() != null && expectedState.getPositionQty().signum() > 0
             && expectedState.getPendingOrderTime() != null) {
             try {
@@ -3196,8 +3197,10 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             return true;
         }
         if (order == null) {
-            if (closedCloseProven && snapshots != null && snapshots.stream().allMatch(p -> p.quantity() != null && p.quantity().signum() == 0)) {
+            if (closedCloseProven && snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol())
+                && p.quantity() != null && p.quantity().signum() == 0)) {
                 // 仅在账户空仓、完整成交数量与原持仓完全吻合且普通活动订单为空后，才允许结束未知退出。
+                BigDecimal recoveredPositionQty = runtime.state.getPositionQty();
                 if (!cancelStaleProtection(runtime)) {
                     return true;
                 }
@@ -3228,7 +3231,7 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                 runtime.state = stateService.findByInstance(runtime.instance.getId());
                 log.warn("未知退出恢复完成：交易所空仓、成交数量匹配且无活动订单/保护单 instanceId={} symbol={} pendingAction={} positionQty={}",
                     runtime.instance.getId(), runtime.symbol.getSymbol(), runtime.state == null ? null : runtime.state.getPendingAction(),
-                    expectedState.getPositionQty());
+                    recoveredPositionQty);
                 return true;
             }
             if (snapshots != null && !snapshots.isEmpty()) {
