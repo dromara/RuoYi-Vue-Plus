@@ -1252,8 +1252,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         // 仅在本地意图创建于最近 3 天内时，历史接口未命中才足以证明不存在。
         // 超出该窗口的已撤销/过期无成交 Algo 单可能已被 Binance 清理，必须保持 UNKNOWN。
         long intentStartTime = intentCreatedAtEpochMillis == null ? -1L : intentCreatedAtEpochMillis;
-        boolean absenceCanBeProven = intentStartTime > 0 && intentStartTime <= endTime
-            && endTime - intentStartTime < java.time.Duration.ofDays(3).toMillis();
+        boolean absenceCanBeProven = isProtectionHistoryAbsenceProvable(intentStartTime, endTime);
         long startTime = absenceCanBeProven ? intentStartTime : recentStartTime;
         AlgoHistoryResult result = collectCompleteAlgoHistory(startTime, endTime, (from, to) -> {
             var response = signedRead(credential, RestRequestScheduler.Kind.ACCOUNT,
@@ -1274,6 +1273,11 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             throw new org.dromara.quant.exchange.ExchangeTradingPort.ProtectionOrderAbsentException();
         }
         return null;
+    }
+
+    static boolean isProtectionHistoryAbsenceProvable(long intentCreatedAtEpochMillis, long nowEpochMillis) {
+        return intentCreatedAtEpochMillis > 0 && intentCreatedAtEpochMillis <= nowEpochMillis
+            && nowEpochMillis - intentCreatedAtEpochMillis < java.time.Duration.ofDays(3).toMillis();
     }
 
     static AlgoHistoryResult collectCompleteAlgoHistory(long startTime, long endTime,
