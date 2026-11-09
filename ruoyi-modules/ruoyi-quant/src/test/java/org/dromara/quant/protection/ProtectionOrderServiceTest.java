@@ -1024,6 +1024,40 @@ class ProtectionOrderServiceTest {
     }
 
     @Test
+    void localHardStopFallbackCancelsOnlyItsMatchingExchangeProtection() {
+        var hard = scopedStop("HARD_STOP", "99");
+        var first = scopedStop("FIRST_TP", "101");
+        when(mapper.selectList(any())).thenReturn(List.of(hard, first));
+        when(gateway.queryProtectionOrder(any(), any(), eq(hard.getClientOrderId()), any())).thenReturn(
+            snapshot(55L, hard.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO),
+            snapshot(55L, hard.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
+        when(gateway.queryProtectionOrder(any(), any(), eq(first.getClientOrderId()), any())).thenReturn(
+            snapshot(56L, first.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
+
+        assertTrue(service.prepareLocalExit(1L, position, "HARD_STOP"));
+
+        verify(gateway).cancelProtectionOrder(argThat(request -> hard.getClientOrderId().equals(request.clientOrderId())));
+        verify(gateway, never()).cancelProtectionOrder(argThat(request -> first.getClientOrderId().equals(request.clientOrderId())));
+    }
+
+    @Test
+    void localStepTakeProfitFallbackCancelsStepOrderAndRetainsHardStop() {
+        var hard = scopedStop("HARD_STOP", "99");
+        var step = scopedStop("STEP_TP", "101");
+        when(mapper.selectList(any())).thenReturn(List.of(hard, step));
+        when(gateway.queryProtectionOrder(any(), any(), eq(hard.getClientOrderId()), any())).thenReturn(
+            snapshot(55L, hard.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO));
+        when(gateway.queryProtectionOrder(any(), any(), eq(step.getClientOrderId()), any())).thenReturn(
+            snapshot(56L, step.getClientOrderId(), BigDecimal.ONE, "NEW", BigDecimal.ZERO),
+            snapshot(56L, step.getClientOrderId(), BigDecimal.ONE, "CANCELED", BigDecimal.ZERO));
+
+        assertTrue(service.prepareLocalExit(1L, position, "STEP_TP"));
+
+        verify(gateway).cancelProtectionOrder(argThat(request -> step.getClientOrderId().equals(request.clientOrderId())));
+        verify(gateway, never()).cancelProtectionOrder(argThat(request -> hard.getClientOrderId().equals(request.clientOrderId())));
+    }
+
+    @Test
     void entryCleanupDoesNotTreatImportedManualLedgerAsSystemOwnership() {
         var manual = order();
         manual.setProtectionType("EXCHANGE_CONDITIONAL");
