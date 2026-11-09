@@ -1133,13 +1133,19 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         long to = range.to().toEpochMilli();
         TradeHistoryResult result = collectCompleteTradeHistory(from, to, (startTime, endTime) ->
             signedRead(credential, RestRequestScheduler.Kind.ACCOUNT, client -> {
-                ApiResponse<AccountTradeListResponse> response = client.accountTradeList(
-                    symbol.trim(), null, startTime, endTime, null, (long) ALGO_HISTORY_PAGE_SIZE, RECV_WINDOW_MILLIS);
-                List<TradeSnapshot> page = response == null || response.getData() == null ? null
-                    : response.getData().stream().map(BinanceGatewayAdapter::tradeSnapshot).toList();
-                log.debug("Binance 账户成交历史分段查询 symbol={} startTime={} endTime={} returnedCount={}",
-                    symbol.trim(), startTime, endTime, page == null ? -1 : page.size());
-                return page;
+                try {
+                    ApiResponse<AccountTradeListResponse> response = client.accountTradeList(
+                        symbol.trim(), null, startTime, endTime, null, (long) ALGO_HISTORY_PAGE_SIZE, RECV_WINDOW_MILLIS);
+                    List<TradeSnapshot> page = response == null || response.getData() == null ? null
+                        : response.getData().stream().map(BinanceGatewayAdapter::tradeSnapshot).toList();
+                    log.debug("Binance 账户成交历史分段查询 symbol={} startTime={} endTime={} returnedCount={}",
+                        symbol.trim(), startTime, endTime, page == null ? -1 : page.size());
+                    return page;
+                } catch (RuntimeException ex) {
+                    log.warn("Binance 账户成交历史分段请求失败 symbol={} startTime={} endTime={} errorType={}",
+                        symbol.trim(), startTime, endTime, ex.getClass().getSimpleName());
+                    throw ex;
+                }
             }));
         if (!result.complete()) {
             log.warn("Binance 账户成交历史查询不完整 symbol={} startTime={} endTime={} queryCount={}",
