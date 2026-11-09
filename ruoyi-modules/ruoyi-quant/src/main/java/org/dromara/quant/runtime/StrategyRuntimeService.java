@@ -163,6 +163,8 @@ public class StrategyRuntimeService {
      * 当前 JVM 节点正在运行的策略实例上下文。
      */
     private final Map<Long, ActiveRuntime> activeRuntimes = new ConcurrentHashMap<>();
+    /** 同一凭证/交易对的 REST 本地保护价格查询单飞门禁。 */
+    private final Set<String> restProtectionPriceQueries = ConcurrentHashMap.newKeySet();
     /** 同一策略交易对的实例初始化与运行开关更新使用同一把锁。 */
     private final ConcurrentHashMap<Long, Object> strategySymbolLocks = new ConcurrentHashMap<>();
     /**
@@ -455,6 +457,104 @@ public class StrategyRuntimeService {
     public void reconcileRunningPositions() {
         activeRuntimes.values().forEach(this::requestReconciliation);
     }
+    /**
+     * 行情流断开或成交价过期时，低频查询最新成交价，仅驱动已有持仓的本地保护退出。
+     */
+    public void checkStaleMarketProtectionPrices() {
+        long nowMillis = System.currentTimeMillis();
+        long maxEventAgeMillis = Math.max(1, properties.getMarket().getMaxEventAgeMillis());
+        for (ActiveRuntime runtime : activeRuntimes.values()) {
+            if (runtime == null || !canEvaluateRestProtection(runtime) || !isMarketPriceStale(runtime, Instant.now(), maxEventAgeMillis)) {
+                continue;
+            }
+            synchronized (runtime) {
+                if (!canEvaluateRestProtection(runtime) || !isMarketPriceStale(runtime, Instant.now(), maxEventAgeMillis)
+                    || nowMillis < runtime.nextRestProtectionPollAt) {
+                    continue;
+                }
+                runtime.nextRestProtectionPollAt = nowMillis + 2_000L;
+            }
+            String queryKey = runtime.credential.getId() + ":" + runtime.symbol.getSymbol().toUpperCase(Locale.ROOT);
+            if (!restProtectionPriceQueries.add(queryKey)) {
+                continue;
+            }
+            try {
+                recoveryExecutor.execute(() -> {
+                    try {
+                        QuantPosition expectedPosition;
+                        QuantStrategyPositionState expectedState;
+                        synchronized (runtime) {
+                            if (!canEvaluateRestProtection(runtime)) {
+                                return;
+                            }
+                            expectedPosition = runtime.position;
+                            expectedState = runtime.state;
+                        }
+                        long requestStartedAt = System.nanoTime();
+                        ExchangeGateway.PriceSnapshot snapshot = gateway.queryLastTradePrice(runtime.credential.getRunMode(), runtime.symbol.getSymbol());
+                        long requestDurationMillis = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - requestStartedAt);
+                        Instant observedAt = snapshot == null ? null : snapshot.observedAt();
+                        BigDecimal price = snapshot == null ? null : snapshot.lastTradePrice();
+                        Instant completedAt = Instant.now();
+                        long snapshotAgeMillis = observedAt == null ? Long.MAX_VALUE
+                            : java.time.Duration.between(observedAt, completedAt).toMillis();
+                        if (snapshot == null || !runtime.symbol.getSymbol().equalsIgnoreCase(snapshot.symbol())
+                            || price == null || price.signum() <= 0 || observedAt == null
+                            || requestDurationMillis > maxEventAgeMillis || snapshotAgeMillis < 0 || snapshotAgeMillis > maxEventAgeMillis) {
+                            return;
+                        }
+                        StrategyContext context;
+                        synchronized (runtime) {
+                            if (runtime.position != expectedPosition || runtime.state != expectedState
+                                || !canEvaluateRestProtection(runtime)
+                                || !isMarketPriceStale(runtime, Instant.now(), maxEventAgeMillis)) {
+                                return;
+                            }
+                            if (!updateRuntimeExtrema(runtime, price)) {
+                                return;
+                            }
+                            updateRuntimeMaximumReturnRate(runtime, price);
+                            long offsetMillis = gateway.exchangeTimeOffsetMillis(runtime.credential.getRunMode());
+                            ExchangeGateway.MarketEvent event = new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
+                                runtime.strategySymbol.getIntervalCode(), price, null, observedAt.plusMillis(offsetMillis));
+                            context = buildContext(runtime, price, event);
+                        }
+                        // 只调用退出判断，不进入 evaluate()，因此不会触发开仓或普通策略信号。
+                        evaluateExit(runtime, context);
+                    } catch (RuntimeException ex) {
+                        long logNow = System.currentTimeMillis();
+                        if (logNow >= runtime.nextRestProtectionPriceLogAt) {
+                            runtime.nextRestProtectionPriceLogAt = logNow + 60_000L;
+                            log.warn("行情流不可用时 REST 本地保护价格查询失败 instanceId={} credentialId={} symbol={} errorType={}",
+                                runtime.instance.getId(), runtime.credential.getId(), runtime.symbol.getSymbol(), ex.getClass().getSimpleName());
+                        }
+                    } finally {
+                        restProtectionPriceQueries.remove(queryKey);
+                    }
+                });
+            } catch (RuntimeException ex) {
+                restProtectionPriceQueries.remove(queryKey);
+                log.warn("REST 本地保护价格查询任务无法提交 instanceId={} symbol={} errorType={}",
+                    runtime.instance.getId(), runtime.symbol.getSymbol(), ex.getClass().getSimpleName());
+            }
+        }
+    }
+
+    private boolean canEvaluateRestProtection(ActiveRuntime runtime) {
+        return runtime != null && !runtime.closed && runtime.position != null && runtime.state != null
+            && runtime.positionFactsReady && !runtime.positionReconciling && !runtime.stateRefreshRequired
+            && !runtime.hasPendingAction() && !runtime.exitCoordinating.get() && ensureEventLease(runtime);
+    }
+
+    private boolean isMarketPriceStale(ActiveRuntime runtime, Instant localNow, long maxAgeMillis) {
+        if (!runtime.marketHealthy || !runtime.marketStreamReady || runtime.latestTradeEventAt == null) {
+            return true;
+        }
+        Instant exchangeNow = localNow.plusMillis(gateway.exchangeTimeOffsetMillis(runtime.credential.getRunMode()));
+        java.time.Duration age = java.time.Duration.between(runtime.latestTradeEventAt, exchangeNow);
+        return age.isNegative() || age.toMillis() > maxAgeMillis;
+    }
+
 
     /**
      * Renew strategy leases independently of market-event delivery. Any failed or
@@ -4662,6 +4762,8 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
         private long nextMarketUnreadyLogAt;
         private volatile long nextExpiredMarketLogAt;
         private long marketUnreadySinceAt;
+        private long nextRestProtectionPollAt;
+        private volatile long nextRestProtectionPriceLogAt;
 
         /**
          * 创建单个策略实例的活动 Runtime 上下文。
