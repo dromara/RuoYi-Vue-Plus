@@ -34,6 +34,7 @@ class BinanceGatewayPriceQueryTest {
             var snapshot = new BinanceGatewayAdapter(properties).queryLastTradePrice("LIVE", "BTCUSDT");
             assertEquals("112345.6", snapshot.lastTradePrice().toPlainString());
             assertNull(snapshot.markPrice());
+            assertEquals(java.time.Instant.ofEpochMilli(1750000000000L), snapshot.observedAt());
         } finally {
             server.stop(0);
         }
