@@ -61,7 +61,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 事件驱动策略运行时。
- * <p>运行时通过 MarketStreamHub 接收实时行情；定时任务只负责发现实例、续租和 REST 对账，不再轮询每个实例的实时价格。
+ * <p>运行时通过 MarketStreamHub 接收实时行情；仅在行情流不健康或成交价过期时，定时任务才低频查询最新成交价执行本地持仓保护。
  */
 @Slf4j
 @RequiredArgsConstructor
