@@ -2934,32 +2934,62 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             }
         }
         boolean closedCloseProven = false;
+        String closeProofReason = "NOT_ELIGIBLE";
+        int closeProofTradeCount = 0;
+        BigDecimal closeProofCloseQuantity = BigDecimal.ZERO;
+        BigDecimal closeProofIncreaseQuantity = BigDecimal.ZERO;
+        BigDecimal closeProofRemainingQuantity = expectedState.getPositionQty();
+        boolean exchangeFlatSnapshot = snapshots != null && snapshots.stream().allMatch(p ->
+            runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol()) && p.quantity() != null && p.quantity().signum() == 0);
         if (order == null && "TESTNET".equalsIgnoreCase(runtime.credential.getRunMode())
-            && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0)) && snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol())
-                && p.quantity() != null && p.quantity().signum() == 0)
+            && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0)) && exchangeFlatSnapshot
             && expectedState.getPositionQty() != null && expectedState.getPositionQty().signum() > 0
             && (execution != null && execution.getCreatedAt() != null || expectedState.getPendingOrderTime() != null)) {
             try {
-                // The execution ledger is created immediately before dispatch and is a better
-                // boundary than pendingOrderTime, which may be inherited from older state data.
                 Instant from = execution != null && execution.getCreatedAt() != null
                     ? execution.getCreatedAt().toInstant(java.time.ZoneOffset.UTC)
                     : Instant.ofEpochMilli(expectedState.getPendingOrderTime());
                 Instant to = Instant.now();
-                ExchangeGateway.PositionMode positionMode = gateway.queryPositionMode(credential);
-                List<ExchangeGateway.OrderSnapshot> openOrders = gateway.queryOrders(credential, runtime.symbol.getSymbol());
-                List<ExchangeGateway.ProtectionOrderSnapshot> protections = gateway.queryProtectionOrders(credential, runtime.symbol.getSymbol());
-                if (from.isAfter(to.minusSeconds(6 * 24 * 3600L)) && !from.isAfter(to)
-                    && positionMode != null && openOrders != null && protections != null && openOrders.isEmpty()) {
-                    List<ExchangeGateway.TradeSnapshot> trades = gateway.queryTrades(credential, runtime.symbol.getSymbol(),
-                        new ExchangeGateway.TimeRange(from, to));
-                    closedCloseProven = closedPendingCloseProven(runtime.symbol.getSymbol(), expectedDirection,
-                        expectedState.getPositionQty(), positionMode, trades, from, to);
+                if (!from.isAfter(to.minusSeconds(6 * 24 * 3600L)) && !from.isAfter(to)) {
+                    ExchangeGateway.PositionMode positionMode = gateway.queryPositionMode(credential);
+                    List<ExchangeGateway.OrderSnapshot> openOrders = gateway.queryOrders(credential, runtime.symbol.getSymbol());
+                    if (positionMode == null) {
+                        closeProofReason = "POSITION_MODE_UNKNOWN";
+                    } else if (openOrders == null) {
+                        closeProofReason = "OPEN_ORDERS_UNKNOWN";
+                    } else if (!openOrders.isEmpty()) {
+                        closeProofReason = "OPEN_ORDERS_PRESENT";
+                    } else {
+                        List<ExchangeGateway.TradeSnapshot> trades = gateway.queryTrades(credential, runtime.symbol.getSymbol(),
+                            new ExchangeGateway.TimeRange(from, to));
+                        CloseProofResult proof = evaluatePendingCloseProof(runtime.symbol.getSymbol(), expectedDirection,
+                            expectedState.getPositionQty(), positionMode, trades, from, to);
+                        closedCloseProven = proof.proven();
+                        closeProofReason = proof.reason();
+                        closeProofTradeCount = proof.tradeCount();
+                        closeProofCloseQuantity = proof.closeQuantity();
+                        closeProofIncreaseQuantity = proof.increaseQuantity();
+                        closeProofRemainingQuantity = proof.remainingQuantity();
+                    }
+                } else {
+                    closeProofReason = "TRADE_TIME_WINDOW_OUT_OF_RANGE";
                 }
             } catch (RuntimeException ex) {
-                // Any incomplete exchange read leaves the close UNKNOWN; a failed read is never a flat-position proof.
+                closeProofReason = "EXCHANGE_QUERY_FAILED:" + ex.getClass().getSimpleName();
                 orderQueryFailure = "closeFlatProof " + ex.getClass().getSimpleName();
             }
+        } else if (order == null && "TESTNET".equalsIgnoreCase(runtime.credential.getRunMode())) {
+            closeProofReason = !exchangeFlatSnapshot ? "POSITION_NOT_CONFIRMED_FLAT"
+                : expectedState.getPositionQty() == null || expectedState.getPositionQty().signum() <= 0 ? "LOCAL_POSITION_QUANTITY_INVALID"
+                : expectedPending.get(0) == null || "OPEN".equalsIgnoreCase(String.valueOf(expectedPending.get(0))) ? "NOT_A_CLOSE_ACTION"
+                : "EXECUTION_TIME_MISSING";
+        }
+        int closeProofConfirmations = expectedState.getPendingNotFoundConfirmations() == null ? 0 : expectedState.getPendingNotFoundConfirmations();
+        if (order == null && "TESTNET".equalsIgnoreCase(runtime.credential.getRunMode()) && closeProofConfirmations % 6 == 0) {
+            log.warn("未知退出恢复核验诊断 instanceId={} symbol={} reason={} flatSnapshot={} tradeCount={} closeQty={} increaseQty={} remainingQty={} pendingOrderId={} clientOrderId={} executionId={}",
+                runtime.instance.getId(), runtime.symbol.getSymbol(), closeProofReason, exchangeFlatSnapshot, closeProofTradeCount,
+                closeProofCloseQuantity, closeProofIncreaseQuantity, closeProofRemainingQuantity, orderId, clientOrderId,
+                execution == null ? null : execution.getId());
         }
         runtime.lastPendingOrderQueryFailure = orderQueryFailure;
         if (decisionLogs != null && order != null) {
@@ -3066,34 +3096,70 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
     static boolean closedPendingCloseProven(String symbol, String direction, BigDecimal beforeQuantity,
                                             ExchangeGateway.PositionMode positionMode,
                                             List<ExchangeGateway.TradeSnapshot> trades, Instant from, Instant to) {
+        return evaluatePendingCloseProof(symbol, direction, beforeQuantity, positionMode, trades, from, to).proven();
+    }
+
+    static CloseProofResult evaluatePendingCloseProof(String symbol, String direction, BigDecimal beforeQuantity,
+                                                       ExchangeGateway.PositionMode positionMode,
+                                                       List<ExchangeGateway.TradeSnapshot> trades, Instant from, Instant to) {
         if (symbol == null || symbol.isBlank() || !Set.of("LONG", "SHORT").contains(direction == null ? "" : direction)
             || beforeQuantity == null || beforeQuantity.signum() <= 0 || positionMode == null
-            || trades == null || trades.isEmpty() || trades.size() >= 1000 || from == null || to == null || from.isAfter(to)) {
-            return false;
+            || trades == null || trades.isEmpty() || from == null || to == null || from.isAfter(to)) {
+            return new CloseProofResult(false, "INVALID_OR_EMPTY_INPUT", trades == null ? 0 : trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
         }
-        String closeSide = "LONG".equals(direction) ? "SELL" : "BUY";
+        if (trades.size() >= 1000) {
+            return new CloseProofResult(false, "TRADE_HISTORY_SATURATED", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+        }
         Set<Long> seen = new HashSet<>();
-        BigDecimal closedQuantity = BigDecimal.ZERO;
+        List<ExchangeGateway.TradeSnapshot> relevant = new ArrayList<>();
         for (ExchangeGateway.TradeSnapshot trade : trades) {
             if (trade == null || trade.tradeId() == null || !seen.add(trade.tradeId()) || trade.orderId() == null
                 || trade.time() == null || trade.time().isBefore(from) || trade.time().isAfter(to)
-                || !symbol.equalsIgnoreCase(trade.symbol()) || !closeSide.equalsIgnoreCase(trade.side())
-                || trade.quantity() == null || trade.quantity().signum() <= 0) {
-                return false;
+                || !symbol.equalsIgnoreCase(trade.symbol()) || trade.quantity() == null || trade.quantity().signum() <= 0
+                || !("BUY".equalsIgnoreCase(trade.side()) || "SELL".equalsIgnoreCase(trade.side()))) {
+                return new CloseProofResult(false, "INVALID_OR_DUPLICATE_TRADE", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
             }
             if (positionMode.hedgeMode()) {
-                if (!direction.equalsIgnoreCase(trade.positionSide())) {
-                    return false;
+                if (trade.positionSide() == null || trade.positionSide().isBlank()) {
+                    return new CloseProofResult(false, "HEDGE_POSITION_SIDE_MISSING", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
                 }
-            } else if (trade.positionSide() != null && !"BOTH".equalsIgnoreCase(trade.positionSide())
-                && !direction.equalsIgnoreCase(trade.positionSide())) {
-                return false;
+                if (!direction.equalsIgnoreCase(trade.positionSide())) {
+                    continue;
+                }
+            } else if (trade.positionSide() != null && !trade.positionSide().isBlank()
+                && !"BOTH".equalsIgnoreCase(trade.positionSide())) {
+                return new CloseProofResult(false, "ONE_WAY_POSITION_SIDE_MISMATCH", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
             }
-            closedQuantity = closedQuantity.add(trade.quantity());
+            relevant.add(trade);
         }
-        return closedQuantity.compareTo(beforeQuantity) == 0;
+        if (relevant.isEmpty()) {
+            return new CloseProofResult(false, "NO_RELEVANT_TRADES", trades.size(), BigDecimal.ZERO, BigDecimal.ZERO, beforeQuantity);
+        }
+        String closeSide = "LONG".equals(direction) ? "SELL" : "BUY";
+        BigDecimal closeQuantity = BigDecimal.ZERO;
+        BigDecimal increaseQuantity = BigDecimal.ZERO;
+        BigDecimal remaining = beforeQuantity;
+        List<ExchangeGateway.TradeSnapshot> ordered = relevant.stream()
+            .sorted(Comparator.comparing(ExchangeGateway.TradeSnapshot::time).thenComparing(ExchangeGateway.TradeSnapshot::tradeId)).toList();
+        for (ExchangeGateway.TradeSnapshot trade : ordered) {
+            if (closeSide.equalsIgnoreCase(trade.side())) {
+                closeQuantity = closeQuantity.add(trade.quantity());
+                remaining = remaining.subtract(trade.quantity());
+                if (remaining.signum() < 0) {
+                    return new CloseProofResult(false, "CLOSE_QUANTITY_EXCEEDS_POSITION", trades.size(), closeQuantity, increaseQuantity, remaining);
+                }
+            } else {
+                increaseQuantity = increaseQuantity.add(trade.quantity());
+                remaining = remaining.add(trade.quantity());
+            }
+        }
+        return new CloseProofResult(remaining.signum() == 0, remaining.signum() == 0 ? "PROVEN" : "NET_POSITION_NOT_ZERO",
+            trades.size(), closeQuantity, increaseQuantity, remaining);
     }
 
+    record CloseProofResult(boolean proven, String reason, int tradeCount, BigDecimal closeQuantity,
+                            BigDecimal increaseQuantity, BigDecimal remainingQuantity) {
+    }
     /**
      * 完整单向开平仓成交证明；不接受缺失、截断或其他开仓订单混入的历史。
      */
