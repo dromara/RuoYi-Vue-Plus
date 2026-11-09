@@ -31,6 +31,18 @@ class BinanceGatewayAdapterTest {
     }
 
     @Test
+    void onlyProvesAlgoOrderAbsenceInsideBinanceThreeDayHistoryWindow() {
+        long now = 1_800_000_000_000L;
+        long threeDays = java.time.Duration.ofDays(3).toMillis();
+
+        assertTrue(BinanceGatewayAdapter.isProtectionHistoryAbsenceProvable(now - threeDays + 1, now));
+        assertFalse(BinanceGatewayAdapter.isProtectionHistoryAbsenceProvable(now - threeDays, now));
+        assertFalse(BinanceGatewayAdapter.isProtectionHistoryAbsenceProvable(now - threeDays - 1, now));
+        assertFalse(BinanceGatewayAdapter.isProtectionHistoryAbsenceProvable(now + 1, now));
+        assertFalse(BinanceGatewayAdapter.isProtectionHistoryAbsenceProvable(0, now));
+    }
+
+    @Test
     void mapsPositionSideFromBinanceAccountTradeResponse() {
         var raw = new com.binance.connector.client.derivatives_trading_usds_futures.rest.model.AccountTradeListResponseInner()
             .symbol("BTCUSDT").id(123L).orderId(456L).side("SELL").qty("0.5").price("100")
