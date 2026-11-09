@@ -1204,6 +1204,11 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
      */
     @Override
     public ProtectionOrderSnapshot queryProtectionOrder(Credential credential, Long orderId, String clientOrderId, String symbol) {
+        return queryProtectionOrder(credential, orderId, clientOrderId, symbol, null);
+    }
+
+    @Override
+    public ProtectionOrderSnapshot queryProtectionOrder(Credential credential, Long orderId, String clientOrderId, String symbol, Long intentCreatedAtEpochMillis) {
         requireCredential(credential);
         com.binance.connector.client.derivatives_trading_usds_futures.rest.model.QueryAlgoOrderResponse data;
         try {
@@ -1233,10 +1238,10 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
             return null;
         }
         long endTime = System.currentTimeMillis();
-        long startTime = endTime - java.time.Duration.ofDays(7).toMillis() + 1;
+        long recentStartTime = endTime - java.time.Duration.ofDays(7).toMillis() + 1;
         if (orderId != null && orderId > 0) {
             var response = signedRead(credential, RestRequestScheduler.Kind.ACCOUNT,
-                client -> client.queryAllAlgoOrders(symbol.trim().toUpperCase(Locale.ROOT), orderId, startTime, endTime,
+                client -> client.queryAllAlgoOrders(symbol.trim().toUpperCase(Locale.ROOT), orderId, recentStartTime, endTime,
                     (long) ALGO_HISTORY_PAGE_SIZE, RECV_WINDOW_MILLIS));
             var data = response == null ? null : response.getData();
             ProtectionOrderSnapshot exact = findExactAlgoHistory(data, symbol, orderId, clientOrderId);
@@ -1244,6 +1249,12 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
                 return exact;
             }
         }
+        // 仅在本地意图创建于最近 3 天内时，历史接口未命中才足以证明不存在。
+        // 超出该窗口的已撤销/过期无成交 Algo 单可能已被 Binance 清理，必须保持 UNKNOWN。
+        long intentStartTime = intentCreatedAtEpochMillis == null ? -1L : intentCreatedAtEpochMillis;
+        boolean absenceCanBeProven = intentStartTime > 0 && intentStartTime <= endTime
+            && endTime - intentStartTime < java.time.Duration.ofDays(3).toMillis();
+        long startTime = absenceCanBeProven ? intentStartTime : recentStartTime;
         AlgoHistoryResult result = collectCompleteAlgoHistory(startTime, endTime, (from, to) -> {
             var response = signedRead(credential, RestRequestScheduler.Kind.ACCOUNT,
                 client -> client.queryAllAlgoOrders(symbol.trim().toUpperCase(Locale.ROOT), null, from, to,
@@ -1252,7 +1263,17 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         });
         // A full page at one millisecond resolution may still be truncated.
         // In that case absence and uniqueness are unknowable, so stay fail closed.
-        return result.complete() ? findExactAlgoHistory(result.orders(), symbol, orderId, clientOrderId) : null;
+        if (!result.complete()) {
+            return null;
+        }
+        ProtectionOrderSnapshot exact = findExactAlgoHistory(result.orders(), symbol, orderId, clientOrderId);
+        if (exact != null) {
+            return exact;
+        }
+        if (absenceCanBeProven) {
+            throw new org.dromara.quant.exchange.ExchangeTradingPort.ProtectionOrderAbsentException();
+        }
+        return null;
     }
 
     static AlgoHistoryResult collectCompleteAlgoHistory(long startTime, long endTime,
