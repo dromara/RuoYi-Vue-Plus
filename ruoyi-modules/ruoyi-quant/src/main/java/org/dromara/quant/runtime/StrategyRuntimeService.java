@@ -2052,7 +2052,11 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             runtime.state = state;
             StrategyContext openedContext = buildContext(runtime, context.currentPrice(), new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
             runtime.strategySymbol.getIntervalCode(), context.currentPrice(), null, context.eventTime()));
-            syncPluginProtections(runtime, openedContext);   // 内部会 requestProtectionSync(runtime, true)
+            // 开仓成交后先用最新行情检查本地镜像止损，避免提交已穿价的 Binance 条件单。
+            evaluateExit(runtime, openedContext);
+            if (!runtime.exitCoordinating.get()) {
+                syncPluginProtections(runtime, openedContext);   // 内部会 requestProtectionSync(runtime, true)
+            }
             notificationService.notifyOpen(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, runtime.position.getQuantity(),
              runtime.position.getEntryPrice(), leverage, openRatio, signal.get().reason());
             log.info("实时策略开仓 instanceId={} symbol={} direction={} price={} quantity={} reason={}", runtime.instance.getId(), runtime.symbol.getSymbol(), direction,
@@ -2399,6 +2403,12 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
             if (runtime.position == null || runtime.hasPendingAction() || evaluated.isEmpty() || !runtime.exitCoordinating.compareAndSet(false, true)) {
                 return;
             }
+            boolean hardStopExit = "HARD_STOP_LOSS".equals(evaluated.getFirst().type());
+            if (hardStopExit) {
+                log.warn("本地硬止损镜像触发 instanceId={} credentialId={} symbol={} direction={} currentPrice={} eventTime={} detectedAt={} reason={}",
+                    runtime.instance.getId(), runtime.credential.getId(), runtime.symbol.getSymbol(),
+                    context.direction(), context.currentPrice(), context.eventTime(), Instant.now(), evaluated.getFirst().reason());
+            }
             String cycle = runtime.state == null ? null : runtime.state.getPositionCycleKey();
             runtime.exitTask = recoveryExecutor.submit(() -> {
                 AtomicBoolean renewing = new AtomicBoolean(true);
@@ -2419,7 +2429,7 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
                     }
                 });
                 try {
-                    if (!"PAPER".equalsIgnoreCase(runtime.credential.getRunMode())) {
+                    if (!"PAPER".equalsIgnoreCase(runtime.credential.getRunMode()) && !"HARD_STOP_LOSS".equals(evaluated.getFirst().type())) {
                         Thread.sleep(Math.max(0, properties.getProtection().getConfirmationWaitMillis()));
                     }
                     java.util.concurrent.Future<?> inFlightProtection = runtime.protectionTask;
@@ -4003,29 +4013,37 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                         } catch (RuntimeException ex) {
                             failure = ex;
                         }
-                        try {
-                            if (work.signalFailure() != null) {
-                                throw work.signalFailure();
-                            }
-                            if (work.dynamic() && !runtime.closed && leaseHeld.get() && leaseService.acquireOrRenew(runtime.instance.getId(), work.credentialId(),
-                             work.position().getSymbol())) {
-                                // 硬止损价可能已冻结；跨类型覆盖必须由保护服务精确核实实际委托，不能用重算价格提前过滤。
-                                List<ProtectionSignal> exchangeSignals = deduplicateExchangeProtectionSignals(work.signals(), work.position(), work.initialQuantity(),
-                                 null, runtime.protectionRule, work.state() != null && work.state().getFrozenLeverage() != null ?
-                                  work.state().getFrozenLeverage() : work.position().getLeverage() == null ? 1 : work.position().getLeverage());
-                                protectionOrderService.syncStrategyProtections(work.credentialId(), work.position(), work.initialQuantity(), exchangeSignals,
-                            work.state() == null ? null : work.state().getFirstTakeProfitTargetQty() == null ? null :
-                                  PositionProtectionState.remainingFirstProfit(work.state()),
-                                    work.state() == null ? null : work.state().getFirstTakeProfitLocalExecutedQty(), work.live());
-                            }
-                            if (failure == null) {
-                                confirmedStep = protectionOrderService.confirmedStep(work.credentialId(), work.position());
-                            }
-                        } catch (RuntimeException ex) {
-                            if (failure == null) {
-                                failure = ex;
-                            } else if (failure != ex) {
-                                failure.addSuppressed(ex);
+                        boolean hardStopAlreadyTriggered = failure instanceof org.dromara.quant.exchange.ExchangeTradingPort.OrderRejectedException rejected
+                            && Integer.valueOf(-2021).equals(rejected.code());
+                        if (hardStopAlreadyTriggered) {
+                            log.error("Binance -2021 拒绝硬止损条件单，停止本轮其它保护单提交并立即启动本地镜像退出 instanceId={} credentialId={} symbol={} positionId={} triggerPrice={} currentPrice={}",
+                                runtime.instance.getId(), work.credentialId(), work.position().getSymbol(), work.position().getId(),
+                                work.position().getProtectionStopLossPrice(), runtime.currentPrice(), failure);
+                        } else {
+                            try {
+                                if (work.signalFailure() != null) {
+                                    throw work.signalFailure();
+                                }
+                                if (work.dynamic() && !runtime.closed && leaseHeld.get() && leaseService.acquireOrRenew(runtime.instance.getId(), work.credentialId(),
+                                 work.position().getSymbol())) {
+                                    // 硬止损价可能已冻结；跨类型覆盖必须由保护服务精确核实实际委托，不能用重算价格提前过滤。
+                                    List<ProtectionSignal> exchangeSignals = deduplicateExchangeProtectionSignals(work.signals(), work.position(), work.initialQuantity(),
+                                     null, runtime.protectionRule, work.state() != null && work.state().getFrozenLeverage() != null ?
+                                      work.state().getFrozenLeverage() : work.position().getLeverage() == null ? 1 : work.position().getLeverage());
+                                    protectionOrderService.syncStrategyProtections(work.credentialId(), work.position(), work.initialQuantity(), exchangeSignals,
+                                work.state() == null ? null : work.state().getFirstTakeProfitTargetQty() == null ? null :
+                                      PositionProtectionState.remainingFirstProfit(work.state()),
+                                        work.state() == null ? null : work.state().getFirstTakeProfitLocalExecutedQty(), work.live());
+                                }
+                                if (failure == null) {
+                                    confirmedStep = protectionOrderService.confirmedStep(work.credentialId(), work.position());
+                                }
+                            } catch (RuntimeException ex) {
+                                if (failure == null) {
+                                    failure = ex;
+                                } else if (failure != ex) {
+                                    failure.addSuppressed(ex);
+                                }
                             }
                         }
                         if (!leaseHeld.get() || !leaseService.acquireOrRenew(runtime.instance.getId(), work.credentialId(), work.position().getSymbol())) {
@@ -4064,6 +4082,24 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                             } else if (!runtime.closed && !obsolete) {
                                 // 同一持仓数量改变：下一轮先挂正确保护再撤旧，不能清空全部保护。
                                 runtime.protectionRequested.set(true);
+                            }
+                        }
+                        if (hardStopAlreadyTriggered && !obsolete) {
+                            StrategyContext emergencyContext = null;
+                            synchronized (runtime) {
+                                if (!runtime.closed && runtime.state == work.state() && runtime.position != null
+                                    && Objects.equals(runtime.position.getId(), work.position().getId())
+                                    && Objects.equals(runtime.state.getPositionCycleKey(), work.position().getProtectionCycleKey())
+                                    && !runtime.hasPendingAction()) {
+                                    BigDecimal emergencyPrice = runtime.currentPrice() != null ? runtime.currentPrice() : runtime.position.getMarkPrice();
+                                    if (emergencyPrice != null && emergencyPrice.signum() > 0) {
+                                        emergencyContext = buildContext(runtime, emergencyPrice, new ExchangeGateway.MarketEvent("HARD_STOP_REJECTED",
+                                            runtime.symbol.getSymbol(), runtime.strategySymbol.getIntervalCode(), emergencyPrice, null, Instant.now()));
+                                    }
+                                }
+                            }
+                            if (emergencyContext != null) {
+                                evaluateExit(runtime, emergencyContext);
                             }
                         }
                         if (obsolete) {
