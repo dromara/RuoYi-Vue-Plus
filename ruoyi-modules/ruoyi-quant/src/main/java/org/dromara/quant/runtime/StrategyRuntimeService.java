@@ -2938,9 +2938,13 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
             && !"OPEN".equalsIgnoreCase((String) expectedPending.get(0)) && snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol().equalsIgnoreCase(p.symbol())
                 && p.quantity() != null && p.quantity().signum() == 0)
             && expectedState.getPositionQty() != null && expectedState.getPositionQty().signum() > 0
-            && expectedState.getPendingOrderTime() != null) {
+            && (execution != null && execution.getCreatedAt() != null || expectedState.getPendingOrderTime() != null)) {
             try {
-                Instant from = Instant.ofEpochMilli(expectedState.getPendingOrderTime());
+                // The execution ledger is created immediately before dispatch and is a better
+                // boundary than pendingOrderTime, which may be inherited from older state data.
+                Instant from = execution != null && execution.getCreatedAt() != null
+                    ? execution.getCreatedAt().toInstant(java.time.ZoneOffset.UTC)
+                    : Instant.ofEpochMilli(expectedState.getPendingOrderTime());
                 Instant to = Instant.now();
                 ExchangeGateway.PositionMode positionMode = gateway.queryPositionMode(credential);
                 List<ExchangeGateway.OrderSnapshot> openOrders = gateway.queryOrders(credential, runtime.symbol.getSymbol());
