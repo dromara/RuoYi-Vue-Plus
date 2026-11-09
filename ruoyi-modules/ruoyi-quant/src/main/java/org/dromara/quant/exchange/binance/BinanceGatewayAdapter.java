@@ -1194,7 +1194,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         var data = signedRead(credential, RestRequestScheduler.Kind.ACCOUNT,
             client -> client.currentAllAlgoOpenOrders("CONDITIONAL", symbol, null, RECV_WINDOW_MILLIS).getData());
         if (data == null) {
-            return List.of();
+            throw new IllegalStateException("Binance 条件单活动列表响应缺少数据载荷，无法确认保护单清理状态");
         }
         return data.stream().map(item -> new ProtectionOrderSnapshot(string(item, "getSymbol"), number(item, "getAlgoId"), string(item, "getClientAlgoId"), normalizeAlgoStatus(string(item,
             "getAlgoStatus")), string(item, "getSide"), string(item, "getPositionSide"), string(item, "getOrderType"), decimal(string(item, "getQuantity")), decimal(string(item,
