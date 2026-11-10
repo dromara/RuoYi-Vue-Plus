@@ -1347,8 +1347,13 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
                 runtime.latestTradePrice = event.price();
                 runtime.latestTradeEventAt = event.eventTime();
                 if (runtime.position != null && !runtime.exitCoordinating.get()) {
+                    int previousHighestStep = runtime.state == null || runtime.state.getHighestStep() == null ? 0 : runtime.state.getHighestStep();
                     if (!updateRuntimeExtrema(runtime, event.price())) {
                         return;
+                    }
+                    int currentHighestStep = runtime.state == null || runtime.state.getHighestStep() == null ? 0 : runtime.state.getHighestStep();
+                    if (runtime.plugin instanceof KlineSlopeRateStrategy && currentHighestStep > previousHighestStep) {
+                        syncPluginProtections(runtime, buildContext(runtime, event.price(), event));
                     }
                 }
                 if (runtime.exitCoordinating.get()) {
