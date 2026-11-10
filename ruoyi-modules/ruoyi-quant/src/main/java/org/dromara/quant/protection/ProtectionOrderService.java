@@ -358,7 +358,7 @@ public class ProtectionOrderService {
         }
         if (live && !Integer.valueOf(2).equals(position.getProtectionPolicyVersion())) {
             BigDecimal quantity = normalizeQuantity(credentialId, position.getSymbol(), position.getQuantity(), true);
-            BigDecimal price = normalizePrice(credentialId, position.getSymbol(), hardStopPrice(position, marginLossRatio), true);
+            BigDecimal price = QuantityNormalizer.protectionPrice(hardStopPrice(position, marginLossRatio), rule(credentialId, position.getSymbol()), position.getPositionSide(), "STOP_MARKET");
             // 已冻结的硬止损不能因均价变化而被更弱的替代单覆盖。
             for (var old : scopedStops(credentialId, position)) {
                 if ("HARD_STOP".equals(old.getProtectionType()) && "WORKING".equals(old.getStatus()) && old.getStopPrice() != null) {
