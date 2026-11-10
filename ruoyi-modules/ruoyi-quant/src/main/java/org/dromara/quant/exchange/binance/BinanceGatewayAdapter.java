@@ -1314,7 +1314,7 @@ public class BinanceGatewayAdapter implements ExchangeGateway {
         String status = normalizeAlgoStatus(string(data, "getAlgoStatus"));
         return new ProtectionOrderSnapshot(string(data, "getSymbol"), number(data, "getAlgoId"), string(data, "getClientAlgoId"), status, string(data, "getSide"), string(data,
             "getPositionSide"), string(data, "getOrderType"), decimal(string(data, "getQuantity")), decimal(string(data, "getTriggerPrice")),
-            instant(number(data, "getUpdateTime")), protectionExecutedQuantity(status, decimal(string(data, "getActualQty"))), null, null, number(data, "getActualOrderId"),
+            instant(number(data, "getUpdateTime")), protectionExecutedQuantity(status, decimal(string(data, "getActualQty"))), nullableBoolean(data, "getReduceOnly"), nullableBoolean(data, "getClosePosition"), number(data, "getActualOrderId"),
             decimal(string(data, "getActualPrice")));
     }
 
