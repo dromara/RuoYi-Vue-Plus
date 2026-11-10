@@ -406,12 +406,9 @@ public class QuantTradeNotificationService {
         }
         if (account != null && account.marginBalance() != null) {
             jdbcTemplate.update("""
-                INSERT INTO quant_trade_close_equity
+                INSERT IGNORE INTO quant_trade_close_equity
                     (credential_id, symbol, exchange_order_id, closing_equity, captured_at)
                 VALUES (?, ?, ?, ?, UTC_TIMESTAMP(3))
-                ON DUPLICATE KEY UPDATE
-                    closing_equity=VALUES(closing_equity),
-                    captured_at=VALUES(captured_at)
                 """, credential.getId(), symbol, orderId, account.marginBalance());
         }
         String asset = safe(quoteAsset);
