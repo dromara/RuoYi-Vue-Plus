@@ -402,6 +402,13 @@ public class QuantTradeNotificationService {
     }
 
     private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
+                                         BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate,
+                                         BigDecimal triggerReturnRate, String closeType, String reason) {
+        enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, null, null, quoteAsset,
+            maximumReturnRate, triggerReturnRate, closeType, reason);
+    }
+
+    private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                          BigDecimal entryPrice, Long orderId, Long strategyInstanceId, String positionCycleKey, String quoteAsset,
                                          BigDecimal maximumReturnRate, BigDecimal triggerReturnRate, String closeType, String reason) {
         if (credential == null || credential.getId() == null || entryPrice == null || entryPrice.signum() <= 0
