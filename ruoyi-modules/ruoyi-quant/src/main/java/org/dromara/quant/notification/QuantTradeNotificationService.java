@@ -91,6 +91,10 @@ public class QuantTradeNotificationService {
         return value == null ? "待核实" : value.stripTrailingZeros().toPlainString() + "%";
     }
 
+    private static String returnRatePercentage(BigDecimal ratio) {
+        return ratio == null ? "待核实" : percentage(ratio.multiply(BigDecimal.valueOf(100)));
+    }
+
     private static String plain(BigDecimal value) {
         return value == null ? "N/A" : value.stripTrailingZeros().toPlainString();
     }
@@ -165,14 +169,21 @@ public class QuantTradeNotificationService {
     public void notifyCloseByStrategyOrder(QuantStrategy strategy, QuantCredential credential, Long strategyInstanceId, String positionCycleKey,
                                            String symbol, String direction, BigDecimal requestedQuantity, BigDecimal entryPrice, String quoteAsset,
                                            BigDecimal maximumReturnRate, String closeType, String reason) {
+        notifyCloseByStrategyOrder(strategy, credential, strategyInstanceId, positionCycleKey, symbol, direction, requestedQuantity,
+            entryPrice, quoteAsset, maximumReturnRate, null, closeType, reason);
+    }
+
+    public void notifyCloseByStrategyOrder(QuantStrategy strategy, QuantCredential credential, Long strategyInstanceId, String positionCycleKey,
+                                           String symbol, String direction, BigDecimal requestedQuantity, BigDecimal entryPrice, String quoteAsset,
+                                           BigDecimal maximumReturnRate, BigDecimal triggerReturnRate, String closeType, String reason) {
         Long orderId = resolveStrategyCloseOrderId(credential == null ? null : credential.getId(), strategyInstanceId, symbol, direction, requestedQuantity);
         if (orderId != null) {
             notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
-                maximumReturnRate, closeType, reason);
+                maximumReturnRate, triggerReturnRate, closeType, reason);
             return;
         }
         enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, null, strategyInstanceId,
-            positionCycleKey, quoteAsset, maximumReturnRate, closeType, reason);
+            positionCycleKey, quoteAsset, maximumReturnRate, triggerReturnRate, closeType, reason);
     }
 
     private Long resolveStrategyCloseOrderId(Long credentialId, Long strategyInstanceId, String symbol, String direction, BigDecimal quantity) {
@@ -203,11 +214,18 @@ public class QuantTradeNotificationService {
 
     public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                   BigDecimal entryPrice, Long orderId, String quoteAsset, String closeType, String reason) {
-        notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset, null, closeType, reason);
+        notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset, null, null, closeType, reason);
     }
 
     public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                   BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate, String closeType, String reason) {
+        notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
+            maximumReturnRate, null, closeType, reason);
+    }
+
+    public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
+                                  BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate,
+                                  BigDecimal triggerReturnRate, String closeType, String reason) {
         if (credential == null || orderId == null || entryPrice == null || entryPrice.signum() <= 0) {
             log.warn("平仓成交通知暂缓：缺少账户、订单或开仓价 credentialId={} symbol={} orderId={}",
                 credential == null ? null : credential.getId(), symbol, orderId);
@@ -215,19 +233,20 @@ public class QuantTradeNotificationService {
         }
         try {
             if (!tryNotifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
-                maximumReturnRate, closeType, reason)) {
+                maximumReturnRate, triggerReturnRate, closeType, reason)) {
                 enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
-                    maximumReturnRate, closeType, reason);
+                    maximumReturnRate, triggerReturnRate, closeType, reason);
             }
         } catch (RuntimeException ex) {
             log.warn("平仓成交事实核验失败，已安排后台补偿 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId, ex);
             enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
-                maximumReturnRate, closeType, reason);
+                maximumReturnRate, triggerReturnRate, closeType, reason);
         }
     }
 
     private boolean tryNotifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
-                                          BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate, String closeType, String reason) {
+                                          BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate,
+                                          BigDecimal triggerReturnRate, String closeType, String reason) {
         if (credential == null || orderId == null || entryPrice == null || entryPrice.signum() <= 0 || requestedQuantity == null
             || requestedQuantity.signum() <= 0) {
             return false;
@@ -303,6 +322,7 @@ public class QuantTradeNotificationService {
             + "平仓数量: " + plain(filledQuantity) + "\n"
             + "开仓价格: " + plain(entryPrice) + "\n"
             + "实际平仓均价: " + plain(averageClosePrice) + "\n"
+            + "平仓触发时回报率: " + returnRatePercentage(triggerReturnRate) + "\n"
             + "最大回报率: " + percentage(maximumReturnRate) + "\n"
             + "交易所已实现盈亏（未扣手续费）: " + plain(realizedPnl) + " " + asset + "\n"
             + "手续费: " + feeText + "\n"
@@ -370,12 +390,12 @@ public class QuantTradeNotificationService {
     private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                          BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate, String closeType, String reason) {
         enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, null, null, quoteAsset,
-            maximumReturnRate, closeType, reason);
+            maximumReturnRate, null, closeType, reason);
     }
 
     private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                          BigDecimal entryPrice, Long orderId, Long strategyInstanceId, String positionCycleKey, String quoteAsset,
-                                         BigDecimal maximumReturnRate, String closeType, String reason) {
+                                         BigDecimal maximumReturnRate, BigDecimal triggerReturnRate, String closeType, String reason) {
         if (credential == null || credential.getId() == null || entryPrice == null || entryPrice.signum() <= 0
             || orderId == null && strategyInstanceId == null) {
             log.error("平仓通知无法建立待核验任务：缺少账户、订单或策略身份 credentialId={} symbol={} orderId={} strategyInstanceId={}",
@@ -404,6 +424,7 @@ public class QuantTradeNotificationService {
             task.put("orderId", orderId == null ? null : String.valueOf(orderId));
             task.put("quoteAsset", quoteAsset);
             task.put("maximumReturnRate", maximumReturnRate == null ? null : maximumReturnRate.toPlainString());
+            task.put("triggerReturnRate", triggerReturnRate == null ? null : triggerReturnRate.toPlainString());
             task.put("closeType", closeType);
             task.put("reason", reason);
             QuantNotification pending = new QuantNotification();
@@ -472,7 +493,8 @@ public class QuantTradeNotificationService {
                 }
                 boolean sent = orderId != null && tryNotifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity,
                     decimal(data.get("entryPrice")), orderId, String.valueOf(data.get("quoteAsset")),
-                    decimal(data.get("maximumReturnRate")), String.valueOf(data.get("closeType")), String.valueOf(data.get("reason")));
+                    decimal(data.get("maximumReturnRate")), decimal(data.get("triggerReturnRate")),
+                    String.valueOf(data.get("closeType")), String.valueOf(data.get("reason")));
                 if (sent) {
                     task.setStatus("SENT");
                     task.setSentAt(LocalDateTime.now());
@@ -511,13 +533,21 @@ public class QuantTradeNotificationService {
                                  BigDecimal entryPrice, BigDecimal closePrice, BigDecimal realizedPnl, String quoteAsset,
                                  BigDecimal walletBalance, BigDecimal availableBalance, BigDecimal unrealizedPnl, String closeType, String reason) {
         notifyClosePaper(strategy, credential, symbol, direction, quantity, entryPrice, closePrice, realizedPnl, quoteAsset,
-            walletBalance, availableBalance, unrealizedPnl, null, closeType, reason);
+            walletBalance, availableBalance, unrealizedPnl, null, null, closeType, reason);
     }
 
     public void notifyClosePaper(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
                                  BigDecimal entryPrice, BigDecimal closePrice, BigDecimal realizedPnl, String quoteAsset,
                                  BigDecimal walletBalance, BigDecimal availableBalance, BigDecimal unrealizedPnl, BigDecimal maximumReturnRate,
                                  String closeType, String reason) {
+        notifyClosePaper(strategy, credential, symbol, direction, quantity, entryPrice, closePrice, realizedPnl, quoteAsset,
+            walletBalance, availableBalance, unrealizedPnl, maximumReturnRate, null, closeType, reason);
+    }
+
+    public void notifyClosePaper(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
+                                 BigDecimal entryPrice, BigDecimal closePrice, BigDecimal realizedPnl, String quoteAsset,
+                                 BigDecimal walletBalance, BigDecimal availableBalance, BigDecimal unrealizedPnl, BigDecimal maximumReturnRate,
+                                 BigDecimal triggerReturnRate, String closeType, String reason) {
         String asset = safe(quoteAsset);
         BigDecimal marginBalance = walletBalance == null || unrealizedPnl == null ? null : walletBalance.add(unrealizedPnl);
         String subject = "量化平仓通知 - " + symbol + " " + cnDirection(direction);
@@ -531,6 +561,7 @@ public class QuantTradeNotificationService {
             + "平仓数量: " + plain(quantity) + "\n"
             + "开仓价格: " + plain(entryPrice) + "\n"
             + "实际平仓价格: " + plain(closePrice) + "\n"
+            + "平仓触发时回报率: " + returnRatePercentage(triggerReturnRate) + "\n"
             + "最大回报率: " + percentage(maximumReturnRate) + "\n"
             + "模拟账本已实现盈亏: " + plain(realizedPnl) + " " + asset + "\n"
             + "手续费: PAPER 模式未计入交易所手续费\n"
