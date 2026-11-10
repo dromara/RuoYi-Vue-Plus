@@ -230,8 +230,8 @@ public class QuantTradeNotificationService {
     private void sendOpenNotification(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
                                       BigDecimal price, int leverage, BigDecimal openRatio, Instant openTime, String reason) {
         String subject = "量化开仓通知 - " + symbol + " " + cnDirection(direction);
-        String content = "【量化开仓通知】\\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\\n" + "账户: " + safe(credential == null ? null :
-            credential.getAccountName()) + "\\n" + "交易对: " + symbol + "\\n" + "方向: " + cnDirection(direction) + "\\n" + "开仓数量: " + plain(quantity) + "\\n" + "开仓价格: " + plain(price) + "\\n" + "杠杆倍数: " + leverage + "倍\\n" + "开仓比例: " + plain(openRatio) + "\\n" + "开仓时间: " + tradeTime(openTime) + "\\n" + "触发原因: " + safe(reason);
+        String content = "【量化开仓通知】\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\n" + "账户: " + safe(credential == null ? null :
+            credential.getAccountName()) + "\n" + "交易对: " + symbol + "\n" + "方向: " + cnDirection(direction) + "\n" + "开仓数量: " + plain(quantity) + "\n" + "开仓价格: " + plain(price) + "\n" + "杠杆倍数: " + leverage + "倍\n" + "开仓比例: " + plain(openRatio) + "\n" + "开仓时间: " + tradeTime(openTime) + "\n" + "触发原因: " + safe(reason);
         send(credential == null ? null : credential.getId(), subject, content);
     }
 
@@ -610,7 +610,7 @@ public class QuantTradeNotificationService {
                 task.setNextRetryAt(null);
                 task.setLastError("超过 Binance 成交明细可查询窗口，无法继续自动核验");
                 notificationMapper.updateById(task);
-                log.error("平仓通知待核验任务超过可查询窗口，停止自动重试 notificationId={} recipient={}", task.getId(), task.getRecipient());
+                log.error("交易通知待核验任务超过可查询窗口，停止自动重试 notificationId={} recipient={}", task.getId(), task.getRecipient());
                 continue;
             }
             String ownerToken = UUID.randomUUID().toString();
