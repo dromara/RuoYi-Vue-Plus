@@ -463,7 +463,7 @@ class ProtectionOrderServiceTest {
         assertEquals("FINISHED", local.getStatus());
         assertEquals(BigDecimal.ONE, local.getExecutedQuantity());
         verify(mapper).updateById(local);
-        verify(lease).cleaned();
+        verify(lease).markOrderTerminal(local);
     }
 
     @Test
