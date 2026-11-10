@@ -498,7 +498,7 @@ public class ProtectionOrderService {
                 if (live && Set.of("LOCAL_STOP", "SYMBOL_STOP").contains(signal.type()) && "STOP_MARKET".equalsIgnoreCase(signal.orderType())) {
                     BigDecimal base = signal.quantityBase() == ProtectionSignal.QuantityBase.INITIAL && initialPositionQuantity != null ? initialPositionQuantity : position.getQuantity();
                     BigDecimal quantity = normalizeQuantity(credentialId, position.getSymbol(), base.multiply(signal.quantityRate() == null ? BigDecimal.ONE : signal.quantityRate()).min(position.getQuantity()), true);
-                    BigDecimal price = normalizePrice(credentialId, position.getSymbol(), signal.triggerPrice(), true);
+                    BigDecimal price = QuantityNormalizer.protectionPrice(signal.triggerPrice(), rule(credentialId, position.getSymbol()), position.getPositionSide(), signal.orderType());
                     if (confirmedCover(credentialId, position, signal.type(), quantity, price) != null) {
                         continue;
                     }
@@ -632,7 +632,7 @@ public class ProtectionOrderService {
             return;
         }
         targetQty = normalizeQuantity(credentialId, position.getSymbol(), targetQty, live);
-        BigDecimal triggerPrice = normalizeProtectionPrice(credentialId, position, signal.triggerPrice(), live);
+        BigDecimal triggerPrice = normalizeProtectionPrice(credentialId, position, signal.triggerPrice(), signal.orderType(), live);
         if (targetQty.signum() <= 0 || triggerPrice == null || triggerPrice.signum() <= 0) {
             return;
         }
@@ -1064,7 +1064,7 @@ public class ProtectionOrderService {
                 }
                 local.setQuantity(normalizeQuantity(credentialId, local.getSymbol(), currentQuantity == null ? local.getQuantity() : local.getQuantity().min(currentQuantity),
                     true));
-                local.setStopPrice(normalizePrice(credentialId, local.getSymbol(), local.getStopPrice(), true));
+                local.setStopPrice(QuantityNormalizer.protectionPrice(local.getStopPrice(), rule(credentialId, local.getSymbol()), local.getPositionSide(), local.getOrderType()));
                 local.setStatus("PENDING");
                 if (mapper.updateById(local) != 1) {
                     throw new IllegalStateException("恢复保护单意图未可靠持久化，拒绝重送");
@@ -1248,11 +1248,11 @@ public class ProtectionOrderService {
     /**
      * 按实际交易环境的 PRICE_FILTER 标准化触发价。
      */
-    private BigDecimal normalizeProtectionPrice(Long credentialId, QuantPosition position, BigDecimal price, boolean live) {
-        if (live && price != null && Integer.valueOf(2).equals(position.getProtectionPolicyVersion())) {
-            return QuantityNormalizer.protectionPrice(price, rule(credentialId, position.getSymbol()), position.getPositionSide());
+    private BigDecimal normalizeProtectionPrice(Long credentialId, QuantPosition position, BigDecimal price, String orderType, boolean live) {
+        if (price == null || !live) {
+            return price;
         }
-        return normalizePrice(credentialId, position.getSymbol(), price, live);
+        return QuantityNormalizer.protectionPrice(price, rule(credentialId, position.getSymbol()), position.getPositionSide(), orderType);
     }
 
     private BigDecimal normalizePrice(Long credentialId, String symbol, BigDecimal price, boolean live) {
