@@ -805,7 +805,7 @@ public class QuantTradeNotificationService {
         try {
             notificationMapper.insert(systemNotification);
             if (systemNotification.getId() != null) {
-                claimAndDeliver(systemNotification);
+                dispatchNotification(systemNotification.getId());
             }
         } catch (RuntimeException ex) {
             log.error("量化交易站内通知入队或即时投递失败 credentialId={} subject={}", credentialId, subject, ex);
