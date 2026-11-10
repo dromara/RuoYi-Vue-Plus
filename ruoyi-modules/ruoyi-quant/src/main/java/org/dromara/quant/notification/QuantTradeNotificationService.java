@@ -428,7 +428,7 @@ public class QuantTradeNotificationService {
     private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
                                          BigDecimal entryPrice, Long orderId, String quoteAsset, BigDecimal maximumReturnRate, String closeType, String reason) {
         enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, null, null, quoteAsset,
-            maximumReturnRate, null, closeType, reason);
+            maximumReturnRate, null, null, closeType, reason);
     }
 
     private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
