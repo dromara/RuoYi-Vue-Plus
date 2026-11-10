@@ -317,16 +317,18 @@ public class QuantTradeNotificationService {
                 credential == null ? null : credential.getId(), symbol, orderId);
             return;
         }
+        QuantNotification pendingTask = enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice,
+            orderId, quoteAsset, maximumReturnRate, openTime, triggerReturnRate, closeType, reason);
         try {
-            if (!tryNotifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
+            if (tryNotifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
                 maximumReturnRate, openTime, triggerReturnRate, closeType, reason)) {
-                enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
-                    maximumReturnRate, openTime, triggerReturnRate, closeType, reason);
+                markCloseFactSent(pendingTask);
+            } else {
+                log.warn("平仓成交事实暂未完整确认，保留后台补偿任务 credentialId={} symbol={} orderId={}",
+                    credential.getId(), symbol, orderId);
             }
         } catch (RuntimeException ex) {
-            log.warn("平仓成交事实核验失败，已安排后台补偿 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId, ex);
-            enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
-                maximumReturnRate, openTime, triggerReturnRate, closeType, reason);
+            log.warn("平仓成交事实核验失败，保留后台补偿任务 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId, ex);
         }
     }
 
@@ -497,24 +499,24 @@ public class QuantTradeNotificationService {
             maximumReturnRate, openTime, triggerReturnRate, closeType, reason);
     }
 
-    private void enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
-                                         BigDecimal entryPrice, Long orderId, Long strategyInstanceId, String positionCycleKey, String quoteAsset,
-                                         BigDecimal maximumReturnRate, Instant openTime, BigDecimal triggerReturnRate, String closeType, String reason) {
+    private QuantNotification enqueuePendingCloseFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
+                                                       BigDecimal entryPrice, Long orderId, Long strategyInstanceId, String positionCycleKey, String quoteAsset,
+                                                       BigDecimal maximumReturnRate, Instant openTime, BigDecimal triggerReturnRate, String closeType, String reason) {
         if (credential == null || credential.getId() == null || entryPrice == null || entryPrice.signum() <= 0
             || orderId == null && strategyInstanceId == null) {
             log.error("平仓通知无法建立待核验任务：缺少账户、订单或策略身份 credentialId={} symbol={} orderId={} strategyInstanceId={}",
                 credential == null ? null : credential.getId(), symbol, orderId, strategyInstanceId);
-            return;
+            return null;
         }
         String taskKey = orderId == null
             ? "STRATEGY:" + strategyInstanceId + ":" + (positionCycleKey == null ? "UNKNOWN" : positionCycleKey) + ":" + UUID.randomUUID()
             : String.valueOf(orderId);
         try {
-            long existing = notificationMapper.selectCount(new LambdaQueryWrapper<QuantNotification>()
+            QuantNotification existing = notificationMapper.selectOne(new LambdaQueryWrapper<QuantNotification>()
                 .eq(QuantNotification::getCredentialId, credential.getId()).eq(QuantNotification::getChannel, "FACT_PENDING")
-                .eq(QuantNotification::getRecipient, taskKey));
-            if (existing > 0) {
-                return;
+                .eq(QuantNotification::getRecipient, taskKey).last("LIMIT 1"));
+            if (existing != null) {
+                return existing;
             }
             Map<String, Object> task = new LinkedHashMap<>();
             task.put("credentialId", String.valueOf(credential.getId()));
@@ -542,13 +544,28 @@ public class QuantTradeNotificationService {
             pending.setRetryCount(0);
             pending.setNextRetryAt(LocalDateTime.now().plusSeconds(30));
             pending.setCreatedAt(LocalDateTime.now());
-            notificationMapper.insert(pending);
+            if (notificationMapper.insert(pending) != 1) {
+                return null;
+            }
             log.warn("平仓通知已进入持久化待核验队列 credentialId={} symbol={} orderId={} strategyInstanceId={}",
                 credential.getId(), symbol, orderId, strategyInstanceId);
+            return pending;
         } catch (Exception ex) {
             log.error("平仓通知待核验任务持久化失败 credentialId={} symbol={} orderId={} strategyInstanceId={}",
                 credential.getId(), symbol, orderId, strategyInstanceId, ex);
+            return null;
         }
+    }
+
+    private void markCloseFactSent(QuantNotification task) {
+        if (task == null) {
+            return;
+        }
+        task.setStatus("SENT");
+        task.setSentAt(LocalDateTime.now());
+        task.setNextRetryAt(null);
+        task.setLastError(null);
+        notificationMapper.updateById(task);
     }
 
     private void enqueuePendingOpenFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
