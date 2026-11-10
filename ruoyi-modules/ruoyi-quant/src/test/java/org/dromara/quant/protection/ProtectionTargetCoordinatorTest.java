@@ -106,6 +106,23 @@ class ProtectionTargetCoordinatorTest {
     }
 
     @Test
+    void terminalOrderClearsOnlyItsOwnCurrentAndPreviousReferences() {
+        var f = fixture();
+        try (var lease = f.first.acquire(1L, f.position, "HARD_STOP")) {
+            var original = order(1);
+            lease.prepare(original, 0, null, row -> f.jdbc.update("INSERT INTO test_order VALUES (?,?)", row.getId(), row.getClientOrderId()));
+            lease.confirmed(original, 0);
+            var replacement = order(2);
+            lease.prepare(replacement, 0, original, row -> f.jdbc.update("INSERT INTO test_order VALUES (?,?)", row.getId(), row.getClientOrderId()));
+            lease.terminal(replacement);
+
+            lease.markOrderTerminal(original);
+            assertNull(lease.state().currentOrderId());
+            assertNull(lease.state().previousOrderId());
+        }
+    }
+
+    @Test
     void failedIntentInsertRollsBackVersionAndConfirmationCannotRegress() {
         var f = fixture();
         try (var lease = f.first.acquire(1L, f.position, "STEP_TP")) {
