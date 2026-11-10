@@ -895,12 +895,11 @@ public class QuantTradeNotificationService {
         try {
             notificationExecutor.execute(() -> {
                 QuantNotification task = notificationMapper.selectById(notificationId);
-                if (task == null || notificationMapper.claim(task.getId(), UUID.randomUUID().toString(),
-                    LocalDateTime.now().plusMinutes(2)) != 1) {
+                String ownerToken = UUID.randomUUID().toString();
+                LocalDateTime leaseUntil = LocalDateTime.now().plusMinutes(2);
+                if (task == null || notificationMapper.claim(task.getId(), ownerToken, leaseUntil) != 1) {
                     return;
                 }
-                String ownerToken = task.getOwnerToken();
-                LocalDateTime leaseUntil = LocalDateTime.now().plusMinutes(2);
                 task.setStatus("SENDING");
                 task.setOwnerToken(ownerToken);
                 task.setLeaseUntil(leaseUntil);
