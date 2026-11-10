@@ -1173,7 +1173,9 @@ public class ProtectionOrderService {
                     if (Objects.equals(target.pendingOrderId(), local.getId())) {
                         targetLease.get().terminal(local);
                     }
-                    targetLease.get().markOrderTerminal(local);
+                    if (Objects.equals(target.currentOrderId(), local.getId()) || Objects.equals(target.previousOrderId(), local.getId())) {
+                        targetLease.get().markOrderTerminal(local);
+                    }
                 } else if (targets != null && local.getPositionCycleKey() != null) {
                     QuantPosition scope = new QuantPosition();
                     scope.setId(local.getPositionId());
@@ -1184,7 +1186,9 @@ public class ProtectionOrderService {
                         if (Objects.equals(target.pendingOrderId(), local.getId())) {
                             targetLease.get().terminal(local);
                         }
-                        targetLease.get().markOrderTerminal(local);
+                        if (Objects.equals(target.currentOrderId(), local.getId()) || Objects.equals(target.previousOrderId(), local.getId())) {
+                            targetLease.get().markOrderTerminal(local);
+                        }
                         return null;
                     });
                 }
