@@ -38,7 +38,8 @@ WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTA
 SET current_order_id=CASE WHEN current_order_id=#{orderId} THEN NULL ELSE current_order_id END,
     previous_order_id=CASE WHEN previous_order_id=#{orderId} THEN NULL ELSE previous_order_id END,
     updated_at=UTC_TIMESTAMP()
-WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
+WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP
+  AND (current_order_id=#{orderId} OR previous_order_id=#{orderId})]]></update>
     <update id="releaseLease" timeout="3"><![CDATA[UPDATE quant_protection_target SET owner_token=NULL,lease_until=NULL
 WHERE target_key=#{key} AND owner_token=#{owner}]]></update>
 </mapper>
