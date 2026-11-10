@@ -75,6 +75,24 @@ class ProtectionOrderJournalServiceTest {
     }
 
     @Test
+    void reducedAlgoQuantityIsAcceptedOnlyWhenExactChildProvesFullFill() {
+        var parent = local();
+        parent.setQuantity(new BigDecimal("2"));
+        assertTrue(journal.bindChild(credential, parent, actual("BOTH"), child(91L)));
+        verify(orders).insert(any(QuantOrder.class));
+    }
+
+    @Test
+    void reducedAlgoQuantityWithoutFilledChildProofIsRejected() {
+        var parent = local();
+        parent.setQuantity(new BigDecimal("2"));
+        var partialChild = new ExchangeGateway.OrderSnapshot("BTCUSDT", 91L, "child-client", "SELL", "MARKET", "CANCELED",
+            BigDecimal.ZERO, BigDecimal.ONE, new BigDecimal("0.5"), Instant.now(), BigDecimal.TEN);
+        assertThrows(IllegalStateException.class, () -> journal.bindChild(credential, parent, actual("BOTH"), partialChild));
+        verifyNoInteractions(orders);
+    }
+
+    @Test
     void conflictingExistingAttributionCannotBeOverwritten() {
         var existing = new QuantOrder();
         existing.setId(11L);
