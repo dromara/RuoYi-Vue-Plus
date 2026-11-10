@@ -238,16 +238,16 @@ public class StrategyRuntimeService {
                 var account = paperTradingService.find(runtime.credential.getId());
                 notificationService.notifyClosePaper(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity, entryPrice,
                     closePrice, profitAmount, runtime.symbol.getQuoteAsset(), account == null ? null : account.getBalance(),
-                    account == null ? null : account.getAvailableBalance(), account == null ? null : account.getUnrealizedPnl(), maximumReturnRate, closeType, reason);
+                    account == null ? null : account.getAvailableBalance(), account == null ? null : account.getUnrealizedPnl(), maximumReturnRate, profitRate, closeType, reason);
             } else {
                 Long orderId = runtime.state == null ? null : runtime.state.getPendingOrderId();
                 if (orderId != null) {
                     notificationService.notifyCloseByOrder(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity,
-                        entryPrice, orderId, runtime.symbol.getQuoteAsset(), maximumReturnRate, closeType, reason);
+                        entryPrice, orderId, runtime.symbol.getQuoteAsset(), maximumReturnRate, profitRate, closeType, reason);
                 } else {
                     notificationService.notifyCloseByStrategyOrder(runtime.strategy, runtime.credential, runtime.instance.getId(),
                         runtime.state == null ? null : runtime.state.getPositionCycleKey(), runtime.symbol.getSymbol(), direction, quantity,
-                        entryPrice, runtime.symbol.getQuoteAsset(), maximumReturnRate, closeType, reason);
+                        entryPrice, runtime.symbol.getQuoteAsset(), maximumReturnRate, profitRate, closeType, reason);
                 }
             }
         } catch (RuntimeException ex) {
@@ -845,7 +845,7 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
                         BigDecimal closePrice = runtime.currentPrice() != null ? runtime.currentPrice() : runtime.position.getMarkPrice();
                         BigDecimal profitRate = leveragedReturnRate(runtime, previousPosition.getPositionSide(), closePrice, previousPosition.getEntryPrice());
                         BigDecimal profitAmount = calculateProfitAmount(previousPosition.getPositionSide(), closePrice, previousPosition.getEntryPrice(), closedQty);
-                        notifyCloseSafely(runtime, previousPosition.getPositionSide(), closedQty, previousPosition.getEntryPrice(), closePrice, profitAmount, profitRate,
+                        notifyCloseSafely(runtime, previousPosition.getPositionSide(), closedQty, previousPosition.getEntryPrice(), closePrice, profitAmount, null,
                             "EXCHANGE_PARTIAL_CLOSE", "交易所保护单/外部操作导致部分减仓，经 REST 对账确认");
                     }
                     if (firstExecuted != null) {
@@ -880,14 +880,14 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
                         BigDecimal profitAmount = calculateProfitAmount(previousPosition.getPositionSide(), closePrice, previousPosition.getEntryPrice(),
                          previousPosition.getQuantity());
                         notifyCloseSafely(runtime, previousPosition.getPositionSide(), previousPosition.getQuantity(), previousPosition.getEntryPrice(), closePrice,
-                            profitAmount, profitRate, "EXCHANGE_PROTECTION_OR_EXTERNAL", "交易所保护单/外部操作导致持仓关闭，经 REST 对账确认");
+                            profitAmount, null, "EXCHANGE_PROTECTION_OR_EXTERNAL", "交易所保护单/外部操作导致持仓关闭，经 REST 对账确认");
                     } else if (runtime.state.getPositionQty() != null && runtime.state.getPositionQty().signum() > 0
                         && runtime.state.getEntryPrice() != null && runtime.state.getDirection() != null) {
                         BigDecimal closePrice = runtime.currentPrice() != null ? runtime.currentPrice() : runtime.state.getEntryPrice();
                         BigDecimal qty = runtime.state.getPositionQty();
                         BigDecimal profitRate = leveragedReturnRate(runtime, runtime.state.getDirection(), closePrice, runtime.state.getEntryPrice());
                         BigDecimal profitAmount = calculateProfitAmount(runtime.state.getDirection(), closePrice, runtime.state.getEntryPrice(), qty);
-                        notifyCloseSafely(runtime, runtime.state.getDirection(), qty, runtime.state.getEntryPrice(), closePrice, profitAmount, profitRate,
+                        notifyCloseSafely(runtime, runtime.state.getDirection(), qty, runtime.state.getEntryPrice(), closePrice, profitAmount, null,
                             "EXCHANGE_PROTECTION_OR_EXTERNAL", "策略恢复时经账户快照确认持仓已关闭");
                     }
                     boolean protectionCleaned = cancelStaleProtection(runtime);
