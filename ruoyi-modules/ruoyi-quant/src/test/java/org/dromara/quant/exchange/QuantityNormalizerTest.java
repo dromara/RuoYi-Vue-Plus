@@ -19,10 +19,10 @@ class QuantityNormalizerTest {
             BigDecimal.ONE, BigDecimal.ONE, new BigDecimal("1000"), new BigDecimal("1000"),
             new BigDecimal("5"), "TRADING");
         BigDecimal raw = new BigDecimal("100.003");
-        assertEquals(new BigDecimal("100.01"), QuantityNormalizer.protectionPrice(raw, rule, "LONG", "STOP_MARKET"));
-        assertEquals(new BigDecimal("100.00"), QuantityNormalizer.protectionPrice(raw, rule, "SHORT", "STOP_MARKET"));
-        assertEquals(new BigDecimal("100.00"), QuantityNormalizer.protectionPrice(raw, rule, "LONG", "TAKE_PROFIT_MARKET"));
-        assertEquals(new BigDecimal("100.01"), QuantityNormalizer.protectionPrice(raw, rule, "SHORT", "TAKE_PROFIT_MARKET"));
+        assertEquals(0, new BigDecimal("100.01").compareTo(QuantityNormalizer.protectionPrice(raw, rule, "LONG", "STOP_MARKET")));
+        assertEquals(0, new BigDecimal("100.00").compareTo(QuantityNormalizer.protectionPrice(raw, rule, "SHORT", "STOP_MARKET")));
+        assertEquals(0, new BigDecimal("100.00").compareTo(QuantityNormalizer.protectionPrice(raw, rule, "LONG", "TAKE_PROFIT_MARKET")));
+        assertEquals(0, new BigDecimal("100.01").compareTo(QuantityNormalizer.protectionPrice(raw, rule, "SHORT", "TAKE_PROFIT_MARKET")));
     }
 
     @Test
