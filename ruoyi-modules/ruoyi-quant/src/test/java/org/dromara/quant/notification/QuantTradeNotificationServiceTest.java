@@ -54,6 +54,97 @@ class QuantTradeNotificationServiceTest {
     }
 
     @Test
+    void liveOpenNotificationQueuesExchangeFillTimeVerificationWithoutBlockingCaller() {
+        com.baomidou.mybatisplus.core.metadata.TableInfoHelper.initTableInfo(
+            new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-open-pending-test"), QuantNotification.class);
+        var mapper = mock(QuantNotificationMapper.class);
+        var gateway = mock(ExchangeGateway.class);
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway);
+        when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
+            ((QuantNotification) invocation.getArgument(0)).setId(46L);
+            return 1;
+        });
+        var credential = new QuantCredential();
+        credential.setId(10L);
+        credential.setApiKey("test-key");
+        credential.setSecretKey("test-secret");
+        credential.setSignatureType("HMAC");
+        credential.setRunMode("TESTNET");
+
+        service.notifyOpen(null, credential, "BTCUSDT", "LONG", BigDecimal.ONE, BigDecimal.TEN, 5,
+            new BigDecimal("0.1"), Instant.now(), 102L, "test open");
+
+        var rows = ArgumentCaptor.forClass(QuantNotification.class);
+        verify(mapper).insert(rows.capture());
+        assertEquals("FACT_PENDING", rows.getValue().getChannel());
+        assertEquals("OPEN:102", rows.getValue().getRecipient());
+        assertTrue(rows.getValue().getContent().contains("\\"taskType\\":\\"OPEN\\""));
+        verifyNoInteractions(gateway);
+    }
+
+    @Test
+    void pendingOpenNotificationUsesEarliestConfirmedExchangeFillTime() throws Exception {
+        com.baomidou.mybatisplus.core.metadata.TableInfoHelper.initTableInfo(
+            new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-open-fill-test"), QuantNotification.class);
+        var mapper = mock(QuantNotificationMapper.class);
+        var gateway = mock(ExchangeGateway.class);
+        var jdbc = mock(JdbcTemplate.class);
+        var messageService = mock(MessageService.class);
+        var properties = new QuantProperties();
+        properties.getNotification().setDefaultEmails("test@example.invalid");
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties,
+            messageService, jdbc, gateway);
+        var credentialMapper = mock(org.dromara.quant.credential.mapper.QuantCredentialMapper.class);
+        var credentialMapperField = QuantTradeNotificationService.class.getDeclaredField("credentialMapper");
+        credentialMapperField.setAccessible(true);
+        credentialMapperField.set(service, credentialMapper);
+        var credential = new QuantCredential();
+        credential.setId(10L);
+        credential.setAccountName("test-account");
+        credential.setApiKey("test-key");
+        credential.setSecretKey("test-secret");
+        credential.setSignatureType("HMAC");
+        credential.setRunMode("TESTNET");
+        when(credentialMapper.selectById(10L)).thenReturn(credential);
+
+        Instant firstFill = Instant.parse("2026-11-10T02:00:00Z");
+        Instant secondFill = Instant.parse("2026-11-10T02:00:03Z");
+        when(gateway.queryOrder(any(), eq("BTCUSDT"), eq(102L), isNull())).thenReturn(
+            new ExchangeGateway.OrderSnapshot("BTCUSDT", 102L, "client-open", "BUY", "MARKET", "FILLED",
+                BigDecimal.ZERO, BigDecimal.valueOf(2), BigDecimal.valueOf(2), secondFill, BigDecimal.valueOf(100)));
+        when(gateway.queryTradesByOrder(any(), eq("BTCUSDT"), eq(102L), any(), eq(1000L))).thenReturn(List.of(
+            new ExchangeGateway.TradeSnapshot("BTCUSDT", 1L, 102L, "BUY", BigDecimal.ONE, BigDecimal.valueOf(99),
+                BigDecimal.ZERO, BigDecimal.ZERO, secondFill, "USDT", "LONG"),
+            new ExchangeGateway.TradeSnapshot("BTCUSDT", 2L, 102L, "BUY", BigDecimal.ONE, BigDecimal.valueOf(100),
+                BigDecimal.ZERO, BigDecimal.ZERO, firstFill, "USDT", "LONG")));
+        var task = new QuantNotification();
+        task.setId(47L);
+        task.setCreatedAt(java.time.LocalDateTime.now());
+        task.setContent(org.dromara.quant.util.QuantJsonMapper.writeMap(java.util.Map.of(
+            "taskType", "OPEN", "credentialId", "10", "strategyName", "test-strategy", "symbol", "BTCUSDT",
+            "direction", "LONG", "quantity", "2", "price", "99.5", "leverage", 5, "openRatio", "0.1",
+            "orderId", "102", "reason", "test open")));
+        when(mapper.selectList(any())).thenReturn(List.of(task));
+        when(mapper.claim(eq(47L), any(), any())).thenReturn(1);
+        when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
+            ((QuantNotification) invocation.getArgument(0)).setId(48L);
+            return 1;
+        });
+        when(mapper.claim(eq(48L), any(), any())).thenReturn(1);
+        when(jdbc.queryForObject(anyString(), eq(Long.class), any())).thenReturn(7L);
+        when(jdbc.query(anyString(), ArgumentMatchers.<RowMapper<Long>>any())).thenReturn(List.of(9L));
+
+        service.retryPendingCloseFacts();
+
+        var rows = ArgumentCaptor.forClass(QuantNotification.class);
+        verify(mapper, atLeastOnce()).insert(rows.capture());
+        var systemNotice = rows.getAllValues().stream().filter(row -> "SYSTEM".equals(row.getChannel())).findFirst().orElseThrow();
+        assertTrue(systemNotice.getContent().contains("开仓时间: 2026-11-10 10:00:00"));
+        verify(mapper).updateById(argThat(updated -> "SENT".equals(updated.getStatus())));
+    }
+
+    @Test
     void failedSystemMessageIsPersistedForRetryInsteadOfMarkedSent() {
         com.baomidou.mybatisplus.core.metadata.TableInfoHelper.initTableInfo(
             new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-retry-test"), QuantNotification.class);
