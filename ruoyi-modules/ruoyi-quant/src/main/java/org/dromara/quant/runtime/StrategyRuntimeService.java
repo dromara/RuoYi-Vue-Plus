@@ -2076,7 +2076,7 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             StrategyContext openedContext = buildContext(runtime, context.currentPrice(), new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
             runtime.strategySymbol.getIntervalCode(), context.currentPrice(), null, context.eventTime()));
             notificationService.notifyOpen(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, runtime.position.getQuantity(),
-             runtime.position.getEntryPrice(), leverage, openRatio, openTime, signal.get().reason());
+             runtime.position.getEntryPrice(), leverage, openRatio, openTime, paper ? null : filledOpen.orderId(), signal.get().reason());
             log.info("实时策略开仓 instanceId={} symbol={} direction={} price={} quantity={} reason={}", runtime.instance.getId(), runtime.symbol.getSymbol(), direction,
              context.currentPrice(), quantity, signal.get().reason());
             // kline_slope_rate 开仓成交后先检查本地镜像保护，避免提交已穿价的 Binance 条件单。
@@ -3515,7 +3515,7 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                         stateService.save(runtime.state);
                     }
                     notificationService.notifyOpen(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), runtime.position.getPositionSide(),
-                runtime.position.getQuantity(), runtime.position.getEntryPrice(), leverage, openRatio, openTime, "未知执行恢复后确认开仓成交");
+                runtime.position.getQuantity(), runtime.position.getEntryPrice(), leverage, openRatio, openTime, order.orderId(), "未知执行恢复后确认开仓成交");
                 } else {
                     BigDecimal beforeQty = runtime.state.getPositionQty();
                     BigDecimal executedQty = order.executedQuantity();
