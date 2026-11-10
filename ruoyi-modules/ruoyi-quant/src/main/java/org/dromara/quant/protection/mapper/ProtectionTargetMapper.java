@@ -40,5 +40,7 @@ public interface ProtectionTargetMapper {
 
     int clearPrevious(@Param("key") String key, @Param("owner") String owner);
 
+    int markOrderTerminal(@Param("key") String key, @Param("owner") String owner, @Param("orderId") Long orderId);
+
     int releaseLease(@Param("key") String key, @Param("owner") String owner);
 }
