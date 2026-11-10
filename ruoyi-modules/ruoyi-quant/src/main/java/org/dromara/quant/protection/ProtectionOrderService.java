@@ -1022,7 +1022,7 @@ public class ProtectionOrderService {
             || !("BOTH".equalsIgnoreCase(actual.positionSide()) || local.getPositionSide().equalsIgnoreCase(actual.positionSide()))
             || local.getOrderType() == null || !local.getOrderType().equalsIgnoreCase(actual.type())
             || local.getStopPrice() == null || actual.triggerPrice() == null || local.getStopPrice().compareTo(actual.triggerPrice()) != 0
-            || !Boolean.TRUE.equals(actual.reduceOnly()) || Boolean.TRUE.equals(actual.closePosition())
+            || !Boolean.TRUE.equals(actual.reduceOnly()) || !Boolean.FALSE.equals(actual.closePosition())
             || actual.quantity() == null || actual.quantity().signum() <= 0) {
             throw new IllegalStateException("Algo 触发终态与本地保护单身份或参数不一致");
         }
@@ -1059,7 +1059,7 @@ public class ProtectionOrderService {
             || child.originalQuantity().compareTo(actual.quantity()) != 0
             || child.executedQuantity().compareTo(child.originalQuantity()) != 0
             || actual.executedQuantity() != null && actual.executedQuantity().compareTo(child.executedQuantity()) != 0
-            || !Boolean.TRUE.equals(child.reduceOnly()) || Boolean.TRUE.equals(child.closePosition())) {
+            || !Boolean.TRUE.equals(child.reduceOnly()) || !Boolean.FALSE.equals(child.closePosition())) {
             throw new IllegalStateException("Algo 实际子订单未能证明身份一致且完整成交");
         }
         if (protectionJournal != null) {
