@@ -407,9 +407,11 @@ public class QuantTradeNotificationService {
         if (account != null && account.marginBalance() != null) {
             jdbcTemplate.update("""
                 INSERT IGNORE INTO quant_trade_close_equity
-                    (credential_id, symbol, exchange_order_id, closing_equity, captured_at)
-                VALUES (?, ?, ?, ?, UTC_TIMESTAMP(3))
-                """, credential.getId(), symbol, orderId, account.marginBalance());
+                    (credential_id, symbol, exchange_order_id, closing_equity,
+                     wallet_balance, unrealized_pnl, captured_at)
+                VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(3))
+                """, credential.getId(), symbol, orderId, account.marginBalance(),
+                account.walletBalance(), account.unrealizedPnl());
         }
         String asset = safe(quoteAsset);
         String subject = "量化平仓通知 - " + symbol + " " + cnDirection(direction);
