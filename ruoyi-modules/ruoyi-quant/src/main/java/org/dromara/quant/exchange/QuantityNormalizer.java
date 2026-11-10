@@ -21,13 +21,28 @@ public final class QuantityNormalizer {
         return floor(value, rule.priceTickSize());
     }
 
-    /** 保护目标按收益不劣于目标值取整：多头向上、空头向下；普通订单仍使用 price。 */
+    /**
+     * 按持仓方向和条件单类型取整，使触发价朝更早触发的方向靠拢。
+     * STOP_MARKET：LONG 向上、SHORT 向下；TAKE_PROFIT_MARKET：LONG 向下、SHORT 向上。
+     */
     public static BigDecimal protectionPrice(BigDecimal value, ExchangeGateway.SymbolRule rule, String direction) {
-        price(value, rule); // 复用价格过滤器校验。
-        if (!"LONG".equalsIgnoreCase(direction) && !"SHORT".equalsIgnoreCase(direction)) {
+        return protectionPrice(value, rule, direction, "STOP_MARKET");
+    }
+
+    public static BigDecimal protectionPrice(BigDecimal value, ExchangeGateway.SymbolRule rule, String direction, String orderType) {
+        price(value, rule);
+        boolean isLong = "LONG".equalsIgnoreCase(direction);
+        boolean isShort = "SHORT".equalsIgnoreCase(direction);
+        if (!isLong && !isShort) {
             throw new IllegalArgumentException("保护价格缺少明确持仓方向");
         }
-        return value.divide(rule.priceTickSize(), 0, "LONG".equalsIgnoreCase(direction) ? RoundingMode.CEILING : RoundingMode.FLOOR)
+        boolean stopMarket = "STOP_MARKET".equalsIgnoreCase(orderType);
+        boolean takeProfitMarket = "TAKE_PROFIT_MARKET".equalsIgnoreCase(orderType);
+        if (!stopMarket && !takeProfitMarket) {
+            throw new IllegalArgumentException("不支持的保护订单类型: " + orderType);
+        }
+        boolean roundUp = stopMarket == isLong;
+        return value.divide(rule.priceTickSize(), 0, roundUp ? RoundingMode.CEILING : RoundingMode.FLOOR)
             .multiply(rule.priceTickSize()).stripTrailingZeros();
     }
 
