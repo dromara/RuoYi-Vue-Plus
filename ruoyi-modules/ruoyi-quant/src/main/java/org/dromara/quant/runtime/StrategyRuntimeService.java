@@ -4121,7 +4121,10 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                                 runtime.protectionRequested.set(true);
                             }
                         }
-                        if (hardStopAlreadyTriggered && !obsolete) {
+                        boolean protectionAlreadyTriggered = hardStopAlreadyTriggered
+                            || failure instanceof org.dromara.quant.exchange.ExchangeTradingPort.OrderRejectedException rejected
+                            && Integer.valueOf(-2021).equals(rejected.code());
+                        if (protectionAlreadyTriggered && !obsolete) {
                             StrategyContext emergencyContext = null;
                             synchronized (runtime) {
                                 if (!runtime.closed && runtime.state != null && runtime.state == work.state() && runtime.position != null
@@ -4131,7 +4134,8 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                                     BigDecimal emergencyPrice = runtime.currentPrice() != null ? runtime.currentPrice()
                                         : runtime.position.getMarkPrice() != null ? runtime.position.getMarkPrice() : runtime.position.getEntryPrice();
                                     if (emergencyPrice != null && emergencyPrice.signum() > 0) {
-                                        emergencyContext = buildContext(runtime, emergencyPrice, new ExchangeGateway.MarketEvent("HARD_STOP_REJECTED",
+                                        emergencyContext = buildContext(runtime, emergencyPrice, new ExchangeGateway.MarketEvent(
+                                            hardStopAlreadyTriggered ? "HARD_STOP_REJECTED" : "STEP_TP_ALREADY_TRIGGERED",
                                             runtime.symbol.getSymbol(), runtime.strategySymbol.getIntervalCode(), emergencyPrice, null, Instant.now()));
                                     }
                                 }
