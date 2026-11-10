@@ -1176,6 +1176,21 @@ public class ProtectionOrderService {
                     if (Objects.equals(target.previousOrderId(), local.getId())) {
                         targetLease.get().cleaned();
                     }
+                } else if (targets != null && local.getPositionCycleKey() != null) {
+                    QuantPosition scope = new QuantPosition();
+                    scope.setId(local.getPositionId());
+                    scope.setPositionSide(local.getPositionSide());
+                    scope.setProtectionCycleKey(local.getPositionCycleKey());
+                    coordinated(credentialId, scope, local.getProtectionType(), () -> {
+                        ProtectionTargetCoordinator.State target = targetLease.get().state();
+                        if (Objects.equals(target.pendingOrderId(), local.getId())) {
+                            targetLease.get().terminal(local);
+                        }
+                        if (Objects.equals(target.previousOrderId(), local.getId())) {
+                            targetLease.get().cleaned();
+                        }
+                        return null;
+                    });
                 }
             }
             throw new ProtectionExecutionPendingException();
