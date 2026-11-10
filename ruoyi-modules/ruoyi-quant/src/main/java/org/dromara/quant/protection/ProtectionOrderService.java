@@ -303,8 +303,8 @@ public class ProtectionOrderService {
             return recovered;
         } catch (RuntimeException ex) {
             String errorMessage = Objects.toString(ex.getMessage(), "");
-            if (errorMessage.length() > 300) {
-                errorMessage = errorMessage.substring(0, 300);
+            if (errorMessage.length() > 1200) {
+                errorMessage = errorMessage.substring(0, 1200);
             }
             log.warn("未决保护撤单核实失败，继续占用派发门禁 accountId={} symbol={} dispatchKey={} clientAlgoId={} stage={} errorType={} errorMessage={}",
                 active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), stage, ex.getClass().getSimpleName(), errorMessage, ex);
