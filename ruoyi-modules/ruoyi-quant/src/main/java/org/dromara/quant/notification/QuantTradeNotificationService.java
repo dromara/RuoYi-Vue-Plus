@@ -404,6 +404,16 @@ public class QuantTradeNotificationService {
             log.warn("平仓后账户资金快照获取失败 credentialId={} orderId={}，通知将标记资金待核实",
                 credential.getId(), orderId, ex);
         }
+        if (account != null && account.marginBalance() != null) {
+            jdbcTemplate.update("""
+                INSERT INTO quant_trade_close_equity
+                    (credential_id, symbol, exchange_order_id, closing_equity, captured_at)
+                VALUES (?, ?, ?, ?, UTC_TIMESTAMP(3))
+                ON DUPLICATE KEY UPDATE
+                    closing_equity=VALUES(closing_equity),
+                    captured_at=VALUES(captured_at)
+                """, credential.getId(), symbol, orderId, account.marginBalance());
+        }
         String asset = safe(quoteAsset);
         String subject = "量化平仓通知 - " + symbol + " " + cnDirection(direction);
         String content = "【量化平仓通知】\n"
