@@ -458,6 +458,42 @@ class ProtectionOrderServiceTest {
     }
 
     @Test
+    void definitelyNotSentStepTargetReusesItsPersistedClientAlgoId() {
+        position.setProtectionCycleKey("cycle-test");
+        QuantProtectionOrder notSent = order();
+        notSent.setId(77L);
+        notSent.setCredentialId(1L);
+        notSent.setPositionCycleKey("cycle-test");
+        notSent.setPositionSide("LONG");
+        notSent.setProtectionType("STEP_TP");
+        notSent.setOrderType("STOP_MARKET");
+        notSent.setClientOrderId("QSTEP_retry");
+        notSent.setExchangeOrderId(null);
+        notSent.setQuantity(BigDecimal.ONE);
+        notSent.setStopPrice(new BigDecimal("99"));
+        notSent.setStepIndex(1);
+        notSent.setTargetVersion(1L);
+        notSent.setExecutedQuantity(BigDecimal.ZERO);
+        notSent.setStatus("NOT_SENT");
+
+        java.util.concurrent.atomic.AtomicInteger queryCount = new java.util.concurrent.atomic.AtomicInteger();
+        when(mapper.selectList(any())).thenAnswer(call -> switch (queryCount.getAndIncrement()) {
+            case 1 -> List.of(notSent);
+            default -> List.of();
+        });
+        when(gateway.placeProtectionOrder(any())).thenAnswer(call -> new ExchangeGateway.ProtectionOrderResult(66L,
+            call.<ExchangeGateway.ProtectionOrderRequest>getArgument(0).clientOrderId(), "NEW"));
+        when(gateway.queryProtectionOrder(any(), any(), any(), any(), any())).thenReturn(snapshot(66L, "QSTEP_retry", BigDecimal.ONE, "NEW", null));
+
+        service.syncStrategyProtections(1L, position, BigDecimal.ONE, List.of(new org.dromara.quant.strategy.ProtectionSignal("STEP_TP", "STOP_MARKET",
+            BigDecimal.ONE, org.dromara.quant.strategy.ProtectionSignal.QuantityBase.CURRENT, new BigDecimal("99"), "test", 1)), true);
+
+        verify(gateway).placeProtectionOrder(argThat(request -> "QSTEP_retry".equals(request.clientOrderId())));
+        verify(mapper, never()).insert(any(QuantProtectionOrder.class));
+        verify(mapper).updateById(notSent);
+    }
+
+    @Test
     void stepStopNeverMovesBackwards() {
         QuantProtectionOrder local = order();
         local.setPositionSide("LONG");
