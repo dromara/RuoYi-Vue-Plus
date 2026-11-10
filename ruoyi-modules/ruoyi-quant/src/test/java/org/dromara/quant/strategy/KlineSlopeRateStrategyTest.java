@@ -28,6 +28,35 @@ class KlineSlopeRateStrategyTest {
     }
 
     @Test
+    void oneMinuteMaDirectionFilterAllowsLongOnlyWhenMa5AboveMa7() {
+        StrategyContext c = context(null, null, new BigDecimal("100"), new BigDecimal("102"), false, null, null);
+        var signal = strategy.evaluateEntry(c, Map.of(), new BigDecimal("101.5"), new BigDecimal("101.2")).orElseThrow();
+        assertEquals(EntrySignal.Direction.LONG, signal.direction());
+        assertTrue(signal.reason().contains("1分钟5MA高于7MA"));
+    }
+
+    @Test
+    void oneMinuteMaDirectionFilterRejectsLongWhenMa5BelowMa7() {
+        StrategyContext c = context(null, null, new BigDecimal("100"), new BigDecimal("102"), false, null, null);
+        assertTrue(strategy.evaluateEntry(c, Map.of(), new BigDecimal("101.0"), new BigDecimal("101.2")).isEmpty());
+    }
+
+    @Test
+    void oneMinuteMaDirectionFilterAllowsShortOnlyWhenMa5BelowMa7() {
+        StrategyContext c = context(null, null, new BigDecimal("100"), new BigDecimal("98"), false, null, null);
+        var signal = strategy.evaluateEntry(c, Map.of(), new BigDecimal("98.8"), new BigDecimal("99.0")).orElseThrow();
+        assertEquals(EntrySignal.Direction.SHORT, signal.direction());
+    }
+
+    @Test
+    void oneMinuteMaDirectionFilterWaitsForSevenClosedCandlesUnlessDisabled() {
+        StrategyContext c = context(null, null, new BigDecimal("100"), new BigDecimal("102"), false, null, null);
+        assertTrue(strategy.evaluateEntry(c, Map.of(), null, null).isEmpty());
+        assertEquals(EntrySignal.Direction.LONG, strategy.evaluateEntry(c, Map.of("entryMaDirectionFilterEnabled", false), null, null)
+            .orElseThrow().direction());
+    }
+
+    @Test
     void firstTakeProfitClosesConfiguredHalf() {
         StrategyContext c = context("LONG", new BigDecimal("100"), null, new BigDecimal("101"), false, new BigDecimal("101"), null);
         var exit = strategy.evaluateExit(c, Map.of("firstProfitTakingRate", "0.10", "firstClosePositionRate", "0.50")).getFirst();

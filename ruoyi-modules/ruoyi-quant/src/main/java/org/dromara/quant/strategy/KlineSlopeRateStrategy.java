@@ -257,6 +257,7 @@ public final class KlineSlopeRateStrategy implements StrategyPlugin {
         example.put("firstClosePositionRate", 0.50d);
         example.put("stepRatio", 0.10d);
         example.put("localStopLossRate", 0.05d);
+        example.put("entryMaDirectionFilterEnabled", true);
         return new StrategyDescriptor(CODE, VERSION, "实时K线斜率阶梯止盈", example);
     }
 
@@ -274,6 +275,12 @@ public final class KlineSlopeRateStrategy implements StrategyPlugin {
         // 旧版本曾使用 stopLossRatio 表示程序止损；新版本明确命名 localStopLossRate，避免和策略表硬止损混淆。
         requireRate(params, "localStopLossRate", "LocalStopLossRate", DEFAULT_LOCAL_STOP_LOSS_RATE);
         requireRate(params, "stepRatio", "StepRatio", DEFAULT_STEP_RATIO);
+        Object maFilter = params == null ? null : params.get("entryMaDirectionFilterEnabled");
+        if (maFilter != null && !(maFilter instanceof Boolean)
+            && !"true".equalsIgnoreCase(String.valueOf(maFilter))
+            && !"false".equalsIgnoreCase(String.valueOf(maFilter))) {
+            throw new IllegalArgumentException("entryMaDirectionFilterEnabled 必须为 true 或 false");
+        }
     }
 
     /**
@@ -307,6 +314,34 @@ public final class KlineSlopeRateStrategy implements StrategyPlugin {
         }
         EntrySignal.Direction direction = degrees > 0 ? EntrySignal.Direction.LONG : EntrySignal.Direction.SHORT;
         return Optional.of(new EntrySignal(direction, "K线斜率角度=" + evaluation.degrees() + "°, 阈值=" + evaluation.entryThreshold() + "°"));
+    }
+
+    /**
+     * 在斜率信号通过后，使用最近已收盘的 1 分钟 K 线 5MA/7MA 做方向过滤。
+     * 均线不包含当前未收盘 K 线；缺少完整窗口或均线方向不一致时不允许开仓。
+     */
+    public Optional<EntrySignal> evaluateEntry(StrategyContext context, Map<String, Object> params, BigDecimal ma5, BigDecimal ma7) {
+        Optional<EntrySignal> signal = evaluateEntry(context, params);
+        if (signal.isEmpty() || !entryMaDirectionFilterEnabled(params)) {
+            return signal;
+        }
+        if (ma5 == null || ma7 == null) {
+            return Optional.empty();
+        }
+        EntrySignal entry = signal.get();
+        int comparison = ma5.compareTo(ma7);
+        boolean directionApproved = entry.direction() == EntrySignal.Direction.LONG ? comparison > 0
+            : entry.direction() == EntrySignal.Direction.SHORT && comparison < 0;
+        if (!directionApproved) {
+            return Optional.empty();
+        }
+        String maReason = comparison > 0 ? "1分钟5MA高于7MA" : "1分钟5MA低于7MA";
+        return Optional.of(new EntrySignal(entry.direction(), entry.reason() + "，" + maReason + "，均线方向过滤通过"));
+    }
+
+    private static boolean entryMaDirectionFilterEnabled(Map<String, Object> params) {
+        Object value = params == null ? null : params.get("entryMaDirectionFilterEnabled");
+        return value == null || Boolean.parseBoolean(String.valueOf(value));
     }
 
     static boolean shouldLogSlope(String symbol, long nowMillis) {

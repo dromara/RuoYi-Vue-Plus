@@ -1796,7 +1796,13 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             logEntryDecision(runtime, context, "PROTECTION_UNCONFIRMED", "当前持仓保护单未全部确认，禁止开仓");
             return;
         }
-        Optional<EntrySignal> signal = runtime.plugin.evaluateEntry(context, runtime.params);
+        Optional<EntrySignal> signal;
+        if (runtime.plugin instanceof KlineSlopeRateStrategy slopeStrategy
+            && "1m".equalsIgnoreCase(runtime.strategySymbol.getIntervalCode())) {
+            signal = slopeStrategy.evaluateEntry(context, runtime.params, runtime.market.movingAverage(5), runtime.market.movingAverage(7));
+        } else {
+            signal = runtime.plugin.evaluateEntry(context, runtime.params);
+        }
         if (signal.isEmpty()) {
             return;
         }
@@ -4842,6 +4848,9 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
          * 最近一次收到 K 线事件的时间。
          */
         private Instant lastKlineEventAt;
+        /** 最近 7 根已收盘 K 线的收盘价，用于 1 分钟 5MA/7MA 入场方向过滤。 */
+        private final Deque<BigDecimal> closedKlineCloses = new ArrayDeque<>();
+        private Instant lastClosedKlineOpenTime;
 
         /**
          * 更新对应业务状态。
@@ -4852,6 +4861,14 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
             }
             if (currentKline != null && kline.openTime().isBefore(currentKline.openTime())) {
                 return;
+            }
+            if (kline.closed() && kline.close() != null && kline.close().signum() > 0
+                && (lastClosedKlineOpenTime == null || kline.openTime().isAfter(lastClosedKlineOpenTime))) {
+                closedKlineCloses.addLast(kline.close());
+                while (closedKlineCloses.size() > 7) {
+                    closedKlineCloses.removeFirst();
+                }
+                lastClosedKlineOpenTime = kline.openTime();
             }
             if (currentKline != null && !currentKline.openTime().equals(kline.openTime())) {
                 thirdPreviousKlineOpen = secondPreviousKlineOpen;
@@ -4866,6 +4883,24 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
             if (kline.closed()) {
                 previousClosedClose = kline.close();
             }
+        }
+
+        /**
+         * 返回最近指定根数已收盘 K 线收盘价的简单移动平均。
+         */
+        private BigDecimal movingAverage(int period) {
+            if (period <= 0 || closedKlineCloses.size() < period) {
+                return null;
+            }
+            BigDecimal sum = BigDecimal.ZERO;
+            int skip = closedKlineCloses.size() - period;
+            int index = 0;
+            for (BigDecimal close : closedKlineCloses) {
+                if (index++ >= skip) {
+                    sum = sum.add(close);
+                }
+            }
+            return sum.divide(BigDecimal.valueOf(period), 24, RoundingMode.HALF_UP);
         }
 
         /**
