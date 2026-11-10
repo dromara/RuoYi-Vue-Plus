@@ -79,7 +79,7 @@ class QuantTradeNotificationServiceTest {
         verify(mapper).insert(rows.capture());
         assertEquals("FACT_PENDING", rows.getValue().getChannel());
         assertEquals("OPEN:102", rows.getValue().getRecipient());
-        assertTrue(rows.getValue().getContent().contains("\\"taskType\\":\\"OPEN\\""));
+        assertTrue(rows.getValue().getContent().contains("\"taskType\":\"OPEN\""));
         verifyNoInteractions(gateway);
     }
 
