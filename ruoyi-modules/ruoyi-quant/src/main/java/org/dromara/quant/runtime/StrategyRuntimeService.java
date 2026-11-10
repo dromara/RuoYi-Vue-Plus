@@ -4400,7 +4400,8 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
      * 加载 Runtime 启动所需的初始 K 线和价格快照。
      */
     private MarketRuntime loadInitialMarket(String runMode, String symbol, String interval, Map<String, Object> params, boolean requireSlopeReference) {
-        int limit = Math.max(KlineSlopeRateStrategy.SLOPE_LOOKBACK_BARS + 1, positiveInt(params.get("historyLimit"), 50));
+        int minimumHistoryBars = requireSlopeReference && "1m".equalsIgnoreCase(interval) ? 8 : KlineSlopeRateStrategy.SLOPE_LOOKBACK_BARS + 1;
+        int limit = Math.max(minimumHistoryBars, positiveInt(params.get("historyLimit"), 50));
         List<ExchangeGateway.Kline> history = "TESTNET".equalsIgnoreCase(runMode) ? gateway.queryKlines(runMode, symbol, interval, limit) : gateway.queryKlines(symbol, interval,
             limit);
         if (requireSlopeReference && (history == null || history.size() < KlineSlopeRateStrategy.SLOPE_LOOKBACK_BARS + 1)) {
@@ -5100,6 +5101,8 @@ StrategyPlugin plugin, Map<String, Object> params) {
             this.market.previousKlineOpen = initial.previousKlineOpen;
             this.market.secondPreviousKlineOpen = initial.secondPreviousKlineOpen;
             this.market.thirdPreviousKlineOpen = initial.thirdPreviousKlineOpen;
+            this.market.closedKlineCloses.addAll(initial.closedKlineCloses);
+            this.market.lastClosedKlineOpenTime = initial.lastClosedKlineOpenTime;
             this.market.currentKline = initial.currentKline;
             this.market.lastKlineEventAt = initial.lastKlineEventAt;
         }
