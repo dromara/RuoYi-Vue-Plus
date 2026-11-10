@@ -233,6 +233,23 @@ public class ProtectionOrderService {
         return recoverProtectionDispatch(active) ? 1 : 0;
     }
 
+    /**
+     * 人工触发单张保护派发票据的事实核验。先匹配页面提交的完整票据身份，
+     * 再进入与自动恢复完全相同的核验路径，避免误处理后来产生的新票据。
+     */
+    public boolean recheckProtectionDispatch(Long credentialId, String symbol, String dispatchKey, String clientOrderId) {
+        if (credentialId == null || credentialId <= 0 || symbol == null || symbol.isBlank()
+            || dispatchKey == null || dispatchKey.isBlank() || clientOrderId == null || clientOrderId.isBlank()) {
+            throw new IllegalArgumentException("保护派发核查缺少完整票据身份");
+        }
+        LiveOrderDispatcher.ActiveDispatch active = requireLiveDispatcher().activeDispatch(credentialId, symbol);
+        if (active == null || !dispatchKey.equals(active.dispatchKey()) || !clientOrderId.equals(active.clientOrderId())
+            || !Set.of("PROTECT_CREATE", "PROTECT_CANCEL").contains(active.operationType())) {
+            return false;
+        }
+        return recoverProtectionDispatch(active);
+    }
+
     /** 判断账户交易对是否仍有必须通过精确交易所查询恢复的保护派发票据。 */
     public boolean hasUnresolvedProtectionDispatches(Long credentialId, String symbol) {
         return !requireLiveDispatcher().activeProtectionDispatches(credentialId, symbol).isEmpty();
