@@ -54,18 +54,36 @@ public class ProtectionOrderJournalService {
         // 事务回滚不能把失败的来源绑定留在调用方实体里，随后被状态更新意外写回。
         QuantProtectionOrder local = new QuantProtectionOrder();
         org.springframework.beans.BeanUtils.copyProperties(parent, local);
-        if (actual == null || child == null || actual.actualOrderId() == null || !actual.actualOrderId().equals(child.orderId())
-            || actual.algoId() == null || !Objects.equals(local.getClientOrderId(), actual.clientAlgoId())
-            || local.getExchangeOrderId() != null && !local.getExchangeOrderId().equals(actual.algoId())
-            || !local.getSymbol().equalsIgnoreCase(actual.symbol()) || !local.getSymbol().equalsIgnoreCase(child.symbol())
-            || child.clientOrderId() == null || child.clientOrderId().isBlank()
-            || local.getQuantity() == null || actual.quantity() == null || local.getQuantity().compareTo(actual.quantity()) != 0
-            || local.getStopPrice() == null || actual.triggerPrice() == null || local.getStopPrice().compareTo(actual.triggerPrice()) != 0
-            || local.getOrderType() == null || !local.getOrderType().equalsIgnoreCase(actual.type())
-            || !("SHORT".equalsIgnoreCase(local.getPositionSide()) ? "BUY" : "SELL").equalsIgnoreCase(child.side())
-            || !child.side().equalsIgnoreCase(actual.side())
-            || !("BOTH".equalsIgnoreCase(actual.positionSide()) || local.getPositionSide().equalsIgnoreCase(actual.positionSide()))) {
-            throw new IllegalStateException("保护单实际子订单身份或减仓方向冲突，禁止分配成交");
+        java.util.StringJoiner conflicts = new java.util.StringJoiner(",");
+        if (actual == null) {
+            conflicts.add("actualMissing");
+        } else if (child == null) {
+            conflicts.add("childMissing");
+        } else {
+            if (actual.actualOrderId() == null || !actual.actualOrderId().equals(child.orderId())) conflicts.add("actualOrderId");
+            if (actual.algoId() == null) conflicts.add("algoIdMissing");
+            if (!Objects.equals(local.getClientOrderId(), actual.clientAlgoId())) conflicts.add("clientAlgoId");
+            if (local.getExchangeOrderId() != null && !local.getExchangeOrderId().equals(actual.algoId())) conflicts.add("algoIdMismatch");
+            if (!local.getSymbol().equalsIgnoreCase(actual.symbol())) conflicts.add("algoSymbol");
+            if (!local.getSymbol().equalsIgnoreCase(child.symbol())) conflicts.add("childSymbol");
+            if (child.clientOrderId() == null || child.clientOrderId().isBlank()) conflicts.add("childClientOrderIdMissing");
+            if (local.getQuantity() == null || actual.quantity() == null || local.getQuantity().compareTo(actual.quantity()) != 0) conflicts.add("quantity");
+            if (local.getStopPrice() == null || actual.triggerPrice() == null || local.getStopPrice().compareTo(actual.triggerPrice()) != 0) conflicts.add("triggerPrice");
+            if (local.getOrderType() == null || !local.getOrderType().equalsIgnoreCase(actual.type())) conflicts.add("orderType");
+            if (!("SHORT".equalsIgnoreCase(local.getPositionSide()) ? "BUY" : "SELL").equalsIgnoreCase(child.side())) conflicts.add("childReduceSide");
+            if (child.side() == null || actual.side() == null || !child.side().equalsIgnoreCase(actual.side())) conflicts.add("algoChildSide");
+            if (!("BOTH".equalsIgnoreCase(actual.positionSide()) || local.getPositionSide().equalsIgnoreCase(actual.positionSide()))) conflicts.add("positionSide");
+        }
+        if (conflicts.length() > 0) {
+            throw new IllegalStateException("保护单实际子订单身份或减仓方向冲突，禁止分配成交；conflicts=" + conflicts
+                + "; localSide=" + local.getPositionSide()
+                + "; algoSide=" + (actual == null ? null : actual.side())
+                + "; algoPositionSide=" + (actual == null ? null : actual.positionSide())
+                + "; childSide=" + (child == null ? null : child.side())
+                + "; localQty=" + local.getQuantity()
+                + "; algoQty=" + (actual == null ? null : actual.quantity())
+                + "; localTrigger=" + local.getStopPrice()
+                + "; algoTrigger=" + (actual == null ? null : actual.triggerPrice()));
         }
         if (local.getStrategyId() == null && local.getStrategyInstanceId() == null) {
             captureOwner(local);
