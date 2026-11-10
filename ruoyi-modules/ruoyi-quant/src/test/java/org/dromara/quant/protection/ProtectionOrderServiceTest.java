@@ -466,6 +466,89 @@ class ProtectionOrderServiceTest {
         verify(lease).markOrderTerminal(local);
     }
 
+    private record TriggeredRecoveryFixture(ProtectionOrderService service, QuantProtectionOrder local,
+                                            ProtectionTargetCoordinator.Lease lease) { }
+
+    private TriggeredRecoveryFixture triggeredRecoveryFixture(String childClientOrderId, String childStatus, String childExecutedQuantity) {
+        String clientId = "QHARD_triggered";
+        QuantProtectionOrder local = order();
+        local.setId(7L);
+        local.setCredentialId(1L);
+        local.setPositionId(10L);
+        local.setPositionCycleKey("cycle-triggered");
+        local.setSymbol("JCTUSDT");
+        local.setClientOrderId(clientId);
+        local.setExchangeOrderId(null);
+        local.setProtectionType("HARD_STOP");
+        local.setPositionSide("SHORT");
+        local.setOrderType("STOP_MARKET");
+        local.setQuantity(new BigDecimal("601369"));
+        local.setStopPrice(new BigDecimal("0.0051900"));
+        local.setExecutedQuantity(BigDecimal.ZERO);
+
+        QuantProtectionOrder firstTp = new QuantProtectionOrder();
+        firstTp.setId(6L);
+        firstTp.setStatus("FINISHED");
+        firstTp.setExecutedQuantity(new BigDecimal("300684"));
+        when(mapper.selectOne(any())).thenReturn(local);
+        when(mapper.selectList(any())).thenReturn(List.of(firstTp));
+        when(dispatcher.activeDispatch(1L, "JCTUSDT")).thenReturn(
+            new LiveOrderDispatcher.ActiveDispatch(1L, "JCTUSDT", "cancel-key", "PROTECT_CANCEL", clientId, "UNKNOWN", null));
+
+        var algo = new ExchangeGateway.ProtectionOrderSnapshot("JCTUSDT", 1000000282028535L, clientId, "FINISHED",
+            "BUY", "SHORT", "STOP_MARKET", new BigDecimal("300685"), new BigDecimal("0.0051900"), Instant.now(),
+            new BigDecimal("300685"), true, false, 271997586L, new BigDecimal("0.0052680"));
+        when(gateway.queryProtectionOrder(any(), any(), eq(clientId), eq("JCTUSDT"), any())).thenReturn(algo, algo);
+        var child = new ExchangeGateway.OrderSnapshot("JCTUSDT", 271997586L, childClientOrderId, "BUY", "MARKET", childStatus,
+            BigDecimal.ZERO, new BigDecimal("300685"), new BigDecimal(childExecutedQuantity), Instant.now(), new BigDecimal("0.0052680"),
+            "SHORT", true, Instant.now(), false);
+        when(gateway.queryOrder(any(), eq("JCTUSDT"), eq(271997586L), isNull())).thenReturn(child);
+
+        ProtectionTargetCoordinator coordinator = mock(ProtectionTargetCoordinator.class);
+        ProtectionTargetCoordinator.Lease lease = mock(ProtectionTargetCoordinator.Lease.class);
+        when(coordinator.acquire(eq(1L), any(QuantPosition.class), eq("HARD_STOP"))).thenReturn(lease);
+        when(lease.state()).thenReturn(new ProtectionTargetCoordinator.State(2, 0, 0, 7L, null, null,
+            new BigDecimal("300685"), new BigDecimal("0.0051900"), "STOP_MARKET"));
+        var coordinatedService = new ProtectionOrderService(gateway, mapper, execution, coordinator);
+        coordinatedService.setLiveOrderDispatcher(dispatcher);
+        when(dispatcher.recoveredFromExchange(1L, "JCTUSDT", "cancel-key", clientId, 1000000282028535L)).thenReturn(true);
+        return new TriggeredRecoveryFixture(coordinatedService, local, lease);
+    }
+
+    @Test
+    void fullyFilledTriggeredAlgoPersistsChildExecutionAndReleasesExactDispatchGate() {
+        var fixture = triggeredRecoveryFixture("QHARD_triggered", "FILLED", "300685");
+
+        assertTrue(fixture.service().recoverDispatchBeforeStrategyStart(1L, "JCTUSDT"));
+
+        assertEquals(1000000282028535L, fixture.local().getExchangeOrderId());
+        assertEquals("FINISHED", fixture.local().getStatus());
+        assertEquals(new BigDecimal("300685"), fixture.local().getExecutedQuantity());
+        verify(mapper).updateById(fixture.local());
+        verify(fixture.lease()).markOrderTerminal(fixture.local());
+        verify(dispatcher).recoveredFromExchange(1L, "JCTUSDT", "cancel-key", "QHARD_triggered", 1000000282028535L);
+    }
+
+    @Test
+    void triggeredAlgoWithWrongChildIdentityRemainsBlocked() {
+        var fixture = triggeredRecoveryFixture("another-client-id", "FILLED", "300685");
+
+        assertFalse(fixture.service().recoverDispatchBeforeStrategyStart(1L, "JCTUSDT"));
+
+        verify(mapper, never()).updateById(fixture.local());
+        verify(dispatcher, never()).recoveredFromExchange(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void triggeredAlgoWithPartialChildFillRemainsBlocked() {
+        var fixture = triggeredRecoveryFixture("QHARD_triggered", "PARTIALLY_FILLED", "100000");
+
+        assertFalse(fixture.service().recoverDispatchBeforeStrategyStart(1L, "JCTUSDT"));
+
+        verify(mapper, never()).updateById(fixture.local());
+        verify(dispatcher, never()).recoveredFromExchange(any(), any(), any(), any(), any());
+    }
+
     @Test
     void definitelyNotSentStepTargetReusesItsPersistedClientAlgoId() {
         position.setProtectionCycleKey("cycle-test");
