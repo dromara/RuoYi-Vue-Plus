@@ -34,6 +34,11 @@ WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTA
 WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
     <update id="clearPrevious" timeout="3"><![CDATA[UPDATE quant_protection_target SET previous_order_id=NULL,updated_at=UTC_TIMESTAMP()
 WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
+    <update id="markOrderTerminal" timeout="3"><![CDATA[UPDATE quant_protection_target
+SET current_order_id=CASE WHEN current_order_id=#{orderId} THEN NULL ELSE current_order_id END,
+    previous_order_id=CASE WHEN previous_order_id=#{orderId} THEN NULL ELSE previous_order_id END,
+    updated_at=UTC_TIMESTAMP()
+WHERE target_key=#{key} AND owner_token=#{owner} AND lease_until>CURRENT_TIMESTAMP]]></update>
     <update id="releaseLease" timeout="3"><![CDATA[UPDATE quant_protection_target SET owner_token=NULL,lease_until=NULL
 WHERE target_key=#{key} AND owner_token=#{owner}]]></update>
 </mapper>
