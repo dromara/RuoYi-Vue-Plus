@@ -227,6 +227,8 @@ WHERE credential_id=#{credentialId} AND symbol=#{symbol}
             c.realized_pnl AS realizedPnl,
             c.commission_display AS commission,
             ce.closing_equity AS closingEquity,
+            ce.wallet_balance AS walletBalance,
+            ce.unrealized_pnl AS unrealizedPnl,
             DATE_FORMAT(ce.captured_at, '%Y-%m-%dT%H:%i:%sZ') AS closingEquityAt,
             DATE_FORMAT(c.closed_at, '%Y-%m-%dT%H:%i:%sZ') AS closedAt,
             c.fill_count AS fillCount
