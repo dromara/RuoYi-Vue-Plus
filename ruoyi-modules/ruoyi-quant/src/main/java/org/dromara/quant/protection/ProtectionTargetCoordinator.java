@@ -201,6 +201,12 @@ public class ProtectionTargetCoordinator {
             requireUpdate(mapper.clearPrevious(key, owner));
         }
 
+        /** Clear current/previous references only when they still point at this terminal order. */
+        public void markOrderTerminal(QuantProtectionOrder local) {
+            check();
+            requireUpdate(mapper.markOrderTerminal(key, owner, local.getId()));
+        }
+
         private void requireUpdate(int affected) {
             if (affected != 1) {
                 lost.set(true);
