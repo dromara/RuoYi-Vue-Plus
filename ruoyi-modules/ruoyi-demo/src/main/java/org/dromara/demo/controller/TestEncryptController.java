@@ -1,6 +1,7 @@
 package org.dromara.demo.controller;
 
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.demo.domain.TestDemoEncrypt;
 import org.dromara.demo.mapper.TestDemoEncryptMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class TestEncryptController {
     @GetMapping()
     public R<Map<String, TestDemoEncrypt>> test(String key, String value) {
         if (!encryptEnable) {
-            throw new RuntimeException("加密功能未开启!");
+            throw new ServiceException("加密功能未开启!");
         }
         Map<String, TestDemoEncrypt> map = new HashMap<>(2);
         TestDemoEncrypt demo = new TestDemoEncrypt();

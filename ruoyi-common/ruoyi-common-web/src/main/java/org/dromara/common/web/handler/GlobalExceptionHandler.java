@@ -1,5 +1,6 @@
 package org.dromara.common.web.handler;
 
+import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpStatus;
@@ -62,6 +63,15 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
         Integer code = e.getCode();
         return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
+    }
+
+    /**
+     * 参数校验异常
+     */
+    @ExceptionHandler({IllegalArgumentException.class, ValidateException.class})
+    public R<Void> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
+        log.error("请求地址'{}',参数校验异常: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(e.getMessage());
     }
 
     /**

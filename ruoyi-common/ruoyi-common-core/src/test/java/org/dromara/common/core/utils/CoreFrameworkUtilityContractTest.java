@@ -162,7 +162,7 @@ class CoreFrameworkUtilityContractTest {
     @Test
     @DisplayName("报告空对象和约束违规")
     void shouldReportNullObjectAndConstraintViolations() {
-        RuntimeException nullException = assertThrows(RuntimeException.class,
+        IllegalArgumentException nullException = assertThrows(IllegalArgumentException.class,
             () -> ValidatorUtils.validate(null));
         @SuppressWarnings("unchecked")
         ConstraintViolation<Source> violation = mock(ConstraintViolation.class);

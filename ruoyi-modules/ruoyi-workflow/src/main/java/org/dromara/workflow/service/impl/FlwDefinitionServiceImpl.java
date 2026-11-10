@@ -159,7 +159,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
             defService.importDef(defJson);
         } catch (IOException e) {
             log.error("读取文件流错误: {}", e.getMessage(), e);
-            throw new IllegalStateException("文件读取失败，请检查文件内容", e);
+            throw new ServiceException("文件读取失败，请检查文件内容", e);
         }
         return true;
     }

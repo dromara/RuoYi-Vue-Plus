@@ -27,7 +27,7 @@ public class ValidatorUtils {
      */
     public static <T> void validate(T object, Class<?>... groups) {
         if (object == null) {
-            throw new RuntimeException("请求参数不能为空");
+            throw new IllegalArgumentException("请求参数不能为空");
         }
         Set<ConstraintViolation<T>> validate = VALID.validate(object, groups);
         if (!validate.isEmpty()) {
