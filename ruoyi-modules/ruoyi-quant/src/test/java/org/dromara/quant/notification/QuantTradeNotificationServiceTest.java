@@ -212,8 +212,12 @@ class QuantTradeNotificationServiceTest {
             99L, "USDT", new BigDecimal("5.86351456"), "MANUAL", "test close");
 
         var rows = ArgumentCaptor.forClass(QuantNotification.class);
-        verify(mapper).insert(rows.capture());
-        String content = rows.getValue().getContent();
+        verify(mapper, times(2)).insert(rows.capture());
+        var notifications = rows.getAllValues();
+        var content = notifications.stream().filter(row -> "SYSTEM".equals(row.getChannel())).findFirst().orElseThrow().getContent();
+        var factTask = notifications.stream().filter(row -> "FACT_PENDING".equals(row.getChannel())).findFirst().orElseThrow();
+        assertEquals("SENT", factTask.getStatus());
+        verify(mapper).updateById(argThat(updated -> "SENT".equals(updated.getStatus()) && "FACT_PENDING".equals(updated.getChannel())));
         assertTrue(content.contains("实际平仓均价: 102"));
         assertTrue(content.contains("最大回报率: 5.86351456%"));
         assertTrue(content.contains("交易所已实现盈亏（未扣手续费）: 3 USDT"));
@@ -254,10 +258,13 @@ class QuantTradeNotificationServiceTest {
             100L, "USDT", "STOP", "partial close");
 
         var rows = ArgumentCaptor.forClass(QuantNotification.class);
-        verify(mapper).insert(rows.capture());
-        assertEquals("SYSTEM", rows.getValue().getChannel());
-        assertTrue(rows.getValue().getContent().contains("平仓数量: 1"));
-        assertTrue(rows.getValue().getContent().contains("实际平仓均价: 102"));
+        verify(mapper, times(2)).insert(rows.capture());
+        var notifications = rows.getAllValues();
+        var systemNotice = notifications.stream().filter(row -> "SYSTEM".equals(row.getChannel())).findFirst().orElseThrow();
+        var factTask = notifications.stream().filter(row -> "FACT_PENDING".equals(row.getChannel())).findFirst().orElseThrow();
+        assertEquals("SENT", factTask.getStatus());
+        assertTrue(systemNotice.getContent().contains("平仓数量: 1"));
+        assertTrue(systemNotice.getContent().contains("实际平仓均价: 102"));
     }
 
     @Test
