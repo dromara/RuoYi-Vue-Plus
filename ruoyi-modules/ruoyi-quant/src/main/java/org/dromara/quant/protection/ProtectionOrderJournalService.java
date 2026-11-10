@@ -11,7 +11,8 @@ import org.dromara.quant.protection.mapper.QuantProtectionOrderMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;\nimport java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.Set;
