@@ -743,7 +743,7 @@ public class ProtectionOrderService {
             entity.setExecutedQuantity(BigDecimal.ZERO);
             entity.setSymbol(position.getSymbol());
             entity.setPositionSide(position.getPositionSide());
-            entity.setClientOrderId(clientAlgoId);
+            entity.setClientOrderId(prefix + UUID.randomUUID().toString().replace("-", "").substring(0, 28));
             entity.setProtectionType(protectionType);
             entity.setOrderType(normalizedOrderType);
             entity.setQuantity(quantity);
