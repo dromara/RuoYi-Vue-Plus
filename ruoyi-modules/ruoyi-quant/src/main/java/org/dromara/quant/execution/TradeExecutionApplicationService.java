@@ -113,7 +113,7 @@ public class TradeExecutionApplicationService {
             PaperTradingService.PaperCloseSettlement settlement = paperTradingService.settlePaperExecution(
                 credential.getId(), request.getIdempotencyKey(), position.getId(), request.getQuantity(), closePrice);
             var paperAccount = paperTradingService.find(credential.getId());
-            String direction = position.quantity().signum() < 0 || "SHORT".equalsIgnoreCase(position.getPositionSide()) ? "SHORT" : "LONG";
+            String direction = position.getQuantity().signum() < 0 || "SHORT".equalsIgnoreCase(position.getPositionSide()) ? "SHORT" : "LONG";
             notificationService.notifyClosePaper(null, credential, request.getSymbol(), direction, request.getQuantity(),
                 position.getEntryPrice(), closePrice, settlement.realizedPnl(), symbol.getQuoteAsset(),
                 paperAccount == null ? null : paperAccount.getBalance(), paperAccount == null ? null : paperAccount.getAvailableBalance(),
