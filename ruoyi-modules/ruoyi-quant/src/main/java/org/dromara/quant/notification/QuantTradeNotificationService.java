@@ -226,8 +226,8 @@ public class QuantTradeNotificationService {
                 credential == null ? null : credential.getId(), symbol, orderId);
         }
         String subject = "量化开仓通知 - " + symbol + " " + cnDirection(direction);
-        String content = "【量化开仓通知】\\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\\n" + "账户: " + safe(credential == null ? null :
-            credential.getAccountName()) + "\\n" + "交易对: " + symbol + "\\n" + "方向: " + cnDirection(direction) + "\\n" + "开仓数量: " + plain(quantity) + "\\n" + "开仓价格: " + plain(price) + "\\n" + "杠杆倍数: " + leverage + "倍\\n" + "开仓比例: " + plain(openRatio) + "\\n" + "开仓时间: " + tradeTime(actualOpenTime) + "\\n" + "触发原因: " + safe(reason);
+        String content = "【量化开仓通知】\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\n" + "账户: " + safe(credential == null ? null :
+            credential.getAccountName()) + "\n" + "交易对: " + symbol + "\n" + "方向: " + cnDirection(direction) + "\n" + "开仓数量: " + plain(quantity) + "\n" + "开仓价格: " + plain(price) + "\n" + "杠杆倍数: " + leverage + "倍\n" + "开仓比例: " + plain(openRatio) + "\n" + "开仓时间: " + tradeTime(actualOpenTime) + "\n" + "触发原因: " + safe(reason);
         send(credential == null ? null : credential.getId(), subject, content);
     }
 
