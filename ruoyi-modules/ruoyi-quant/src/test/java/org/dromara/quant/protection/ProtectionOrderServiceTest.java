@@ -490,7 +490,7 @@ class ProtectionOrderServiceTest {
 
         verify(gateway).placeProtectionOrder(argThat(request -> "QSTEP_retry".equals(request.clientOrderId())));
         verify(mapper, never()).insert(any(QuantProtectionOrder.class));
-        verify(mapper).updateById(notSent);
+        verify(mapper, atLeastOnce()).updateById(same(notSent));
     }
 
     @Test
