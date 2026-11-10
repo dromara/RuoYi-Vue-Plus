@@ -435,6 +435,29 @@ class ProtectionOrderServiceTest {
     }
 
     @Test
+    void triggeredProtectionPersistsTerminalChildExecutionBeforeBlockingFurtherSync() {
+        QuantProtectionOrder local = order();
+        local.setProtectionType("HARD_STOP");
+        local.setClientOrderId("QHARD_test");
+        local.setPositionSide("LONG");
+        local.setQuantity(new BigDecimal("2"));
+        when(mapper.selectList(any())).thenReturn(List.of(local));
+        when(gateway.queryProtectionOrder(any(), any(), any(), any(), any())).thenReturn(
+            new ExchangeGateway.ProtectionOrderSnapshot("BTCUSDT", 55L, "QHARD_test", "TRIGGERED", "SELL", "BOTH", "STOP_MARKET",
+                BigDecimal.ONE, new BigDecimal("99"), Instant.now(), null, true, false, 91L, new BigDecimal("98")));
+        when(gateway.queryOrder(any(), eq("BTCUSDT"), eq(91L), isNull())).thenReturn(
+            new ExchangeGateway.OrderSnapshot("BTCUSDT", 91L, "QHARD_test", "SELL", "MARKET", "FILLED",
+                BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, Instant.now(), new BigDecimal("98")));
+
+        assertThrows(ProtectionOrderService.ProtectionExecutionPendingException.class,
+            () -> service.isStrategyProtectionWorking(1L, position, "HARD_STOP", true));
+
+        assertEquals("FINISHED", local.getStatus());
+        assertEquals(BigDecimal.ONE, local.getExecutedQuantity());
+        verify(mapper).updateById(local);
+    }
+
+    @Test
     void stepStopNeverMovesBackwards() {
         QuantProtectionOrder local = order();
         local.setPositionSide("LONG");
