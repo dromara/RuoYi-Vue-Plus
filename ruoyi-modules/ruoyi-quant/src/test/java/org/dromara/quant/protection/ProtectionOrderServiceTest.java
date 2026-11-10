@@ -440,7 +440,15 @@ class ProtectionOrderServiceTest {
         local.setProtectionType("HARD_STOP");
         local.setClientOrderId("QHARD_test");
         local.setPositionSide("LONG");
+        local.setPositionCycleKey("cycle-test");
         local.setQuantity(new BigDecimal("2"));
+        ProtectionTargetCoordinator coordinator = mock(ProtectionTargetCoordinator.class);
+        ProtectionTargetCoordinator.Lease lease = mock(ProtectionTargetCoordinator.Lease.class);
+        when(coordinator.acquire(eq(1L), any(QuantPosition.class), eq("HARD_STOP"))).thenReturn(lease);
+        when(lease.state()).thenReturn(new ProtectionTargetCoordinator.State(2, 0, 0, null, null, 7L,
+            BigDecimal.ONE, new BigDecimal("99"), "STOP_MARKET"));
+        var coordinatedService = new ProtectionOrderService(gateway, mapper, execution, coordinator);
+        coordinatedService.setLiveOrderDispatcher(dispatcher);
         when(mapper.selectList(any())).thenReturn(List.of(local));
         when(gateway.queryProtectionOrder(any(), any(), any(), any(), any())).thenReturn(
             new ExchangeGateway.ProtectionOrderSnapshot("BTCUSDT", 55L, "QHARD_test", "TRIGGERED", "SELL", "BOTH", "STOP_MARKET",
@@ -450,11 +458,12 @@ class ProtectionOrderServiceTest {
                 BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, Instant.now(), new BigDecimal("98")));
 
         assertThrows(ProtectionOrderService.ProtectionExecutionPendingException.class,
-            () -> service.isStrategyProtectionWorking(1L, position, "HARD_STOP", true));
+            () -> coordinatedService.isStrategyProtectionWorking(1L, position, "HARD_STOP", true));
 
         assertEquals("FINISHED", local.getStatus());
         assertEquals(BigDecimal.ONE, local.getExecutedQuantity());
         verify(mapper).updateById(local);
+        verify(lease).cleaned();
     }
 
     @Test
