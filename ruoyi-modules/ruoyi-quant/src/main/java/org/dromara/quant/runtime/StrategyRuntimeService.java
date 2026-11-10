@@ -234,20 +234,23 @@ public class StrategyRuntimeService {
                                    BigDecimal profitAmount, BigDecimal profitRate, String closeType, String reason) {
         try {
             BigDecimal maximumReturnRate = runtime.state == null ? null : runtime.state.getMaximumReturnRate();
+            Instant openTime = runtime.state == null || runtime.state.getOpenedAt() == null ? null
+                : runtime.state.getOpenedAt().atZone(ZoneId.of("Asia/Shanghai")).toInstant();
             if ("PAPER".equalsIgnoreCase(runtime.credential.getRunMode())) {
                 var account = paperTradingService.find(runtime.credential.getId());
                 notificationService.notifyClosePaper(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity, entryPrice,
                     closePrice, profitAmount, runtime.symbol.getQuoteAsset(), account == null ? null : account.getBalance(),
-                    account == null ? null : account.getAvailableBalance(), account == null ? null : account.getUnrealizedPnl(), maximumReturnRate, profitRate, closeType, reason);
+                    account == null ? null : account.getAvailableBalance(), account == null ? null : account.getUnrealizedPnl(), maximumReturnRate,
+                    openTime, Instant.now(), profitRate, closeType, reason);
             } else {
                 Long orderId = runtime.state == null ? null : runtime.state.getPendingOrderId();
                 if (orderId != null) {
                     notificationService.notifyCloseByOrder(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, quantity,
-                        entryPrice, orderId, runtime.symbol.getQuoteAsset(), maximumReturnRate, profitRate, closeType, reason);
+                        entryPrice, orderId, runtime.symbol.getQuoteAsset(), maximumReturnRate, openTime, profitRate, closeType, reason);
                 } else {
                     notificationService.notifyCloseByStrategyOrder(runtime.strategy, runtime.credential, runtime.instance.getId(),
                         runtime.state == null ? null : runtime.state.getPositionCycleKey(), runtime.symbol.getSymbol(), direction, quantity,
-                        entryPrice, runtime.symbol.getQuoteAsset(), maximumReturnRate, profitRate, closeType, reason);
+                        entryPrice, runtime.symbol.getQuoteAsset(), maximumReturnRate, openTime, profitRate, closeType, reason);
                 }
             }
         } catch (RuntimeException ex) {
@@ -2059,9 +2062,13 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             state.setInitialMargin(runtime.position.getMargin());
             freezeFilledProtection(runtime);
             freezeOrderEntryPrice(state, filledOpen);
+            Instant openTime = paper ? Instant.now() : filledOpen == null ? null : filledOpen.updateTime();
+            if (openTime == null && state.getOpenedAt() != null) {
+                openTime = state.getOpenedAt().atZone(ZoneId.of("Asia/Shanghai")).toInstant();
+            }
             state.setStatus("OPEN");
-            if (state.getOpenedAt() == null) {
-                state.setOpenedAt(LocalDateTime.now(ZoneId.of("Asia/Shanghai")));
+            if (state.getOpenedAt() == null && openTime != null) {
+                state.setOpenedAt(LocalDateTime.ofInstant(openTime, ZoneId.of("Asia/Shanghai")));
             }
             clearPending(state);
             stateService.save(state);
@@ -2069,7 +2076,7 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             StrategyContext openedContext = buildContext(runtime, context.currentPrice(), new ExchangeGateway.MarketEvent("TRADE", runtime.symbol.getSymbol(),
             runtime.strategySymbol.getIntervalCode(), context.currentPrice(), null, context.eventTime()));
             notificationService.notifyOpen(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), direction, runtime.position.getQuantity(),
-             runtime.position.getEntryPrice(), leverage, openRatio, signal.get().reason());
+             runtime.position.getEntryPrice(), leverage, openRatio, openTime, signal.get().reason());
             log.info("实时策略开仓 instanceId={} symbol={} direction={} price={} quantity={} reason={}", runtime.instance.getId(), runtime.symbol.getSymbol(), direction,
              context.currentPrice(), quantity, signal.get().reason());
             // kline_slope_rate 开仓成交后先检查本地镜像保护，避免提交已穿价的 Binance 条件单。
@@ -3501,8 +3508,14 @@ snapshots != null && snapshots.stream().allMatch(p -> runtime.symbol.getSymbol()
                     }
                     BigDecimal openRatio = runtime.strategySymbol.getOpenRatio() == null ? runtime.strategy.getDefaultOpenRatio() : runtime.strategySymbol.getOpenRatio();
                     int leverage = runtime.strategySymbol.getLeverage() == null ? runtime.strategy.getDefaultLeverage() : runtime.strategySymbol.getLeverage();
+                    Instant openTime = order.updateTime() != null ? order.updateTime() : runtime.state.getOpenedAt() == null ? null
+                        : runtime.state.getOpenedAt().atZone(ZoneId.of("Asia/Shanghai")).toInstant();
+                    if (runtime.state.getOpenedAt() == null && openTime != null) {
+                        runtime.state.setOpenedAt(LocalDateTime.ofInstant(openTime, ZoneId.of("Asia/Shanghai")));
+                        stateService.save(runtime.state);
+                    }
                     notificationService.notifyOpen(runtime.strategy, runtime.credential, runtime.symbol.getSymbol(), runtime.position.getPositionSide(),
-                runtime.position.getQuantity(), runtime.position.getEntryPrice(), leverage, openRatio, "未知执行恢复后确认开仓成交");
+                runtime.position.getQuantity(), runtime.position.getEntryPrice(), leverage, openRatio, openTime, "未知执行恢复后确认开仓成交");
                 } else {
                     BigDecimal beforeQty = runtime.state.getPositionQty();
                     BigDecimal executedQty = order.executedQuantity();
