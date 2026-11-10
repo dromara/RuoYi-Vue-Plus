@@ -540,6 +540,17 @@ class ProtectionOrderServiceTest {
     }
 
     @Test
+    void reducedAlgoQuantityWithoutPriorProtectionFillEvidenceRemainsBlocked() {
+        var fixture = triggeredRecoveryFixture("QHARD_triggered", "FILLED", "300685");
+        when(mapper.selectList(any())).thenReturn(List.of());
+
+        assertFalse(fixture.service().recoverDispatchBeforeStrategyStart(1L, "JCTUSDT"));
+
+        verify(mapper, never()).updateById(fixture.local());
+        verify(dispatcher, never()).recoveredFromExchange(any(), any(), any(), any(), any());
+    }
+
+    @Test
     void triggeredAlgoWithPartialChildFillRemainsBlocked() {
         var fixture = triggeredRecoveryFixture("QHARD_triggered", "PARTIALLY_FILLED", "100000");
 
