@@ -115,6 +115,44 @@ public class QuantTradeNotificationService {
     }
 
     /**
+     * 开仓时间以该订单最早一笔实际成交为准；订单更新时间不能代替成交时间。
+     */
+    private Instant resolveOpenFillTime(QuantCredential credential, String symbol, String direction, Long orderId) {
+        if (credential == null || orderId == null || symbol == null || direction == null) {
+            return null;
+        }
+        ExchangeGateway.Credential exchangeCredential = new ExchangeGateway.Credential(
+            credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode());
+        Instant to = Instant.now().plusSeconds(1);
+        Instant from = to.minus(Duration.ofDays(6));
+        ExchangeGateway.OrderSnapshot order = gateway.queryOrder(exchangeCredential, symbol, orderId, null);
+        if (order == null || !orderId.equals(order.orderId()) || !symbol.equalsIgnoreCase(order.symbol())
+            || !"FILLED".equalsIgnoreCase(order.status()) || order.executedQuantity() == null
+            || order.executedQuantity().signum() <= 0) {
+            return null;
+        }
+        List<ExchangeGateway.TradeSnapshot> fills = gateway.queryTradesByOrder(
+            exchangeCredential, symbol, orderId, new ExchangeGateway.TimeRange(from, to), 1000L);
+        if (fills == null || fills.isEmpty() || fills.size() >= 1000) {
+            return null;
+        }
+        String expectedSide = "SHORT".equalsIgnoreCase(direction) ? "SELL" : "BUY";
+        BigDecimal filledQuantity = BigDecimal.ZERO;
+        Instant firstFillTime = null;
+        for (ExchangeGateway.TradeSnapshot fill : fills) {
+            if (fill == null || !symbol.equalsIgnoreCase(fill.symbol()) || !orderId.equals(fill.orderId())
+                || !expectedSide.equalsIgnoreCase(fill.side()) || fill.quantity() == null || fill.quantity().signum() <= 0
+                || fill.time() == null || fill.positionSide() != null && !fill.positionSide().isBlank()
+                    && !"BOTH".equalsIgnoreCase(fill.positionSide()) && !direction.equalsIgnoreCase(fill.positionSide())) {
+                return null;
+            }
+            filledQuantity = filledQuantity.add(fill.quantity());
+            firstFillTime = firstFillTime == null || fill.time().isBefore(firstFillTime) ? fill.time() : firstFillTime;
+        }
+        return filledQuantity.compareTo(order.executedQuantity()) == 0 ? firstFillTime : null;
+    }
+
+    /**
      * 隔离执行单个后台同步步骤，单项异常不阻断整轮任务。
      */
     private static String safe(String value) {
@@ -177,9 +215,19 @@ public class QuantTradeNotificationService {
 
     public void notifyOpen(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity, BigDecimal price, int leverage,
                            BigDecimal openRatio, Instant openTime, String reason) {
+        notifyOpen(strategy, credential, symbol, direction, quantity, price, leverage, openRatio, openTime, null, reason);
+    }
+
+    public void notifyOpen(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity, BigDecimal price, int leverage,
+                           BigDecimal openRatio, Instant openTime, Long orderId, String reason) {
+        Instant actualOpenTime = orderId == null ? openTime : resolveOpenFillTime(credential, symbol, direction, orderId);
+        if (orderId != null && actualOpenTime == null) {
+            log.warn("开仓成交时间未能从成交明细核实，通知显示待核实 credentialId={} symbol={} orderId={}",
+                credential == null ? null : credential.getId(), symbol, orderId);
+        }
         String subject = "量化开仓通知 - " + symbol + " " + cnDirection(direction);
-        String content = "【量化开仓通知】\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\n" + "账户: " + safe(credential == null ? null :
-            credential.getAccountName()) + "\n" + "交易对: " + symbol + "\n" + "方向: " + cnDirection(direction) + "\n" + "开仓数量: " + plain(quantity) + "\n" + "开仓价格: " + plain(price) + "\n" + "杠杆倍数: " + leverage + "倍\n" + "开仓比例: " + plain(openRatio) + "\n" + "开仓时间: " + tradeTime(openTime) + "\n" + "触发原因: " + safe(reason);
+        String content = "【量化开仓通知】\\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\\n" + "账户: " + safe(credential == null ? null :
+            credential.getAccountName()) + "\\n" + "交易对: " + symbol + "\\n" + "方向: " + cnDirection(direction) + "\\n" + "开仓数量: " + plain(quantity) + "\\n" + "开仓价格: " + plain(price) + "\\n" + "杠杆倍数: " + leverage + "倍\\n" + "开仓比例: " + plain(openRatio) + "\\n" + "开仓时间: " + tradeTime(actualOpenTime) + "\\n" + "触发原因: " + safe(reason);
         send(credential == null ? null : credential.getId(), subject, content);
     }
 
