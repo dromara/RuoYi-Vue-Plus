@@ -382,7 +382,7 @@ public class ProtectionOrderService {
             return null;
         }
         BigDecimal quantity = normalizeQuantity(credentialId, position.getSymbol(), position.getQuantity(), live);
-        BigDecimal stopPrice = normalizeProtectionPrice(credentialId, position, hardStopPrice(position, marginLossRatio), live);
+        BigDecimal stopPrice = normalizeProtectionPrice(credentialId, position, hardStopPrice(position, marginLossRatio), "STOP_MARKET", live);
         QuantProtectionOrder existing = findActive(credentialId, position, "HARD_STOP");
         boolean working = existing != null && (!live || confirmOnExchange(credentialId, existing, true, position.getQuantity()));
         // 固定保护价在该持仓生命周期内冻结，保证金波动不能驱动撤单重挂。
@@ -415,7 +415,7 @@ public class ProtectionOrderService {
             return null;
         }
         return placeProtection(credentialId, position, "HARD_STOP", "STOP_MARKET", normalizeQuantity(credentialId, position.getSymbol(), position.getQuantity(), live),
-            normalizeProtectionPrice(credentialId, position, hardStopPrice(position, marginLossRatio), live), live);
+            normalizeProtectionPrice(credentialId, position, hardStopPrice(position, marginLossRatio), "STOP_MARKET", live), live);
     }
 
     /**
