@@ -88,11 +88,19 @@ public class QuantTradeNotificationService {
      */
     private static String percentage(BigDecimal value) {
         // maximumReturnRate is persisted as a percentage value (for example, 5.86 means 5.86%).
-        return value == null ? "待核实" : value.stripTrailingZeros().toPlainString() + "%";
+        return value == null ? "待核实" : value.setScale(2, RoundingMode.HALF_UP).toPlainString() + "%";
     }
 
     private static String returnRatePercentage(BigDecimal ratio) {
         return ratio == null ? "待核实" : percentage(ratio.multiply(BigDecimal.valueOf(100)));
+    }
+
+    private static String amount2(BigDecimal value) {
+        return value == null ? "待核实" : value.setScale(2, RoundingMode.HALF_UP).toPlainString();
+    }
+
+    private static String fee4(BigDecimal value) {
+        return value == null ? "N/A" : value.setScale(4, RoundingMode.HALF_UP).toPlainString();
     }
 
     private static String plain(BigDecimal value) {
@@ -300,7 +308,7 @@ public class QuantTradeNotificationService {
         }
         BigDecimal averageClosePrice = quoteAmount.divide(filledQuantity, 18, RoundingMode.HALF_UP);
         String feeText = !commissionComplete || commissions.isEmpty() ? "N/A（成交手续费字段不完整）" :
-            commissions.entrySet().stream().map(entry -> plain(entry.getValue()) + " " + entry.getKey()).collect(java.util.stream.Collectors.joining(", "));
+            commissions.entrySet().stream().map(entry -> fee4(entry.getValue()) + " " + entry.getKey()).collect(java.util.stream.Collectors.joining(", "));
         ExchangeGateway.AccountSnapshot account = null;
         try {
             account = gateway.queryAccountFresh(new ExchangeGateway.Credential(
@@ -324,12 +332,12 @@ public class QuantTradeNotificationService {
             + "实际平仓均价: " + plain(averageClosePrice) + "\n"
             + "平仓触发时回报率: " + returnRatePercentage(triggerReturnRate) + "\n"
             + "最大回报率: " + percentage(maximumReturnRate) + "\n"
-            + "交易所已实现盈亏（未扣手续费）: " + plain(realizedPnl) + " " + asset + "\n"
+            + "交易所已实现盈亏（未扣手续费）: " + amount2(realizedPnl) + " " + asset + "\n"
             + "手续费: " + feeText + "\n"
             + "平仓后账户资金\n"
-            + "钱包余额: " + (account == null ? "待核实" : plain(account.walletBalance()) + " " + asset) + "\n"
-            + "账户权益: " + (account == null ? "待核实" : plain(account.marginBalance()) + " " + asset) + "\n"
-            + "可用余额: " + (account == null ? "待核实" : plain(account.availableBalance()) + " " + asset) + "\n"
+            + "钱包余额: " + (account == null ? "待核实" : amount2(account.walletBalance()) + " " + asset) + "\n"
+            + "账户权益: " + (account == null ? "待核实" : amount2(account.marginBalance()) + " " + asset) + "\n"
+            + "可用余额: " + (account == null ? "待核实" : amount2(account.availableBalance()) + " " + asset) + "\n"
             + "时间: " + LocalDateTime.now();
         return sendCloseOnce(credential.getId(), orderId, subject, content);
     }
@@ -563,12 +571,12 @@ public class QuantTradeNotificationService {
             + "实际平仓价格: " + plain(closePrice) + "\n"
             + "平仓触发时回报率: " + returnRatePercentage(triggerReturnRate) + "\n"
             + "最大回报率: " + percentage(maximumReturnRate) + "\n"
-            + "模拟账本已实现盈亏: " + plain(realizedPnl) + " " + asset + "\n"
+            + "模拟账本已实现盈亏: " + amount2(realizedPnl) + " " + asset + "\n"
             + "手续费: PAPER 模式未计入交易所手续费\n"
             + "平仓后账户资金\n"
-            + "钱包余额: " + plain(walletBalance) + " " + asset + "\n"
-            + "账户权益: " + plain(marginBalance) + " " + asset + "\n"
-            + "可用余额: " + plain(availableBalance) + " " + asset + "\n"
+            + "钱包余额: " + amount2(walletBalance) + " " + asset + "\n"
+            + "账户权益: " + amount2(marginBalance) + " " + asset + "\n"
+            + "可用余额: " + amount2(availableBalance) + " " + asset + "\n"
             + "时间: " + LocalDateTime.now();
         send(credential == null ? null : credential.getId(), subject, content);
     }
