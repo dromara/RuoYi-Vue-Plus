@@ -735,7 +735,6 @@ public class ProtectionOrderService {
                 .orderByDesc(QuantProtectionOrder::getId)).stream().findFirst().orElse(null);
         }
         if (entity == null) {
-            String clientAlgoId = prefix + UUID.randomUUID().toString().replace("-", "").substring(0, 28);
             entity = new QuantProtectionOrder();
             entity.setCredentialId(credentialId);
             entity.setCreatedAtEpochMillis(System.currentTimeMillis());
@@ -751,6 +750,7 @@ public class ProtectionOrderService {
             entity.setStopPrice(stopPrice);
             entity.setStepIndex(stepIndex);
         }
+        String clientAlgoId = entity.getClientOrderId();
         // Reuse is limited to a durable intent proven not to have reached Binance.
         // Keep its original clientAlgoId so retries cannot create a second identity.
         entity.setStatus("PAPER".equalsIgnoreCase(credential.runMode()) ? "PENDING" : "PREPARED");
