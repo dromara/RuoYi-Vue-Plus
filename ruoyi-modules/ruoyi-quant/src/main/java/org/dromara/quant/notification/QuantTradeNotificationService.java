@@ -319,6 +319,11 @@ public class QuantTradeNotificationService {
         }
         QuantNotification pendingTask = enqueuePendingCloseFact(strategy, credential, symbol, direction, requestedQuantity, entryPrice,
             orderId, quoteAsset, maximumReturnRate, openTime, triggerReturnRate, closeType, reason);
+        if (pendingTask == null) {
+            log.error("平仓通知待核验任务未能持久化，跳过即时核验以避免产生不可恢复的通知事实 credentialId={} symbol={} orderId={}",
+                credential.getId(), symbol, orderId);
+            return;
+        }
         try {
             if (tryNotifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
                 maximumReturnRate, openTime, triggerReturnRate, closeType, reason)) {
