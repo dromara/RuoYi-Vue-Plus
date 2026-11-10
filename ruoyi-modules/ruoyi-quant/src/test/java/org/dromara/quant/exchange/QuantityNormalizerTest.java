@@ -14,6 +14,25 @@ class QuantityNormalizerTest {
     }
 
     @Test
+    void protectionPriceRoundsTowardEarlierTriggerForEachSideAndOrderType() {
+        var rule = new ExchangeGateway.SymbolRule("TACUSDT", "USDT", 2, 8, new BigDecimal("0.01"),
+            BigDecimal.ONE, BigDecimal.ONE, new BigDecimal("1000"), new BigDecimal("1000"),
+            new BigDecimal("5"), "TRADING");
+        BigDecimal raw = new BigDecimal("100.003");
+        assertEquals(new BigDecimal("100.01"), QuantityNormalizer.protectionPrice(raw, rule, "LONG", "STOP_MARKET"));
+        assertEquals(new BigDecimal("100.00"), QuantityNormalizer.protectionPrice(raw, rule, "SHORT", "STOP_MARKET"));
+        assertEquals(new BigDecimal("100.00"), QuantityNormalizer.protectionPrice(raw, rule, "LONG", "TAKE_PROFIT_MARKET"));
+        assertEquals(new BigDecimal("100.01"), QuantityNormalizer.protectionPrice(raw, rule, "SHORT", "TAKE_PROFIT_MARKET"));
+    }
+
+    @Test
+    void rejectsUnknownProtectionOrderType() {
+        var rule = rule("1000", "500");
+        assertThrows(IllegalArgumentException.class,
+            () -> QuantityNormalizer.protectionPrice(BigDecimal.ONE, rule, "LONG", "LIMIT"));
+    }
+
+    @Test
     void rejectsLimitQuantityAboveLotSizeMaximum() {
         var rule = rule("1000", "500");
         var error = assertThrows(IllegalArgumentException.class,
