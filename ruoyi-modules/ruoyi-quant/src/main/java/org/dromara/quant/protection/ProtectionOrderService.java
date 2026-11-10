@@ -263,37 +263,51 @@ public class ProtectionOrderService {
                 active.dispatchKey(), active.clientOrderId());
             return false;
         }
+        String stage = "LOAD_CREDENTIAL";
         try {
             var credentialEntity = executionApplicationService.requireCredential(active.credentialId());
             ExchangeGateway.Credential credential = executionApplicationService.toCredential(credentialEntity);
             if (!"PROTECT_CANCEL".equals(active.operationType()) || !local.getClientOrderId().equals(active.clientOrderId())) {
+                log.warn("未决保护撤单身份校验未通过，继续占用派发门禁 accountId={} symbol={} dispatchKey={} clientAlgoId={} operationType={} localClientAlgoId={}",
+                    active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), active.operationType(), local.getClientOrderId());
                 return false;
             }
+            stage = "QUERY_EXCHANGE_PROTECTION";
             ExchangeGateway.ProtectionOrderSnapshot current = readProtectionSnapshot(credential, local);
             if (isExactUnfilledWorkingProtection(local, current)) {
                 // A precise active-order fact proves that the prior cancel did not reach a terminal state.
                 // Repeating cancellation with the same exchange/client identity is idempotent; never create a new ticket.
+                stage = "RETRY_EXCHANGE_CANCEL";
                 try {
                     gateway.cancelProtectionOrder(new ExchangeGateway.CancelProtectionOrderRequest(credential, local.getExchangeOrderId(), local.getClientOrderId(), true));
                 } catch (RuntimeException retryFailure) {
-                    log.debug("恢复期间重复保护撤单没有明确回执，随后按同一客户端标识查询终态 accountId={} symbol={} clientAlgoId={} errorType={}",
-                        active.credentialId(), active.symbol(), active.clientOrderId(), retryFailure.getClass().getSimpleName());
+                    log.debug("恢复期间重复保护撤单没有明确回执，随后按同一客户端标识查询终态 accountId={} symbol={} clientAlgoId={} errorType={} errorMessage={}",
+                        active.credentialId(), active.symbol(), active.clientOrderId(), retryFailure.getClass().getSimpleName(), retryFailure.getMessage());
                 }
             }
+            stage = "VERIFY_AND_PERSIST_TERMINAL";
             Long terminalAlgoId = persistVerifiedCancelledProtection(active.credentialId(), local, credential,
                 Set.of("CANCELED", "EXPIRED", "REJECTED"), true);
             if (terminalAlgoId == null) {
                 return false;
             }
+            stage = "RELEASE_DISPATCH_GATE";
             boolean recovered = requireLiveDispatcher().recoveredFromExchange(active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), terminalAlgoId);
             if (recovered) {
                 log.info("未决保护撤单已按交易所终态恢复并释放派发门禁 accountId={} symbol={} dispatchKey={} clientAlgoId={} algoId={}", active.credentialId(), active.symbol(),
                     active.dispatchKey(), active.clientOrderId(), terminalAlgoId);
+            } else {
+                log.warn("未决保护撤单终态已写入，但派发门禁未能释放 accountId={} symbol={} dispatchKey={} clientAlgoId={} algoId={}",
+                    active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), terminalAlgoId);
             }
             return recovered;
         } catch (RuntimeException ex) {
-            log.warn("未决保护撤单核实失败，继续占用派发门禁 accountId={} symbol={} dispatchKey={} clientAlgoId={} errorType={}", active.credentialId(), active.symbol(),
-                active.dispatchKey(), active.clientOrderId(), ex.getClass().getSimpleName());
+            String errorMessage = Objects.toString(ex.getMessage(), "");
+            if (errorMessage.length() > 300) {
+                errorMessage = errorMessage.substring(0, 300);
+            }
+            log.warn("未决保护撤单核实失败，继续占用派发门禁 accountId={} symbol={} dispatchKey={} clientAlgoId={} stage={} errorType={} errorMessage={}",
+                active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), stage, ex.getClass().getSimpleName(), errorMessage, ex);
             return false;
         }
     }
