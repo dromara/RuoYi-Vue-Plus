@@ -639,12 +639,7 @@ public class QuantTradeNotificationService {
                     if (openTime == null) {
                         retryCloseFactTask(task, "开仓订单成交明细尚未完整，无法确认最早成交时间");
                     } else {
-                        QuantStrategy openStrategy = null;
-                        if (data.get("strategyName") != null) {
-                            openStrategy = new QuantStrategy();
-                            openStrategy.setStrategyName(String.valueOf(data.get("strategyName")));
-                        }
-                        sendOpenNotification(openStrategy, credential, String.valueOf(data.get("symbol")), String.valueOf(data.get("direction")),
+                        sendOpenNotification(strategy, credential, String.valueOf(data.get("symbol")), String.valueOf(data.get("direction")),
                             decimal(data.get("quantity")), decimal(data.get("price")), Integer.parseInt(String.valueOf(data.get("leverage"))),
                             decimal(data.get("openRatio")), openTime, String.valueOf(data.get("reason")));
                         task.setStatus("SENT");
@@ -676,7 +671,7 @@ public class QuantTradeNotificationService {
                 }
             } catch (Exception ex) {
                 retryCloseFactTask(task, ex.getClass().getSimpleName() + ": " + ex.getMessage());
-                log.warn("平仓通知待核验任务执行失败 notificationId={} orderId={}", task.getId(), task.getRecipient(), ex);
+                log.warn("交易通知待核验任务执行失败 notificationId={} taskKey={}", task.getId(), task.getRecipient(), ex);
             }
             task.setOwnerToken(null);
             task.setLeaseUntil(null);
