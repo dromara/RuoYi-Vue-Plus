@@ -2398,9 +2398,8 @@ KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(),
                 : KlineSlopeRateStrategy.priceForReturn(context.entryPrice(), context.direction(), hard.negate(), context.leverage()), "固定硬止损"));
         }
         for (ProtectionSignal signal : signals) {
-            BigDecimal trigger = runtime.protectionRule == null ? signal.triggerPrice() : KlineSlopeRateStrategy.unifiedProtection(frozenParams(runtime))
-                ? org.dromara.quant.exchange.QuantityNormalizer.protectionPrice(signal.triggerPrice(), runtime.protectionRule, context.direction())
-                : org.dromara.quant.exchange.QuantityNormalizer.price(signal.triggerPrice(), runtime.protectionRule);
+            BigDecimal trigger = runtime.protectionRule == null ? signal.triggerPrice()
+                : org.dromara.quant.exchange.QuantityNormalizer.protectionPrice(signal.triggerPrice(), runtime.protectionRule, context.direction(), signal.orderType());
             boolean shortPosition = "SHORT".equalsIgnoreCase(context.direction());
             boolean profit = "TAKE_PROFIT_MARKET".equals(signal.orderType());
             boolean triggered = shortPosition == profit ? context.currentPrice().compareTo(trigger) <= 0 : context.currentPrice().compareTo(trigger) >= 0;
@@ -3972,7 +3971,7 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
                                     BigDecimal stop = KlineSlopeRateStrategy.priceForReturn(snapshot.getEntryPrice(), snapshot.getPositionSide(),
                                         hardStopRatio.negate(), snapshot.getLeverage());
                                     runtime.state.setStopLossPrice(runtime.protectionRule == null ? stop
-                                        : org.dromara.quant.exchange.QuantityNormalizer.protectionPrice(stop, runtime.protectionRule, snapshot.getPositionSide()));
+                                        : org.dromara.quant.exchange.QuantityNormalizer.protectionPrice(stop, runtime.protectionRule, snapshot.getPositionSide(), "STOP_MARKET"));
                                     try {
                                         stateService.save(runtime.state);
                                     } catch (RuntimeException ex) {
