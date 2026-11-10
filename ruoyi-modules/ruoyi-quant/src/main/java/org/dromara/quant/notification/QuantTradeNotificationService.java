@@ -21,6 +21,8 @@ import org.dromara.quant.util.QuantJsonMapper;
 import org.dromara.system.api.MessageService;
 import org.dromara.system.api.domain.PushPayloadDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -60,6 +62,7 @@ public class QuantTradeNotificationService {
     private final MessageService messageService;
     private final JdbcTemplate jdbcTemplate;
     private final ExchangeGateway gateway;
+    private final TaskExecutor notificationExecutor;
     @Autowired
     private QuantCredentialMapper credentialMapper;
     @Autowired
@@ -70,13 +73,15 @@ public class QuantTradeNotificationService {
      * 创建 QuantTradeNotificationService 实例并初始化其依赖。
      */
     public QuantTradeNotificationService(QuantRiskConfigMapper riskConfigMapper, QuantNotificationMapper notificationMapper, QuantProperties properties,
-                                         MessageService messageService, JdbcTemplate jdbcTemplate, ExchangeGateway gateway) {
+                                         MessageService messageService, JdbcTemplate jdbcTemplate, ExchangeGateway gateway,
+                                         @Qualifier("quantNotificationExecutor") TaskExecutor notificationExecutor) {
         this.riskConfigMapper = riskConfigMapper;
         this.notificationMapper = notificationMapper;
         this.properties = properties;
         this.messageService = messageService;
         this.jdbcTemplate = jdbcTemplate;
         this.gateway = gateway;
+        this.notificationExecutor = notificationExecutor;
     }
 
     /**
@@ -461,7 +466,7 @@ public class QuantTradeNotificationService {
                     return false;
                 }
                 if (systemNotification.getId() != null) {
-                    claimAndDeliver(systemNotification);
+                    dispatchNotification(systemNotification.getId());
                 }
             }
             List<String> emailRecipients = recipients(credentialId);
@@ -618,10 +623,12 @@ public class QuantTradeNotificationService {
             pending.setContent(QuantJsonMapper.writeMap(task));
             pending.setStatus("PENDING");
             pending.setRetryCount(0);
-            pending.setNextRetryAt(LocalDateTime.now().plusSeconds(5));
+            pending.setNextRetryAt(LocalDateTime.now());
             pending.setCreatedAt(LocalDateTime.now());
-            notificationMapper.insert(pending);
-            log.info("开仓通知已进入成交时间核验队列 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId);
+            if (notificationMapper.insert(pending) == 1 && pending.getId() != null) {
+                dispatchPendingOpenFact(pending.getId());
+            }
+            log.info("开仓通知已进入即时成交时间核验队列 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId);
         } catch (Exception ex) {
             log.error("开仓通知待核验任务持久化失败 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId, ex);
         }
@@ -828,7 +835,10 @@ public class QuantTradeNotificationService {
             notification.setCreatedAt(LocalDateTime.now());
             try {
                 notificationMapper.insert(notification);
-                // 邮件网络等待不能阻塞行情消费；现有调度器负责抢占、发送和失败重试。
+                if (notification.getId() != null) {
+                    dispatchNotification(notification.getId());
+                }
+                // 邮件网络请求在独立线程执行；定时任务负责失败重试和异常恢复。
             } catch (RuntimeException ex) {
                 // Outbox 入库本身失败时不能影响交易，但必须留下高优先级错误日志。
                 log.error("量化交易通知 Outbox 写入失败 credentialId={} recipient={} subject={}", credentialId, email, subject, ex);
@@ -865,6 +875,71 @@ public class QuantTradeNotificationService {
         }
         messageService.publishMessage(new java.util.ArrayList<>(recipients), PushPayloadDTO.of(PushTypeEnum.MESSAGE, PushSourceEnum.WORKFLOW, subject + "\n" + content, null,
             "/quant/terminal/index"));
+    }
+
+    private void dispatchNotification(Long notificationId) {
+        try {
+            notificationExecutor.execute(() -> {
+                QuantNotification notification = notificationMapper.selectById(notificationId);
+                if (notification != null) {
+                    claimAndDeliver(notification);
+                }
+            });
+        } catch (RuntimeException ex) {
+            // 保留 PENDING 状态，由定时 Outbox 扫描任务补发。
+            log.warn("通知异步投递任务提交失败，等待后台重试 notificationId={}", notificationId, ex);
+        }
+    }
+
+    private void dispatchPendingOpenFact(Long notificationId) {
+        try {
+            notificationExecutor.execute(() -> {
+                QuantNotification task = notificationMapper.selectById(notificationId);
+                if (task == null || notificationMapper.claim(task.getId(), UUID.randomUUID().toString(),
+                    LocalDateTime.now().plusMinutes(2)) != 1) {
+                    return;
+                }
+                String ownerToken = task.getOwnerToken();
+                LocalDateTime leaseUntil = LocalDateTime.now().plusMinutes(2);
+                task.setStatus("SENDING");
+                task.setOwnerToken(ownerToken);
+                task.setLeaseUntil(leaseUntil);
+                try {
+                    Map<String, Object> data = QuantJsonMapper.readMap(task.getContent());
+                    Long credentialId = Long.valueOf(String.valueOf(data.get("credentialId")));
+                    QuantCredential credential = credentialMapper.selectById(credentialId);
+                    if (credential == null) {
+                        throw new IllegalStateException("开仓通知待核验任务对应的交易凭证不存在");
+                    }
+                    Instant openTime = resolveOpenFillTime(credential, String.valueOf(data.get("symbol")),
+                        String.valueOf(data.get("direction")), Long.valueOf(String.valueOf(data.get("orderId"))));
+                    if (openTime == null) {
+                        retryCloseFactTask(task, "开仓订单成交明细尚未完整，无法确认最早成交时间");
+                    } else {
+                        QuantStrategy strategy = null;
+                        if (data.get("strategyName") != null) {
+                            strategy = new QuantStrategy();
+                            strategy.setStrategyName(String.valueOf(data.get("strategyName")));
+                        }
+                        sendOpenNotification(strategy, credential, String.valueOf(data.get("symbol")), String.valueOf(data.get("direction")),
+                            decimal(data.get("quantity")), decimal(data.get("price")), Integer.parseInt(String.valueOf(data.get("leverage"))),
+                            decimal(data.get("openRatio")), openTime, String.valueOf(data.get("reason")));
+                        task.setStatus("SENT");
+                        task.setSentAt(LocalDateTime.now());
+                        task.setNextRetryAt(null);
+                        task.setLastError(null);
+                    }
+                } catch (Exception ex) {
+                    retryCloseFactTask(task, ex.getClass().getSimpleName() + ": " + ex.getMessage());
+                    log.warn("开仓通知即时核验失败，保留后台补偿任务 notificationId={}", task.getId(), ex);
+                }
+                task.setOwnerToken(null);
+                task.setLeaseUntil(null);
+                notificationMapper.updateById(task);
+            });
+        } catch (RuntimeException ex) {
+            log.warn("开仓通知即时核验任务提交失败，等待后台补偿 notificationId={}", notificationId, ex);
+        }
     }
 
     /**
