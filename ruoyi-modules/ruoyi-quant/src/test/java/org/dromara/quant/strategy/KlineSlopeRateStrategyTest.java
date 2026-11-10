@@ -148,6 +148,35 @@ class KlineSlopeRateStrategyTest {
         assertEquals(KlineSlopeRateStrategy.EXIT_STEP_TP, strategy.evaluateExit(c, Map.of()).getFirst().type());
     }
 
+    @Test
+    void shortMarkPricePeakAdvancesToFourthStepAndLocksThirtyPercent() {
+        // MARK 最低价对应约 40.88% 杠杆回报率；即使当前成交价反弹，仍应保留第 4 阶。
+        StrategyContext c = new StrategyContext("VVVUSDT", "SHORT", new BigDecimal("20.870"), new BigDecimal("20.057"),
+            new BigDecimal("20.057"), null, Instant.ofEpochMilli(1_000), false, Instant.ofEpochMilli(2_000),
+            new BigDecimal("73.81"), new BigDecimal("73.81"), new BigDecimal("148.04"), 10,
+            null, new BigDecimal("20.0167"), true, 4);
+        var step = strategy.evaluateProtection(c, Map.of("stepRatio", "0.10")).stream()
+            .filter(p -> p.type().equals("STEP_TP")).findFirst().orElseThrow();
+
+        assertEquals(4, step.stepIndex());
+        assertEquals(0, new BigDecimal("20.2439").compareTo(step.triggerPrice().setScale(4, java.math.RoundingMode.HALF_UP)));
+        assertTrue(step.reason().contains("锁定回报率=30%"));
+    }
+
+    @Test
+    void persistedHighestStepDoesNotFallWhenPriceRetraces() {
+        StrategyContext c = new StrategyContext("VVVUSDT", "SHORT", new BigDecimal("20.870"), new BigDecimal("20.300"),
+            new BigDecimal("20.300"), null, Instant.ofEpochMilli(1_000), false, Instant.ofEpochMilli(2_000),
+            new BigDecimal("73.81"), new BigDecimal("73.81"), new BigDecimal("148.04"), 10,
+            null, new BigDecimal("20.0167"), true, 4);
+        var step = strategy.evaluateProtection(c, Map.of("stepRatio", "0.10")).stream()
+            .filter(p -> p.type().equals("STEP_TP")).findFirst().orElseThrow();
+
+        assertEquals(4, step.stepIndex());
+        assertEquals(0, new BigDecimal("20.2439").compareTo(step.triggerPrice().setScale(4, java.math.RoundingMode.HALF_UP)));
+    }
+
+
     @org.junit.jupiter.params.ParameterizedTest
     @org.junit.jupiter.params.provider.CsvSource({"LONG,5", "SHORT,5", "LONG,20", "SHORT,20"})
     void stopThresholdEqualsBoundaryAndProfitConversionUsesSameLeverage(String direction, int leverage) {
