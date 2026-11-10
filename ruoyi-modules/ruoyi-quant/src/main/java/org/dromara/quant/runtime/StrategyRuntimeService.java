@@ -1319,6 +1319,16 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
                 runtime.lastEvaluatedKlineOpenTime = event.kline().openTime();
             }
             if (!event.replay() && "MARK".equalsIgnoreCase(event.type()) && event.price() != null && runtime.position != null && !runtime.exitCoordinating.get()) {
+                if (runtime.plugin instanceof KlineSlopeRateStrategy && runtime.state != null) {
+                    int previousHighestStep = runtime.state.getHighestStep() == null ? 0 : runtime.state.getHighestStep();
+                    if (!updateRuntimeExtrema(runtime, event.price())) {
+                        return;
+                    }
+                    int currentHighestStep = runtime.state.getHighestStep() == null ? 0 : runtime.state.getHighestStep();
+                    if (currentHighestStep > previousHighestStep) {
+                        syncPluginProtections(runtime, buildContext(runtime, event.price(), event));
+                    }
+                }
                 updateRuntimeMaximumReturnRate(runtime, event.price());
             }
             if (event.replay()) {
