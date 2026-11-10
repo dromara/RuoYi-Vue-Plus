@@ -1059,7 +1059,7 @@ public class ProtectionOrderService {
             || child.originalQuantity() == null || child.executedQuantity() == null
             || child.originalQuantity().compareTo(actual.quantity()) != 0
             || child.executedQuantity().compareTo(child.originalQuantity()) != 0
-            || actual.executedQuantity() != null && actual.executedQuantity().compareTo(child.executedQuantity()) != 0
+            || actual.executedQuantity() == null || actual.executedQuantity().compareTo(child.executedQuantity()) != 0
             || !Boolean.TRUE.equals(child.reduceOnly()) || !Boolean.FALSE.equals(child.closePosition())) {
             throw new IllegalStateException("Algo 实际子订单未能证明身份一致且完整成交");
         }
