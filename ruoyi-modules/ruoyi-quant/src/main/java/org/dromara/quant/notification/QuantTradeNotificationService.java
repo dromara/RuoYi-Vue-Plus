@@ -220,14 +220,18 @@ public class QuantTradeNotificationService {
 
     public void notifyOpen(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity, BigDecimal price, int leverage,
                            BigDecimal openRatio, Instant openTime, Long orderId, String reason) {
-        Instant actualOpenTime = orderId == null ? openTime : resolveOpenFillTime(credential, symbol, direction, orderId);
-        if (orderId != null && actualOpenTime == null) {
-            log.warn("开仓成交时间未能从成交明细核实，通知显示待核实 credentialId={} symbol={} orderId={}",
-                credential == null ? null : credential.getId(), symbol, orderId);
+        if (orderId != null) {
+            enqueuePendingOpenFact(strategy, credential, symbol, direction, quantity, price, leverage, openRatio, orderId, reason);
+            return;
         }
+        sendOpenNotification(strategy, credential, symbol, direction, quantity, price, leverage, openRatio, openTime, reason);
+    }
+
+    private void sendOpenNotification(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
+                                      BigDecimal price, int leverage, BigDecimal openRatio, Instant openTime, String reason) {
         String subject = "量化开仓通知 - " + symbol + " " + cnDirection(direction);
-        String content = "【量化开仓通知】\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\n" + "账户: " + safe(credential == null ? null :
-            credential.getAccountName()) + "\n" + "交易对: " + symbol + "\n" + "方向: " + cnDirection(direction) + "\n" + "开仓数量: " + plain(quantity) + "\n" + "开仓价格: " + plain(price) + "\n" + "杠杆倍数: " + leverage + "倍\n" + "开仓比例: " + plain(openRatio) + "\n" + "开仓时间: " + tradeTime(actualOpenTime) + "\n" + "触发原因: " + safe(reason);
+        String content = "【量化开仓通知】\\n" + "策略名称: " + safe(strategy == null ? null : strategy.getStrategyName()) + "\\n" + "账户: " + safe(credential == null ? null :
+            credential.getAccountName()) + "\\n" + "交易对: " + symbol + "\\n" + "方向: " + cnDirection(direction) + "\\n" + "开仓数量: " + plain(quantity) + "\\n" + "开仓价格: " + plain(price) + "\\n" + "杠杆倍数: " + leverage + "倍\\n" + "开仓比例: " + plain(openRatio) + "\\n" + "开仓时间: " + tradeTime(openTime) + "\\n" + "触发原因: " + safe(reason);
         send(credential == null ? null : credential.getId(), subject, content);
     }
 
@@ -547,6 +551,51 @@ public class QuantTradeNotificationService {
         }
     }
 
+    private void enqueuePendingOpenFact(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal quantity,
+                                        BigDecimal price, int leverage, BigDecimal openRatio, Long orderId, String reason) {
+        if (credential == null || credential.getId() == null || orderId == null || symbol == null || direction == null
+            || quantity == null || quantity.signum() <= 0 || price == null || price.signum() <= 0) {
+            log.error("开仓通知无法建立待核验任务：缺少账户、订单或开仓数据 credentialId={} symbol={} orderId={}",
+                credential == null ? null : credential.getId(), symbol, orderId);
+            return;
+        }
+        String taskKey = "OPEN:" + orderId;
+        try {
+            long existing = notificationMapper.selectCount(new LambdaQueryWrapper<QuantNotification>()
+                .eq(QuantNotification::getCredentialId, credential.getId()).eq(QuantNotification::getChannel, "FACT_PENDING")
+                .eq(QuantNotification::getRecipient, taskKey));
+            if (existing > 0) {
+                return;
+            }
+            Map<String, Object> task = new LinkedHashMap<>();
+            task.put("taskType", "OPEN");
+            task.put("credentialId", String.valueOf(credential.getId()));
+            task.put("strategyName", strategy == null ? null : strategy.getStrategyName());
+            task.put("symbol", symbol);
+            task.put("direction", direction);
+            task.put("quantity", quantity.toPlainString());
+            task.put("price", price.toPlainString());
+            task.put("leverage", leverage);
+            task.put("openRatio", openRatio == null ? null : openRatio.toPlainString());
+            task.put("orderId", String.valueOf(orderId));
+            task.put("reason", reason);
+            QuantNotification pending = new QuantNotification();
+            pending.setCredentialId(credential.getId());
+            pending.setChannel("FACT_PENDING");
+            pending.setRecipient(taskKey);
+            pending.setSubject("开仓成交事实待核验");
+            pending.setContent(QuantJsonMapper.writeMap(task));
+            pending.setStatus("PENDING");
+            pending.setRetryCount(0);
+            pending.setNextRetryAt(LocalDateTime.now().plusSeconds(5));
+            pending.setCreatedAt(LocalDateTime.now());
+            notificationMapper.insert(pending);
+            log.info("开仓通知已进入成交时间核验队列 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId);
+        } catch (Exception ex) {
+            log.error("开仓通知待核验任务持久化失败 credentialId={} symbol={} orderId={}", credential.getId(), symbol, orderId, ex);
+        }
+    }
+
     @Scheduled(fixedDelay = 30000L, initialDelay = 30000L)
     public void retryPendingCloseFacts() {
         LocalDateTime now = LocalDateTime.now();
@@ -584,6 +633,26 @@ public class QuantTradeNotificationService {
                     strategy = new QuantStrategy();
                     strategy.setStrategyName(String.valueOf(data.get("strategyName")));
                 }
+                if ("OPEN".equalsIgnoreCase(String.valueOf(data.get("taskType")))) {
+                    Instant openTime = resolveOpenFillTime(credential, String.valueOf(data.get("symbol")),
+                        String.valueOf(data.get("direction")), Long.valueOf(String.valueOf(data.get("orderId"))));
+                    if (openTime == null) {
+                        retryCloseFactTask(task, "开仓订单成交明细尚未完整，无法确认最早成交时间");
+                    } else {
+                        QuantStrategy openStrategy = null;
+                        if (data.get("strategyName") != null) {
+                            openStrategy = new QuantStrategy();
+                            openStrategy.setStrategyName(String.valueOf(data.get("strategyName")));
+                        }
+                        sendOpenNotification(openStrategy, credential, String.valueOf(data.get("symbol")), String.valueOf(data.get("direction")),
+                            decimal(data.get("quantity")), decimal(data.get("price")), Integer.parseInt(String.valueOf(data.get("leverage"))),
+                            decimal(data.get("openRatio")), openTime, String.valueOf(data.get("reason")));
+                        task.setStatus("SENT");
+                        task.setSentAt(LocalDateTime.now());
+                        task.setNextRetryAt(null);
+                        task.setLastError(null);
+                    }
+                } else {
                 String symbol = String.valueOf(data.get("symbol"));
                 String direction = String.valueOf(data.get("direction"));
                 BigDecimal requestedQuantity = decimal(data.get("requestedQuantity"));
@@ -603,6 +672,7 @@ public class QuantTradeNotificationService {
                     task.setLastError(null);
                 } else {
                     retryCloseFactTask(task, "交易所订单或成交明细尚未完整");
+                }
                 }
             } catch (Exception ex) {
                 retryCloseFactTask(task, ex.getClass().getSimpleName() + ": " + ex.getMessage());
