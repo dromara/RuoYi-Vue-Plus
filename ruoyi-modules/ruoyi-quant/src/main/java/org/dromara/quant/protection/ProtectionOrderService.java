@@ -715,36 +715,58 @@ public class ProtectionOrderService {
             default -> "QSTOP_";
         };
         // 标识先写入持久化意图，超时后沿用该标识精确查询，禁止换标识盲目重试。
-        String clientAlgoId = prefix + UUID.randomUUID().toString().replace("-", "").substring(0, 28);
-        QuantProtectionOrder entity = new QuantProtectionOrder();
-        entity.setCredentialId(credentialId);
-        entity.setCreatedAtEpochMillis(System.currentTimeMillis());
-        entity.setPositionId(position.getId());
-        entity.setPositionCycleKey(position.getProtectionCycleKey());
-        entity.setExecutedQuantity(BigDecimal.ZERO);
-        entity.setSymbol(position.getSymbol());
-        entity.setPositionSide(position.getPositionSide());
-        entity.setClientOrderId(clientAlgoId);
-        entity.setProtectionType(protectionType);
-        entity.setOrderType(orderType == null ? "STOP_MARKET" : orderType);
-        entity.setQuantity(quantity);
-        entity.setStopPrice(stopPrice);
-        // PREPARED means the local intent is durable but no create-dispatch
-        // ticket has been reserved yet. It lets restart recovery distinguish
-        // this safe-to-retry boundary from an exchange request with unknown result.
+        String normalizedOrderType = orderType == null ? "STOP_MARKET" : orderType;
+        QuantProtectionOrder entity = null;
+        if (position.getProtectionCycleKey() != null && !position.getProtectionCycleKey().isBlank()) {
+            entity = mapper.selectList(new LambdaQueryWrapper<QuantProtectionOrder>()
+                .eq(QuantProtectionOrder::getCredentialId, credentialId)
+                .eq(QuantProtectionOrder::getPositionId, position.getId())
+                .eq(QuantProtectionOrder::getPositionCycleKey, position.getProtectionCycleKey())
+                .eq(QuantProtectionOrder::getSymbol, position.getSymbol())
+                .eq(QuantProtectionOrder::getPositionSide, position.getPositionSide())
+                .eq(QuantProtectionOrder::getProtectionType, protectionType)
+                .eq(QuantProtectionOrder::getOrderType, normalizedOrderType)
+                .eq(QuantProtectionOrder::getQuantity, quantity)
+                .eq(QuantProtectionOrder::getStopPrice, stopPrice)
+                .eq(QuantProtectionOrder::getStepIndex, stepIndex)
+                .eq(QuantProtectionOrder::getStatus, "NOT_SENT")
+                .isNull(QuantProtectionOrder::getExchangeOrderId)
+                .eq(QuantProtectionOrder::getExecutedQuantity, BigDecimal.ZERO)
+                .orderByDesc(QuantProtectionOrder::getId)).stream().findFirst().orElse(null);
+        }
+        if (entity == null) {
+            String clientAlgoId = prefix + UUID.randomUUID().toString().replace("-", "").substring(0, 28);
+            entity = new QuantProtectionOrder();
+            entity.setCredentialId(credentialId);
+            entity.setCreatedAtEpochMillis(System.currentTimeMillis());
+            entity.setPositionId(position.getId());
+            entity.setPositionCycleKey(position.getProtectionCycleKey());
+            entity.setExecutedQuantity(BigDecimal.ZERO);
+            entity.setSymbol(position.getSymbol());
+            entity.setPositionSide(position.getPositionSide());
+            entity.setClientOrderId(clientAlgoId);
+            entity.setProtectionType(protectionType);
+            entity.setOrderType(normalizedOrderType);
+            entity.setQuantity(quantity);
+            entity.setStopPrice(stopPrice);
+            entity.setStepIndex(stepIndex);
+        }
+        // Reuse is limited to a durable intent proven not to have reached Binance.
+        // Keep its original clientAlgoId so retries cannot create a second identity.
         entity.setStatus("PAPER".equalsIgnoreCase(credential.runMode()) ? "PENDING" : "PREPARED");
-        entity.setStepIndex(stepIndex);
         if (protectionJournal != null) {
             protectionJournal.captureOwner(entity);
         }
         if (targetLease.get() == null) {
-            if (mapper.insert(entity) != 1 || entity.getId() == null) {
+            int affected = entity.getId() == null ? mapper.insert(entity) : mapper.updateById(entity);
+            if (affected != 1 || entity.getId() == null) {
                 throw new IllegalStateException("保护单意图未可靠持久化，拒绝发送交易所请求");
             }
         } else {
             QuantProtectionOrder previous = findActive(credentialId, position, protectionType);
             targetLease.get().prepare(entity, stepIndex, previous, row -> {
-                if (mapper.insert(row) != 1) {
+                int affected = row.getId() == null ? mapper.insert(row) : mapper.updateById(row);
+                if (affected != 1 || row.getId() == null) {
                     throw new IllegalStateException("保护意图持久化失败");
                 }
             });
@@ -1136,6 +1158,26 @@ public class ProtectionOrderService {
         }
         local.setExchangeOrderId(actual.algoId());
         if (Set.of("TRIGGERING", "TRIGGERED", "FINISHED").contains(actual.status()) || actual.executedQuantity() != null && actual.executedQuantity().signum() > 0) {
+            // readProtectionSnapshot returns FINISHED only after the exact child order is terminal.
+            // Persist that exchange fact before forcing position reconciliation; otherwise the
+            // parent protection remains WORKING forever and its previous-target lease never clears.
+            if ("FINISHED".equals(actual.status()) && actual.actualOrderId() != null && actual.actualOrderId() > 0) {
+                local.setStatus("FINISHED");
+                BigDecimal executed = actual.executedQuantity() == null ? BigDecimal.ZERO : actual.executedQuantity();
+                local.setExecutedQuantity(executed.max(local.getExecutedQuantity() == null ? BigDecimal.ZERO : local.getExecutedQuantity()));
+                if (mapper.updateById(local) != 1) {
+                    throw new IllegalStateException("保护单实际子订单已终态，但本地保护账本更新失败");
+                }
+                if (targetLease.get() != null) {
+                    ProtectionTargetCoordinator.State target = targetLease.get().state();
+                    if (Objects.equals(target.pendingOrderId(), local.getId())) {
+                        targetLease.get().terminal(local);
+                    }
+                    if (Objects.equals(target.previousOrderId(), local.getId())) {
+                        targetLease.get().cleaned();
+                    }
+                }
+            }
             throw new ProtectionExecutionPendingException();
         }
         if (!Set.of("NEW", "WORKING", "ACCEPTED").contains(actual.status())) {
