@@ -498,7 +498,7 @@ class ProtectionOrderServiceTest {
         var algo = new ExchangeGateway.ProtectionOrderSnapshot("JCTUSDT", 1000000282028535L, clientId, "FINISHED",
             "BUY", "SHORT", "STOP_MARKET", new BigDecimal("300685"), new BigDecimal("0.0051900"), Instant.now(),
             new BigDecimal("300685"), true, false, 271997586L, new BigDecimal("0.0052680"));
-        when(gateway.queryProtectionOrder(any(), any(), eq(clientId), eq("JCTUSDT"), any())).thenReturn(algo, algo);
+        when(gateway.queryProtectionOrder(any(), org.mockito.ArgumentMatchers.nullable(Long.class), eq(clientId), eq("JCTUSDT"), org.mockito.ArgumentMatchers.nullable(Long.class))).thenReturn(algo, algo);
         var child = new ExchangeGateway.OrderSnapshot("JCTUSDT", 271997586L, childClientOrderId, "BUY", "MARKET", childStatus,
             BigDecimal.ZERO, new BigDecimal("300685"), new BigDecimal(childExecutedQuantity), Instant.now(), new BigDecimal("0.0052680"),
             "SHORT", true, Instant.now(), false);
