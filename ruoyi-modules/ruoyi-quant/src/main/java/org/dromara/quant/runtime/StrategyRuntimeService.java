@@ -2066,6 +2066,10 @@ List.of() : pendingIdentity(runtime.state)) || runtime.position != expectedPosit
             if (state.getOpenedAt() == null && openTime != null) {
                 state.setOpenedAt(LocalDateTime.ofInstant(openTime, ZoneId.of("Asia/Shanghai")));
             }
+            // 新开仓的交易所保护尚未确认前，持久化恢复阻断；本地镜像仍立即运行。
+            // 只有硬止损和动态保护目标整轮确认成功后，保护同步任务才会解除该阻断。
+            state.setRecoveryRequired(true);
+            runtime.protectionDegraded = true;
             clearPending(state);
             stateService.save(state);
             runtime.state = state;
