@@ -151,7 +151,12 @@ public class ProtectionTargetCoordinator {
                 if (old.pendingOrderId() != null || old.previousOrderId() != null) {
                     throw new PendingTargetException(old.pendingOrderId(), old.previousOrderId());
                 }
-                candidate.setTargetVersion(old.version() + 1);
+                boolean sameNotSentTargetRetry = candidate.getId() != null && candidate.getTargetVersion() != null
+                    && candidate.getTargetVersion() == old.version() && old.stepIndex() == step
+                    && old.quantity() != null && candidate.getQuantity() != null && old.quantity().compareTo(candidate.getQuantity()) == 0
+                    && old.triggerPrice() != null && candidate.getStopPrice() != null && old.triggerPrice().compareTo(candidate.getStopPrice()) == 0
+                    && Objects.equals(old.orderType(), candidate.getOrderType());
+                candidate.setTargetVersion(sameNotSentTargetRetry ? old.version() : old.version() + 1);
                 candidate.setStepIndex(Math.max(old.stepIndex(), step));
                 insert.accept(candidate);
                 if (candidate.getId() == null) {
