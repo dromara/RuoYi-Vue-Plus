@@ -73,6 +73,25 @@ class ProtectionTargetCoordinatorTest {
     }
 
     @Test
+    void definitelyNotSentRetryReusesTheSameTargetVersionAndIntent() {
+        var f = fixture();
+        try (var lease = f.first.acquire(1L, f.position, "STEP_TP")) {
+            var first = order(1);
+            lease.prepare(first, 2, null, row -> f.jdbc.update("INSERT INTO test_order VALUES (?,?)", row.getId(), row.getClientOrderId()));
+            assertEquals(1L, first.getTargetVersion());
+            lease.terminal(first);
+
+            var retry = order(1);
+            retry.setTargetVersion(1L);
+            lease.prepare(retry, 2, null, row -> f.jdbc.update("UPDATE test_order SET client_id=? WHERE id=?", row.getClientOrderId(), row.getId()));
+            assertEquals(1L, retry.getTargetVersion());
+            assertEquals(1L, lease.state().version());
+            assertEquals(1L, lease.state().pendingOrderId());
+        }
+        assertEquals(1, f.jdbc.queryForObject("SELECT COUNT(*) FROM test_order", Integer.class));
+    }
+
+    @Test
     void stalePreviousTargetIsReportedAsRecoverablePendingState() {
         var f = fixture();
         try (var lease = f.first.acquire(1L, f.position, "HARD_STOP")) {
