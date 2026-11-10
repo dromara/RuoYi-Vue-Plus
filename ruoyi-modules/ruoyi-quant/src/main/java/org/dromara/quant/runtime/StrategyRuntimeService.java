@@ -4604,8 +4604,9 @@ positionMapper.selectList(new LambdaQueryWrapper<QuantPosition>().eq(QuantPositi
         String target =
          runtime.position.getId() + ":" + runtime.position.getPositionSide() + ":" + runtime.position.getQuantity().stripTrailingZeros().toPlainString() + ":" + signals.stream().map(signal -> signal.type() + ":" + signal.orderType() + ":" + signal.quantityBase() + ":" + (signal.quantityRate() == null ? "1" : signal.quantityRate().stripTrailingZeros().toPlainString()) + ":" + (signal.triggerPrice() == null ? "null" : signal.triggerPrice().stripTrailingZeros().toPlainString())).sorted().collect(java.util.stream.Collectors.joining("|"));
         long now = System.nanoTime();
-        // 相同目标合并；定期仍交给后台精确查询，变化的阶梯/数量立即同步。
-        if (target.equals(runtime.lastProtectionTarget) && now - runtime.lastProtectionRequestNanos < java.util.concurrent.TimeUnit.SECONDS.toNanos(15)) {
+        // 正常状态下合并相同目标；保护降级时缩短重试间隔，避免失败目标被 15 秒去重窗口延迟恢复。
+        long retryIntervalNanos = java.util.concurrent.TimeUnit.SECONDS.toNanos(runtime.protectionDegraded ? 2 : 15);
+        if (target.equals(runtime.lastProtectionTarget) && now - runtime.lastProtectionRequestNanos < retryIntervalNanos) {
             return;
         }
         runtime.lastProtectionTarget = target;
