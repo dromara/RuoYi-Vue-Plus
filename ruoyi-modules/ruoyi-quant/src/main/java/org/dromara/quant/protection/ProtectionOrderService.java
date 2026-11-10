@@ -296,10 +296,11 @@ public class ProtectionOrderService {
             stage = "RELEASE_DISPATCH_GATE";
             boolean recovered = requireLiveDispatcher().recoveredFromExchange(active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), terminalAlgoId);
             if (recovered) {
-                log.info("未决保护撤单已按交易所终态恢复并释放派发门禁 accountId={} symbol={} dispatchKey={} clientAlgoId={} algoId={}", active.credentialId(), active.symbol(),
-                    active.dispatchKey(), active.clientOrderId(), terminalAlgoId);
+                String recoveryType = "FINISHED".equalsIgnoreCase(current == null ? null : current.status()) ? "触发成交" : "撤单";
+                log.info("未决保护{}已按交易所终态恢复并释放派发门禁 accountId={} symbol={} dispatchKey={} clientAlgoId={} algoId={}", recoveryType,
+                    active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), terminalAlgoId);
             } else {
-                log.warn("未决保护撤单终态已写入，但派发门禁未能释放 accountId={} symbol={} dispatchKey={} clientAlgoId={} algoId={}",
+                log.warn("未决保护终态已写入，但派发门禁未能释放 accountId={} symbol={} dispatchKey={} clientAlgoId={} algoId={}",
                     active.credentialId(), active.symbol(), active.dispatchKey(), active.clientOrderId(), terminalAlgoId);
             }
             return recovered;
