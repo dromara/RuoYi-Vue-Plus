@@ -295,8 +295,13 @@ class QuantTradeNotificationServiceTest {
         var rows = ArgumentCaptor.forClass(QuantNotification.class);
         verify(mapper).insert(rows.capture());
         assertEquals("FACT_PENDING", rows.getValue().getChannel());
+        assertEquals("PENDING", rows.getValue().getStatus());
+        assertNotNull(rows.getValue().getNextRetryAt());
         assertTrue(rows.getValue().getContent().contains("\"orderId\":\"101\""));
         assertFalse(rows.getValue().getContent().contains("test-secret"));
+        var callOrder = inOrder(mapper, gateway);
+        callOrder.verify(mapper).insert(any(QuantNotification.class));
+        callOrder.verify(gateway).queryOrder(any(), eq("BTCUSDT"), eq(101L), isNull());
     }
 
 
