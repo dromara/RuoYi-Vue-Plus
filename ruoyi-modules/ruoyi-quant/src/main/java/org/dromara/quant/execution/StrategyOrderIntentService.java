@@ -76,4 +76,42 @@ public class StrategyOrderIntentService {
             }
         }
     }
+
+    /**
+     * Persist a protection child only after ProtectionOrderJournalService has verified
+     * the exact algo-to-child relationship and frozen cycle owner.
+     */
+    public void recordVerifiedProtectionChild(long credentialId, long strategyId, long instanceId,
+                                              String symbol, String positionCycleKey, String positionSide,
+                                              String exchangeSide, long orderId, String clientOrderId) {
+        String normalizedSymbol = symbol == null ? null : symbol.toUpperCase(Locale.ROOT);
+        String normalizedPositionSide = positionSide == null ? null : positionSide.toUpperCase(Locale.ROOT);
+        String normalizedExchangeSide = exchangeSide == null ? null : exchangeSide.toUpperCase(Locale.ROOT);
+        String expectedSide = "LONG".equals(normalizedPositionSide) ? "SELL"
+            : "SHORT".equals(normalizedPositionSide) ? "BUY" : null;
+        if (credentialId <= 0 || strategyId <= 0 || instanceId <= 0 || normalizedSymbol == null || normalizedSymbol.isBlank()
+            || positionCycleKey == null || positionCycleKey.isBlank()
+            || expectedSide == null || !expectedSide.equals(normalizedExchangeSide)
+            || orderId <= 0 || clientOrderId == null || clientOrderId.isBlank()) {
+            throw new IllegalStateException("Cannot persist a protection child without an exact verified strategy-cycle identity");
+        }
+        try {
+            if (mapper.insert(credentialId, normalizedSymbol, orderId, strategyId, instanceId,
+                normalizedPositionSide, "CLOSE", positionCycleKey, normalizedExchangeSide, clientOrderId) != 1) {
+                throw new IllegalStateException("Verified protection child close intent was not persisted");
+            }
+        } catch (DuplicateKeyException replay) {
+            Map<String, Object> prior = mapper.find(credentialId, normalizedSymbol, orderId);
+            if (prior == null || !equalsId(prior.get("strategy_id"), strategyId)
+                || !equalsId(prior.get("strategy_instance_id"), instanceId)
+                || !"CLOSE".equals(prior.get("fill_role"))
+                || !normalizedPositionSide.equals(prior.get("position_side"))
+                || !positionCycleKey.equals(prior.get("position_cycle_key"))
+                || !normalizedExchangeSide.equals(prior.get("exchange_side"))
+                || !clientOrderId.equals(prior.get("client_order_id"))) {
+                throw new IllegalStateException("Conflicting immutable protection child order identity", replay);
+            }
+        }
+    }
+
 }
