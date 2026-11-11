@@ -59,4 +59,56 @@ WHERE id=#{localId} AND credential_id=#{credentialId}
   AND position_side=#{positionSide}
   AND reduce_only=#{reduceOnly}
 ]]></select>
+    <select id="findCloseOrderIdsByCycle" resultType="java.lang.Long" timeout="3"><![CDATA[
+SELECT candidates.exchange_order_id
+FROM (
+    SELECT q.exchange_order_id
+    FROM quant_strategy_order_intent i
+    INNER JOIN quant_order q
+        ON q.credential_id=i.credential_id
+       AND q.symbol=i.symbol
+       AND q.exchange_order_id=i.exchange_order_id
+    WHERE i.credential_id=#{credentialId}
+      AND i.symbol=#{symbol}
+      AND i.strategy_instance_id=#{instanceId}
+      AND i.position_cycle_key=#{positionCycleKey}
+      AND i.position_side=#{positionSide}
+      AND i.fill_role='CLOSE'
+      AND i.exchange_side=#{exchangeSide}
+      AND (q.strategy_instance_id IS NULL OR q.strategy_instance_id=#{instanceId})
+      AND q.side=#{exchangeSide}
+      AND (q.position_side IS NULL OR q.position_side IN (#{positionSide},'BOTH'))
+      AND (q.reduce_only IS NULL OR q.reduce_only='1')
+      AND (q.close_position IS NULL OR q.close_position<>'1')
+      AND q.original_quantity=#{requestedQuantity}
+      AND q.executed_quantity>0
+      AND q.status IN ('FILLED','CANCELED','EXPIRED','REJECTED')
+      AND q.updated_at>=UTC_TIMESTAMP(3)-INTERVAL 6 DAY
+
+    UNION
+
+    SELECT q.exchange_order_id
+    FROM quant_strategy_pre_dispatch_intent p
+    INNER JOIN quant_order q
+        ON q.credential_id=p.credential_id
+       AND q.symbol=p.symbol
+       AND q.client_order_id=p.client_order_id
+    WHERE p.credential_id=#{credentialId}
+      AND p.symbol=#{symbol}
+      AND p.strategy_instance_id=#{instanceId}
+      AND p.position_cycle_key=#{positionCycleKey}
+      AND p.position_side=#{positionSide}
+      AND p.operation_type='CLOSE'
+      AND p.exchange_side=#{exchangeSide}
+      AND q.strategy_instance_id=#{instanceId}
+      AND q.side=#{exchangeSide}
+      AND (q.position_side IS NULL OR q.position_side IN (#{positionSide},'BOTH'))
+      AND q.reduce_only='1'
+      AND q.original_quantity=#{requestedQuantity}
+      AND q.executed_quantity>0
+      AND q.status IN ('FILLED','CANCELED','EXPIRED','REJECTED')
+      AND q.updated_at>=UTC_TIMESTAMP(3)-INTERVAL 6 DAY
+) candidates
+WHERE candidates.exchange_order_id IS NOT NULL
+]]></select>
 </mapper>
