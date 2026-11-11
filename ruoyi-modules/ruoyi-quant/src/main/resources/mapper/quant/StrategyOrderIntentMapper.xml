@@ -80,7 +80,7 @@ FROM (
       AND (q.position_side IS NULL OR q.position_side IN (#{positionSide},'BOTH'))
       AND (q.reduce_only IS NULL OR q.reduce_only='1')
       AND (q.close_position IS NULL OR q.close_position<>'1')
-      AND q.executed_quantity=#{requestedQuantity}
+      AND q.executed_quantity<=#{requestedQuantity}
       AND q.executed_quantity>0
       AND q.status IN ('FILLED','CANCELED','EXPIRED','REJECTED')
       AND q.updated_at>=UTC_TIMESTAMP(3)-INTERVAL 6 DAY
@@ -104,7 +104,7 @@ FROM (
       AND q.side=#{exchangeSide}
       AND (q.position_side IS NULL OR q.position_side IN (#{positionSide},'BOTH'))
       AND q.reduce_only='1'
-      AND q.executed_quantity=#{requestedQuantity}
+      AND q.executed_quantity<=#{requestedQuantity}
       AND q.executed_quantity>0
       AND q.status IN ('FILLED','CANCELED','EXPIRED','REJECTED')
       AND q.updated_at>=UTC_TIMESTAMP(3)-INTERVAL 6 DAY
@@ -127,7 +127,7 @@ FROM (
       AND q.side=#{exchangeSide}
       AND (q.position_side IS NULL OR q.position_side IN (#{positionSide},'BOTH'))
       AND q.reduce_only='1'
-      AND q.executed_quantity=#{requestedQuantity}
+      AND q.executed_quantity<=#{requestedQuantity}
       AND q.status IN ('FILLED','CANCELED','EXPIRED','REJECTED')
       AND q.updated_at>=UTC_TIMESTAMP(3)-INTERVAL 6 DAY
 
