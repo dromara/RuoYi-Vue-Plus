@@ -11,8 +11,6 @@ import org.dromara.quant.exchange.ExchangeGateway;
 import org.dromara.quant.execution.StrategyOrderIntentMapper;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.credential.mapper.QuantCredentialMapper;
-import org.dromara.quant.order.domain.QuantOrder;
-import org.dromara.quant.order.mapper.QuantOrderMapper;
 import org.dromara.quant.notification.domain.QuantNotification;
 import org.dromara.quant.notification.mapper.QuantNotificationMapper;
 import org.dromara.quant.risk.domain.QuantRiskConfig;
