@@ -8,6 +8,7 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mail.core.MailBuilder;
 import org.dromara.quant.config.QuantProperties;
 import org.dromara.quant.exchange.ExchangeGateway;
+import org.dromara.quant.execution.StrategyOrderIntentMapper;
 import org.dromara.quant.credential.domain.QuantCredential;
 import org.dromara.quant.credential.mapper.QuantCredentialMapper;
 import org.dromara.quant.order.domain.QuantOrder;
@@ -47,6 +48,8 @@ import java.util.UUID;
 public class QuantTradeNotificationService {
     private static final ZoneId NOTIFICATION_ZONE = ZoneId.of("Asia/Shanghai");
     private static final DateTimeFormatter NOTIFICATION_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String SNAPSHOT_TASK_PREFIX = "SNAPSHOT:";
+    private static final Duration CLOSE_SNAPSHOT_RETRY_WINDOW = Duration.ofMinutes(2);
     /**
      * 风险配置 Mapper。
      */
@@ -66,7 +69,7 @@ public class QuantTradeNotificationService {
     @Autowired
     private QuantCredentialMapper credentialMapper;
     @Autowired
-    private QuantOrderMapper orderMapper;
+    private StrategyOrderIntentMapper strategyOrderIntentMapper;
     private final java.util.concurrent.ConcurrentHashMap<String, Long> blockedNoticeTimes = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
@@ -260,7 +263,8 @@ public class QuantTradeNotificationService {
     public void notifyCloseByStrategyOrder(QuantStrategy strategy, QuantCredential credential, Long strategyInstanceId, String positionCycleKey,
                                            String symbol, String direction, BigDecimal requestedQuantity, BigDecimal entryPrice, String quoteAsset,
                                            BigDecimal maximumReturnRate, Instant openTime, BigDecimal triggerReturnRate, String closeType, String reason) {
-        Long orderId = resolveStrategyCloseOrderId(credential == null ? null : credential.getId(), strategyInstanceId, symbol, direction, requestedQuantity);
+        Long orderId = resolveStrategyCloseOrderId(credential == null ? null : credential.getId(), strategyInstanceId,
+            positionCycleKey, symbol, direction, requestedQuantity);
         if (orderId != null) {
             notifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity, entryPrice, orderId, quoteAsset,
                 maximumReturnRate, openTime, triggerReturnRate, closeType, reason);
@@ -270,30 +274,17 @@ public class QuantTradeNotificationService {
             positionCycleKey, quoteAsset, maximumReturnRate, openTime, triggerReturnRate, closeType, reason);
     }
 
-    private Long resolveStrategyCloseOrderId(Long credentialId, Long strategyInstanceId, String symbol, String direction, BigDecimal quantity) {
-        if (orderMapper == null || credentialId == null || strategyInstanceId == null || symbol == null || direction == null
+    private Long resolveStrategyCloseOrderId(Long credentialId, Long strategyInstanceId, String positionCycleKey,
+                                             String symbol, String direction, BigDecimal quantity) {
+        if (strategyOrderIntentMapper == null || credentialId == null || strategyInstanceId == null
+            || positionCycleKey == null || positionCycleKey.isBlank() || symbol == null || direction == null
             || quantity == null || quantity.signum() <= 0) {
             return null;
         }
         String closeSide = "SHORT".equalsIgnoreCase(direction) ? "BUY" : "SELL";
-        List<QuantOrder> matches = orderMapper.selectList(new LambdaQueryWrapper<QuantOrder>()
-            .eq(QuantOrder::getCredentialId, credentialId)
-            .eq(QuantOrder::getStrategyInstanceId, strategyInstanceId)
-            .eq(QuantOrder::getSymbol, symbol)
-            .in(QuantOrder::getPositionSide, direction, "BOTH")
-            .eq(QuantOrder::getReduceOnly, true)
-            .eq(QuantOrder::getSide, closeSide)
-            .in(QuantOrder::getStatus, "FILLED", "CANCELED", "EXPIRED", "REJECTED")
-            .gt(QuantOrder::getExecutedQuantity, BigDecimal.ZERO)
-            .ge(QuantOrder::getUpdatedAt, LocalDateTime.now(java.time.ZoneOffset.UTC).minusDays(6))
-            .orderByDesc(QuantOrder::getUpdatedAt).last("LIMIT 20")).stream()
-            .filter(order -> order.getExchangeOrderId() != null && order.getExecutedQuantity() != null
-                && order.getExecutedQuantity().compareTo(quantity) == 0)
-            .toList();
-        if (matches.size() != 1) {
-            return null;
-        }
-        return matches.getFirst().getExchangeOrderId();
+        List<Long> matches = strategyOrderIntentMapper.findCloseOrderIdsByCycle(
+            credentialId, symbol, strategyInstanceId, positionCycleKey, direction, closeSide, quantity);
+        return matches != null && matches.size() == 1 ? matches.getFirst() : null;
     }
 
     public void notifyCloseByOrder(QuantStrategy strategy, QuantCredential credential, String symbol, String direction, BigDecimal requestedQuantity,
@@ -402,21 +393,22 @@ public class QuantTradeNotificationService {
         String feeText = !commissionComplete || commissions.isEmpty() ? "N/A（成交手续费字段不完整）" :
             commissions.entrySet().stream().map(entry -> fee4(entry.getValue()) + " " + entry.getKey()).collect(java.util.stream.Collectors.joining(", "));
         ExchangeGateway.AccountSnapshot account = null;
-        try {
-            account = gateway.queryAccountFresh(new ExchangeGateway.Credential(
-                credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode()));
-        } catch (RuntimeException ex) {
-            log.warn("平仓后账户资金快照获取失败 credentialId={} orderId={}，通知将标记资金待核实",
-                credential.getId(), orderId, ex);
-        }
-        if (account != null && account.marginBalance() != null) {
-            jdbcTemplate.update("""
-                INSERT IGNORE INTO quant_trade_close_equity
-                    (credential_id, symbol, exchange_order_id, closing_equity,
-                     wallet_balance, unrealized_pnl, captured_at)
-                VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(3))
-                """, credential.getId(), symbol, orderId, account.marginBalance(),
-                account.walletBalance(), account.unrealizedPnl());
+        if (withinCloseSnapshotWindow(closeTime)) {
+            try {
+                account = gateway.queryAccountFresh(new ExchangeGateway.Credential(
+                    credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode()));
+            } catch (RuntimeException ex) {
+                log.warn("平仓后账户资金快照获取失败 credentialId={} orderId={}", credential.getId(), orderId, ex);
+            }
+            if (!persistCloseEquitySnapshot(credential.getId(), symbol, orderId, account)
+                && !enqueuePendingCloseSnapshot(credential, symbol, orderId, closeTime)) {
+                log.error("平仓资金快照未能保存或建立独立重试任务 credentialId={} symbol={} orderId={}",
+                    credential.getId(), symbol, orderId);
+                return false;
+            }
+        } else {
+            log.warn("平仓时间已超出即时账户快照窗口，不使用当前余额冒充平仓时余额 credentialId={} symbol={} orderId={} closeTime={}",
+                credential.getId(), symbol, orderId, closeTime);
         }
         String asset = safe(quoteAsset);
         String subject = "量化平仓通知 - " + symbol + " " + cnDirection(direction);
@@ -443,6 +435,98 @@ public class QuantTradeNotificationService {
             + "可用余额: " + (account == null ? "待核实" : amount2(account.availableBalance()) + " " + asset) + "\n"
             + "时间: " + LocalDateTime.now();
         return sendCloseOnce(credential.getId(), orderId, subject, content);
+    }
+
+    private static boolean withinCloseSnapshotWindow(Instant closeTime) {
+        Instant now = Instant.now();
+        return closeTime != null && !closeTime.isAfter(now.plusSeconds(5))
+            && !closeTime.isBefore(now.minus(CLOSE_SNAPSHOT_RETRY_WINDOW));
+    }
+
+    private boolean persistCloseEquitySnapshot(Long credentialId, String symbol, Long orderId,
+                                               ExchangeGateway.AccountSnapshot account) {
+        if (account == null || account.marginBalance() == null && account.walletBalance() == null) {
+            return false;
+        }
+        try {
+            jdbcTemplate.update("""
+                INSERT INTO quant_trade_close_equity
+                    (credential_id, symbol, exchange_order_id, closing_equity,
+                     wallet_balance, unrealized_pnl, captured_at)
+                VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(3))
+                ON DUPLICATE KEY UPDATE
+                    captured_at = IF(closing_equity IS NULL OR wallet_balance IS NULL,
+                                     VALUES(captured_at), captured_at),
+                    closing_equity = COALESCE(closing_equity, VALUES(closing_equity)),
+                    wallet_balance = COALESCE(wallet_balance, VALUES(wallet_balance)),
+                    unrealized_pnl = COALESCE(unrealized_pnl, VALUES(unrealized_pnl))
+                """, credentialId, symbol, orderId, account.marginBalance(),
+                account.walletBalance(), account.unrealizedPnl());
+            return account.marginBalance() != null && account.walletBalance() != null;
+        } catch (RuntimeException ex) {
+            log.warn("平仓账户资金快照持久化失败 credentialId={} symbol={} orderId={}",
+                credentialId, symbol, orderId, ex);
+            return false;
+        }
+    }
+
+    private boolean captureCloseEquitySnapshot(QuantCredential credential, String symbol, Long orderId) {
+        if (credential == null || credential.getId() == null || symbol == null || orderId == null) {
+            return false;
+        }
+        ExchangeGateway.AccountSnapshot account;
+        try {
+            account = gateway.queryAccountFresh(new ExchangeGateway.Credential(
+                credential.getApiKey(), credential.getSecretKey(), credential.getSignatureType(), credential.getRunMode()));
+        } catch (RuntimeException ex) {
+            log.warn("平仓资金快照独立重试失败 credentialId={} symbol={} orderId={}",
+                credential.getId(), symbol, orderId, ex);
+            return false;
+        }
+        return persistCloseEquitySnapshot(credential.getId(), symbol, orderId, account);
+    }
+
+    private boolean enqueuePendingCloseSnapshot(QuantCredential credential, String symbol, Long orderId, Instant closeTime) {
+        if (credential == null || credential.getId() == null || symbol == null || orderId == null || closeTime == null) {
+            return false;
+        }
+        String taskKey = SNAPSHOT_TASK_PREFIX + orderId;
+        try {
+            QuantNotification existing = notificationMapper.selectOne(new LambdaQueryWrapper<QuantNotification>()
+                .eq(QuantNotification::getCredentialId, credential.getId())
+                .eq(QuantNotification::getChannel, "FACT_PENDING")
+                .eq(QuantNotification::getRecipient, taskKey)
+                .last("LIMIT 1"));
+            if (existing != null) {
+                return true;
+            }
+            Map<String, Object> task = new LinkedHashMap<>();
+            task.put("taskType", "SNAPSHOT");
+            task.put("credentialId", String.valueOf(credential.getId()));
+            task.put("symbol", symbol);
+            task.put("orderId", String.valueOf(orderId));
+            task.put("closeTime", closeTime.toString());
+            QuantNotification pending = new QuantNotification();
+            pending.setCredentialId(credential.getId());
+            pending.setChannel("FACT_PENDING");
+            pending.setRecipient(taskKey);
+            pending.setSubject("平仓账户资金快照待采集");
+            pending.setContent(QuantJsonMapper.writeMap(task));
+            pending.setStatus("PENDING");
+            pending.setRetryCount(0);
+            pending.setNextRetryAt(LocalDateTime.now().plusSeconds(30));
+            pending.setCreatedAt(LocalDateTime.now());
+            if (notificationMapper.insert(pending) != 1) {
+                return false;
+            }
+            log.warn("平仓账户资金快照已进入独立重试队列 credentialId={} symbol={} orderId={}",
+                credential.getId(), symbol, orderId);
+            return true;
+        } catch (RuntimeException ex) {
+            log.error("平仓账户资金快照重试任务持久化失败 credentialId={} symbol={} orderId={}",
+                credential.getId(), symbol, orderId, ex);
+            return false;
+        }
     }
 
     private boolean sendCloseOnce(Long credentialId, Long orderId, String subject, String content) {
@@ -643,6 +727,15 @@ public class QuantTradeNotificationService {
                 .or().eq(QuantNotification::getStatus, "SENDING").lt(QuantNotification::getLeaseUntil, now))
             .orderByAsc(QuantNotification::getCreatedAt).last("LIMIT 50"));
         for (QuantNotification task : pending) {
+            if (task.getRecipient() != null && task.getRecipient().startsWith(SNAPSHOT_TASK_PREFIX)
+                && task.getCreatedAt() != null && task.getCreatedAt().isBefore(now.minus(CLOSE_SNAPSHOT_RETRY_WINDOW))) {
+                task.setStatus("FAILED");
+                task.setNextRetryAt(null);
+                task.setLastError("超过平仓后即时资金快照窗口，不使用当前账户余额冒充历史平仓余额");
+                notificationMapper.updateById(task);
+                log.warn("平仓资金快照超过即时采集窗口，停止重试 notificationId={} recipient={}", task.getId(), task.getRecipient());
+                continue;
+            }
             if (task.getCreatedAt() != null && task.getCreatedAt().isBefore(now.minusDays(5))) {
                 task.setStatus("FAILED");
                 task.setNextRetryAt(null);
@@ -671,7 +764,23 @@ public class QuantTradeNotificationService {
                     strategy = new QuantStrategy();
                     strategy.setStrategyName(String.valueOf(data.get("strategyName")));
                 }
-                if ("OPEN".equalsIgnoreCase(String.valueOf(data.get("taskType")))) {
+                if ("SNAPSHOT".equalsIgnoreCase(String.valueOf(data.get("taskType")))) {
+                    String symbol = String.valueOf(data.get("symbol"));
+                    Long orderId = Long.valueOf(String.valueOf(data.get("orderId")));
+                    Instant closeTime = Instant.parse(String.valueOf(data.get("closeTime")));
+                    if (!withinCloseSnapshotWindow(closeTime)) {
+                        task.setStatus("FAILED");
+                        task.setNextRetryAt(null);
+                        task.setLastError("超过平仓后即时资金快照窗口，不使用当前账户余额冒充历史平仓余额");
+                    } else if (captureCloseEquitySnapshot(credential, symbol, orderId)) {
+                        task.setStatus("SENT");
+                        task.setSentAt(LocalDateTime.now());
+                        task.setNextRetryAt(null);
+                        task.setLastError(null);
+                    } else {
+                        retryCloseFactTask(task, "平仓账户资金快照尚未完整");
+                    }
+                } else if ("OPEN".equalsIgnoreCase(String.valueOf(data.get("taskType")))) {
                     Instant openTime = resolveOpenFillTime(credential, String.valueOf(data.get("symbol")),
                         String.valueOf(data.get("direction")), Long.valueOf(String.valueOf(data.get("orderId"))));
                     if (openTime == null) {
@@ -691,7 +800,9 @@ public class QuantTradeNotificationService {
                 BigDecimal requestedQuantity = decimal(data.get("requestedQuantity"));
                 Long orderId = data.get("orderId") == null ? null : Long.valueOf(String.valueOf(data.get("orderId")));
                 if (orderId == null && data.get("strategyInstanceId") != null) {
-                    orderId = resolveStrategyCloseOrderId(credentialId, Long.valueOf(String.valueOf(data.get("strategyInstanceId"))),
+                    orderId = resolveStrategyCloseOrderId(credentialId,
+                        Long.valueOf(String.valueOf(data.get("strategyInstanceId"))),
+                        data.get("positionCycleKey") == null ? null : String.valueOf(data.get("positionCycleKey")),
                         symbol, direction, requestedQuantity);
                 }
                 boolean sent = orderId != null && tryNotifyCloseByOrder(strategy, credential, symbol, direction, requestedQuantity,
