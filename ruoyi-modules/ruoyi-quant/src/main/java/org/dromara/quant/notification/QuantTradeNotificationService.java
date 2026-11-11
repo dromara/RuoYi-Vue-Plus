@@ -488,7 +488,7 @@ public class QuantTradeNotificationService {
         if (credential == null || credential.getId() == null || symbol == null || orderId == null || closeTime == null) {
             return false;
         }
-        String taskKey = SNAPSHOT_TASK_PREFIX + orderId;
+        String taskKey = SNAPSHOT_TASK_PREFIX + symbol + ":" + orderId;
         try {
             QuantNotification existing = notificationMapper.selectOne(new LambdaQueryWrapper<QuantNotification>()
                 .eq(QuantNotification::getCredentialId, credential.getId())
