@@ -74,4 +74,36 @@ class StrategyOrderIntentServiceTest {
             "exchange_side", "BUY", "client_order_id", "cid-1"));
         assertThrows(IllegalStateException.class, () -> service.record(1L, 2L, 3L, "OPEN", request("BUY", "LONG", false), result()));
     }
+
+    @Test
+    void verifiedProtectionChildPersistsLogicalPositionSideEvenWhenExchangePositionSideIsBoth() {
+        when(mapper.insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(),
+            anyString(), anyString(), anyString())).thenReturn(1);
+        service.recordVerifiedProtectionChild(1L, 2L, 3L, "BTCUSDT", "cycle-1",
+            "LONG", "SELL", 91L, "child-client");
+        verify(mapper).insert(1L, "BTCUSDT", 91L, 2L, 3L, "LONG", "CLOSE",
+            "cycle-1", "SELL", "child-client");
+        verify(mapper, never()).pendingByClient(anyLong(), anyString(), anyString());
+    }
+
+    @Test
+    void conflictingProtectionChildReplayIsRejected() {
+        when(mapper.insert(anyLong(), anyString(), anyLong(), anyLong(), anyLong(), anyString(), anyString(),
+            anyString(), anyString(), anyString())).thenThrow(new DuplicateKeyException("collision"));
+        when(mapper.find(1L, "BTCUSDT", 91L)).thenReturn(Map.of(
+            "strategy_id", 2L, "strategy_instance_id", 3L, "fill_role", "CLOSE",
+            "position_side", "LONG", "position_cycle_key", "other-cycle",
+            "exchange_side", "SELL", "client_order_id", "child-client"));
+        assertThrows(IllegalStateException.class, () -> service.recordVerifiedProtectionChild(
+            1L, 2L, 3L, "BTCUSDT", "cycle-1", "LONG", "SELL", 91L, "child-client"));
+    }
+
+    @Test
+    void protectionChildCannotBeAttributedFromAnInconsistentCloseSide() {
+        assertThrows(IllegalStateException.class, () -> service.recordVerifiedProtectionChild(
+            1L, 2L, 3L, "BTCUSDT", "cycle-1", "LONG", "BUY", 91L, "child-client"));
+        verifyNoInteractions(mapper);
+    }
+
+
 }
