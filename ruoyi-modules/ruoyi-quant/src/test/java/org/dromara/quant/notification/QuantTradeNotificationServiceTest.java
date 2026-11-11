@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.core.task.TaskExecutor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -31,7 +32,7 @@ class QuantTradeNotificationServiceTest {
         var properties = new QuantProperties();
         properties.getNotification().setDefaultEmails("test@example.invalid");
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties,
-            mock(MessageService.class), mock(JdbcTemplate.class), mock(ExchangeGateway.class));
+            mock(MessageService.class), mock(JdbcTemplate.class), mock(ExchangeGateway.class), mock(TaskExecutor.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId((long) invocation.getArgument(0, QuantNotification.class).getChannel().hashCode());
             return 1;
@@ -60,7 +61,7 @@ class QuantTradeNotificationServiceTest {
         var mapper = mock(QuantNotificationMapper.class);
         var gateway = mock(ExchangeGateway.class);
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
-            mock(MessageService.class), mock(JdbcTemplate.class), gateway);
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway, mock(TaskExecutor.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId(46L);
             return 1;
@@ -94,7 +95,7 @@ class QuantTradeNotificationServiceTest {
         var properties = new QuantProperties();
         properties.getNotification().setDefaultEmails("test@example.invalid");
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties,
-            messageService, jdbc, gateway);
+            messageService, jdbc, gateway, mock(TaskExecutor.class));
         var credentialMapper = mock(org.dromara.quant.credential.mapper.QuantCredentialMapper.class);
         var credentialMapperField = QuantTradeNotificationService.class.getDeclaredField("credentialMapper");
         credentialMapperField.setAccessible(true);
@@ -185,7 +186,7 @@ class QuantTradeNotificationServiceTest {
         var gateway = mock(ExchangeGateway.class);
         var properties = new QuantProperties();
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties,
-            mock(MessageService.class), mock(JdbcTemplate.class), gateway);
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway, mock(TaskExecutor.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId(42L);
             return 1;
@@ -235,7 +236,7 @@ class QuantTradeNotificationServiceTest {
         var mapper = mock(QuantNotificationMapper.class);
         var gateway = mock(ExchangeGateway.class);
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
-            mock(MessageService.class), mock(JdbcTemplate.class), gateway);
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway, mock(TaskExecutor.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId(43L);
             return 1;
@@ -258,11 +259,15 @@ class QuantTradeNotificationServiceTest {
             100L, "USDT", "STOP", "partial close");
 
         var rows = ArgumentCaptor.forClass(QuantNotification.class);
-        verify(mapper, times(2)).insert(rows.capture());
+        verify(mapper, times(3)).insert(rows.capture());
         var notifications = rows.getAllValues();
         var systemNotice = notifications.stream().filter(row -> "SYSTEM".equals(row.getChannel())).findFirst().orElseThrow();
-        var factTask = notifications.stream().filter(row -> "FACT_PENDING".equals(row.getChannel())).findFirst().orElseThrow();
+        var factTask = notifications.stream().filter(row -> "FACT_PENDING".equals(row.getChannel())
+            && "100".equals(row.getRecipient())).findFirst().orElseThrow();
+        var snapshotTask = notifications.stream().filter(row -> "FACT_PENDING".equals(row.getChannel())
+            && "SNAPSHOT:100".equals(row.getRecipient())).findFirst().orElseThrow();
         assertEquals("SENT", factTask.getStatus());
+        assertEquals("PENDING", snapshotTask.getStatus());
         assertTrue(systemNotice.getContent().contains("平仓数量: 1"));
         assertTrue(systemNotice.getContent().contains("实际平仓均价: 102"));
     }
@@ -274,7 +279,7 @@ class QuantTradeNotificationServiceTest {
         var mapper = mock(QuantNotificationMapper.class);
         var gateway = mock(ExchangeGateway.class);
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
-            mock(MessageService.class), mock(JdbcTemplate.class), gateway);
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway, mock(TaskExecutor.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId(44L);
             return 1;
@@ -311,12 +316,13 @@ class QuantTradeNotificationServiceTest {
             new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-unresolved-child-test"), QuantNotification.class);
         var mapper = mock(QuantNotificationMapper.class);
         var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
-            mock(MessageService.class), mock(JdbcTemplate.class), mock(ExchangeGateway.class));
-        var orderMapper = mock(org.dromara.quant.order.mapper.QuantOrderMapper.class);
-        var orderMapperField = QuantTradeNotificationService.class.getDeclaredField("orderMapper");
-        orderMapperField.setAccessible(true);
-        orderMapperField.set(service, orderMapper);
-        when(orderMapper.selectList(any())).thenReturn(List.of());
+            mock(MessageService.class), mock(JdbcTemplate.class), mock(ExchangeGateway.class), mock(TaskExecutor.class));
+        var intentMapper = mock(org.dromara.quant.execution.StrategyOrderIntentMapper.class);
+        var intentMapperField = QuantTradeNotificationService.class.getDeclaredField("strategyOrderIntentMapper");
+        intentMapperField.setAccessible(true);
+        intentMapperField.set(service, intentMapper);
+        when(intentMapper.findCloseOrderIdsByCycle(10L, "BTCUSDT", 21L, "cycle-abc", "LONG", "SELL", BigDecimal.ONE))
+            .thenReturn(List.of());
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId(45L);
             return 1;
