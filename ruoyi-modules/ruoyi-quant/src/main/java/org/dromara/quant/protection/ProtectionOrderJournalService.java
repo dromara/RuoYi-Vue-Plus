@@ -148,11 +148,10 @@ public class ProtectionOrderJournalService {
         if ((order.getId() == null ? orders.insert(order) : orders.updateById(order)) != 1) {
             throw new IllegalStateException("保护单子订单未可靠入账");
         }
-        if ("LIVE".equalsIgnoreCase(credential.runMode()) && Set.of("LONG", "SHORT").contains(actual.positionSide())) {
-            var request = new ExchangeGateway.OrderRequest(credential, local.getSymbol(), child.side(), child.type(), child.originalQuantity(), child.price(), true,
-                actual.positionSide(), child.clientOrderId(), true);
-            intents.record(local.getCredentialId(), local.getStrategyId(), local.getStrategyInstanceId(), "CLOSE", request,
-                new ExchangeGateway.OrderResult(child.orderId(), child.clientOrderId(), child.status()));
+        if ("LIVE".equalsIgnoreCase(credential.runMode())) {
+            intents.recordVerifiedProtectionChild(local.getCredentialId(), local.getStrategyId(), local.getStrategyInstanceId(),
+                local.getSymbol(), local.getPositionCycleKey(), local.getPositionSide(), child.side(),
+                child.orderId(), child.clientOrderId());
         }
         return true;
     }
