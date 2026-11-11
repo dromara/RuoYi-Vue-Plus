@@ -64,14 +64,15 @@ class ProtectionOrderJournalServiceTest {
         assertEquals(3L, saved.getValue().getStrategyInstanceId());
         assertEquals(91L, saved.getValue().getExchangeOrderId());
         assertTrue(saved.getValue().getReduceOnly());
-        verifyNoInteractions(protections, intents);
+        verifyNoInteractions(protections);
+        verify(intents).recordVerifiedProtectionChild(1L, 2L, 3L, "BTCUSDT", "cycle-a", "LONG", "SELL", 91L, "child-client");
     }
 
     @Test
     void hedgeChildAlsoRecordsImmutableCloseRole() {
         when(orders.insert(any(QuantOrder.class))).thenReturn(1);
         assertTrue(journal.bindChild(credential, local(), actual("LONG"), child(91L)));
-        verify(intents).record(eq(1L), eq(2L), eq(3L), eq("CLOSE"), argThat(r -> r.reduceOnly() && "LONG".equals(r.positionSide())), any());
+        verify(intents).recordVerifiedProtectionChild(1L, 2L, 3L, "BTCUSDT", "cycle-a", "LONG", "SELL", 91L, "child-client");
     }
 
     @Test
@@ -80,6 +81,7 @@ class ProtectionOrderJournalServiceTest {
         parent.setQuantity(new BigDecimal("2"));
         assertTrue(journal.bindChild(credential, parent, actual("BOTH"), child(91L)));
         verify(orders).insert(any(QuantOrder.class));
+        verify(intents).recordVerifiedProtectionChild(1L, 2L, 3L, "BTCUSDT", "cycle-a", "LONG", "SELL", 91L, "child-client");
     }
 
     @Test
