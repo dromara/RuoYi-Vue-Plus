@@ -153,7 +153,8 @@ class QuantTradeNotificationServiceTest {
         var jdbc = mock(JdbcTemplate.class);
         var messageService = mock(MessageService.class);
         var properties = new QuantProperties();
-        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties, messageService, jdbc, mock(ExchangeGateway.class));
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, properties,
+            messageService, jdbc, mock(ExchangeGateway.class), mock(TaskExecutor.class));
         when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
             ((QuantNotification) invocation.getArgument(0)).setId(42L);
             return 1;
@@ -344,5 +345,45 @@ class QuantTradeNotificationServiceTest {
         assertTrue(rows.getValue().getContent().contains("\"strategyInstanceId\":\"21\""));
         assertFalse(rows.getValue().getContent().contains("test-secret"));
     }
+
+
+    @Test
+    void strategyCloseResolverUsesExactCycleIntentInsteadOfMatchingQuantityAcrossTheInstance() throws Exception {
+        com.baomidou.mybatisplus.core.metadata.TableInfoHelper.initTableInfo(
+            new org.apache.ibatis.builder.MapperBuilderAssistant(new com.baomidou.mybatisplus.core.MybatisConfiguration(), "notification-cycle-close-resolver-test"), QuantNotification.class);
+        var mapper = mock(QuantNotificationMapper.class);
+        var gateway = mock(ExchangeGateway.class);
+        var service = new QuantTradeNotificationService(mock(QuantRiskConfigMapper.class), mapper, new QuantProperties(),
+            mock(MessageService.class), mock(JdbcTemplate.class), gateway, mock(TaskExecutor.class));
+        var intentMapper = mock(org.dromara.quant.execution.StrategyOrderIntentMapper.class);
+        var intentMapperField = QuantTradeNotificationService.class.getDeclaredField("strategyOrderIntentMapper");
+        intentMapperField.setAccessible(true);
+        intentMapperField.set(service, intentMapper);
+        when(intentMapper.findCloseOrderIdsByCycle(10L, "BTCUSDT", 21L, "cycle-abc", "LONG", "SELL", BigDecimal.ONE))
+            .thenReturn(List.of(99L));
+        when(mapper.insert(any(QuantNotification.class))).thenAnswer(invocation -> {
+            ((QuantNotification) invocation.getArgument(0)).setId(46L);
+            return 1;
+        });
+        var credential = new QuantCredential();
+        credential.setId(10L);
+        credential.setApiKey("test-key");
+        credential.setSecretKey("test-secret");
+        credential.setSignatureType("HMAC");
+        credential.setRunMode("LIVE");
+        when(gateway.queryOrder(any(), eq("BTCUSDT"), eq(99L), isNull())).thenReturn(
+            new ExchangeGateway.OrderSnapshot("BTCUSDT", 99L, "client-close", "SELL", "MARKET", "PARTIALLY_FILLED",
+                BigDecimal.ZERO, BigDecimal.ONE, new BigDecimal("0.5"), Instant.now(), BigDecimal.valueOf(100)));
+
+        service.notifyCloseByStrategyOrder(null, credential, 21L, "cycle-abc", "BTCUSDT", "LONG",
+            BigDecimal.ONE, BigDecimal.valueOf(100), "USDT", null, "MANUAL", "cycle-keyed close");
+
+        var rows = ArgumentCaptor.forClass(QuantNotification.class);
+        verify(mapper).insert(rows.capture());
+        assertEquals("99", rows.getValue().getRecipient());
+        assertTrue(rows.getValue().getContent().contains("\"orderId\":\"99\""));
+        verify(intentMapper).findCloseOrderIdsByCycle(10L, "BTCUSDT", 21L, "cycle-abc", "LONG", "SELL", BigDecimal.ONE);
+    }
+
 
 }
