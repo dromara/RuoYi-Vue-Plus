@@ -266,7 +266,7 @@ class QuantTradeNotificationServiceTest {
         var factTask = notifications.stream().filter(row -> "FACT_PENDING".equals(row.getChannel())
             && "100".equals(row.getRecipient())).findFirst().orElseThrow();
         var snapshotTask = notifications.stream().filter(row -> "FACT_PENDING".equals(row.getChannel())
-            && "SNAPSHOT:100".equals(row.getRecipient())).findFirst().orElseThrow();
+            && "SNAPSHOT:BTCUSDT:100".equals(row.getRecipient())).findFirst().orElseThrow();
         assertEquals("SENT", factTask.getStatus());
         assertEquals("PENDING", snapshotTask.getStatus());
         assertTrue(systemNotice.getContent().contains("平仓数量: 1"));
