@@ -100,7 +100,7 @@ FROM (
       AND p.position_side=#{positionSide}
       AND p.operation_type='CLOSE'
       AND p.exchange_side=#{exchangeSide}
-      AND q.strategy_instance_id=#{instanceId}
+      AND (q.strategy_instance_id IS NULL OR q.strategy_instance_id=#{instanceId})
       AND q.side=#{exchangeSide}
       AND (q.position_side IS NULL OR q.position_side IN (#{positionSide},'BOTH'))
       AND q.reduce_only='1'
