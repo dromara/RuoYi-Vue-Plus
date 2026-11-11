@@ -3,6 +3,8 @@ package org.dromara.quant.execution;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +21,17 @@ public interface StrategyOrderIntentMapper {
 
     Map<String, Object> find(@Param("credentialId") long credentialId,
                              @Param("symbol") String symbol, @Param("orderId") long orderId);
+
+    /**
+     * Resolve a close order only from immutable strategy-cycle identity and its accepted local order.
+     */
+    List<Long> findCloseOrderIdsByCycle(@Param("credentialId") long credentialId,
+                                        @Param("symbol") String symbol,
+                                        @Param("instanceId") long instanceId,
+                                        @Param("positionCycleKey") String positionCycleKey,
+                                        @Param("positionSide") String positionSide,
+                                        @Param("exchangeSide") String exchangeSide,
+                                        @Param("requestedQuantity") BigDecimal requestedQuantity);
 
     Map<String, Object> pending(@Param("credentialId") long credentialId, @Param("key") String key);
 
