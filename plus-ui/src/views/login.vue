@@ -2,12 +2,10 @@
   <div class="login">
     <div class="login-shell">
       <section class="login-brand">
-        <span class="brand-pill">Plus UI Workspace</span>
+        <span class="brand-pill">管理工作台</span>
         <h1 class="brand-title">企业级后台管理系统</h1>
         <p class="brand-desc">
-          真正面向企业级的应用框架 组件化 模块化 轻耦合 高扩展 针对企业痛点 业界一流技术栈
-          <br />
-          重写 RuoYi-Vue 所有功能 集成 Sa-Token、Mybatis-Plus、WarmFlow、SpringDoc、Hutool、OSS 定期同步。
+          统一管理业务数据与日常工作，快速访问系统功能。
         </p>
         <div class="brand-highlights">
           <span v-for="item in highlights" :key="item" class="highlight-chip">{{ item }}</span>
@@ -106,10 +104,6 @@
         </el-form-item>
       </el-form>
     </div>
-
-    <div class="el-login-footer">
-      <span>Copyright © 2018-{{ currentYear }} 疯狂的狮子Li All Rights Reserved.</span>
-    </div>
   </div>
 </template>
 
@@ -123,7 +117,6 @@ import { HttpStatus } from '@/enums/RespEnum';
 import { useUserStore } from '@/store/modules/user';
 
 const title = import.meta.env.VITE_APP_TITLE;
-const currentYear = new Date().getFullYear();
 const quickStats = [
   { label: '细粒度权限管理', value: '动态权限控制' },
   { label: '主流技术栈', value: '全栈技术集成' },
@@ -513,18 +506,6 @@ onMounted(() => {
     height: 100%;
     object-fit: cover;
   }
-}
-
-.el-login-footer {
-  height: 40px;
-  line-height: 40px;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  color: rgba(226, 232, 240, 0.68);
-  font-size: 12px;
-  letter-spacing: 0.08em;
 }
 
 .login-code-img {

@@ -275,7 +275,7 @@ const handleGenTable = async (row?: Partial<TableVO>) => {
   }
 
   const zipIds = currentRows.map(item => item.tableId).join(',');
-  download.zip('/tool/gen/batchGenCode?tableIdStr=' + zipIds, 'ruoyi.zip');
+  download.zip('/tool/gen/batchGenCode?tableIdStr=' + zipIds, 'generated-code.zip');
 };
 /** 同步数据库操作 */
 const handleSynchDb = async (row: Partial<TableVO>) => {

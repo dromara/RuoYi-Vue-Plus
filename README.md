@@ -1,171 +1,69 @@
-<img src="https://foruda.gitee.com/images/1679673773341074847/178e8451_1766278.png" width="50%" height="50%">
-<div style="height: 10px; clear: both;"></div>
+# RuoYi-Vue-Plus 本地启动指南
 
-- - -
+本仓库包含后端和 Vue 前端。日常开发只需要运行主后端和前端，不需要把每个 Java 模块或扩展服务都单独启动。
 
-## 平台简介
+## 项目结构与服务
 
-[![码云Gitee](https://gitee.com/dromara/RuoYi-Vue-Plus/badge/star.svg?theme=blue)](https://gitee.com/dromara/RuoYi-Vue-Plus)
-[![GitHub](https://img.shields.io/github/stars/dromara/RuoYi-Vue-Plus?style=social&label=Github%20Stars)](https://github.com/dromara/RuoYi-Vue-Plus)
-[![Star](https://gitcode.com/dromara/RuoYi-Vue-Plus/star/badge.svg)](https://gitcode.com/dromara/RuoYi-Vue-Plus)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus/blob/6.X/LICENSE)
-<br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-6.1.0-success.svg)](https://gitee.com/dromara/RuoYi-Vue-Plus)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-blue.svg)]()
-[![JDK-21](https://img.shields.io/badge/JDK-21-green.svg)]()
-[![JDK-25](https://img.shields.io/badge/JDK-25-green.svg)]()
+| 位置 / 启动类 | 用途 | 本地开发是否必需 |
+| --- | --- | --- |
+| `ruoyi-admin` / `org.dromara.DromaraApplication` | 主后端，提供登录、系统管理、工作流等业务接口；默认端口 `8080` | 是 |
+| `plus-ui/` | Vue 3 + TypeScript + Element Plus 前端；开发服务器默认端口 `80` | 需要页面时启动 |
+| `ruoyi-extend/ruoyi-monitor-admin` / `MonitorAdminApplication` | Spring Boot Admin 应用监控；默认端口 `9090` | 否 |
+| `ruoyi-extend/ruoyi-snailjob-server` / `SnailJobServerApplication` | SnailJob 任务调度服务端；控制台默认端口 `8800` | 使用任务调度时启动 |
+| `ruoyi-extend/ruoyi-snailai-server` / `SnailAiServerApplication` | SnailAI 服务端；默认端口 `8900` | 使用 SnailAI 时启动 |
 
-> Dromara RuoYi-Vue-Plus 是重写 RuoYi-Vue 针对 `分布式集群` 场景全方位升级(不兼容原框架)
+`ruoyi-common`、`ruoyi-api`、`ruoyi-modules` 是后端依赖模块，不需要分别运行；数据库实体类也不是启动入口。PostgreSQL 和 Redis 是外部服务，需要在运行后端前自行启动。
 
-> 项目代码、文档 均开源免费可商用 遵循开源协议在项目中保留开源协议文件即可<br>
-> 活到老写到老 为兴趣而开源 为学习而开源 为让大家真正可以学到技术而开源
+## 环境准备
 
-> 系统演示: [传送门](https://plus-doc.dromara.org/#/common/demo_system)
+- JDK 21、Maven、PostgreSQL、Redis。
+- Node.js 满足 `plus-ui/package.json` 的 `engines.node` 要求（目前为 `^22.12.0 || ^24.0.0 || >=26.0.0`），pnpm 10 或以上。
+- 默认 Maven profile 为 `dev`，对应 `ruoyi-admin/src/main/resources/application-dev.yml`。正式环境使用 `application-prod.yml`，目前仍配置 MySQL；以下步骤针对开发环境。
 
-> 官方前端项目地址: 基于 Vue + ElementPlus 版本前端项目 [gitee](https://gitee.com/JavaLionLi/plus-ui) - [github](https://github.com/CrazyLionCat/plus-ui) - [gitcode](https://gitcode.com/dromara/plus-ui)<br>
-> 官方前端项目地址: 基于 React + Ant Design 版本前端项目 [plus-ui-react](https://gitee.com/JavaLionLi/plus-ui/tree/6.X-React/)
-> 成员前端项目地址: 基于vben5 [ruoyi-plus-vben5](https://github.com/imdap/ruoyi-plus-vben5)<br>
-> 成员前端项目地址: 基于soybean [ruoyi-plus-soybean](https://gitee.com/xlsea/ruoyi-plus-soybean)<br>
-> 成员项目地址: 删除多租户与工作流 [RuoYi-Vue-Plus-Single](https://gitee.com/ColorDreams/RuoYi-Vue-Plus-Single)<br>
+## 数据库与 Redis 配置
 
-> 文档地址: [plus-doc](https://plus-doc.dromara.org) 国内加速: [plus-doc.top](https://plus-doc.top)
+1. 在 PostgreSQL 创建数据库；把 `ruoyi-admin/src/main/resources/application-dev.yml` 中 `spring.datasource.dynamic.datasource.master` 的 `url`、`username`、`password` 改为实际连接信息。当前开发配置使用 PostgreSQL；数据库名、账号和密码以你本机为准。
+2. 向该数据库导入 `script/sql/postgres/postgres_ry_vue.sql`；使用工作流时再导入 `script/sql/postgres/postgres_ry_workflow.sql`。执行脚本前确认目标库，避免导入到其他数据库。
+3. 在同一份 `application-dev.yml` 中配置 `spring.data.redis` 的地址和端口，并启动 Redis；本地 Redis 无密码时，不配置 `password` 项。
 
-## 赞助商
+可在项目根目录使用以下命令导入（将占位符换成实际值）：
 
-MaxKey 业界领先单点登录产品 - https://gitee.com/dromara/MaxKey <br>
-CCFlow 驰聘低代码-流程-表单 - https://gitee.com/opencc/RuoYi-JFlow <br>
-数舵科技 软件定制开发APP小程序等 - https://www.shuduokeji.com/ <br>
-Mall4J 高质量Java商城系统 - https://www.mall4j.com/cn/?statId=11 <br>
-aizuda flowlong 工作流 - https://gitee.com/aizuda/flowlong <br>
-Ruoyi-Plus-Uniapp - https://ruoyi.plus <br>
-Topiam IAM/IDaaS身份管理平台 - https://www.topiam.cn/ <br>
-稳定低价的大模型中转站 - https://aicodelink.top/register?aff=pHeG <br>
+```bash
+psql -h <数据库地址> -p 5432 -U <数据库用户> -d <数据库名> -f script/sql/postgres/postgres_ry_vue.sql
+psql -h <数据库地址> -p 5432 -U <数据库用户> -d <数据库名> -f script/sql/postgres/postgres_ry_workflow.sql
+```
 
-[如何成为赞助商 加群联系作者详谈 每日PV2500-3000 IP1700-2500](https://plus-doc.dromara.org/#/common/add_group)
+不要把实际生产密码写入仓库。`application.yml` 中配置后端端口及公共选项，`application-dev.yml` 配置开发环境数据库、Redis 和扩展服务开关。
 
-# 本框架与RuoYi的功能差异
+## 启动后端
 
-| 功能          | 本框架                                                                                                               | RuoYi                                                                              |
-|-------------|-------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| 前端项目        | 采用 Vue3 + TS + ElementPlus 重写                                                                                     | 基于Vue2/Vue3 + JS                                                                   | 
-| 后端项目结构      | 采用插件化 + 扩展包形式 结构解耦 易于扩展                                                                                           | 模块相互注入耦合严重难以扩展                                                                     | 
-| 后端代码风格      | 参考 Alibaba 规范与项目统一配置的代码格式化                                                                                        | 代码书写与常规结构不同阅读障碍大                                                                   |
-| Web容器       | 采用 Jetty 基于 Netty 的高性能容器                                                                                          | 采用 Tomcat                                                                          |
-| 权限认证        | 采用 Sa-Token、Jwt 静态使用功能齐全 低耦合 高扩展                                                                                  | Spring Security 配置繁琐扩展性极差                                                          |
-| 权限注解        | 采用 Sa-Token 支持注解 登录校验、角色校验、权限校验、二级认证校验、HttpBasic校验、忽略校验<br/>角色与权限校验支持多种条件 如 `AND` `OR` 或 `权限 OR 角色` 等复杂表达式        | 只支持是否存在匹配                                                                          |
-| 三方鉴权        | 采用 JustAuth 第三方登录组件 支持微信、钉钉等数十种三方认证                                                                               | 无                                                                                  |
-| 关系数据库支持     | 原生支持 MySQL、Oracle、PostgreSQL、SQLServer<br/>可同时使用异构切换(支持其他 mybatis-plus 支持的所有数据库 只需要增加jdbc依赖即可使用 达梦金仓等均有成功案例)      | 支持 Mysql、Oracle 不支持同时使用、不支持异构切换                                                    |
-| 缓存数据库       | 支持 Redis >= 6 支持大部分新功能特性 如 分布式限流、分布式队列                                                                            | Redis 简单 get set 支持                                                                |
-| Redis客户端    | 采用 Redisson Redis官方推荐 基于Netty的客户端工具<br/>支持Redis 90%以上的命令 底层优化规避很多不正确的用法 例如: keys被转换为scan<br/>支持单机、哨兵、单主集群、多主集群等模式 | Lettuce + RedisTemplate 支持模式少 工具使用繁琐<br/>连接池采用 common-pool Bug多经常性出问题              |
-| 缓存注解        | 采用 Spring-Cache 注解 对其扩展了实现支持了更多功能<br/>例如 过期时间 最大空闲时间 组最大长度等 只需一个注解即可完成数据自动缓存                                      | 需手动编写Redis代码逻辑                                                                     |
-| ORM框架       | 采用 Mybatis-Plus 基于对象几乎不用写SQL全java操作 功能强大插件众多<br/>例如分页插件 乐观锁插件等等                                                   | 采用 Mybatis 基于XML需要手写SQL                                                            |
-| SQL监控       | 内置 MyBatis 完整 SQL 输出工具，可输出完整SQL、Mapper ID与执行时间监控                                                                  | log输出 需手动拼接sql与参数无法快速查看调试问题                                                        |
-| 数据分页        | 采用 Mybatis-Plus 分页插件<br/>框架对其进行了扩展 对象化分页对象 支持多种方式传参 支持前端多排序 复杂排序                                                  | 采用 PageHelper 仅支持单查询分页 参数只能从param传 只能单排序 功能扩展性差 体验不好                               |
-| 数据权限        | 采用 Mybatis-Plus 插件 自行分析拼接SQL 无感式过滤<br/>只需为Mapper设置好注解条件 支持多种自定义 不限于部门角色                                           | 采用 注解+aop 实现 基于部门角色 生成的sql兼容性差 不支持其他业务扩展<br/>生成sql后需手动拼接到具体业务sql上 对于多个Mapper查询不起作用 |
-| 数据脱敏        | 采用 注解 + jackson 序列化期间脱敏 支持不同模块不同的脱敏条件<br/>支持多种策略 如身份证、手机号、地址、邮箱、银行卡等 可自行扩展                                        | 无                                                                                  |
-| 数据加解密       | 采用 注解 + mybatis 拦截器 对存取数据期间自动加解密<br/>支持多种策略 如BASE64、AES、RSA、SM2、SM4等                                              | 无                                                                                  |
-| 接口传输加密      | 采用 动态 AES + RSA 加密请求 body 每一次请求秘钥都不同大幅度降低可破解性                                                                     | 无                                                                                  |
-| 数据翻译        | 采用 注解 + jackson 序列化期间动态修改数据 数据进行翻译<br/>支持多种模式: `映射翻译` `直接翻译` `其他扩展条件翻译` 接口化两步即可完成自定义扩展 内置多种翻译实现                   | 无                                                                                  |
-| 多数据源框架      | 采用 dynamic-datasource 支持市面大部分数据库<br/>通过yml配置即可动态管理异构不同种类的数据库 也可通过前端页面添加数据源<br/>支持spel表达式从请求头参数等条件切换数据源            | 基于 druid 手动编写代码配置数据源 配置繁琐 支持性差                                                     |
-| 多数据源事务      | 采用 dynamic-datasource 支持多数据源不同种类的数据库事务回滚                                                                          | 不支持                                                                                |
-| 数据库连接池      | 采用 HikariCP Spring官方内置连接池 配置简单 以性能与稳定性闻名天下                                                                        | 采用 druid bug众多 社区维护差 活跃度低 配置众多繁琐性能一般                                               |
-| 数据库主键       | 采用 雪花ID 基于时间戳的 有序增长 唯一ID 再也不用为分库分表 数据合并主键冲突重复而发愁                                                                  | 采用 数据库自增ID 支持数据量有限 不支持多数据源主键唯一                                                     |
-| WebSocket协议 | 基于 Spring 封装的 WebSocket 协议 扩展了Token鉴权与分布式会话同步 不再只是基于单机的废物                                                         | 无                                                                                  |
-| SSE推送       | 采用 Spring SSE 实现 扩展了Token鉴权与分布式会话同步                                                                               | 无                                                                                  |
-| 序列化         | 采用 Jackson Spring官方内置序列化 靠谱!!!                                                                                    | 采用 fastjson bugjson 远近闻名                                                           | 
-| 分布式幂等       | 参考美团GTIS防重系统简化实现(细节可看文档)                                                                                          | 手动编写注解基于aop实现                                                                      |
-| 分布式锁        | 采用 Lock4j 底层基于 Redisson                                                                                           | 无                                                                                  |
-| 分布式任务调度     | 采用 SnailJob 天生支持分布式 统一的管理中心 支持多种数据库 支持分片重试DAG任务流等                                                                 | 采用 Quartz 基于数据库锁性能差 集群需要做很多配置与改造                                                   | 
-| 文件存储        | 采用 Minio、RustFS 分布式文件存储 天生支持多机、多硬盘、多分片、多副本存储<br/>支持权限管理 安全可靠 文件可加密存储                                              | 采用 本机文件存储 文件裸漏 易丢失泄漏 不支持集群有单点效应                                                    |
-| 云存储         | 采用 AWS S3 协议客户端 支持 七牛、阿里、腾讯 等一切支持S3协议的厂家                                                                          | 不支持                                                                                |
-| 短信          | 采用 sms4j 短信融合包 支持数十种短信厂家 只需在yml配置好厂家密钥即可使用 可多厂家共用                                                                 | 不支持                                                                                |
-| 邮件          | 采用 mail-api 通用协议支持大部分邮件厂商                                                                                         | 不支持                                                                                |
-| 接口文档        | 采用 SpringDoc、javadoc 无注解零入侵基于java注释<br/>只需把注释写好 无需再写一大堆的文档注解了                                                     | 采用 Springfox 已停止维护 需要编写大量的注解来支持文档生成                                                | 
-| 校验框架        | 采用 Validation 支持注解与工具类校验 注解支持国际化                                                                                  | 仅支持注解 且注解不支持国际化                                                                    |
-| Excel框架     | 采用 Apache Fesod(原Alibaba EasyExcel) 基于插件化<br/>框架对其增加了很多功能 例如 自动合并相同内容 自动排列布局 字典翻译等                                | 基于 POI 手写实现 功能有限 复杂 扩展性差                                                           |
-| 工作流支持       | 采用 WarmFlow 支持各种复杂审批 转办 委派 加减签 会签 或签 票签 等功能                                                                       | 无                                                                                  |
-| 工具类框架       | 采用 Hutool、Lombok 上百种工具覆盖90%的使用需求 基于注解自动生成 get set 等简化框架大量代码                                                       | 手写工具稳定性差易出问题 工具数量有限 代码臃肿需自己手写 get set 等                                            | 
-| 监控框架        | 采用 SpringBoot-Admin 基于SpringBoot官方 actuator 探针机制<br/>实时监控服务状态 框架还为其扩展了在线日志查看监控                                    | 无                                                                                  | 
-| 链路追踪        | 采用 Apache SkyWalking 还在为请求不知道去哪了 到哪出了问题而烦恼吗<br/>用了它即可实时查看请求经过的每一处每一个节点                                            | 无                                                                                  |
-| 代码生成器       | 只需设计好表结构 一键生成所有crud代码与页面<br/>降低80%的开发量 把精力都投入到业务设计上<br/>框架为其适配MP、SpringDoc规范化代码 同时支持动态多数据源代码生成                    | 代码生成原生结构 只支持单数据源生成                                                                 |
-| 部署方式        | 支持 Docker 编排 一键搭建所有环境 让开发人员从此不再为搭建环境而烦恼                                                                           | 原生jar部署 其他环境需手动下载安装 自行搭建                                                           | 
-| 项目路径修改      | 提供详细的修改方案文档 并为其做了一些改动 非常简单即可修改成自己想要的                                                                              | 需要做很多改造 文档说明有限                                                                     |
-| 国际化         | 基于请求头动态返回不同语种的文本内容 开发难度低 有对应的工具类 支持大部分注解内容国际化                                                                     | 只提供基础功能 其他需自行编写扩展                                                                  |
-| 代码单例测试      | 提供单例测试 使用方式编写方法与maven多环境单测插件                                                                                      | 只提供基础功能 其他需自行编写扩展                                                                  |
-| Demo案例      | 提供框架功能的实际使用案例 单独一个模块提供了很多很全                                                                                       | 无                                                                                  |
+在 IDEA 中从项目根目录导入 Maven 项目，选择 JDK 21，运行 `ruoyi-admin/src/main/java/org/dromara/DromaraApplication.java` 的 `main` 方法即可，不用启动其他业务模块。
 
-## 本框架与RuoYi的业务差异
+也可以在项目根目录打包并运行：
 
-| 业务     | 功能说明                                                                 | 本框架 | RuoYi            |
-|--------|----------------------------------------------------------------------|-----|------------------|
-| 客户端管理  | 系统内对接的所有客户端管理 如: pc端、小程序端等<br>支持动态授权登录方式 如: 短信登录、密码登录等 支持动态控制token时效 | 支持  | 无                |
-| 用户管理   | 用户的管理配置 如:新增用户、分配用户所属部门、角色、岗位等                                       | 支持  | 支持               |
-| 部门管理   | 配置系统组织机构（公司、部门、小组） 树结构展现支持数据权限                                       | 支持  | 支持               |
-| 岗位管理   | 配置系统用户所属担任职务                                                         | 支持  | 支持               |
-| 菜单管理   | 配置系统菜单、操作权限、按钮权限标识等                                                  | 支持  | 支持               |
-| 角色管理   | 角色菜单权限分配、设置角色按机构进行数据范围权限划分                                           | 支持  | 支持               |
-| 字典管理   | 对系统中经常使用的一些较为固定的数据进行维护                                               | 支持  | 支持               |
-| 参数管理   | 对系统动态配置常用参数                                                          | 支持  | 支持               |
-| 通知公告   | 系统通知公告信息发布维护                                                         | 支持  | 支持               |
-| 操作日志   | 系统正常操作日志记录和查询 系统异常信息日志记录和查询                                          | 支持  | 支持               |
-| 登录日志   | 系统登录日志记录查询包含登录异常                                                     | 支持  | 支持               |
-| 文件管理   | 系统文件展示、上传、下载、删除等管理                                                   | 支持  | 无                |
-| 文件配置管理 | 系统文件上传、下载所需要的配置信息动态添加、修改、删除等管理                                       | 支持  | 无                |
-| 在线用户管理 | 已登录系统的在线用户信息监控与强制踢出操作                                                | 支持  | 支持               |
-| 定时任务   | 运行报表、任务管理(添加、修改、删除)、日志管理、执行器管理等                                      | 支持  | 仅支持任务与日志管理       |
-| 代码生成   | 多数据源前后端代码的生成（java、html、xml、sql）支持CRUD下载                              | 支持  | 仅支持单数据源          |
-| 系统接口   | 根据业务代码自动生成相关的api接口文档                                                 | 支持  | 支持               |
-| 服务监控   | 监视集群系统CPU、内存、磁盘、堆栈、在线日志、Spring相关配置等                                  | 支持  | 仅支持单机CPU、内存、磁盘监控 |
-| 缓存监控   | 对系统的缓存信息查询，命令统计等。                                                    | 支持  | 支持               |
-| 使用案例   | 系统的一些功能案例                                                            | 支持  | 不支持              |
+```bash
+mvn -pl ruoyi-admin -am -DskipTests package
+java -jar ruoyi-admin/target/ruoyi-admin.jar
+```
 
-## 参考文档
+后端默认地址：`http://localhost:8080`。如果 IDEA 提示项目内的 `ruoyi-common-bom` 无法解析，先重新加载 Maven 项目；必要时运行 `mvn -f ruoyi-common/ruoyi-common-bom/pom.xml install` 后再刷新。
 
-使用框架前请仔细阅读文档重点注意事项
-<br>
->[初始化项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
->> [https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/init)
->
->[专栏与视频 入门必看](https://plus-doc.dromara.org/#/common/column)
->> [https://plus-doc.dromara.org/#/common/column](https://plus-doc.dromara.org/#/common/column)
->
->[部署项目 必看](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
->> [https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy](https://plus-doc.dromara.org/#/ruoyi-vue-plus/quickstart/deploy)
->
->[如何加群](https://plus-doc.dromara.org/#/common/add_group)
->> [https://plus-doc.dromara.org/#/common/add_group](https://plus-doc.dromara.org/#/common/add_group)
->
->[参考文档 Wiki](https://plus-doc.dromara.org)
->> [https://plus-doc.dromara.org](https://plus-doc.dromara.org)
+## 启动前端
 
-## 软件架构图
+前端源码已放在本仓库的 [`plus-ui/`](plus-ui/) 目录中，无需另行 clone：
 
-![Plus部署架构图](https://foruda.gitee.com/images/1678981882624240692/ae2a3f3e_1766278.png "Plus部署架构图.png")
+```bash
+cd plus-ui
+pnpm install
+pnpm dev
+```
 
-## 如何参与贡献
+开发环境配置在 `plus-ui/.env.development`；`VITE_APP_PORT` 默认是 `80`，页面地址为 `http://localhost:80`。如端口不可用，可修改该变量。前端通过 `plus-ui/vite.config.ts` 把 `/dev-api` 请求代理到 `http://localhost:8080`，修改后端端口时也要同步修改代理目标。前端的构建和其他脚本见 `plus-ui/package.json`，详细说明见 [`plus-ui/README.md`](plus-ui/README.md)。
 
-[参与贡献的方式 https://plus-doc.dromara.org/#/common/contribution](https://plus-doc.dromara.org/#/common/contribution)
+## 按需启动扩展服务
 
-## 捐献作者
+- **监控中心**：运行 `MonitorAdminApplication`，访问 `http://localhost:9090/admin`；主后端需要在 `application-dev.yml` 中启用 `spring.boot.admin.client.enabled` 才会上报到监控中心。
+- **SnailJob**：运行 `SnailJobServerApplication`，访问 `http://localhost:8800/snail-job`；主后端需要启用 `snail-job.enabled`。调度服务的数据库连接单独配置在 `ruoyi-extend/ruoyi-snailjob-server/src/main/resources/application-dev.yml`，相关 PostgreSQL 脚本为 `script/sql/postgres/postgres_ry_job.sql`。
+- **SnailAI**：运行 `SnailAiServerApplication`，访问 `http://localhost:8900/snail-ai`；主后端需要启用 `snail-ai.enabled`。AI 服务的数据库连接单独配置在 `ruoyi-extend/ruoyi-snailai-server/src/main/resources/application-dev.yml`，相关 PostgreSQL 脚本为 `script/sql/postgres/postgres_ry_ai.sql`。
 
-作者为兼职做开源,平时还需要工作,如果帮到了您可以请作者吃个盒饭  
-<img src="https://foruda.gitee.com/images/1678975784848381069/d8661ed9_1766278.png" width="300px" height="450px" />
-<img src="https://foruda.gitee.com/images/1678975801230205215/6f96229d_1766278.png" width="300px" height="450px" />
-
-## 演示图例
-
-|                                                                                            |                                                                                            |
-|--------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| ![输入图片说明](https://foruda.gitee.com/images/1780299033689126697/868ef1ea_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299052163404649/8d94165d_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299074949590692/27f5bfb5_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299108816841231/619a7c57_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299089818500856/862ba805_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299173744267947/95cb0cd3_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299193694706123/28257dc1_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299147525013883/ebcd9dfe_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299220007761523/dc7e27c9_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299235966983519/35b047e1_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299250884681522/e5731314_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299267028602229/230d5428_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299293149732467/19abcf6c_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299311267192779/e665c668_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299327888096947/283a177f_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299348897579356/caac864e_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299376680669014/452585fb_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299843158459866/ceebbb63_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299432356918392/07abdf6a_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299465584172180/a2b2be12_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299491233431530/d88bfa35_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299513358913413/f2f90032_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299527419238776/549cb852_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299553918371792/43bd3bff_1766278.png "屏幕截图") |
-| ![输入图片说明](https://foruda.gitee.com/images/1780299586662735625/1107a3ee_1766278.png "屏幕截图") | ![输入图片说明](https://foruda.gitee.com/images/1780299613342135530/526d7859_1766278.png "屏幕截图") |
+主后端开发配置中，上述三个客户端开关目前均为 `false`。SnailJob 和 SnailAI 服务端的开发配置目前仍使用 **MySQL**；如果要让它们连接 PostgreSQL，需分别调整各自的数据源、驱动依赖并准备对应数据库，不能只修改主后端的数据源。
