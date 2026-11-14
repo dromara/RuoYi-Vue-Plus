@@ -1,0 +1,136 @@
+/* Shared search and filter form layout. */
+
+.query-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.query-form .el-form-item {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+  margin-right: 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.query-form .el-form-item__content {
+  min-width: 0;
+}
+
+.query-form.el-form--inline .el-form-item__label {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 68px;
+  overflow: visible;
+  white-space: nowrap;
+  word-break: keep-all;
+  line-break: strict;
+  justify-content: flex-end;
+}
+
+.query-form .el-form-item:last-child {
+  margin-left: auto;
+  align-self: center;
+}
+
+.query-form .el-form-item:last-child .el-form-item__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.query-form .el-form-item:last-child .el-button {
+  margin-left: 0 !important;
+  flex-shrink: 0;
+}
+
+.query-form .el-form-item:last-child .el-button + .el-button {
+  margin-left: 0 !important;
+}
+
+.query-form .el-form-item[style*='width: 308px'] {
+  width: auto !important;
+  min-width: 376px;
+}
+
+.query-form .el-form-item[style*='width: 308px'] .el-form-item__content {
+  flex: 0 0 308px;
+  min-width: 308px;
+}
+
+.query-form .el-form-item[style*='width: 308px'] .el-date-editor.el-range-editor {
+  width: 308px;
+  min-width: 308px;
+}
+
+.query-form .el-input__wrapper,
+.query-form .el-select__wrapper,
+.query-form .el-textarea__inner,
+.query-form .el-date-editor,
+.query-form .el-range-editor,
+.query-form .el-cascader .el-input__wrapper,
+.query-form .el-input-number,
+.query-form .el-input-number__decrease,
+.query-form .el-input-number__increase {
+  border-radius: var(--app-radius-md) !important;
+}
+
+.query-form .el-button {
+  border-radius: var(--app-radius-md) !important;
+}
+
+html.dark .query-form .el-button--primary {
+  --el-button-bg-color: rgba(37, 99, 235, 0.28);
+  --el-button-border-color: rgba(96, 165, 250, 0.62);
+  --el-button-text-color: #dbeafe;
+  --el-button-hover-bg-color: rgba(59, 130, 246, 0.36);
+  --el-button-hover-border-color: rgba(147, 197, 253, 0.78);
+  --el-button-hover-text-color: #eff6ff;
+  --el-button-active-bg-color: rgba(29, 78, 216, 0.44);
+  --el-button-active-border-color: rgba(96, 165, 250, 0.86);
+  --el-button-active-text-color: #eff6ff;
+}
+
+@media (max-width: 900px) {
+  .query-form {
+    gap: 10px 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .query-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .query-form .el-form-item {
+    width: 100%;
+  }
+
+  .query-form .el-form-item[style*='width: 308px'] {
+    min-width: 0;
+  }
+
+  .query-form .el-form-item[style*='width: 308px'] .el-form-item__content {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .query-form .el-input,
+  .query-form .el-select,
+  .query-form .el-date-editor,
+  .query-form .el-cascader,
+  .query-form .el-input-number {
+    width: 100% !important;
+  }
+
+  .query-form .el-form-item:last-child {
+    margin-left: 0;
+  }
+}

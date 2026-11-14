@@ -12,20 +12,14 @@ import me.zhyd.oauth.utils.AuthStateUtils;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginBody;
-import org.dromara.common.core.enums.PushSourceEnum;
-import org.dromara.common.core.enums.PushTypeEnum;
-import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
-import org.dromara.system.api.MessageService;
-import org.dromara.system.api.domain.PushPayloadDTO;
 import org.dromara.system.api.model.RegisterBody;
 import org.dromara.system.api.model.SocialLoginBody;
 import org.dromara.system.domain.vo.SysClientVo;
@@ -38,11 +32,6 @@ import org.dromara.web.service.SysLoginService;
 import org.dromara.web.service.SysRegisterService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 认证控制器，提供登录、注册、社交绑定和退出能力。
@@ -62,9 +51,6 @@ public class AuthController {
     private final ISysConfigService configService;
     private final ISysSocialService socialUserService;
     private final ISysClientService clientService;
-    private final ScheduledExecutorService scheduledExecutorService;
-    private final MessageService messageService;
-
 
     /**
      * 登录方法
@@ -91,18 +77,6 @@ public class AuthController {
         // 登录
         LoginVo loginVo = IAuthStrategy.login(body, client, grantType);
 
-        Long userId = LoginHelper.getUserId();
-        scheduledExecutorService.schedule(() -> {
-            messageService.publishMessage(
-                List.of(userId),
-                PushPayloadDTO.of(
-                    PushTypeEnum.MESSAGE,
-                    PushSourceEnum.BACKEND,
-                    DateUtils.getTodayHour(new Date()) + "好，欢迎登录 RuoYi-Vue-Plus 后台管理系统",
-                    null
-                )
-            );
-        }, 5, TimeUnit.SECONDS);
         return R.ok(loginVo);
     }
 

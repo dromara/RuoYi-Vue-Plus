@@ -1,0 +1,226 @@
+/* 反馈：MessageBox 卡片化；Message / Notification / Alert 圆角与暗色下 success 等背景微调。 */
+
+.el-message-box .el-message-box__message {
+  word-break: break-word;
+}
+
+.el-message-box {
+  width: min(440px, calc(100vw - 32px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--app-surface-border);
+  background: var(--app-surface-bg);
+  border-radius: 20px;
+  box-shadow: var(--app-shadow-md);
+
+  .el-message-box__header {
+    padding: 18px 20px 0;
+  }
+
+  .el-message-box__title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--app-text-title);
+  }
+
+  .el-message-box__headerbtn {
+    top: 14px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--app-elevated-close-bg);
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
+
+    .el-message-box__close {
+      color: var(--app-text-muted);
+      font-size: 16px;
+    }
+
+    &:hover {
+      background: var(--app-elevated-close-hover-bg);
+      transform: translateY(-1px);
+
+      .el-message-box__close {
+        color: var(--app-accent-strong);
+      }
+    }
+  }
+
+  .el-message-box__content {
+    padding: 16px 20px 18px;
+  }
+
+  .el-message-box__container {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .el-message-box__status {
+    position: static;
+    margin-top: 1px;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px !important;
+    background: var(--app-elevated-soft-bg);
+  }
+
+  .el-message-box__message {
+    color: var(--app-text-title);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .el-message-box__btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 20px 20px;
+    border-top: 1px solid var(--app-surface-border);
+  }
+
+  .el-message-box__btns .el-button {
+    margin-left: 0;
+    min-width: 88px;
+  }
+
+  .el-message-box__input {
+    padding-top: 2px;
+  }
+}
+
+.el-message,
+.el-notification,
+.el-alert {
+  border-radius: var(--app-radius-md);
+  box-shadow: var(--app-shadow-sm);
+}
+
+.el-message {
+  min-width: 320px;
+  padding: 12px 14px;
+  border: 1px solid var(--app-surface-border);
+  background: var(--app-surface-bg);
+  gap: 10px;
+  align-items: center;
+
+  .el-message__icon {
+    font-size: 18px;
+  }
+
+  .el-message__content {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--app-text-title);
+  }
+
+  .el-message__closeBtn {
+    color: var(--app-text-muted);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--app-accent-strong);
+    }
+  }
+}
+
+.el-message--success {
+  border-color: var(--el-color-success-light-7);
+  background: var(--el-color-success-light-9);
+}
+
+.el-message--warning {
+  border-color: var(--el-color-warning-light-7);
+  background: var(--el-color-warning-light-9);
+}
+
+.el-message--error {
+  border-color: var(--el-color-danger-light-7);
+  background: var(--el-color-danger-light-9);
+}
+
+.el-message--info {
+  border-color: var(--el-color-primary-light-7);
+  background: var(--el-color-primary-light-9);
+}
+
+.el-notification {
+  width: 340px;
+  padding: 16px 18px 16px 16px;
+  border: 1px solid var(--app-surface-border);
+  background: var(--app-surface-bg);
+
+  .el-notification__group {
+    margin-left: 8px;
+  }
+
+  .el-notification__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--app-text-title);
+  }
+
+  .el-notification__content {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--app-text-muted);
+  }
+
+  .el-notification__closeBtn {
+    top: 18px;
+    color: var(--app-text-muted);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--app-accent-strong);
+    }
+  }
+}
+
+.el-notification.right,
+.el-notification.left {
+  margin-top: 12px;
+}
+
+.el-notification--success {
+  border-color: var(--el-color-success-light-7);
+}
+
+.el-notification--warning {
+  border-color: var(--el-color-warning-light-7);
+}
+
+.el-notification--error {
+  border-color: var(--el-color-danger-light-7);
+}
+
+.el-notification--info {
+  border-color: var(--el-color-primary-light-7);
+}
+
+// --- 暗色下 Message 类型背景（与 tokens 中按钮色阶独立） ---
+html.dark {
+  .el-message--success {
+    background: rgba(31, 138, 90, 0.18);
+  }
+
+  .el-message--warning {
+    background: rgba(184, 121, 34, 0.18);
+  }
+
+  .el-message--error {
+    background: rgba(178, 74, 74, 0.18);
+  }
+
+  .el-message--info {
+    background: rgba(43, 107, 211, 0.18);
+  }
+}

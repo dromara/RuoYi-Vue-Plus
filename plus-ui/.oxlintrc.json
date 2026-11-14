@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "vue"],
+  "rules": {
+    "typescript/no-empty-function": "off",
+    "typescript/no-explicit-any": "off",
+    "typescript/no-unused-vars": "off",
+    "typescript/no-this-alias": "off",
+    "typescript/no-empty-object-type": "off",
+    "typescript/no-unused-expressions": "off",
+    "prefer-rest-params": "off",
+    "import/no-unassigned-import": "off",
+    "import/no-named-as-default-member": "off",
+    "import/no-named-as-default": "off",
+    "no-shadow": "off",
+    "unicorn/prefer-add-event-listener": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "unicorn/no-instanceof-builtins": "off"
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "ignorePatterns": [".ai_state", ".claude", ".codex", "doc", "dist/**", "dist-ssr/**", "coverage/**"]
+}

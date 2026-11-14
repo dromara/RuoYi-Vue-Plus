@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    // This setting lets you specify a file for storing incremental compilation information as a part of composite projects which enables faster building of larger TypeScript codebases.
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+    "strict": true,
+    "allowJs": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["node", "vite/client"],
+    // 自定义配置
+    "noImplicitAny": false, // 禁用 隐式的any错误
+    "removeComments": true, // 移除 ts注释
+    "experimentalDecorators": true, // 启用实验性的装饰器支持
+    "strictFunctionTypes": false, // 禁用严格函数类型检查
+    "strictNullChecks": false, // 禁用严格的空值检查
+    "allowSyntheticDefaultImports": true, // 允许默认导入
+    "forceConsistentCasingInFileNames": true // 强制在文件名中使用一致的大小写
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts", "vitest.config.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "src/**/__tests__/*"]
+}

@@ -1,0 +1,67 @@
+/* 浅色主题：仅声明 CSS 自定义属性，无具体选择器样式。 */
+
+:root {
+  // --- 侧栏与顶栏表格区域 ---
+  --menuBg: #ffffff;
+  --menuColor: #1f2937;
+  --menuActiveText: #111827;
+  --menuHover: rgba(64, 158, 255, 0.12);
+
+  --subMenuBg: #ffffff;
+  --subMenuActiveText: #111827;
+  --subMenuHover: rgba(64, 158, 255, 0.12);
+  --subMenuTitleHover: rgba(64, 158, 255, 0.08);
+
+  --el-menu-base-level-padding: 12px;
+  --el-menu-level-padding: 8px;
+  --el-menu-item-height: 50px;
+
+  --fixedHeaderBg: #ffffff;
+  --tableHeaderBg: #f8fafc;
+  --tableHeaderTextColor: #475569;
+
+  --brder-color: #e8e8e8;
+
+  --tags-view-active-bg: var(--el-color-primary);
+  --tags-view-active-border-color: var(--el-color-primary);
+
+  // --- 应用壳：圆角、阴影、表面、导航、强调色与文案色 ---
+  --app-radius-sm: max(0px, calc(var(--app-radius-base) - 8px));
+  --app-radius-md: max(0px, calc(var(--app-radius-base) - 4px));
+  --app-radius-lg: var(--app-radius-base);
+  --app-radius-base: 14px;
+
+  --app-space-base: 12px;
+
+  --app-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --app-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.06);
+  --app-shadow-lg: 0 14px 36px rgba(15, 23, 42, 0.1);
+
+  --app-font-size-base: 14px;
+
+  --app-surface-bg: #ffffff;
+  --app-surface-border: #e5e7eb;
+  --app-shell-bg: #f5f7fa;
+  --app-shell-spot-1: rgba(64, 158, 255, 0.08);
+  --app-shell-spot-2: rgba(64, 158, 255, 0.04);
+  --app-sidebar-border: #e5e7eb;
+  --app-navbar-bg: #ffffff;
+  --app-navbar-border: #e5e7eb;
+  --app-navbar-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --app-accent-soft: rgba(64, 158, 255, 0.08);
+  --app-accent-strong: #409eff;
+  --app-text-title: #1f2937;
+  --app-text-muted: #6b7280;
+  --app-overlay-mask: rgba(15, 23, 42, 0.22);
+  --app-elevated-soft-bg: #f8fafc;
+  --app-elevated-close-bg: rgba(148, 163, 184, 0.14);
+  --app-elevated-close-hover-bg: rgba(64, 158, 255, 0.14);
+
+  // --- 与 Element Plus 主题变量的桥接（页面背景、默认圆角/阴影） ---
+  --el-border-radius-base: var(--app-radius-md);
+  --el-border-radius-small: var(--app-radius-sm);
+  --el-border-radius-round: 999px;
+  --el-box-shadow-light: var(--app-shadow-sm);
+  --el-box-shadow: var(--app-shadow-md);
+  --el-bg-color-page: var(--app-shell-bg);
+}

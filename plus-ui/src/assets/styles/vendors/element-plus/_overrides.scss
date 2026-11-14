@@ -1,0 +1,84 @@
+/* 跨多个 Element Plus 组件的共用覆盖（圆角、描边、阴影、主按钮、表格变量、输入框等）。
+ * 注意：本文件在入口中晚于 components/_card-shell 载入，其中 .el-card 等与卡片壳层重叠的属性以本文件为准（例如阴影强度）。 */
+
+// --- 卡片、弹层、抽屉及常见 popper 容器的圆角/边线/阴影 ---
+.el-card,
+.el-dialog,
+.el-drawer,
+.el-popover.el-popper,
+.el-dropdown__popper .el-dropdown-menu,
+.el-picker__popper,
+.el-select__popper.el-popper {
+  border-radius: var(--app-radius-base);
+  border-color: var(--app-surface-border);
+  box-shadow: var(--app-shadow-md);
+}
+
+// --- 实体「面板」背景 ---
+.el-card,
+.el-dialog,
+.el-drawer {
+  background: var(--app-surface-bg);
+}
+
+// --- 按钮默认字重 ---
+.el-button {
+  font-weight: 500;
+}
+
+// --- primary 品牌色（亮色；暗色见 tokens/_theme-dark） ---
+.el-button--primary {
+  --el-button-bg-color: var(--app-accent-strong);
+  --el-button-border-color: var(--app-accent-strong);
+  --el-button-hover-bg-color: #4a7cff;
+  --el-button-hover-border-color: #4a7cff;
+  --el-button-active-bg-color: #2e5ce0;
+  --el-button-active-border-color: #2e5ce0;
+}
+
+// --- 表格 CSS 变量接业务 token ---
+.el-table {
+  --el-table-border-color: var(--app-surface-border);
+  --el-table-header-bg-color: var(--tableHeaderBg);
+  --el-table-tr-bg-color: var(--el-bg-color);
+  --el-table-bg-color: var(--el-bg-color);
+  --el-table-row-hover-bg-color: var(--el-fill-color-light);
+  --el-table-current-row-bg-color: var(--el-color-primary-light-9);
+  background: var(--el-bg-color);
+}
+
+// 暗色模式：行背景、hover、选中全部用不透明色，防止固定列透视
+html.dark .el-table {
+  --el-table-tr-bg-color: var(--app-surface-bg);
+  --el-table-bg-color: var(--app-surface-bg);
+  --el-table-row-hover-bg-color: #2a3a55;
+  --el-table-current-row-bg-color: #1e3a6e;
+  --el-color-primary-light-9: #1e3a6e;
+  background: var(--app-surface-bg);
+}
+
+// 固定列单元格基底背景与普通行保持一致（亮/暗均适用）
+.el-table .el-table__cell {
+  background-color: var(--el-table-tr-bg-color);
+}
+
+// hover 行的所有单元格（含固定列）覆写为不透明背景
+.el-table__body tr.hover-row > td.el-table__cell,
+.el-table__body tr.hover-row.current-row > td.el-table__cell,
+.el-table__body tr.hover-row.el-table__row--striped > td.el-table__cell,
+.el-table__body tr.hover-row.el-table__row--striped.current-row > td.el-table__cell,
+.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+  background-color: var(--el-table-row-hover-bg-color) !important;
+}
+
+// 选中行的所有单元格（含固定列）覆写为不透明背景
+.el-table__body tr.current-row > td.el-table__cell {
+  background-color: var(--el-table-current-row-bg-color) !important;
+}
+
+// --- 输入类默认内描边（与 _form 中 focus 环配合） ---
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper {
+  box-shadow: 0 0 0 1px var(--el-border-color) inset;
+}

@@ -1,0 +1,67 @@
+/* 业务列表/卡片页：分页、树、列表、el-card 等（与 vendors/element-plus 通用覆盖叠加，入口顺序见 index.scss）。
+ * 属「页面模式」而非 EP 公共主题，故放在 components。 */
+
+// --- 历史「表单分区标题」样式 ---
+.form-header {
+  font-size: 15px;
+  color: var(--el-color-primary);
+  border-bottom: 1px solid var(--app-surface-border);
+  margin: 8px 10px 25px 10px;
+  padding-bottom: 5px;
+}
+
+// --- 树形容器描边（暗色覆盖在 _search-panel） ---
+.tree-border {
+  margin-top: 8px;
+  border: 1px solid var(--app-surface-border);
+  background: var(--app-surface-bg);
+  border-radius: 22px;
+  width: 100%;
+  padding: 12px;
+}
+
+@media (max-width: 768px) {
+  .pagination-container .el-pagination > .el-pagination__jump {
+    display: none !important;
+  }
+
+  .pagination-container .el-pagination > .el-pagination__sizes {
+    display: none !important;
+  }
+}
+
+.el-tree-node__content > .el-checkbox {
+  margin-right: 8px;
+}
+
+// --- el-card 本业务页外观（与 EP vendors 叠加） ---
+.el-card__header {
+  padding: 14px 16px 10px !important;
+  min-height: auto;
+  background: transparent;
+  border-bottom: 1px solid var(--app-surface-border);
+}
+
+.el-card__body {
+  padding: 16px !important;
+}
+
+.el-card {
+  border-radius: var(--app-radius-base);
+  box-shadow: var(--app-shadow-sm);
+  border-color: var(--app-surface-border);
+  overflow: hidden;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  background: var(--app-surface-bg);
+}
+
+.el-card:hover {
+  box-shadow: var(--app-shadow-md);
+  border-color: var(--app-accent-soft);
+}
+
+.card-box {
+  margin-bottom: 10px;
+}

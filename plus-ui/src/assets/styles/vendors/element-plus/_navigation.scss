@@ -1,0 +1,56 @@
+/* 导航类组件：Tabs、Pagination、面包屑容 */
+
+.el-tabs__header {
+  margin: 0 0 12px 0;
+}
+
+.el-tabs__item {
+  border-radius: var(--app-radius-md);
+  margin: 0 2px;
+}
+
+.el-tabs__nav-wrap::after {
+  background-color: var(--el-border-color-lighter);
+}
+
+.el-pagination .btn-prev,
+.el-pagination .btn-next,
+.el-pagination .el-pager li {
+  border-radius: var(--app-radius-sm);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.el-pagination {
+  gap: 6px;
+  flex-wrap: wrap;
+  color: var(--app-text-muted);
+}
+
+.el-pagination .el-pagination__total,
+.el-pagination .el-pagination__jump {
+  color: var(--app-text-muted);
+}
+
+.el-pagination .btn-prev,
+.el-pagination .btn-next,
+.el-pagination .el-pager li,
+.el-pagination .el-pagination__sizes .el-input__wrapper {
+  min-width: 32px;
+  height: 32px;
+  border: 1px solid var(--app-surface-border);
+  background: var(--app-surface-bg);
+}
+
+.el-pagination .el-pager li.is-active {
+  box-shadow: var(--app-shadow-sm);
+}
+
+.el-breadcrumb {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}

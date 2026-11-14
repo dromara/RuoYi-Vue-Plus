@@ -1,0 +1,141 @@
+/* 桌面端折叠侧栏：窄宽、仅图标、子菜单箭头隐藏与 tooltip 触发区域（类名 .hideSidebar）。 */
+
+#app {
+  .hideSidebar {
+    .sidebar-container {
+      width: 58px !important;
+    }
+
+    .main-container {
+      margin-left: 70px;
+    }
+
+    .sidebar-shell {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
+    .submenu-title-noDropdown {
+      padding: 0 !important;
+      position: relative;
+      height: 40px;
+      width: 40px !important;
+      min-width: 40px !important;
+      margin: 3px auto !important;
+      display: flex;
+      align-items: center;
+      justify-content: center !important;
+      box-sizing: border-box;
+
+      &.is-active {
+        background-color: var(--side-menu-active-bg) !important;
+        color: var(--side-menu-active-text) !important;
+        box-shadow: inset 3px 0 0 var(--side-menu-active-line);
+      }
+
+      .el-tooltip {
+        padding: 0 !important;
+      }
+
+      .el-menu-tooltip__trigger {
+        width: 100%;
+        height: 100%;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .svg-icon {
+        margin-right: 0 !important;
+      }
+    }
+
+    & .el-sub-menu {
+      overflow: hidden;
+      border-radius: var(--app-radius-md);
+
+      .el-sub-menu__title,
+      .el-sub-menu__title.el-tooltip__trigger {
+        border-radius: var(--app-radius-md);
+        height: 40px;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center !important;
+        line-height: 1;
+      }
+
+      &.is-active .el-sub-menu__title,
+      &.is-active .el-sub-menu__title.el-tooltip__trigger {
+        background-color: var(--side-menu-active-bg) !important;
+        box-shadow: inset 3px 0 0 var(--side-menu-active-line);
+      }
+
+      & > .el-sub-menu__title {
+        padding: 0 !important;
+      }
+    }
+
+    .el-menu--collapse {
+      > div > .el-sub-menu {
+        width: 40px !important;
+        min-width: 40px !important;
+        margin: 3px auto !important;
+      }
+
+      > div > .el-sub-menu > .el-sub-menu__title,
+      > div > .el-sub-menu > .el-sub-menu__title.el-tooltip__trigger {
+        width: 100% !important;
+        min-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+        transform: none;
+        position: relative;
+      }
+
+      .is-active .svg-icon {
+        fill: currentColor;
+      }
+
+      > div > .el-sub-menu > .el-sub-menu__title .svg-icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        transform: translate(-50%, -50%);
+        display: block;
+        margin: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      > div > .el-sub-menu > .el-sub-menu__title {
+        justify-content: center !important;
+
+        .el-sub-menu__icon-arrow {
+          display: none !important;
+          width: 0 !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+        }
+
+        & > span {
+          height: 0;
+          width: 0;
+          overflow: hidden;
+          visibility: hidden;
+          display: inline-block;
+        }
+
+        & > i {
+          height: 0;
+          width: 0;
+          overflow: hidden;
+          visibility: hidden;
+          display: inline-block;
+        }
+      }
+    }
+  }
+}

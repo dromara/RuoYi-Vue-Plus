@@ -282,7 +282,7 @@ CREATE TABLE flow_user
     processed_by varchar(80) NULL,
     associated   int8        NOT NULL,
     create_time  timestamp   NULL,
-    create_by    varchar(80)  NULL:: character varying,
+    create_by    varchar(80)  NULL,
     update_time  timestamp   NULL,
     update_by    varchar(64)  NULL DEFAULT '':: character varying,
     del_flag     bpchar(1)   NULL DEFAULT '0':: character varying,
@@ -606,4 +606,3 @@ INSERT INTO sys_dict_data VALUES (1761600000000000064, 9, '转办', 'transfer', 
 INSERT INTO sys_dict_data VALUES (1761600000000000065, 10, '委派', 'delegate', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '委派');
 INSERT INTO sys_dict_data VALUES (1761600000000000066, 11, '加签', 'add_signer', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '加签');
 INSERT INTO sys_dict_data VALUES (1761600000000000067, 12, '减签', 'remove_signer', 'wf_task_status', '', 'warning', 'N', 1761000000000000103, 1761100000000000001, now(), NULL, NULL, '减签');
-

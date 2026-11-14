@@ -1,0 +1,31 @@
+/* 移动端侧栏：抽屉式滑出、隐藏时 translate；.withoutAnimation 关闭过渡（与布局组件 class 约定一致）。 */
+
+@use '../../tokens/sass-vars' as *;
+
+#app {
+  .mobile {
+    .main-container {
+      margin-left: 0px;
+    }
+
+    .sidebar-container {
+      transition: transform 0.28s;
+      width: $base-sidebar-width !important;
+    }
+
+    &.hideSidebar {
+      .sidebar-container {
+        pointer-events: none;
+        transition-duration: 0.3s;
+        transform: translate3d(calc(-#{$base-sidebar-width} - 12px), 0, 0);
+      }
+    }
+  }
+
+  .withoutAnimation {
+    .main-container,
+    .sidebar-container {
+      transition: none;
+    }
+  }
+}

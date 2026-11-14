@@ -1,0 +1,229 @@
+/* 暗色主题：在 html.dark 上覆写与浅色同名的业务/app 变量 */
+
+html.dark {
+  --menuBg: #111827;
+  --menuColor: #e5edf8;
+  --menuActiveText: #f8fbff;
+  --menuHover: rgba(85, 129, 255, 0.2);
+
+  --subMenuBg: #111827;
+  --subMenuActiveText: #f8fbff;
+  --subMenuHover: rgba(85, 129, 255, 0.18);
+  --subMenuTitleHover: rgba(148, 163, 184, 0.12);
+
+  --fixedHeaderBg: #0f172a;
+  --tableHeaderBg: var(--el-bg-color);
+  --tableHeaderTextColor: var(--el-text-color);
+
+  // --- 表格：暗色下选中行背景 ---
+  --el-table-current-row-bg-color: rgba(53, 109, 255, 0.14);
+  --el-table-row-hover-bg-color: rgba(148, 163, 184, 0.07);
+
+  // --- 全局：暗色下修正 primary 浅底色（表格行选中、树节点等） ---
+  --el-color-primary-light-9: rgba(53, 109, 255, 0.14);
+
+  .el-tree-node__content {
+    --el-color-primary-light-9: rgba(53, 109, 255, 0.14);
+  }
+
+  .el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info):not(.is-text):not(
+      .is-link
+    ) {
+    --el-button-bg-color: rgba(15, 23, 42, 0.44);
+    --el-button-border-color: rgba(96, 165, 250, 0.38);
+    --el-button-text-color: #dbeafe;
+    --el-button-hover-bg-color: rgba(96, 165, 250, 0.16);
+    --el-button-hover-border-color: rgba(96, 165, 250, 0.58);
+    --el-button-hover-text-color: #bfdbfe;
+    --el-button-active-bg-color: rgba(59, 130, 246, 0.22);
+    --el-button-active-border-color: rgba(96, 165, 250, 0.72);
+    --el-button-active-text-color: #dbeafe;
+  }
+
+  // --- 各类型按钮（含 plain）在暗色下的 EP CSS 变量 ---
+  .el-button--primary {
+    --el-button-bg-color: #2b6bd3;
+    --el-button-border-color: #3a7be8;
+    --el-button-text-color: #eef4ff;
+    --el-button-hover-bg-color: #3a7be8;
+    --el-button-hover-border-color: #3a7be8;
+    --el-button-active-bg-color: #255fb8;
+    --el-button-active-border-color: #255fb8;
+  }
+
+  .el-button--primary.is-plain {
+    --el-button-bg-color: rgba(43, 107, 211, 0.12);
+    --el-button-border-color: rgba(58, 123, 232, 0.5);
+    --el-button-text-color: #dbe8ff;
+    --el-button-hover-text-color: #dbe8ff;
+    --el-button-hover-bg-color: rgba(58, 123, 232, 0.2);
+    --el-button-hover-border-color: rgba(58, 123, 232, 0.7);
+    --el-button-active-text-color: #dbe8ff;
+    --el-button-active-bg-color: rgba(43, 107, 211, 0.28);
+    --el-button-active-border-color: rgba(43, 107, 211, 0.8);
+  }
+
+  .el-button--success {
+    --el-button-bg-color: #1f8a5a;
+    --el-button-border-color: #29a46d;
+    --el-button-text-color: #eefaf4;
+    --el-button-hover-bg-color: #29a46d;
+    --el-button-hover-border-color: #29a46d;
+    --el-button-active-bg-color: #1b784f;
+    --el-button-active-border-color: #1b784f;
+  }
+
+  .el-button--success.is-plain {
+    --el-button-bg-color: rgba(31, 138, 90, 0.12);
+    --el-button-border-color: rgba(41, 164, 109, 0.5);
+    --el-button-text-color: #dbf6e8;
+    --el-button-hover-text-color: #dbf6e8;
+    --el-button-hover-bg-color: rgba(41, 164, 109, 0.2);
+    --el-button-hover-border-color: rgba(41, 164, 109, 0.7);
+    --el-button-active-text-color: #dbf6e8;
+    --el-button-active-bg-color: rgba(31, 138, 90, 0.28);
+    --el-button-active-border-color: rgba(31, 138, 90, 0.8);
+  }
+
+  .el-button--warning {
+    --el-button-bg-color: #b87922;
+    --el-button-border-color: #d6953b;
+    --el-button-text-color: #fff7e6;
+    --el-button-hover-bg-color: #d6953b;
+    --el-button-hover-border-color: #d6953b;
+    --el-button-active-bg-color: #a56c1d;
+    --el-button-active-border-color: #a56c1d;
+  }
+
+  .el-button--warning.is-plain {
+    --el-button-bg-color: rgba(184, 121, 34, 0.12);
+    --el-button-border-color: rgba(214, 149, 59, 0.5);
+    --el-button-text-color: #ffecc8;
+    --el-button-hover-text-color: #ffecc8;
+    --el-button-hover-bg-color: rgba(214, 149, 59, 0.2);
+    --el-button-hover-border-color: rgba(214, 149, 59, 0.7);
+    --el-button-active-text-color: #ffecc8;
+    --el-button-active-bg-color: rgba(184, 121, 34, 0.28);
+    --el-button-active-border-color: rgba(184, 121, 34, 0.8);
+  }
+
+  .el-button--danger {
+    --el-button-bg-color: #b24a4a;
+    --el-button-border-color: #d16060;
+    --el-button-text-color: #ffecec;
+    --el-button-hover-bg-color: #d16060;
+    --el-button-hover-border-color: #d16060;
+    --el-button-active-bg-color: #9c3f3f;
+    --el-button-active-border-color: #9c3f3f;
+  }
+
+  .el-button--danger.is-plain {
+    --el-button-bg-color: rgba(178, 74, 74, 0.12);
+    --el-button-border-color: rgba(209, 96, 96, 0.5);
+    --el-button-text-color: #ffd6d6;
+    --el-button-hover-text-color: #ffd6d6;
+    --el-button-hover-bg-color: rgba(209, 96, 96, 0.2);
+    --el-button-hover-border-color: rgba(209, 96, 96, 0.7);
+    --el-button-active-text-color: #ffd6d6;
+    --el-button-active-bg-color: rgba(178, 74, 74, 0.28);
+    --el-button-active-border-color: rgba(178, 74, 74, 0.8);
+  }
+
+  .el-button--info {
+    --el-button-bg-color: #4b5563;
+    --el-button-border-color: #667085;
+    --el-button-text-color: #f3f4f6;
+    --el-button-hover-bg-color: #667085;
+    --el-button-hover-border-color: #667085;
+    --el-button-active-bg-color: #3f4753;
+    --el-button-active-border-color: #3f4753;
+  }
+
+  .el-button--info.is-plain {
+    --el-button-bg-color: rgba(75, 85, 99, 0.16);
+    --el-button-border-color: rgba(102, 112, 133, 0.55);
+    --el-button-text-color: #e5e7eb;
+    --el-button-hover-text-color: #e5e7eb;
+    --el-button-hover-bg-color: rgba(102, 112, 133, 0.22);
+    --el-button-hover-border-color: rgba(102, 112, 133, 0.75);
+    --el-button-active-text-color: #e5e7eb;
+    --el-button-active-bg-color: rgba(75, 85, 99, 0.3);
+    --el-button-active-border-color: rgba(75, 85, 99, 0.85);
+  }
+
+  // --- Switch / Tag 暗色适配 ---
+  .el-switch {
+    --el-switch-on-color: var(--el-color-primary-dark-6);
+    --el-switch-border-color: var(--el-color-primary-light-2);
+  }
+
+  .el-tag--primary {
+    --el-tag-bg-color: var(--el-color-primary-dark-6);
+    --el-tag-border-color: var(--el-color-primary-light-2);
+  }
+
+  .el-tag--success {
+    --el-tag-bg-color: rgba(31, 138, 90, 0.18);
+    --el-tag-border-color: rgba(41, 164, 109, 0.6);
+    --el-tag-text-color: #c7f2df;
+  }
+
+  .el-tag--warning {
+    --el-tag-bg-color: rgba(184, 121, 34, 0.18);
+    --el-tag-border-color: rgba(214, 149, 59, 0.6);
+    --el-tag-text-color: #ffe6bb;
+  }
+
+  .el-tag--danger {
+    --el-tag-bg-color: rgba(178, 74, 74, 0.18);
+    --el-tag-border-color: rgba(209, 96, 96, 0.6);
+    --el-tag-text-color: #ffd0d0;
+  }
+
+  .el-tag--info {
+    --el-tag-bg-color: rgba(75, 85, 99, 0.18);
+    --el-tag-border-color: rgba(102, 112, 133, 0.6);
+    --el-tag-text-color: #e5e7eb;
+  }
+
+  // --- tags-view 与 app 壳变量（暗色） ---
+  --tags-view-active-bg: var(--el-color-primary-dark-6);
+  --tags-view-active-border-color: var(--el-color-primary-light-2);
+
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --app-shadow-md: 0 12px 28px rgba(0, 0, 0, 0.28);
+  --app-shadow-lg: 0 20px 44px rgba(0, 0, 0, 0.32);
+  --app-surface-bg: #111827;
+  --app-surface-border: rgba(71, 85, 105, 0.5);
+  --app-shell-bg: #060b16;
+  --app-shell-spot-1: rgba(69, 120, 255, 0.18);
+  --app-shell-spot-2: rgba(45, 212, 191, 0.14);
+  --app-sidebar-border: rgba(148, 163, 184, 0.1);
+  --app-navbar-bg: #111827;
+  --app-navbar-border: rgba(71, 85, 105, 0.48);
+  --app-navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  --app-accent-soft: rgba(64, 158, 255, 0.14);
+  --app-accent-strong: #60a5fa;
+  --app-text-title: #f3f7ff;
+  --app-text-muted: #8ea0bd;
+  --app-overlay-mask: rgba(2, 6, 23, 0.58);
+  --app-elevated-soft-bg: rgba(148, 163, 184, 0.08);
+  --app-elevated-close-bg: rgba(148, 163, 184, 0.18);
+  --app-elevated-close-hover-bg: rgba(96, 165, 250, 0.18);
+  --el-bg-color-page: var(--app-shell-bg);
+
+  // --- vxe-table 暗色（与 vxe 业务表并存） ---
+  --vxe-font-color: #98989e;
+  --vxe-primary-color: #2c7ecf;
+  --vxe-icon-background-color: #98989e;
+  --vxe-table-font-color: #98989e;
+  --vxe-table-resizable-color: #95969a;
+  --vxe-table-header-background-color: #28282a;
+  --vxe-table-body-background-color: #151518;
+  --vxe-table-background-color: #4a5663;
+  --vxe-table-border-width: 1px;
+  --vxe-table-border-color: #37373a;
+  --vxe-toolbar-background-color: #37373a;
+
+  --brder-color: #37373a;
+}

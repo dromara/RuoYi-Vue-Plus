@@ -1,0 +1,26 @@
+// =============================================================================
+// 全局样式入口（加载顺序即最终 CSS 层叠顺序，后载入的同优先级规则会覆盖先载入的）
+// =============================================================================
+@use './tokens/sass-vars' as *;
+@use './tokens/theme';
+@use './tokens/theme-dark';
+@use './mixin.scss';
+@use './transition.scss';
+@use './base/document';
+@use './layout/surface';
+@use './layout/sidebar/shell' as sidebar-shell;
+@use './layout/sidebar/menu';
+@use './layout/sidebar/collapsed';
+@use './layout/sidebar/responsive';
+@use './layout/sidebar/popper' as sidebar-popper;
+@use './components/legacy-utilities';
+@use './components/misc';
+@use './components/page-shell';
+@use './components/card-shell';
+@use './components/theme-helpers';
+@use './components/table-toolbar';
+@use './components/query-form';
+@use './components/search-panel';
+
+@use './vendors/element-plus/index' as element-custom;
+@use 'animate.css';

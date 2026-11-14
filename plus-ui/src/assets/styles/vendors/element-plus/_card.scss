@@ -1,0 +1,13 @@
+.el-card {
+  overflow: hidden;
+}
+
+.el-card .el-card__header {
+  border-top-left-radius: var(--app-radius-base);
+  border-top-right-radius: var(--app-radius-base);
+}
+
+.el-card .el-card__body {
+  border-bottom-left-radius: var(--app-radius-base);
+  border-bottom-right-radius: var(--app-radius-base);
+}

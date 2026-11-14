@@ -1,0 +1,65 @@
+// 清除浮动（嵌套用）
+@mixin clearfix {
+  &:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+// WebKit 滚动条配色（用于可滚动容器）
+@mixin scrollBar {
+  &::-webkit-scrollbar-track-piece {
+    background: var(--app-surface-border);
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--app-text-muted);
+    border-radius: 20px;
+  }
+}
+
+// 铺满父级的相对定位层
+@mixin relative {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+// 百分比宽度水平居中块
+@mixin pct($pct) {
+  width: #{$pct};
+  position: relative;
+  margin: 0 auto;
+}
+
+// CSS 三角箭头（极少用，保留兼容）
+@mixin triangle($width, $height, $color, $direction) {
+  $width: $width/2;
+  $color-border-style: $height solid $color;
+  $transparent-border-style: $width solid transparent;
+  height: 0;
+  width: 0;
+
+  @if $direction==up {
+    border-bottom: $color-border-style;
+    border-left: $transparent-border-style;
+    border-right: $transparent-border-style;
+  } @else if $direction==right {
+    border-left: $color-border-style;
+    border-top: $transparent-border-style;
+    border-bottom: $transparent-border-style;
+  } @else if $direction==down {
+    border-top: $color-border-style;
+    border-left: $transparent-border-style;
+    border-right: $transparent-border-style;
+  } @else if $direction==left {
+    border-right: $color-border-style;
+    border-top: $transparent-border-style;
+    border-bottom: $transparent-border-style;
+  }
+}

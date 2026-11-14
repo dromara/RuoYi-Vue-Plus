@@ -1,0 +1,248 @@
+/* 各类浮层：Select/Cascader/DatePicker/Tooltip/Popover 等边框、列表项 hover、暗色箭头与日历格选中态。 */
+
+.el-select__popper.el-popper,
+.el-picker__popper.el-popper,
+.el-autocomplete__popper.el-popper,
+.el-cascader__dropdown,
+.el-dropdown__popper.el-popper,
+.el-popover.el-popper {
+  border: 1px solid var(--app-surface-border);
+  background: var(--app-surface-bg);
+  box-shadow: var(--app-shadow-md);
+}
+
+.el-select__popper.el-popper,
+.el-autocomplete__popper.el-popper,
+.el-cascader__dropdown,
+.el-dropdown__popper.el-popper,
+.el-popover.el-popper {
+  padding: 8px;
+}
+
+.el-select-dropdown__list,
+.el-autocomplete-suggestion__list,
+.el-cascader-menu {
+  padding: 0;
+}
+
+.el-select-dropdown__item,
+.el-autocomplete-suggestion li,
+.el-cascader-node {
+  min-height: 38px;
+  margin: 2px 0;
+  border-radius: 10px;
+  color: var(--app-text-title);
+  line-height: 38px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover,
+.el-autocomplete-suggestion li:hover,
+.el-cascader-node:not(.is-disabled):hover,
+.el-cascader-node.in-active-path {
+  background: var(--app-accent-soft);
+  color: var(--app-accent-strong);
+}
+
+.el-select-dropdown__item.is-selected,
+.el-autocomplete-suggestion li.highlighted {
+  background: rgba(64, 158, 255, 0.12);
+  color: var(--app-accent-strong);
+  font-weight: 600;
+}
+
+.el-select-dropdown__item.is-disabled,
+.el-cascader-node.is-disabled {
+  opacity: 0.5;
+}
+
+.el-tree-select__popper .el-tree-node__content {
+  display: flex;
+  align-items: center;
+}
+
+.el-tree-select__popper .el-select-dropdown__item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-height: 20px;
+  height: 20px;
+  line-height: 20px;
+  margin: 0;
+  padding-left: 0;
+  background: transparent !important;
+}
+
+.el-tree-select__popper .el-tree-node__expand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+
+.el-autocomplete-suggestion li {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.el-autocomplete-suggestion li div {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.el-cascader-menu {
+  min-width: 180px;
+  border-right-color: var(--app-surface-border);
+}
+
+.el-cascader-node__prefix,
+.el-cascader-node__postfix {
+  color: var(--app-text-muted);
+}
+
+.el-popper.is-dark {
+  border-color: rgba(15, 23, 42, 0.72);
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+}
+
+.el-popper.is-dark .el-popper__arrow::before {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(15, 23, 42, 0.72);
+}
+
+.el-popper.is-light {
+  border-color: var(--app-surface-border);
+  background: var(--app-surface-bg);
+}
+
+.el-popper.is-light .el-popper__arrow::before {
+  background: var(--app-surface-bg);
+  border-color: var(--app-surface-border);
+}
+
+.el-picker__popper.el-popper {
+  padding: 12px;
+}
+
+.el-date-picker,
+.el-date-range-picker,
+.el-time-panel,
+.el-time-range-picker,
+.el-picker-panel {
+  background: transparent;
+  color: var(--app-text-title);
+}
+
+.el-picker-panel__body-wrapper,
+.el-date-range-picker__content {
+  background: transparent;
+}
+
+.el-picker-panel__icon-btn,
+.el-date-picker__header-label,
+.el-date-range-picker__header-label {
+  color: var(--app-text-title);
+}
+
+.el-date-table td,
+.el-month-table td .cell,
+.el-year-table td .cell {
+  border-radius: 10px;
+}
+
+.el-date-table td.today .el-date-table-cell__text,
+.el-month-table td.today .cell,
+.el-year-table td.today .cell {
+  color: var(--app-accent-strong);
+  font-weight: 700;
+}
+
+.el-date-table td.available:hover,
+.el-month-table td .cell:hover,
+.el-year-table td .cell:hover {
+  color: var(--app-accent-strong);
+  background: var(--app-accent-soft);
+}
+
+.el-date-table td.current:not(.disabled) .el-date-table-cell__text,
+.el-month-table td.current:not(.disabled) .cell,
+.el-year-table td.current:not(.disabled) .cell {
+  background: var(--app-accent-strong);
+  color: #fff;
+}
+
+.el-date-editor .el-range-separator {
+  color: var(--app-text-muted);
+}
+
+.el-time-panel__content::before,
+.el-time-panel__content::after {
+  border-color: var(--app-surface-border);
+}
+
+.el-scrollbar__thumb {
+  background: var(--app-text-muted);
+  opacity: 0.42;
+}
+
+.el-scrollbar__thumb:hover {
+  background: rgba(100, 116, 139, 0.56);
+}
+
+.el-popover,
+.el-tooltip__popper,
+.el-popper {
+  border-radius: var(--app-radius-md);
+  box-shadow: var(--app-shadow-sm);
+}
+
+.el-popover {
+  padding: 10px 12px;
+}
+
+.el-tooltip__popper {
+  max-width: 320px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.el-popconfirm {
+  max-width: 320px;
+}
+
+.el-popconfirm__main {
+  gap: 10px;
+  line-height: 1.6;
+  color: var(--app-text-title);
+}
+
+.el-popconfirm__action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.el-popconfirm__action .el-button {
+  margin-left: 0 !important;
+}
+
+html.dark {
+  .el-popper.is-dark {
+    border-color: rgba(30, 41, 59, 0.92);
+    background: rgba(15, 23, 42, 0.96);
+  }
+
+  .el-popper.is-dark .el-popper__arrow::before {
+    background: rgba(15, 23, 42, 0.96);
+    border-color: rgba(30, 41, 59, 0.92);
+  }
+}
