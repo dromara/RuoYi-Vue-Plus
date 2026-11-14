@@ -1,0 +1,200 @@
+/* Shared vertical page shell spacing helpers. */
+
+.p-2 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.app-main > .p-2 {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.p-2 > .el-row,
+.p-2 > .el-card,
+.p-2 > .search-wrap,
+.p-2 > div,
+.p-2 > section {
+  margin-bottom: 0 !important;
+}
+
+// --- CRUD / 树表页用混入（在 .vue 内 @use 后 @include） ---
+
+@mixin action-link-buttons($background: rgba(53, 109, 255, 0.08)) {
+  .data-table {
+    :deep(.el-button.is-link) {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: $background;
+    }
+  }
+}
+
+@mixin toolbar-responsive($mobile-breakpoint: 900px) {
+  @media (max-width: $mobile-breakpoint) {
+    .toolbar-shell {
+      align-items: flex-start;
+    }
+  }
+}
+
+@mixin content-stack($gap: 12px) {
+  .content-main {
+    display: flex;
+    flex-direction: column;
+    gap: $gap;
+  }
+}
+
+@mixin dept-tree-panel($padding-top: 6px) {
+  .dept-tree {
+    padding-top: $padding-top;
+  }
+}
+
+@mixin collapsible-tree-layout($mobile-breakpoint: 900px) {
+  .content-grid,
+  .selector-layout {
+    align-items: stretch;
+  }
+
+  .tree-panel-col,
+  .tree-content-col {
+    min-width: 0;
+    transition:
+      max-width 0.24s ease,
+      flex-basis 0.24s ease;
+  }
+
+  .tree-panel-col.is-collapsed {
+    max-width: 56px;
+    flex: 0 0 56px;
+  }
+
+  .tree-content-col.is-tree-collapsed {
+    max-width: calc(100% - 56px);
+    flex: 0 0 calc(100% - 56px);
+  }
+
+  .tree-panel-shell,
+  .side-panel {
+    height: 100%;
+  }
+
+  .tree-panel-shell {
+    --tree-panel-max-height: 620px;
+  }
+
+  .tree-panel-shell :deep(.el-card__header) {
+    display: block;
+    padding: 12px 16px !important;
+  }
+
+  .tree-panel-shell :deep(.el-card__body) {
+    display: flex;
+    flex-direction: column;
+    height: var(--tree-panel-max-height);
+    min-height: 0;
+    max-height: var(--tree-panel-max-height);
+    overflow: hidden;
+  }
+
+  .tree-panel-header {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .tree-panel-header::after {
+    display: block;
+    width: 9px;
+    min-width: 9px;
+    height: 9px;
+    margin-left: auto;
+    flex-shrink: 0;
+    transform-origin: center;
+    transform: rotate(135deg);
+  }
+
+  .tree-panel-header.is-collapsed {
+    justify-content: center;
+  }
+
+  .side-panel.is-collapsed :deep(.el-card__body) {
+    display: none;
+  }
+
+  .dept-tree,
+  .selector-tree {
+    flex: 1 1 auto;
+    min-height: 180px;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    scrollbar-width: thin;
+  }
+
+  .dept-tree::-webkit-scrollbar,
+  .selector-tree::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .dept-tree::-webkit-scrollbar-thumb,
+  .selector-tree::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--app-text-muted);
+    opacity: 0.55;
+  }
+
+  .dept-tree::-webkit-scrollbar-track,
+  .selector-tree::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .tree-panel-shell.is-collapsed :deep(.el-card__header) {
+    padding: 12px 0 !important;
+  }
+
+  .tree-panel-shell.is-collapsed .tree-panel-header::after {
+    margin-left: 0;
+  }
+
+  .tree-panel-shell.is-collapsed .tree-panel-header::after {
+    transform: rotate(-45deg);
+  }
+
+  @media (max-width: $mobile-breakpoint) {
+    .tree-panel-col,
+    .tree-content-col {
+      max-width: 100%;
+      flex: 0 0 100%;
+    }
+
+    .tree-panel-shell {
+      --tree-panel-max-height: 420px;
+    }
+
+    .side-panel.is-collapsed {
+      height: auto;
+    }
+  }
+}
+
+@mixin table-crud-page($mobile-breakpoint: 900px, $background: rgba(53, 109, 255, 0.08)) {
+  @include action-link-buttons($background);
+  @include toolbar-responsive($mobile-breakpoint);
+}
+
+@mixin tree-table-crud-page(
+  $mobile-breakpoint: 900px,
+  $gap: 12px,
+  $tree-padding-top: 6px,
+  $background: rgba(53, 109, 255, 0.08)
+) {
+  @include content-stack($gap);
+  @include dept-tree-panel($tree-padding-top);
+  @include collapsible-tree-layout($mobile-breakpoint);
+  @include table-crud-page($mobile-breakpoint, $background);
+}

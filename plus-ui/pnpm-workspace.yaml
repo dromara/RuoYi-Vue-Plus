@@ -1,0 +1,10 @@
+packages:
+  - '.'
+
+allowBuilds:
+  '@parcel/watcher': true
+  es5-ext: true
+  esbuild: true
+
+overrides:
+  esbuild: 0.28.1

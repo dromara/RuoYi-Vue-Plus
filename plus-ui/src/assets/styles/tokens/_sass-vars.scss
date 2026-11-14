@@ -1,0 +1,42 @@
+/* Sass variables consumed by legacy modules and CSS module exports. */
+
+$blue: #324157;
+$light-blue: #3a71a8;
+$red: #c03639;
+$pink: #e65d6e;
+$green: #30b08f;
+$tiffany: #4ab7bd;
+$yellow: #fec171;
+$panGreen: #30b08f;
+
+$base-menu-color: var(--menuColor);
+$base-menu-hover: var(--menuHover);
+$base-menu-color-active: var(--menuActiveText);
+$base-menu-background: var(--menuBg);
+$base-logo-title-color: #ffffff;
+
+$base-menu-light-color: rgba(0, 0, 0, 0.7);
+$base-menu-light-background: #ffffff;
+$base-logo-light-title-color: #001529;
+
+$base-sub-menu-background: var(--subMenuBg);
+$base-sub-menu-hover: var(--subMenuHover);
+$base-sub-menu-title-hover: var(--subMenuTitleHover);
+
+$fixed-header-bg: var(--fixedHeaderBg);
+$table-header-bg: var(--tableHeaderBg);
+$table-header-text-color: var(--tableHeaderTextColor);
+
+$color-primary: #409eff;
+$color-success: #67c23a;
+$color-warning: #e6a23c;
+$color-danger: #f56c6c;
+$color-info: #909399;
+
+$--color-primary: $color-primary;
+$--color-success: $color-success;
+$--color-warning: $color-warning;
+$--color-danger: $color-danger;
+$--color-info: $color-info;
+
+$base-sidebar-width: 200px;

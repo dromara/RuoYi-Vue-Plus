@@ -1,0 +1,113 @@
+/* 侧栏内 el-menu：一级/嵌套项的 hover、active、浅色与 theme-dark 分支（与 _shell 中变量定义配合）。 */
+
+@use '../../tokens/sass-vars' as *;
+
+#app {
+  .sidebar-container {
+    .theme-dark .submenu-title-noDropdown,
+    .theme-dark .el-sub-menu__title {
+      border-radius: var(--app-radius-md);
+      margin: 3px 8px;
+      height: 40px;
+
+      &:hover {
+        background-color: var(--side-menu-hover-bg) !important;
+        color: var(--side-menu-hover-text) !important;
+      }
+    }
+
+    .submenu-title-noDropdown,
+    .el-sub-menu__title {
+      border-radius: var(--app-radius-md);
+      margin: 3px 8px;
+      height: 40px;
+      color: var(--side-menu-text) !important;
+
+      &:hover {
+        background-color: var(--side-menu-hover-bg) !important;
+        color: var(--side-menu-hover-text) !important;
+      }
+    }
+
+    & .theme-dark .is-active > .el-sub-menu__title {
+      color: var(--side-menu-active-text) !important;
+    }
+
+    & .nest-menu .el-sub-menu > .el-sub-menu__title,
+    & .el-sub-menu .el-menu-item {
+      min-width: calc($base-sidebar-width - 16px) !important;
+      border-radius: var(--app-radius-md);
+      height: 40px;
+      margin: 3px 8px;
+      background: transparent !important;
+
+      &:not(.is-active):hover {
+        background-color: var(--side-menu-hover-bg) !important;
+        color: var(--side-menu-hover-text) !important;
+      }
+    }
+
+    & .theme-dark .nest-menu .el-sub-menu > .el-sub-menu__title,
+    & .theme-dark .el-sub-menu .el-menu-item {
+      border-radius: var(--app-radius-md);
+      height: 40px;
+      margin: 3px 8px;
+      background: transparent !important;
+
+      &.is-active {
+        background: var(--side-menu-active-bg) !important;
+        color: var(--side-menu-active-text) !important;
+        box-shadow:
+          inset 3px 0 0 var(--side-menu-active-line),
+          inset 0 0 0 1px var(--side-menu-active-border);
+      }
+
+      &:not(.is-active):hover {
+        background-color: var(--side-menu-hover-bg) !important;
+        color: var(--side-menu-hover-text) !important;
+      }
+    }
+
+    & .theme-dark .nest-menu .el-sub-menu > .el-sub-menu__title,
+    & .theme-dark .el-menu-item {
+      border-radius: var(--app-radius-md);
+      height: 40px;
+      margin: 3px 8px;
+      background: transparent !important;
+
+      &.is-active {
+        background: var(--side-menu-active-bg) !important;
+        color: var(--side-menu-active-text) !important;
+        box-shadow:
+          inset 3px 0 0 var(--side-menu-active-line),
+          inset 0 0 0 1px var(--side-menu-active-border);
+      }
+
+      &:not(.is-active):hover {
+        background-color: var(--side-menu-hover-bg) !important;
+        color: var(--side-menu-hover-text) !important;
+      }
+    }
+
+    & .nest-menu .el-sub-menu > .el-sub-menu__title,
+    & .el-menu-item {
+      border-radius: var(--app-radius-md);
+      height: 40px;
+      margin: 3px 8px;
+      background: transparent !important;
+
+      &.is-active {
+        background: var(--side-menu-active-bg) !important;
+        color: var(--side-menu-active-text) !important;
+        box-shadow:
+          inset 3px 0 0 var(--side-menu-active-line),
+          inset 0 0 0 1px var(--side-menu-active-border);
+      }
+
+      &:not(.is-active):hover {
+        background-color: var(--side-menu-hover-bg) !important;
+        color: var(--side-menu-hover-text) !important;
+      }
+    }
+  }
+}

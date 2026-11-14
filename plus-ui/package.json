@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json.schemastore.org/package",
+  "name": "ruoyi-vue-plus",
+  "version": "6.1.0",
+  "description": "RuoYi-Vue-Plus后台管理系统",
+  "license": "MIT",
+  "author": "LionLi",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/JavaLionLi/plus-ui.git"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "vite build --mode production",
+    "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode production",
+    "dev": "vite serve --mode development",
+    "fmt": "oxfmt .",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "2.3.2",
+    "@highlightjs/vue-plugin": "2.1.2",
+    "@iconify/vue": "^5.0.4",
+    "@noble/ciphers": "^2.4.0",
+    "@vueuse/core": "15.0.0",
+    "@wangeditor-next/editor": "6.5.1",
+    "@wangeditor-next/editor-for-vue": "6.5.1",
+    "animate.css": "4.1.1",
+    "await-to-js": "3.0.0",
+    "axios": "1.20.0",
+    "echarts": "6.1.0",
+    "element-plus": "2.14.7",
+    "highlight.js": "11.12.0",
+    "image-conversion": "2.1.1",
+    "jsencrypt": "3.5.4",
+    "nprogress": "0.2.0",
+    "pinia": "4.1.0",
+    "vue": "3.5.44",
+    "vue-cropper": "1.1.4",
+    "vue-i18n": "11.4.16",
+    "vue-json-pretty": "2.6.0",
+    "vue-router": "5.4.0",
+    "vue-types": "7.0.1",
+    "vxe-pc-ui": "4.20.18",
+    "vxe-table": "4.23.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/nprogress": "0.2.3",
+    "@unocss/preset-attributify": "66.11.0",
+    "@unocss/preset-wind3": "66.11.0",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/compiler-sfc": "3.5.44",
+    "autoprefixer": "10.6.1",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "sass": "1.106.1",
+    "typescript": "^6.0.3",
+    "unocss": "66.11.0",
+    "unplugin-auto-import": "21.1.0",
+    "unplugin-vue-components": "32.1.0",
+    "unplugin-vue-setup-extend-plus": "1.0.1",
+    "vite": "^8.3.5",
+    "vite-plugin-svg-icons-ng": "^1.10.0",
+    "vitest": "5.0.5",
+    "vue-tsc": "^3.3.13"
+  },
+  "browserslist": [
+    "Chrome >= 87",
+    "Edge >= 88",
+    "Safari >= 14",
+    "Firefox >= 78"
+  ],
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.34.5"
+}

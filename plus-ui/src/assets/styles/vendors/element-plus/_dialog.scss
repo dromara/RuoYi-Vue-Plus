@@ -1,0 +1,109 @@
+/* 弹窗：遮罩模糊、居中 el-dialog 头身脚与关闭按钮；底部 .upload-container 为上传区宽度占位。 */
+
+.el-overlay {
+  overflow: hidden;
+  background: var(--app-overlay-mask);
+  backdrop-filter: blur(10px);
+
+  .el-overlay-dialog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+
+    .el-dialog {
+      margin: 0 auto !important;
+      border-radius: var(--app-radius-base);
+      box-shadow: var(--app-shadow-md);
+      overflow: hidden;
+      border: 1px solid var(--app-surface-border);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)) padding-box,
+        var(--app-surface-bg);
+
+      .el-dialog__header {
+        position: relative;
+        padding: 18px 20px 14px;
+        box-sizing: border-box;
+        border-bottom: 1px solid var(--app-surface-border);
+        margin-right: 0;
+        background: var(--app-elevated-soft-bg);
+      }
+
+      .el-dialog__title {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--app-text-title);
+        letter-spacing: 0;
+      }
+
+      .el-dialog__headerbtn {
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 10px;
+        background: var(--app-elevated-close-bg);
+        transform: translateY(-50%);
+        transition:
+          background-color 0.2s ease,
+          transform 0.2s ease,
+          color 0.2s ease;
+
+        .el-dialog__close {
+          color: var(--app-text-muted);
+          font-size: 16px;
+        }
+
+        &:hover {
+          background: var(--app-elevated-close-hover-bg);
+          transform: translateY(calc(-50% - 1px));
+
+          .el-dialog__close {
+            color: var(--app-accent-strong);
+          }
+        }
+      }
+
+      .el-dialog__body {
+        padding: 18px 20px 12px !important;
+      }
+
+      .el-dialog__footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px 20px;
+        border-top: 1px solid var(--app-surface-border);
+      }
+    }
+  }
+}
+
+.el-dialog__body {
+  max-height: calc(90vh - 111px) !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.el-dialog__footer .el-button {
+  margin-left: 0 !important;
+}
+
+.el-dialog__footer .dialog-footer {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  gap: 12px;
+}

@@ -1,0 +1,79 @@
+/* Reusable scoped mixins for selector dialogs backed by cards and vxe tables. */
+
+/* 为多个根选择器统一设置 gap */
+@mixin shell-gap($selectors...) {
+  @each $selector in $selectors {
+    #{$selector} {
+      gap: 12px;
+    }
+  }
+}
+
+/* 卡片区域撑满弹窗 */
+@mixin card-shell {
+  .selector-card {
+    height: 100%;
+  }
+}
+
+/* 按弹窗根 class 收紧 body 顶内边距 */
+@mixin dialog-body-padding($dialog-class) {
+  .#{$dialog-class} :deep(.el-dialog__body) {
+    padding-top: 12px;
+  }
+}
+
+/* 头部标题与已选 tag 换行、窄屏左对齐 */
+@mixin selector-header-tags($mobile-breakpoint: 768px) {
+  .selector-header {
+    align-items: flex-start;
+  }
+
+  .selector-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: min(100%, 520px);
+  }
+
+  .selector-tags :deep(.el-tag) {
+    margin: 0;
+  }
+
+  @media (max-width: $mobile-breakpoint) {
+    .selector-tags {
+      justify-content: flex-start;
+      max-width: 100%;
+    }
+  }
+}
+
+/* vxe 表格圆角与表头色，与全局表格 token 一致 */
+@mixin selector-table {
+  .selector-table {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .selector-table :deep(.vxe-table--render-default) {
+    border-radius: 10px;
+    color: var(--app-text-title);
+  }
+
+  .selector-table :deep(.vxe-header--column) {
+    background: var(--tableHeaderBg);
+    color: var(--tableHeaderTextColor);
+    font-weight: 600;
+  }
+
+  .selector-table :deep(.vxe-body--column),
+  .selector-table :deep(.vxe-header--column) {
+    border-color: var(--app-surface-border);
+  }
+
+  .selector-table :deep(.vxe-body--row.row--hover),
+  .selector-table :deep(.vxe-body--row:hover) {
+    background-color: rgba(53, 109, 255, 0.05);
+  }
+}

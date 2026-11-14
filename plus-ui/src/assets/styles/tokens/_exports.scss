@@ -1,0 +1,21 @@
+/* CSS module exports preserved for JS/Vue consumers. */
+
+@use './sass-vars' as *;
+
+:export {
+  menuColor: $base-menu-color;
+  menuLightColor: $base-menu-light-color;
+  menuColorActive: $base-menu-color-active;
+  menuBackground: $base-menu-background;
+  menuLightBackground: $base-menu-light-background;
+  subMenuBackground: $base-sub-menu-background;
+  subMenuHover: $base-sub-menu-hover;
+  sideBarWidth: $base-sidebar-width;
+  logoTitleColor: $base-logo-title-color;
+  logoLightTitleColor: $base-logo-light-title-color;
+  primaryColor: $color-primary;
+  successColor: $color-success;
+  dangerColor: $color-danger;
+  infoColor: $color-info;
+  warningColor: $color-warning;
+}

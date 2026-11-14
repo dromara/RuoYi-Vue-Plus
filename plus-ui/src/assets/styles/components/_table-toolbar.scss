@@ -1,0 +1,84 @@
+/* Table headers and toolbar action layouts. */
+
+.top-right-btn {
+  margin-left: auto;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-heading h3,
+.table-heading h3 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0;
+  color: var(--app-text-title);
+}
+
+.panel-kicker {
+  display: none;
+  color: var(--app-accent-strong);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.toolbar-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.table-heading p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--app-text-muted);
+  line-height: 1.5;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-left: auto;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2px;
+}
+
+.toolbar-actions::-webkit-scrollbar {
+  height: 0;
+}
+
+.toolbar-actions > * {
+  flex-shrink: 0;
+}
+
+.toolbar-actions .top-right-btn {
+  margin-left: 0;
+  flex-shrink: 0;
+}
+
+.toolbar-actions .el-button + .el-button,
+.toolbar-actions .el-dropdown + .el-button,
+.toolbar-actions .el-button + .el-dropdown,
+.toolbar-actions .el-dropdown + .el-dropdown,
+.toolbar-actions .top-right-btn + .el-button,
+.toolbar-actions .el-button + .top-right-btn,
+.toolbar-actions .top-right-btn + .el-dropdown,
+.toolbar-actions .el-dropdown + .top-right-btn {
+  margin-left: 0 !important;
+}
+
+.table-panel .toolbar-actions .el-button:not(.is-circle):not(.is-link) {
+  border-radius: var(--app-radius-md) !important;
+}

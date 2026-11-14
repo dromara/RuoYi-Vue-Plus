@@ -1,0 +1,100 @@
+/* Element Plus 表格：通用容器圆角、边线、overflow、行 hover、四角单元格、border/fit 清理（不含业务页表头 token，表头见 components/_legacy-utilities）。 */
+@use '../../tokens/sass-vars' as *;
+
+.el-table {
+  border-radius: var(--app-radius-md);
+  border: 1px solid var(--app-surface-border);
+  overflow: hidden;
+
+  // 给右上角表头单元格增加右上角圆角
+  thead tr:first-child th:last-child {
+    border-top-right-radius: var(--app-radius-md);
+  }
+
+  // 给左下角单元格增加左下角圆角
+  tbody tr:last-child td:first-child {
+    border-bottom-left-radius: var(--app-radius-md);
+  }
+
+  // 给右下角单元格增加右下角圆角
+  tbody tr:last-child td:last-child {
+    border-bottom-right-radius: var(--app-radius-md);
+  }
+}
+
+.el-table__header-wrapper {
+  background: transparent;
+}
+
+// 固定列 body 必须有不透明背景，否则横向滚动时数据透视
+.el-table__fixed-body-wrapper,
+.el-table__fixed-right-body-wrapper {
+  background-color: var(--el-bg-color);
+}
+
+html.dark {
+  .el-table__fixed-body-wrapper,
+  .el-table__fixed-right-body-wrapper {
+    background-color: var(--app-surface-bg);
+  }
+}
+
+// 去掉额外的表格边线，使用表格border
+.el-table--border:after,
+.el-table--border:before,
+.el-table--border .el-table__inner-wrapper:after,
+.el-table--border .el-table__inner-wrapper:before,
+.el-table__border-left-patch {
+  display: none;
+}
+
+// 去掉表格右侧和底部边框，使用单元的变宽
+.el-table--fit {
+  border-bottom: 0;
+  border-right: 0;
+}
+
+// 全高表格的外壳会延伸到分页区域，左边框改由实际表头/数据行首列绘制，避免少量数据时边框悬空。
+.el-table.is-full-height-table.el-table--border {
+  border-left: 0;
+
+  > .el-table__inner-wrapper > .el-table__header-wrapper,
+  > .el-table__inner-wrapper > .el-table__body-wrapper,
+  > .el-table__inner-wrapper > .el-table__footer-wrapper {
+    tr > .el-table__cell:first-child {
+      border-left: var(--el-table-border);
+    }
+  }
+}
+
+// --- 表格内操作列：固定宽按钮、下拉链接色 ---
+.el-table .fixed-width .el-button--small {
+  padding-left: 0;
+  padding-right: 0;
+  width: inherit;
+}
+
+.el-table .el-dropdown-link {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  margin-left: 10px;
+}
+
+.el-table {
+  .el-table__header-wrapper,
+  .el-table__fixed-header-wrapper {
+    th {
+      word-break: break-word;
+      background-color: $table-header-bg !important;
+      color: $table-header-text-color;
+      height: 40px !important;
+      font-size: 13px;
+    }
+  }
+
+  .el-table__body-wrapper {
+    .el-button [class*='el-icon-'] + span {
+      margin-left: 1px;
+    }
+  }
+}

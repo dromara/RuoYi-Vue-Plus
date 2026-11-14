@@ -1,0 +1,132 @@
+/* 侧栏外壳：固定定位宽度、主区左边距、滚动条与 el-menu 根级样式；与 _menu/_collapsed/_responsive 分工。 */
+
+@use '../../tokens/sass-vars' as *;
+
+#app {
+  // --- 主内容区相对侧栏的偏移 ---
+  .main-container {
+    height: 100%;
+    transition: margin-left 0.28s;
+    margin-left: calc(#{$base-sidebar-width} + 12px);
+    position: relative;
+    background: transparent;
+  }
+
+  .sidebarHide {
+    margin-left: 0 !important;
+  }
+
+  // --- 侧栏固定列：宽度过渡、主题下滚动条内菜单色变量 ---
+  .sidebar-container {
+    -webkit-transition: width 0.28s;
+    transition: width 0.28s;
+    width: $base-sidebar-width !important;
+    background: transparent;
+    height: calc(100vh - 24px);
+    position: fixed;
+    font-size: 0;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 0;
+    border-right: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+
+    .horizontal-collapse-transition {
+      transition:
+        0s width ease-in-out,
+        0s padding-left ease-in-out,
+        0s padding-right ease-in-out;
+    }
+
+    .scrollbar-wrapper {
+      overflow-x: hidden !important;
+    }
+
+    .el-scrollbar__bar.is-vertical {
+      right: 0;
+    }
+
+    .el-scrollbar {
+      height: 100%;
+    }
+
+    .el-scrollbar.theme-light {
+      --side-menu-text: #1f2937;
+      --side-menu-hover-bg: rgba(64, 158, 255, 0.08);
+      --side-menu-hover-text: #111827;
+      --side-menu-active-bg: rgba(64, 158, 255, 0.12);
+      --side-menu-active-text: #409eff;
+      --side-menu-active-border: rgba(64, 158, 255, 0.16);
+      --side-menu-active-line: #409eff;
+    }
+
+    .el-scrollbar.theme-dark {
+      --side-menu-text: #e5edf8;
+      --side-menu-hover-bg: rgba(255, 255, 255, 0.08);
+      --side-menu-hover-text: #ffffff;
+      --side-menu-active-bg: rgba(64, 158, 255, 0.22);
+      --side-menu-active-text: #ffffff;
+      --side-menu-active-border: rgba(96, 165, 250, 0.24);
+      --side-menu-active-line: #60a5fa;
+    }
+
+    .is-horizontal {
+      display: none;
+    }
+
+    a {
+      display: inline-block;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .svg-icon {
+      margin-right: 10px;
+    }
+
+    .el-menu {
+      border: none;
+      height: 100%;
+      width: 100% !important;
+      background: transparent !important;
+    }
+
+    .el-menu--inline {
+      background: transparent !important;
+    }
+
+    .el-menu-item,
+    .menu-title {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
+    .el-menu-item,
+    .el-sub-menu__title,
+    .el-menu-item .svg-icon,
+    .el-sub-menu__title .svg-icon,
+    .el-sub-menu__icon-arrow {
+      color: var(--side-menu-text) !important;
+      fill: currentColor;
+    }
+
+    .el-menu-item,
+    .el-sub-menu__title {
+      position: relative;
+      font-weight: 500;
+    }
+
+    .el-menu-item .el-menu-tooltip__trigger {
+      display: inline-block !important;
+    }
+  }
+
+  .el-menu--collapse .el-menu .el-sub-menu {
+    min-width: $base-sidebar-width !important;
+  }
+}

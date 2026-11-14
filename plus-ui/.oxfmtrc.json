@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    "src/types/components.d.ts",
+    "src/types/auto-imports.d.ts",
+    ".ai_state",
+    ".claude",
+    ".codex",
+    "doc"
+  ],
+  "printWidth": 120,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "arrowParens": "avoid",
+  "htmlWhitespaceSensitivity": "ignore",
+  "experimentalSortPackageJson": {
+    "sortScripts": true
+  },
+  "sortImports": {
+    "newlinesBetween": false,
+    "groups": [
+      "type-import",
+      ["value-builtin", "value-external"],
+      "type-internal",
+      "value-internal",
+      ["type-parent", "type-sibling", "type-index"],
+      ["value-parent", "value-sibling", "value-index"],
+      "unknown"
+    ]
+  }
+}

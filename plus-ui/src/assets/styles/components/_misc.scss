@@ -1,0 +1,9 @@
+.link-type,
+.link-type:focus {
+  color: var(--el-color-primary);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--app-accent-strong);
+  }
+}
