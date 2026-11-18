@@ -1,5 +1,6 @@
 package org.dromara.common.web.handler;
 
+import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -22,16 +23,21 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.expression.ExpressionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 
@@ -56,6 +62,26 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 不支持操作异常
+     */
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public R<Void> handleUnsupportedOperationException(UnsupportedOperationException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',不支持操作: {}", requestURI, e.getMessage());
+        return R.fail(e.getMessage());
+    }
+
+    /**
+     * Hutool工具类异常
+     */
+    @ExceptionHandler(UtilException.class)
+    public R<Void> handleUtilException(UtilException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',工具执行异常: {}", requestURI, e.getMessage(), e);
+        return R.fail(e.getMessage());
+    }
+
+    /**
      * 业务异常
      */
     @ExceptionHandler(ServiceException.class)
@@ -68,9 +94,18 @@ public class GlobalExceptionHandler {
     /**
      * 参数校验异常
      */
-    @ExceptionHandler({IllegalArgumentException.class, ValidateException.class})
+    @ExceptionHandler(IllegalArgumentException.class)
     public R<Void> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
         log.error("请求地址'{}',参数校验异常: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(e.getMessage());
+    }
+
+    /**
+     * Hutool 参数校验异常
+     */
+    @ExceptionHandler(ValidateException.class)
+    public R<Void> handleValidateException(ValidateException e, HttpServletRequest request) {
+        log.warn("请求地址'{}',参数校验异常: {}", request.getRequestURI(), e.getMessage());
         return R.fail(e.getMessage());
     }
 
@@ -125,10 +160,46 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 找不到路由
+     * 缺少必需的请求参数
      */
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public R<Void> handleNoHandlerFoundException(NoHandlerFoundException e, HttpServletRequest request) {
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public R<Void> handleMissingServletRequestParameterException(MissingServletRequestParameterException e, HttpServletRequest request) {
+        log.warn("请求地址'{}',缺少必需的请求参数'{}'", request.getRequestURI(), e.getParameterName());
+        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "缺少必需的请求参数[" + e.getParameterName() + "]");
+    }
+
+    /**
+     * 缺少必需的上传部分
+     */
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public R<Void> handleMissingServletRequestPartException(MissingServletRequestPartException e, HttpServletRequest request) {
+        log.warn("请求地址'{}',缺少必需的上传部分'{}'", request.getRequestURI(), e.getRequestPartName());
+        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "缺少必需的上传部分[" + e.getRequestPartName() + "]");
+    }
+
+    /**
+     * 上传大小超过限制
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public R<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e, HttpServletRequest request) {
+        log.warn("请求地址'{}',上传大小超过限制: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(e.getStatusCode().value(), "上传大小超过限制");
+    }
+
+    /**
+     * 不支持的请求媒体类型
+     */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public R<Void> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e, HttpServletRequest request) {
+        log.warn("请求地址'{}',不支持请求媒体类型'{}'", request.getRequestURI(), e.getContentType());
+        return R.fail(e.getStatusCode().value(), "不支持的请求媒体类型");
+    }
+
+    /**
+     * 找不到路由或静态资源
+     */
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+    public R<Void> handleNoHandlerFoundException(ServletException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}'不存在.", requestURI);
         return R.fail(HttpStatus.HTTP_NOT_FOUND, "请求地址不存在");
