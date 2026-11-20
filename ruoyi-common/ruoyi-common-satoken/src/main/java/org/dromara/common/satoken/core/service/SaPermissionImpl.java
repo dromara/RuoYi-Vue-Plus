@@ -62,7 +62,7 @@ public class SaPermissionImpl implements StpInterface {
             if (ObjectUtil.isNotNull(permissionService)) {
                 return new ArrayList<>(remotePermissionExtractor.apply(permissionService, resolveUserId(loginId)));
             }
-            throw new ServiceException("PermissionService 实现类不存在");
+            throw new RuntimeException("PermissionService 实现类不存在");
         }
         Collection<String> permissionList = localPermissionExtractor.apply(loginUser);
         if (CollUtil.isNotEmpty(permissionList)) {
@@ -80,7 +80,7 @@ public class SaPermissionImpl implements StpInterface {
         try {
             return SpringUtils.getBean(PermissionService.class);
         } catch (Exception e) {
-            return null;
+            throw new RuntimeException("权限服务获取失败", e);
         }
     }
 
@@ -112,7 +112,7 @@ public class SaPermissionImpl implements StpInterface {
             separatorIndex = loginIdStr.lastIndexOf(LoginUser.LOGIN_ID_SEPARATOR);
         }
         if (separatorIndex < 0 || separatorIndex == loginIdStr.length() - 1) {
-            throw new ServiceException("登录ID格式错误");
+            throw new RuntimeException("登录ID格式错误");
         }
         return Long.parseLong(loginIdStr.substring(separatorIndex + 1));
     }

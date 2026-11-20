@@ -141,7 +141,7 @@ public class EncryptorManager {
                 }
             }
         } catch (Exception e) {
-            throw new IllegalStateException("初始化加密字段缓存失败", e);
+            throw new RuntimeException("初始化加密字段缓存失败", e);
         }
     }
 

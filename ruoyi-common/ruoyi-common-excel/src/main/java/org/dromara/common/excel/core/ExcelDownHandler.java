@@ -18,7 +18,6 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -113,7 +112,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
                 if (StringUtils.isNotBlank(dictType)) {
                     // 如果传递了字典名，则依据字典建立下拉
                     Collection<String> values = Optional.ofNullable(getDictService().getAllDictByDictType(dictType))
-                        .orElseThrow(() -> new ServiceException("字典 {} 不存在", dictType))
+                        .orElseThrow(() -> new RuntimeException("Excel 字典配置不存在: " + dictType))
                         .values();
                     options = new ArrayList<>(values);
                 } else if (StringUtils.isNotBlank(converterExp)) {
@@ -122,7 +121,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
                     options = StreamUtils.toList(strList, s -> {
                         String[] itemArray = s.split("=", 2);
                         if (itemArray.length != 2) {
-                            throw new ServiceException("Excel转换表达式格式错误: {}", s);
+                            throw new RuntimeException("Excel 转换表达式格式错误: " + s);
                         }
                         return itemArray[1];
                     });
@@ -322,7 +321,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
         for (String firstOption : firstOptions) {
             DropDownOptions.validateOptionValue(firstOption);
             if (!names.add(firstOption)) {
-                throw new ServiceException("级联下拉一级选项重复：" + firstOption);
+                throw new RuntimeException("级联下拉一级选项重复: " + firstOption);
             }
         }
     }

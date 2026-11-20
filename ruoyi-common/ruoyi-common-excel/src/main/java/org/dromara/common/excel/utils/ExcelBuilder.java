@@ -22,7 +22,6 @@ import org.apache.fesod.sheet.write.metadata.fill.FillWrapper;
 import org.apache.fesod.sheet.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import org.apache.fesod.sheet.write.style.column.SimpleColumnWidthStyleStrategy;
 import org.apache.fesod.sheet.write.style.row.SimpleRowHeightStyleStrategy;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.excel.convert.ExcelBigNumberConvert;
@@ -403,7 +402,7 @@ public final class ExcelBuilder<T> {
             ServletOutputStream os = response.getOutputStream();
             writeSheet(os);
         } catch (IOException e) {
-            throw new ServiceException("导出Excel异常", e);
+            throw new RuntimeException("导出Excel异常", e);
         }
     }
 
@@ -424,7 +423,7 @@ public final class ExcelBuilder<T> {
         try (ExcelWriter writer = createWriter(outputStream)) {
             consumer.accept(ExcelWriterWrapper.of(writer));
         } catch (Exception e) {
-            throw ServiceException.wrap("导出Excel异常", e);
+            throw new RuntimeException("导出Excel异常", e);
         }
     }
 
@@ -436,7 +435,7 @@ public final class ExcelBuilder<T> {
             resetResponse(sheetName, response);
             toStream(response.getOutputStream(), consumer);
         } catch (IOException e) {
-            throw new ServiceException("导出Excel异常", e);
+            throw new RuntimeException("导出Excel异常", e);
         }
     }
 
@@ -565,7 +564,7 @@ public final class ExcelBuilder<T> {
                 }
             }
         } catch (IOException e) {
-            throw new ServiceException("导出Zip异常", e);
+            throw new RuntimeException("导出Zip异常", e);
         }
     }
 
@@ -584,7 +583,7 @@ public final class ExcelBuilder<T> {
             builder.toStream(bos);
             return bos.toByteArray();
         } catch (Exception e) {
-            throw ServiceException.wrap(exportSheetName + "Excel生成失败", e);
+            throw new RuntimeException("Excel生成失败", e);
         }
     }
 
@@ -1005,7 +1004,7 @@ public final class ExcelBuilder<T> {
                 ServletOutputStream os = response.getOutputStream();
                 toStream(os);
             } catch (IOException e) {
-                throw new ServiceException("导出Excel异常", e);
+                throw new RuntimeException("导出Excel异常", e);
             }
         }
 
@@ -1028,7 +1027,7 @@ public final class ExcelBuilder<T> {
                     excelWriter.finish();
                 }
             } catch (IOException e) {
-                throw new ServiceException("读取Excel模板异常", e);
+                throw new RuntimeException("读取Excel模板异常", e);
             }
         }
 

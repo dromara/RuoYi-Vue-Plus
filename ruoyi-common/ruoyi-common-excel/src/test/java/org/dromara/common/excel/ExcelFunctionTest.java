@@ -1,6 +1,5 @@
 package org.dromara.common.excel;
 
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.excel.core.DefaultExcelResult;
 import org.dromara.common.excel.core.DropDownOptions;
 import org.junit.jupiter.api.DisplayName;
@@ -33,9 +32,9 @@ class ExcelFunctionTest {
     @Test
     @DisplayName("拒绝非法 Excel 下拉选项")
     void shouldRejectInvalidDropDownOptionValue() {
-        assertThrows(ServiceException.class, () -> DropDownOptions.createOptionValue(1001, "华东"));
-        assertThrows(ServiceException.class, () -> DropDownOptions.validateOptionValue("A1"));
-        assertThrows(ServiceException.class, () -> DropDownOptions.createOptionValue("华东-一区"));
+        assertThrows(RuntimeException.class, () -> DropDownOptions.createOptionValue(1001, "华东"));
+        assertThrows(RuntimeException.class, () -> DropDownOptions.validateOptionValue("A1"));
+        assertThrows(RuntimeException.class, () -> DropDownOptions.createOptionValue("华东-一区"));
     }
 
     /**

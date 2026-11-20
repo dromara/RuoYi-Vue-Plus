@@ -102,7 +102,7 @@ public class EncryptedFieldProcessor {
                 }
             }
         } catch (Exception e) {
-            throw new IllegalStateException("处理加密字段失败", e);
+            throw new RuntimeException("处理加密字段失败", e);
         }
     }
 
@@ -135,7 +135,7 @@ public class EncryptedFieldProcessor {
             try {
                 field.set(target, value);
             } catch (IllegalAccessException e) {
-                throw new IllegalStateException("恢复加密字段失败", e);
+                throw new RuntimeException("恢复加密字段失败", e);
             }
         }
     }

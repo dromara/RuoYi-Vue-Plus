@@ -60,7 +60,8 @@ public class SocialAuthStrategy implements IAuthStrategy {
             loginBody.getSource(), loginBody.getSocialCode(),
             loginBody.getSocialState(), socialProperties);
         if (!response.ok()) {
-            throw new ServiceException(response.getMsg());
+            log.warn("第三方授权失败: {}", response.getMsg());
+            throw new ServiceException("第三方授权失败，请重新授权");
         }
         AuthUser authUserData = response.getData();
 

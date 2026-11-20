@@ -80,7 +80,7 @@ public class RateLimiterAspect {
             if (e instanceof ServiceException) {
                 throw e;
             } else {
-                throw new ServiceException("服务器限流异常，请稍候再试", e);
+                throw new RuntimeException("服务器限流异常", e);
             }
         }
     }

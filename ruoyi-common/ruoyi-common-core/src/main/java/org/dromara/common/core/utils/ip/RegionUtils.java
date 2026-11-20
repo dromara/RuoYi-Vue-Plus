@@ -79,7 +79,7 @@ public class RegionUtils {
             RegionUtils.ip2Region = Ip2Region.create(v4Config, v6Config);
             log.debug("IP工具初始化成功，加载IP地址库数据成功！");
         } catch (Exception e) {
-            throw new IllegalStateException("IP地址库初始化失败", e);
+            throw new RuntimeException("IP地址库初始化失败", e);
         }
     }
 

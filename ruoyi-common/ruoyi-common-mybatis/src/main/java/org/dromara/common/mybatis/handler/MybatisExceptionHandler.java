@@ -51,10 +51,10 @@ public class MybatisExceptionHandler {
         }
         if (root instanceof CannotFindDataSourceException) {
             log.error("请求地址'{}', 未找到数据源", requestURI);
-            return R.fail(HttpStatus.HTTP_INTERNAL_ERROR, "未找到数据源，请联系管理员确认");
+            return R.fail(HttpStatus.HTTP_INTERNAL_ERROR, "数据库操作失败，请联系管理员");
         }
         log.error("请求地址'{}', Mybatis系统异常", requestURI, e);
-        return R.fail(HttpStatus.HTTP_INTERNAL_ERROR, e.getMessage());
+        return R.fail(HttpStatus.HTTP_INTERNAL_ERROR, "数据库操作失败，请联系管理员");
     }
 
     /**

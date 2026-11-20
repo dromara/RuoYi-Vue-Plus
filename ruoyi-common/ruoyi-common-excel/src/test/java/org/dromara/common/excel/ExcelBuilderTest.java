@@ -32,19 +32,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ExcelBuilderTest {
 
     /**
-     * 验证自定义导出失败时保留业务异常，其他异常使用固定提示并保留根因。
+     * 验证自定义导出不会把下层错误提示作为业务消息暴露。
      */
     @Test
-    @DisplayName("保留自定义导出的异常信息")
-    void shouldPreserveCustomExportExceptions() {
-        ServiceException businessFailure = new ServiceException("禁止导出", 403);
-        assertSame(businessFailure, assertThrows(ServiceException.class,
+    @DisplayName("隐藏自定义导出的内部异常信息")
+    void shouldHideCustomExportExceptions() {
+        ServiceException businessFailure = new ServiceException("internal table name", 403);
+        RuntimeException businessWrapped = assertThrows(RuntimeException.class,
             () -> ExcelBuilder.of(rows(), ExportRow.class).toStream(new ByteArrayOutputStream(), writer -> {
                 throw businessFailure;
-            })));
+            }));
+        assertEquals("导出Excel异常", businessWrapped.getMessage());
+        assertSame(businessFailure, businessWrapped.getCause());
 
         IllegalStateException systemFailure = new IllegalStateException("internal failure");
-        ServiceException exception = assertThrows(ServiceException.class,
+        RuntimeException exception = assertThrows(RuntimeException.class,
             () -> ExcelBuilder.of(rows(), ExportRow.class).toStream(new ByteArrayOutputStream(), writer -> {
                 throw systemFailure;
             }));

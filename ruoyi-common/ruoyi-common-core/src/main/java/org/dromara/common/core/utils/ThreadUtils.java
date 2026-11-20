@@ -25,7 +25,7 @@ public class ThreadUtils {
      * 批量执行任务，原样传递任务中的运行时异常，其他任务异常保留根因后包装。
      *
      * @param runnableList 任务列表
-     * @throws IllegalStateException 等待任务时线程被中断，中断标记会保留
+     * @throws RuntimeException 等待任务时线程被中断，中断标记会保留
      */
     public static void virtualInvokeAll(Runnable... runnableList) {
         List<Future<?>> callableList = new ArrayList<>();
@@ -38,7 +38,7 @@ public class ThreadUtils {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("线程执行被中断", e);
+            throw new RuntimeException("线程执行被中断", e);
         } catch (ExecutionException e) {
             Throwable cause = e.getCause() == null ? e : e.getCause();
             throw ExceptionUtil.wrapRuntime(cause);
@@ -64,7 +64,7 @@ public class ThreadUtils {
      * @param supplierList 任务列表
      * @param <T>          返回值类型
      * @return 按提交顺序返回的任务结果
-     * @throws IllegalStateException 等待任务时线程被中断，中断标记会保留
+     * @throws RuntimeException 等待任务时线程被中断，中断标记会保留
      */
     public static <T> List<T> virtualSubmitAll(Collection<? extends Supplier<T>> supplierList) {
         List<Future<T>> futureList = new ArrayList<>();
@@ -79,7 +79,7 @@ public class ThreadUtils {
             return resultList;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("线程执行被中断", e);
+            throw new RuntimeException("线程执行被中断", e);
         } catch (ExecutionException e) {
             Throwable cause = e.getCause() == null ? e : e.getCause();
             throw ExceptionUtil.wrapRuntime(cause);

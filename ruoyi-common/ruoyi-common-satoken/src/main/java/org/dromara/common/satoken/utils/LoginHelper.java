@@ -214,8 +214,15 @@ public class LoginHelper {
      * @return 用户类型
      */
     public static UserType getUserType() {
-        String loginType = StpUtil.getLoginIdAsString();
-        return UserType.getUserType(loginType);
+        String loginId = StpUtil.getLoginIdAsString();
+        int separatorIndex = loginId.lastIndexOf(LoginUser.LOGIN_ID_SEPARATOR);
+        if (separatorIndex < 0) {
+            separatorIndex = loginId.lastIndexOf(':');
+        }
+        if (separatorIndex <= 0) {
+            throw new RuntimeException("登录身份格式错误");
+        }
+        return UserType.getUserType(loginId.substring(0, separatorIndex));
     }
 
     /**

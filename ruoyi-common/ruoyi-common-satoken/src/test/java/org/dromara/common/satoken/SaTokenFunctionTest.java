@@ -2,14 +2,15 @@ package org.dromara.common.satoken;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.http.HttpStatus;
 import cn.hutool.extra.spring.SpringUtil;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.enums.UserType;
 import org.dromara.common.satoken.core.dao.PlusSaTokenDao;
 import org.dromara.common.satoken.core.service.SaPermissionImpl;
 import org.dromara.common.satoken.handler.SaTokenExceptionHandler;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.PermissionService;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.system.api.model.LoginUser;
@@ -116,6 +117,19 @@ class SaTokenFunctionTest {
         }
     }
 
+    @Test
+    @DisplayName("精确解析当前登录身份的用户类型")
+    void shouldResolveUserTypeFromLoginIdPrefix() {
+        try (var stp = mockStatic(StpUtil.class)) {
+            stp.when(StpUtil::getLoginIdAsString).thenReturn("sys_user-7", "app_user:9", "prefix_sys_user_suffix-7");
+
+            assertEquals(UserType.SYS_USER, LoginHelper.getUserType());
+            assertEquals(UserType.APP_USER, LoginHelper.getUserType());
+            assertEquals("用户类型无效", assertThrows(RuntimeException.class,
+                LoginHelper::getUserType).getMessage());
+        }
+    }
+
     /**
      * 验证查询其他登录对象时按登录 ID 提取用户 ID 并委托权限服务，格式错误时立即失败。
      */
@@ -133,13 +147,13 @@ class SaTokenFunctionTest {
 
             assertEquals(List.of("system:dept:list"), permission.getPermissionList("sys_user:9", "login"));
             assertEquals(List.of("system:dept:list"), permission.getPermissionList("sys_user-9", "login"));
-            assertThrows(ServiceException.class, () -> permission.getPermissionList("invalid", "login"));
+            assertThrows(RuntimeException.class, () -> permission.getPermissionList("invalid", "login"));
             verify(service, times(2)).getMenuPermission(9L);
         }
     }
 
     /**
-     * 验证系统未提供权限服务时返回明确业务错误，而不是空权限导致静默拒绝。
+     * 验证权限服务获取失败时保留根因，并由通用异常处理器隐藏内部配置。
      */
     @Test
     @DisplayName("缺少权限服务时明确失败")
@@ -150,10 +164,11 @@ class SaTokenFunctionTest {
             spring.when(() -> SpringUtil.getBean(PermissionService.class))
                 .thenThrow(new IllegalStateException("missing bean"));
 
-            ServiceException exception = assertThrows(ServiceException.class,
+            RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> new SaPermissionImpl().getRoleList("sys_user:9", "login"));
 
-            assertEquals("PermissionService 实现类不存在", exception.getMessage());
+            assertEquals("权限服务获取失败", exception.getMessage());
+            assertEquals("missing bean", exception.getCause().getMessage());
         }
     }
 }

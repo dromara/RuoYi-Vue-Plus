@@ -67,7 +67,7 @@ class LiteFlowComponentTest {
         ContextRequiredComponent present = spy(new ContextRequiredComponent());
         doReturn(new Object()).when(present).getFirstContextBean();
 
-        assertEquals("LiteFlow 上下文不能为空", assertThrows(ServiceException.class, missing::process).getMessage());
+        assertEquals("LiteFlow 上下文不能为空", assertThrows(RuntimeException.class, missing::process).getMessage());
         assertDoesNotThrow(present::process);
     }
 }

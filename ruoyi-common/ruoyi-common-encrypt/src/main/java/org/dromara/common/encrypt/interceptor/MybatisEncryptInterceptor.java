@@ -42,11 +42,29 @@ public class MybatisEncryptInterceptor implements Interceptor {
                 snapshots = encryptedFieldProcessor.encrypt(parameterObject);
             }
         }
+        Throwable failure = null;
         try {
             return invocation.proceed();
+        } catch (Throwable e) {
+            failure = e;
+            throw e;
         } finally {
+            Throwable restoreFailure = null;
             for (EncryptedFieldProcessor.FieldSnapshot snapshot : snapshots) {
-                snapshot.restore();
+                try {
+                    snapshot.restore();
+                } catch (Throwable e) {
+                    if (failure != null) {
+                        failure.addSuppressed(e);
+                    } else if (restoreFailure == null) {
+                        restoreFailure = e;
+                    } else {
+                        restoreFailure.addSuppressed(e);
+                    }
+                }
+            }
+            if (failure == null && restoreFailure != null) {
+                throw restoreFailure;
             }
         }
     }

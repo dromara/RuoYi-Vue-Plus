@@ -5,7 +5,6 @@ import com.yomahub.liteflow.flow.LiteflowResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 
 /**
@@ -25,7 +24,7 @@ public class LiteFlowUtils {
      */
     public static void execute(String chainId, Object context) {
         if (context == null) {
-            throw new ServiceException("LiteFlow 上下文不能为空");
+            throw new RuntimeException("LiteFlow 上下文不能为空");
         }
         LiteflowResponse response = SpringUtils.getBean(FlowExecutor.class).execute2Resp(chainId, null, context);
         if (!response.isSuccess()) {
@@ -35,7 +34,7 @@ public class LiteFlowUtils {
             if (cause instanceof RuntimeException runtimeException) {
                 throw runtimeException;
             }
-            throw new IllegalStateException("LiteFlow 链路执行失败", cause);
+            throw new RuntimeException("LiteFlow 链路执行失败", cause);
         }
     }
 

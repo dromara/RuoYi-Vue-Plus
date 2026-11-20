@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.regex.RegexValidator;
@@ -116,7 +115,7 @@ public class CaptchaController {
                 .send();
             RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         } catch (Exception e) {
-            throw ServiceException.wrap("发送邮箱验证码失败，请稍后重试", e);
+            throw new RuntimeException("发送邮箱验证码失败", e);
         }
     }
 

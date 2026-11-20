@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
                                                        HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
-        return R.fail(HttpStatus.HTTP_BAD_METHOD, e.getMessage());
+        return R.fail(HttpStatus.HTTP_BAD_METHOD, "请求方式不支持");
     }
 
     /**
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
     public R<Void> handleUnsupportedOperationException(UnsupportedOperationException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',不支持操作: {}", requestURI, e.getMessage());
-        return R.fail(e.getMessage());
+        return R.fail("不支持该操作");
     }
 
     /**
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
     public R<Void> handleUtilException(UtilException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',工具执行异常: {}", requestURI, e.getMessage(), e);
-        return R.fail(e.getMessage());
+        return R.fail("工具执行失败，请联系管理员");
     }
 
     /**
@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public R<Void> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
         log.error("请求地址'{}',参数校验异常: {}", request.getRequestURI(), e.getMessage());
-        return R.fail(e.getMessage());
+        return R.fail("请求参数不合法");
     }
 
     /**
@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidateException.class)
     public R<Void> handleValidateException(ValidateException e, HttpServletRequest request) {
         log.warn("请求地址'{}',参数校验异常: {}", request.getRequestURI(), e.getMessage());
-        return R.fail(e.getMessage());
+        return R.fail("请求参数不合法");
     }
 
     /**
@@ -160,7 +160,7 @@ public class GlobalExceptionHandler {
     public R<Void> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求参数类型不匹配'{}',发生系统异常.", requestURI);
-        return R.fail(String.format("请求参数类型不匹配，参数[%s]要求类型为：'%s'，但输入值为：'%s'", e.getName(), e.getRequiredType().getName(), e.getValue()));
+        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求参数类型不匹配");
     }
 
     /**
@@ -319,7 +319,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExpressionException.class)
     public R<Void> handleSpelException(ExpressionException e, HttpServletRequest request) {
         log.error("请求地址'{}'，SpEL解析异常: {}", request.getRequestURI(), e.getMessage());
-        return R.fail(HttpStatus.HTTP_INTERNAL_ERROR, "SpEL解析失败：" + e.getMessage());
+        return R.fail(HttpStatus.HTTP_INTERNAL_ERROR, "表达式处理失败，请联系管理员");
     }
 
 }

@@ -1,5 +1,7 @@
 package org.dromara.common.web;
 
+import cn.hutool.core.exceptions.UtilException;
+import cn.hutool.core.exceptions.ValidateException;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -178,7 +180,7 @@ class WebInfrastructureTest {
     }
 
     /**
-     * 验证参数类型不匹配异常会返回包含参数名、目标类型和原始值的可诊断消息。
+     * 验证参数类型不匹配时不回显 Java 类型和原始输入。
      */
     @Test
     @DisplayName("映射参数类型不匹配异常")
@@ -191,8 +193,8 @@ class WebInfrastructureTest {
         R<Void> result = new GlobalExceptionHandler().handleMethodArgumentTypeMismatchException(
             exception, request("GET", "/users/abc", null));
 
-        assertEquals(HttpStatus.ERROR, result.getCode());
-        assertEquals("请求参数类型不匹配，参数[userId]要求类型为：'java.lang.Long'，但输入值为：'abc'", result.getMsg());
+        assertEquals(400, result.getCode());
+        assertEquals("请求参数类型不匹配", result.getMsg());
     }
 
     /**
@@ -216,7 +218,7 @@ class WebInfrastructureTest {
         R<Void> spelResult = handler.handleSpelException(new ExpressionException("bad expression"), request);
 
         assertEquals(405, methodResult.getCode());
-        assertEquals("Method POST is not supported", methodResult.getMsg());
+        assertEquals("请求方式不支持", methodResult.getMsg());
         assertEquals(404, routeResult.getCode());
         assertEquals("请求地址不存在", routeResult.getMsg());
         assertEquals(400, jsonResult.getCode());
@@ -224,7 +226,24 @@ class WebInfrastructureTest {
         assertEquals(400, bodyResult.getCode());
         assertEquals("请求参数格式错误", bodyResult.getMsg());
         assertEquals(500, spelResult.getCode());
-        assertEquals("SpEL解析失败：bad expression", spelResult.getMsg());
+        assertEquals("表达式处理失败，请联系管理员", spelResult.getMsg());
+    }
+
+    @Test
+    @DisplayName("隐藏工具与参数异常的内部消息")
+    void shouldHideInternalExceptionMessages() {
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+        MockHttpServletRequest request = request("POST", "/export", null);
+        String secret = "jdbc:internal-db";
+
+        assertEquals("不支持该操作", handler.handleUnsupportedOperationException(
+            new UnsupportedOperationException(secret), request).getMsg());
+        assertEquals("工具执行失败，请联系管理员", handler.handleUtilException(
+            new UtilException(secret), request).getMsg());
+        assertEquals("请求参数不合法", handler.handleIllegalArgumentException(
+            new IllegalArgumentException(secret), request).getMsg());
+        assertEquals("请求参数不合法", handler.handleValidateException(
+            new ValidateException(secret), request).getMsg());
     }
 
     /**

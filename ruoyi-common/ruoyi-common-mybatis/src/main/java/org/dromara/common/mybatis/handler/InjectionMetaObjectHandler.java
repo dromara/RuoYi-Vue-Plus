@@ -65,7 +65,7 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 this.strictInsertFill(metaObject, "updateTime", Date.class, legacyDate);
             }
         } catch (Exception e) {
-            throw new IllegalStateException("新增数据自动填充失败", e);
+            throw new RuntimeException("新增数据自动填充失败", e);
         }
     }
 
@@ -91,7 +91,7 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 this.strictUpdateFill(metaObject, "updateTime", Date.class, new Date());
             }
         } catch (Exception e) {
-            throw new IllegalStateException("更新数据自动填充失败", e);
+            throw new RuntimeException("更新数据自动填充失败", e);
         }
     }
 

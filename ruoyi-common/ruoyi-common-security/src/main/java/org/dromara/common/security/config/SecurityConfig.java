@@ -108,7 +108,7 @@ public class SecurityConfig implements WebMvcConfigurer {
             .setError(e -> {
                 HttpServletResponse response = ServletUtils.getResponse();
                 response.setContentType(SaTokenConsts.CONTENT_TYPE_APPLICATION_JSON);
-                return SaResult.error(e.getMessage()).setCode(HttpStatus.UNAUTHORIZED);
+                return SaResult.error("认证失败，无法访问系统资源").setCode(HttpStatus.UNAUTHORIZED);
             });
     }
 

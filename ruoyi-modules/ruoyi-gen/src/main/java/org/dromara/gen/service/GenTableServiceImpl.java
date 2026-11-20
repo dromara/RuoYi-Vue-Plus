@@ -280,7 +280,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 }
             }
         } catch (Exception e) {
-            throw ServiceException.wrap("导入表结构失败", e);
+            throw new RuntimeException("导入表结构失败", e);
         }
     }
 
@@ -342,7 +342,7 @@ public class GenTableServiceImpl implements IGenTableService {
         try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
             writeCodeToZip(tableId, zip);
         } catch (IOException e) {
-            throw new ServiceException("生成代码压缩包失败", e);
+            throw new RuntimeException("生成代码压缩包失败", e);
         }
         return outputStream.toByteArray();
     }
@@ -413,7 +413,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 writeCodeToZip(Long.parseLong(tableId), zip);
             }
         } catch (IOException e) {
-            throw new ServiceException("生成代码压缩包失败", e);
+            throw new RuntimeException("生成代码压缩包失败", e);
         }
         return outputStream.toByteArray();
     }
@@ -436,7 +436,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 zip.flush();
                 zip.closeEntry();
             } catch (IOException e) {
-                throw new ServiceException("生成表【" + table.getTableName() + "】代码压缩条目失败", e);
+                throw new RuntimeException("生成代码压缩包失败", e);
             }
         }
     }

@@ -68,7 +68,8 @@ public class XcxAuthStrategy implements IAuthStrategy {
             // 微信小程序只有关联到微信开放平台下之后才能获取到 unionId，因此unionId不一定能返回。
             unionId = token.getUnionId();
         } else {
-            throw new ServiceException(resp.getMsg());
+            log.warn("小程序授权失败: {}", resp.getMsg());
+            throw new ServiceException("小程序授权失败，请重新登录");
         }
         // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
         SysUserVo user = loadUserByOpenid(openid);

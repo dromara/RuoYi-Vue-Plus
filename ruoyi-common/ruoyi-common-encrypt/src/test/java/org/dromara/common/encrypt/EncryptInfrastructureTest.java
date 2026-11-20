@@ -61,7 +61,7 @@ class EncryptInfrastructureTest {
         Invocation invocation = new Invocation(handler,
             ParameterHandler.class.getMethod("setParameters", PreparedStatement.class), new Object[]{statement});
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
+        RuntimeException exception = assertThrows(RuntimeException.class,
             () -> new MybatisEncryptInterceptor(processor).intercept(invocation));
 
         assertSame(cause, exception.getCause());
@@ -82,7 +82,7 @@ class EncryptInfrastructureTest {
         IllegalArgumentException cause = new IllegalArgumentException("invalid ciphertext");
         doThrow(cause).when(manager).decrypt(any(), any());
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
+        RuntimeException exception = assertThrows(RuntimeException.class,
             () -> processor.decrypt(new TestSecretEntity("ciphertext")));
 
         assertSame(cause, exception.getCause());

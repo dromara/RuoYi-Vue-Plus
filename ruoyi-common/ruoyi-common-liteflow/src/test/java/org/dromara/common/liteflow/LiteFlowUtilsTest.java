@@ -3,7 +3,6 @@ package org.dromara.common.liteflow;
 import cn.hutool.extra.spring.SpringUtil;
 import com.yomahub.liteflow.core.FlowExecutor;
 import com.yomahub.liteflow.flow.LiteflowResponse;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.liteflow.utils.LiteFlowUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,12 +41,12 @@ class LiteFlowUtilsTest {
     }
 
     /**
-     * 验证空上下文在调用引擎前被拒绝，并返回统一业务异常。
+     * 验证空上下文在调用引擎前被拒绝，并作为内部异常处理。
      */
     @Test
     @DisplayName("拒绝空流程上下文")
     void shouldRejectNullContextBeforeCallingExecutor() {
-        ServiceException exception = assertThrows(ServiceException.class,
+        RuntimeException exception = assertThrows(RuntimeException.class,
             () -> LiteFlowUtils.execute("demo-chain", null));
 
         assertEquals("LiteFlow 上下文不能为空", exception.getMessage());
@@ -99,9 +98,9 @@ class LiteFlowUtilsTest {
         when(flowExecutor.execute2Resp(eq("empty-chain"), isNull(), any(Object.class)))
             .thenReturn(emptyResponse);
 
-        IllegalStateException checkedException = assertThrows(IllegalStateException.class,
+        RuntimeException checkedException = assertThrows(RuntimeException.class,
             () -> LiteFlowUtils.execute("checked-chain", context));
-        IllegalStateException emptyException = assertThrows(IllegalStateException.class,
+        RuntimeException emptyException = assertThrows(RuntimeException.class,
             () -> LiteFlowUtils.execute("empty-chain", context));
 
         assertEquals("LiteFlow 链路执行失败", checkedException.getMessage());

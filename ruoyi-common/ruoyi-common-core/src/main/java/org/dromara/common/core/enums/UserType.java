@@ -2,8 +2,6 @@ package org.dromara.common.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.core.utils.StringUtils;
 
 /**
  * 用户类型
@@ -37,10 +35,10 @@ public enum UserType {
      */
     public static UserType getUserType(String str) {
         for (UserType value : values()) {
-            if (StringUtils.contains(str, value.getUserType())) {
+            if (value.getUserType().equals(str)) {
                 return value;
             }
         }
-        throw new ServiceException("用户类型不支持：{}", str);
+        throw new RuntimeException("用户类型无效");
     }
 }

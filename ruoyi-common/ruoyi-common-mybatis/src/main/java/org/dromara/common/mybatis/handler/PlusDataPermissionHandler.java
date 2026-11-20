@@ -13,7 +13,6 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -73,7 +72,7 @@ public class PlusDataPermissionHandler {
         try {
             DataPermission dataPermission = getDataPermission();
             if (dataPermission == null) {
-                throw new ServiceException("数据权限上下文缺失，请检查 @DataPermission 注解处理生命周期");
+                throw new RuntimeException("数据权限上下文缺失，请检查 @DataPermission 注解处理生命周期");
             }
             LoginUser currentUser = currentUser();
             // 如果是超级管理员或租户管理员，则不过滤数据
@@ -94,7 +93,7 @@ public class PlusDataPermissionHandler {
                 return parenthesis;
             }
         } catch (JSQLParserException e) {
-            throw new IllegalStateException("数据权限解析失败", e);
+            throw new RuntimeException("数据权限解析失败", e);
         }
     }
 
@@ -104,7 +103,7 @@ public class PlusDataPermissionHandler {
      * @param dataPermission 数据权限注解
      * @param isSelect       标志当前操作是否为查询操作，查询操作和更新或删除操作在处理过滤条件时会有不同的处理方式
      * @return 构建的数据过滤条件的 SQL 语句
-     * @throws ServiceException 如果角色的数据范围异常或者 key 与 value 的长度不匹配，则抛出 ServiceException 异常
+     * @throws RuntimeException 数据权限配置或角色数据范围异常
      */
     private String buildDataFilter(DataPermission dataPermission, LoginUser user, boolean isSelect) {
         // 更新或删除需满足所有条件
@@ -130,7 +129,7 @@ public class PlusDataPermissionHandler {
         List<String> keys = new ArrayList<>();
         for (DataColumn dataColumn : dataPermission.value()) {
             if (dataColumn.key().length != dataColumn.value().length) {
-                throw new ServiceException("角色数据范围异常 => key与value长度不匹配");
+                throw new RuntimeException("角色数据范围配置异常");
             }
             // 设置注解变量 key 为表达式变量 value 为变量值
             for (int i = 0; i < dataColumn.key().length; i++) {
@@ -144,7 +143,7 @@ public class PlusDataPermissionHandler {
             // 获取角色权限泛型
             DataScopeType type = DataScopeType.findCode(role.getDataScope());
             if (ObjectUtil.isNull(type)) {
-                throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
+                throw new RuntimeException("角色数据范围配置异常: " + role.getDataScope());
             }
             // 全部数据权限直接返回
             if (type == DataScopeType.ALL) {

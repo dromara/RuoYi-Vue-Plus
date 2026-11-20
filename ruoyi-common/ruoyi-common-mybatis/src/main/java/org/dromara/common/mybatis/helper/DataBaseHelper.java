@@ -44,7 +44,7 @@ public class DataBaseHelper {
      * 最后调用 DataBaseType.find 方法将数据库名称转换为对应的枚举类型
      *
      * @return 当前数据库对应的 DataBaseType 枚举，找不到时默认返回 MY_SQL
-     * @throws IllegalStateException 获取数据库连接或元数据失败
+     * @throws RuntimeException 获取数据库连接或元数据失败
      */
     public static DataBaseType getDataBaseType() {
         DataSource dataSource = DS.determineDataSource();
@@ -56,7 +56,7 @@ public class DataBaseHelper {
                 String databaseProductName = metaData.getDatabaseProductName();
                 return DataBaseType.find(databaseProductName);
             } catch (SQLException e) {
-                throw new IllegalStateException("获取数据库类型失败", e);
+                throw new RuntimeException("获取数据库类型失败", e);
             }
         });
     }
@@ -66,7 +66,7 @@ public class DataBaseHelper {
      *
      * @param dsName 数据源名称
      * @return 指定数据库对应的 DataBaseType 枚举，找不到时默认返回 MY_SQL
-     * @throws IllegalStateException 获取数据库连接或元数据失败
+     * @throws RuntimeException 获取数据库连接或元数据失败
      */
     public static DataBaseType getDataBaseType(String dsName) {
         DataSource dataSource = DS.getDataSource(dsName);
@@ -76,7 +76,7 @@ public class DataBaseHelper {
                 String databaseProductName = metaData.getDatabaseProductName();
                 return DataBaseType.find(databaseProductName);
             } catch (SQLException e) {
-                throw new IllegalStateException("获取数据库类型失败", e);
+                throw new RuntimeException("获取数据库类型失败", e);
             }
         });
     }
