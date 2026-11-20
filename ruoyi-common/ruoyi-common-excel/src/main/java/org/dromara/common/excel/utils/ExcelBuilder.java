@@ -423,10 +423,8 @@ public final class ExcelBuilder<T> {
     public void toStream(OutputStream outputStream, Consumer<ExcelWriterWrapper<T>> consumer) {
         try (ExcelWriter writer = createWriter(outputStream)) {
             consumer.accept(ExcelWriterWrapper.of(writer));
-        } catch (ServiceException e) {
-            throw e;
         } catch (Exception e) {
-            throw new ServiceException("导出Excel异常", e);
+            throw ServiceException.wrap("导出Excel异常", e);
         }
     }
 
@@ -585,10 +583,8 @@ public final class ExcelBuilder<T> {
             copyOptionsTo(builder);
             builder.toStream(bos);
             return bos.toByteArray();
-        } catch (ServiceException e) {
-            throw e;
         } catch (Exception e) {
-            throw new ServiceException(exportSheetName + "Excel生成失败", e);
+            throw ServiceException.wrap(exportSheetName + "Excel生成失败", e);
         }
     }
 

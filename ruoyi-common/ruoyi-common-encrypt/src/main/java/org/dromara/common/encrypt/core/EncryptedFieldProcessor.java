@@ -3,7 +3,6 @@ package org.dromara.common.encrypt.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -13,7 +12,6 @@ import java.util.*;
  *
  * @author Lion Li
  */
-@Slf4j
 public class EncryptedFieldProcessor {
 
     private final EncryptorManager encryptorManager;
@@ -31,21 +29,32 @@ public class EncryptedFieldProcessor {
     }
 
     /**
-     * 加密对象字段，并返回原始字段快照。
+     * 加密对象字段，并返回原始字段快照；失败时恢复已修改字段并中止处理。
      *
      * @param sourceObject 待加密对象
      * @return 原始字段快照
      */
     public List<FieldSnapshot> encrypt(Object sourceObject) {
         List<FieldSnapshot> snapshots = new ArrayList<>();
-        handle(sourceObject, Collections.newSetFromMap(new IdentityHashMap<>()), (target, field, value) -> {
-            String encrypt = encryptorManager.encrypt(value, contextFactory.create(field));
-            if (!Objects.equals(value, encrypt)) {
-                snapshots.add(new FieldSnapshot(target, field, value));
-                field.set(target, encrypt);
+        try {
+            handle(sourceObject, Collections.newSetFromMap(new IdentityHashMap<>()), (target, field, value) -> {
+                String encrypt = encryptorManager.encrypt(value, contextFactory.create(field));
+                if (!Objects.equals(value, encrypt)) {
+                    snapshots.add(new FieldSnapshot(target, field, value));
+                    field.set(target, encrypt);
+                }
+            });
+            return snapshots;
+        } catch (RuntimeException e) {
+            for (FieldSnapshot snapshot : snapshots.reversed()) {
+                try {
+                    snapshot.restore();
+                } catch (RuntimeException restoreException) {
+                    e.addSuppressed(restoreException);
+                }
             }
-        });
-        return snapshots;
+            throw e;
+        }
     }
 
     /**
@@ -93,7 +102,7 @@ public class EncryptedFieldProcessor {
                 }
             }
         } catch (Exception e) {
-            log.error("处理加密字段时出错", e);
+            throw new IllegalStateException("处理加密字段失败", e);
         }
     }
 
@@ -126,7 +135,7 @@ public class EncryptedFieldProcessor {
             try {
                 field.set(target, value);
             } catch (IllegalAccessException e) {
-                log.error("恢复加密字段时出错", e);
+                throw new IllegalStateException("恢复加密字段失败", e);
             }
         }
     }

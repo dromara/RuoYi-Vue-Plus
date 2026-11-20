@@ -4,7 +4,6 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.lionsoul.ip2region.service.Config;
 import org.lionsoul.ip2region.service.Ip2Region;
@@ -80,7 +79,7 @@ public class RegionUtils {
             RegionUtils.ip2Region = Ip2Region.create(v4Config, v6Config);
             log.debug("IP工具初始化成功，加载IP地址库数据成功！");
         } catch (Exception e) {
-            throw new ServiceException("RegionUtils初始化失败，原因：{}", e.getMessage());
+            throw new IllegalStateException("IP地址库初始化失败", e);
         }
     }
 
@@ -97,7 +96,7 @@ public class RegionUtils {
             }
             return StringUtils.replace(region, "0", UNKNOWN_ADDRESS);
         } catch (Exception e) {
-            log.error("IP地址离线获取城市异常 {}", ipString);
+            log.error("IP地址离线获取城市异常 {}", ipString, e);
             return UNKNOWN_ADDRESS;
         }
 
@@ -116,7 +115,7 @@ public class RegionUtils {
             }
             return StringUtils.replace(region, "0", UNKNOWN_ADDRESS);
         } catch (Exception e) {
-            log.error("IP地址离线获取城市异常 {}", Util.ipToString(ipBytes));
+            log.error("IP地址离线获取城市异常 {}", Util.ipToString(ipBytes), e);
             return UNKNOWN_ADDRESS;
         }
     }

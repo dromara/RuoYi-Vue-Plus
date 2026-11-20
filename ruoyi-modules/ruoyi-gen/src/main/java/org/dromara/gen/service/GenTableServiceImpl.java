@@ -280,8 +280,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 }
             }
         } catch (Exception e) {
-            log.error("导入失败", e);
-            throw new ServiceException("导入失败：" + e.getMessage());
+            throw ServiceException.wrap("导入表结构失败", e);
         }
     }
 
@@ -340,10 +339,10 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public byte[] downloadCode(Long tableId) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try(ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+        try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
             writeCodeToZip(tableId, zip);
         } catch (IOException e) {
-            log.error("渲染模板失败，Zip输出流IO异常。", e);
+            throw new ServiceException("生成代码压缩包失败", e);
         }
         return outputStream.toByteArray();
     }
@@ -409,12 +408,12 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public byte[] downloadCode(String[] tableIds) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try(ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+        try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
             for (String tableId : tableIds) {
                 writeCodeToZip(Long.parseLong(tableId), zip);
             }
         } catch (IOException e) {
-            log.error("渲染模板失败，Zip输出流IO异常。", e);
+            throw new ServiceException("生成代码压缩包失败", e);
         }
         return outputStream.toByteArray();
     }
@@ -437,7 +436,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 zip.flush();
                 zip.closeEntry();
             } catch (IOException e) {
-                log.error("渲染模板失败，表名：{}", table.getTableName(), e);
+                throw new ServiceException("生成表【" + table.getTableName() + "】代码压缩条目失败", e);
             }
         }
     }

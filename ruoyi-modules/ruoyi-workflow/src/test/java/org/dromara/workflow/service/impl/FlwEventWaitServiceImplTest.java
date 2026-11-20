@@ -1,6 +1,6 @@
 package org.dromara.workflow.service.impl;
 
-import org.dromara.common.core.exception.ServiceException;
+import org.dromara.warm.flow.core.exception.FlowException;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.constant.EventCons;
 import org.dromara.warm.flow.core.entity.EventWait;
@@ -26,26 +26,26 @@ class FlwEventWaitServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = {"WAITING", "RETRY", "RUNNING", "CANCELLED", "SUCCESS"})
     void recoveryRejectsRecordsThatAreNotDead(String status) {
-        ServiceException error = recover(status, EventType.TIMER_CATCH);
+        FlowException error = recover(status, EventType.TIMER_CATCH);
         assertTrue(error.getMessage().contains("DEAD"), error.getMessage());
     }
 
     @Test
     void deadTimerStartMustBeRebuiltFromDefinition() {
-        ServiceException error = recover(EventCons.STATUS_DEAD, EventType.TIMER_START);
+        FlowException error = recover(EventCons.STATUS_DEAD, EventType.TIMER_START);
         assertTrue(error.getMessage().contains("定时启动"), error.getMessage());
     }
 
     @Test
     void deadEventCannotResumeWithoutItsInstance() {
-        ServiceException error = recover(EventCons.STATUS_DEAD, EventType.MESSAGE_CATCH);
+        FlowException error = recover(EventCons.STATUS_DEAD, EventType.MESSAGE_CATCH);
         assertTrue(error.getMessage().contains("实例"), error.getMessage());
     }
 
     /**
      * 使用实际 2.1.1 门面和事件服务验证恢复约束，避免宿主绕过引擎直接改状态。
      */
-    private ServiceException recover(String status, EventType type) {
+    private FlowException recover(String status, EventType type) {
         EventWait wait = mock(EventWait.class);
         when(wait.getStatus()).thenReturn(status);
         when(wait.getEventType()).thenReturn(type.getValue());
@@ -56,7 +56,7 @@ class FlwEventWaitServiceImplTest {
         try (MockedStatic<FlowEngine> engine = mockStatic(FlowEngine.class)) {
             engine.when(FlowEngine::workflow).thenReturn(new WorkflowServiceImpl());
             engine.when(FlowEngine::eventWaitService).thenReturn(eventService);
-            return assertThrows(ServiceException.class, () -> new FlwEventWaitServiceImpl().revive(12L));
+            return assertThrows(FlowException.class, () -> new FlwEventWaitServiceImpl().revive(12L));
         }
     }
 }

@@ -141,7 +141,7 @@ public class EncryptorManager {
                 }
             }
         } catch (Exception e) {
-            log.error("初始化数据安全缓存时出错:{}", e.getMessage());
+            throw new IllegalStateException("初始化加密字段缓存失败", e);
         }
     }
 

@@ -69,6 +69,20 @@ public final class ServiceException extends RuntimeException {
     }
 
     /**
+     * 将操作失败转换为业务异常，已有业务异常原样返回，保留错误码、明细和异常链。
+     *
+     * @param message 非业务异常的对外提示
+     * @param cause   操作失败原因
+     * @return 原有业务异常，或携带提示和根因的新业务异常
+     */
+    public static ServiceException wrap(String message, Throwable cause) {
+        if (cause instanceof ServiceException serviceException) {
+            return serviceException;
+        }
+        return new ServiceException(message, cause);
+    }
+
+    /**
      * 使用占位符参数格式化错误消息。
      *
      * @param message 模板消息

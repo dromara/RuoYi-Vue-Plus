@@ -85,7 +85,7 @@ class LiteFlowUtilsTest {
     }
 
     /**
-     * 验证受检异常和无原因失败会转换为 ServiceException，并分别使用原因或响应消息。
+     * 验证受检异常和无根因的引擎失败作为系统异常上抛，不将内部消息作为业务提示。
      */
     @Test
     @DisplayName("转换受检异常和无原因失败")
@@ -99,13 +99,15 @@ class LiteFlowUtilsTest {
         when(flowExecutor.execute2Resp(eq("empty-chain"), isNull(), any(Object.class)))
             .thenReturn(emptyResponse);
 
-        ServiceException checkedException = assertThrows(ServiceException.class,
+        IllegalStateException checkedException = assertThrows(IllegalStateException.class,
             () -> LiteFlowUtils.execute("checked-chain", context));
-        ServiceException emptyException = assertThrows(ServiceException.class,
+        IllegalStateException emptyException = assertThrows(IllegalStateException.class,
             () -> LiteFlowUtils.execute("empty-chain", context));
 
-        assertEquals("checked failure", checkedException.getMessage());
-        assertEquals("response failure", emptyException.getMessage());
+        assertEquals("LiteFlow 链路执行失败", checkedException.getMessage());
+        assertSame(checked, checkedException.getCause());
+        assertEquals("LiteFlow 链路执行失败", emptyException.getMessage());
+        assertNull(emptyException.getCause());
     }
 
     /**

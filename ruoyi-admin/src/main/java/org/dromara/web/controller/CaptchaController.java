@@ -116,8 +116,7 @@ public class CaptchaController {
                 .send();
             RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         } catch (Exception e) {
-            log.error("验证码邮件发送异常 => {}", e.getMessage());
-            throw new ServiceException(e.getMessage());
+            throw ServiceException.wrap("发送邮箱验证码失败，请稍后重试", e);
         }
     }
 

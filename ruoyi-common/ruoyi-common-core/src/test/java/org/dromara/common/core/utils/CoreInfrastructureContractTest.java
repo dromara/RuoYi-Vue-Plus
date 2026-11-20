@@ -121,6 +121,23 @@ class CoreInfrastructureContractTest {
     }
 
     /**
+     * 验证统一包装原样返回业务异常，普通异常只包装一次且保留根因。
+     */
+    @Test
+    @DisplayName("统一包装保留业务异常和根因")
+    void shouldWrapServiceExceptionWithoutLosingMetadata() {
+        ServiceException businessFailure = new ServiceException("操作被拒绝", 403)
+            .setDetailMessage("状态不允许");
+        assertSame(businessFailure, ServiceException.wrap("操作失败", businessFailure));
+
+        IllegalStateException cause = new IllegalStateException("internal failure");
+        ServiceException wrapped = ServiceException.wrap("操作失败", cause);
+        assertEquals("操作失败", wrapped.getMessage());
+        assertSame(cause, wrapped.getCause());
+        assertSame(wrapped, ServiceException.wrap("再次包装", wrapped));
+    }
+
+    /**
      * 验证字典校验器按注解分隔符调用字典服务，并正确处理空值、缺失类型和未知字典值。
      */
     @Test

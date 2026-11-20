@@ -12,13 +12,19 @@ import org.dromara.common.encrypt.enums.EncodeType;
 import org.dromara.common.encrypt.filter.DecryptRequestBodyWrapper;
 import org.dromara.common.encrypt.filter.EncryptResponseBodyWrapper;
 import org.dromara.common.encrypt.properties.EncryptorProperties;
+import org.dromara.common.encrypt.interceptor.MybatisEncryptInterceptor;
 import org.dromara.common.encrypt.utils.EncryptUtils;
+import org.apache.ibatis.executor.parameter.ParameterHandler;
+import org.apache.ibatis.plugin.Invocation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +33,113 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @DisplayName("common-encrypt 基础设施单元测试")
 class EncryptInfrastructureTest {
+
+    /**
+     * 验证第二个对象加密失败后恢复第一个对象，且不继续向 JDBC 绑定参数。
+     */
+    @Test
+    @DisplayName("加密失败恢复明文并中止参数绑定")
+    void shouldRestoreFieldsAndStopBindingOnEncryptionFailure() throws Exception {
+        EncryptorManager manager = spy(new EncryptorManager(""));
+        EncryptedFieldProcessor processor = new EncryptedFieldProcessor(
+            manager, new EncryptContextFactory(new EncryptorProperties()));
+        IllegalArgumentException cause = new IllegalArgumentException("invalid encryption config");
+        doReturn("encrypted-first").when(manager).encrypt(eq("first"), any());
+        doThrow(cause).when(manager).encrypt(eq("second"), any());
+        TestSecretEntity first = new TestSecretEntity("first");
+        TestSecretEntity second = new TestSecretEntity("second");
+        ParameterHandler handler = mock(ParameterHandler.class);
+        when(handler.getParameterObject()).thenReturn(List.of(first, second));
+        PreparedStatement statement = mock(PreparedStatement.class);
+        Invocation invocation = new Invocation(handler,
+            ParameterHandler.class.getMethod("setParameters", PreparedStatement.class), new Object[]{statement});
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> new MybatisEncryptInterceptor(processor).intercept(invocation));
+
+        assertSame(cause, exception.getCause());
+        assertEquals("first", first.secret);
+        assertEquals("second", second.secret);
+        verify(handler, never()).setParameters(any());
+    }
+
+    /**
+     * 验证解密失败向上抛出，避免把未解密结果当作正常响应。
+     */
+    @Test
+    @DisplayName("解密失败保留根因")
+    void shouldPropagateDecryptionFailure() {
+        EncryptorManager manager = spy(new EncryptorManager(""));
+        EncryptedFieldProcessor processor = new EncryptedFieldProcessor(
+            manager, new EncryptContextFactory(new EncryptorProperties()));
+        IllegalArgumentException cause = new IllegalArgumentException("invalid ciphertext");
+        doThrow(cause).when(manager).decrypt(any(), any());
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> processor.decrypt(new TestSecretEntity("ciphertext")));
+
+        assertSame(cause, exception.getCause());
+    }
+
+    /**
+     * 验证 JDBC 参数绑定失败后仍恢复实体明文，并保留原始数据库异常。
+     */
+    @Test
+    @DisplayName("参数绑定失败后恢复加密字段")
+    void shouldRestoreFieldsAfterParameterBindingFailure() throws Exception {
+        EncryptedFieldProcessor processor = new EncryptedFieldProcessor(
+            new EncryptorManager(""), new EncryptContextFactory(new EncryptorProperties()));
+        TestSecretEntity entity = new TestSecretEntity("original");
+        ParameterHandler handler = mock(ParameterHandler.class);
+        when(handler.getParameterObject()).thenReturn(entity);
+        SQLException cause = new SQLException("binding failed");
+        doThrow(cause).when(handler).setParameters(any());
+        Invocation invocation = new Invocation(handler,
+            ParameterHandler.class.getMethod("setParameters", PreparedStatement.class),
+            new Object[]{mock(PreparedStatement.class)});
+
+        InvocationTargetException exception = assertThrows(InvocationTargetException.class,
+            () -> new MybatisEncryptInterceptor(processor).intercept(invocation));
+
+        assertSame(cause, exception.getCause());
+        assertEquals("original", entity.secret);
+    }
+
+    /**
+     * 验证恢复失败作为附加异常保留，并继续恢复其他字段，避免覆盖 JDBC 原始错误。
+     */
+    @Test
+    @DisplayName("字段恢复失败不覆盖参数绑定异常")
+    void shouldSuppressRestoreFailureAndContinueRestoring() throws Exception {
+        EncryptedFieldProcessor processor = mock(EncryptedFieldProcessor.class);
+        EncryptedFieldProcessor.FieldSnapshot first = mock(EncryptedFieldProcessor.FieldSnapshot.class);
+        EncryptedFieldProcessor.FieldSnapshot second = mock(EncryptedFieldProcessor.FieldSnapshot.class);
+        IllegalStateException restoreFailure = new IllegalStateException("restore failed");
+        doThrow(restoreFailure).when(second).restore();
+        when(processor.encrypt(any())).thenReturn(List.of(first, second));
+        ParameterHandler handler = mock(ParameterHandler.class);
+        when(handler.getParameterObject()).thenReturn(new Object());
+        SQLException cause = new SQLException("binding failed");
+        doThrow(cause).when(handler).setParameters(any());
+        Invocation invocation = new Invocation(handler,
+            ParameterHandler.class.getMethod("setParameters", PreparedStatement.class),
+            new Object[]{mock(PreparedStatement.class)});
+
+        InvocationTargetException exception = assertThrows(InvocationTargetException.class,
+            () -> new MybatisEncryptInterceptor(processor).intercept(invocation));
+
+        assertSame(cause, exception.getCause());
+        assertSame(restoreFailure, exception.getSuppressed()[0]);
+        verify(first).restore();
+        verify(second).restore();
+    }
 
     /**
      * 验证集合和 Map 中的加密字段会被处理，且字段快照能够恢复持久化前的原始值。

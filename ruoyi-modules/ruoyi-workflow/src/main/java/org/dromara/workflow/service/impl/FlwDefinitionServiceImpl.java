@@ -205,10 +205,8 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         }
         try {
             defService.removeDef((List<Long>) ids);
-        } catch (ServiceException e) {
-            throw e;
         } catch (Exception e) {
-            throw new ServiceException("删除流程定义失败", e);
+            throw ServiceException.wrap("删除流程定义失败", e);
         }
         return true;
     }

@@ -14,7 +14,6 @@ import org.dromara.warm.flow.core.dto.EventWaitQuery;
 import org.dromara.warm.flow.core.entity.EventWait;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.enums.EventType;
-import org.dromara.warm.flow.core.exception.FlowException;
 import org.dromara.warm.flow.core.utils.page.Page;
 import org.dromara.warm.flow.core.workflow.command.ReviveEventCommand;
 import org.dromara.warm.flow.core.workflow.context.WorkflowContext;
@@ -158,14 +157,9 @@ public class FlwEventWaitServiceImpl implements IFlwEventWaitService {
             ? bo.getBusinessId().trim()
             : String.valueOf(IdWorker.getId());
         WorkflowContext context = WorkflowContext.create(LoginHelper.getUserIdStr());
-        try {
-            Instance instance = FlowEngine.insService().startByTimer(finalBusinessId, wait.getDefinitionId()
-                , wait.getNodeCode(), bo.getVariables(), context);
-            return instance.getId();
-        } catch (FlowException e) {
-            log.warn("定时启动任务手动补发失败 waitId={} 原因={}", bo.getWaitId(), e.getMessage());
-            throw new ServiceException(e.getMessage());
-        }
+        Instance instance = FlowEngine.insService().startByTimer(finalBusinessId, wait.getDefinitionId(),
+            wait.getNodeCode(), bo.getVariables(), context);
+        return instance.getId();
     }
 
     /**
@@ -177,12 +171,7 @@ public class FlwEventWaitServiceImpl implements IFlwEventWaitService {
     public void revive(Long id) {
         ReviveEventCommand command = new ReviveEventCommand();
         command.setEventWaitId(id);
-        try {
-            FlowEngine.workflow().reviveEvent(command);
-        } catch (FlowException e) {
-            log.warn("事件等待记录复活失败 waitId={} 原因={}", id, e.getMessage());
-            throw new ServiceException(e.getMessage());
-        }
+        FlowEngine.workflow().reviveEvent(command);
     }
 
     /**

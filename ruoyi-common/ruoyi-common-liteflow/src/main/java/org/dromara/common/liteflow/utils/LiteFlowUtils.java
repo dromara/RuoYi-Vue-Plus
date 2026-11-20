@@ -35,7 +35,7 @@ public class LiteFlowUtils {
             if (cause instanceof RuntimeException runtimeException) {
                 throw runtimeException;
             }
-            throw new ServiceException(cause != null ? cause.getMessage() : response.getMessage());
+            throw new IllegalStateException("LiteFlow 链路执行失败", cause);
         }
     }
 
