@@ -4,8 +4,10 @@ import org.dromara.common.oss.enums.AccessPolicy;
 import org.dromara.common.oss.exception.S3StorageException;
 import org.dromara.common.oss.util.BucketUrlUtil;
 import org.dromara.common.oss.config.OssClientConfig;
+import org.dromara.common.oss.client.DefaultOssClientImpl;
 import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.regions.Region;
+import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -105,6 +107,24 @@ class OssFunctionTest {
         assertEquals(config.asyncExecutorConfig(), copied.asyncExecutorConfig());
         assertNotSame(config.accessControlPolicyConfig(), copied.accessControlPolicyConfig());
         assertNotSame(config.asyncExecutorConfig(), copied.asyncExecutorConfig());
+    }
+
+    @Test
+    @DisplayName("临时下载签名包含附件文件名")
+    void shouldSignAttachmentDispositionForDefaultAndBoundDomain() throws Exception {
+        for (String domain : new String[]{"", "https://files.example.com"}) {
+            OssClientConfig config = OssClientConfig.formProperties(properties("s3.example.com", domain, "images"));
+            try (DefaultOssClientImpl client = new DefaultOssClientImpl("test", config)) {
+                client.initialize();
+                String url = client.presignDownloadUrl("reports/1.pdf", Duration.ofMinutes(2), "报告.pdf");
+                assertTrue(url.contains("X-Amz-Signature="));
+                assertTrue(url.contains("response-content-disposition="));
+                assertTrue(url.contains("attachment"));
+                if (!domain.isEmpty()) {
+                    assertTrue(url.startsWith("https://files.example.com/reports/1.pdf?"));
+                }
+            }
+        }
     }
 
     /**

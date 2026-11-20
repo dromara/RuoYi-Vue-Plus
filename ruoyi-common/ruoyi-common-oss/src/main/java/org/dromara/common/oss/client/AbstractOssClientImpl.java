@@ -7,11 +7,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.oss.config.OssClientConfig;
 import org.dromara.common.oss.exception.S3StorageException;
 import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
-import org.dromara.common.oss.model.GetObjectResult;
-import org.dromara.common.oss.model.HandleAsyncResult;
-import org.dromara.common.oss.model.Options;
-import org.dromara.common.oss.model.PartUploadResult;
-import org.dromara.common.oss.model.PutObjectResult;
+import org.dromara.common.oss.model.*;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
@@ -903,6 +899,187 @@ public abstract class AbstractOssClientImpl implements OssClient {
     }
 
     /**
+     * 查询指定存储桶中的对象信息，不下载对象内容。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @return 对象信息
+     */
+    @Override
+    public ObjectInfoResult bucketHeadObject(String bucket, String key) {
+        try {
+            HeadObjectResponse response = s3AsyncClient.headObject(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+            ).join();
+            return new ObjectInfoResult(
+                key,
+                response.eTag(),
+                response.lastModified().atOffset(ZoneOffset.UTC).toLocalDateTime(),
+                response.contentLength(),
+                response.contentType(),
+                response.contentDisposition(),
+                response.metadata()
+            );
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 按前缀分页列举指定存储桶中的对象。
+     *
+     * @param bucket            存储桶名称
+     * @param prefix            对象键前缀，为 null 时列举全部对象
+     * @param continuationToken 上一页游标，为 null 时查询第一页
+     * @param maxKeys           每页最大对象数，为 null 时使用服务端默认值
+     * @return 当前页对象及下一页游标
+     */
+    @Override
+    public ObjectListResult bucketListObjects(String bucket, String prefix, String continuationToken, Integer maxKeys) {
+        try {
+            ListObjectsV2Response response = s3AsyncClient.listObjectsV2(builder ->
+                builder.bucket(bucket)
+                    .prefix(prefix)
+                    .continuationToken(continuationToken)
+                    .maxKeys(maxKeys)
+            ).join();
+            List<ObjectListResult.Item> items = response.contents().stream()
+                .map(item -> new ObjectListResult.Item(
+                    item.key(),
+                    item.eTag(),
+                    item.lastModified().atOffset(ZoneOffset.UTC).toLocalDateTime(),
+                    item.size()
+                ))
+                .toList();
+            return new ObjectListResult(items, response.nextContinuationToken());
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 将对象复制到目标存储桶。
+     *
+     * @param sourceBucket      源存储桶名称
+     * @param sourceKey         源对象键
+     * @param destinationBucket 目标存储桶名称
+     * @param destinationKey    目标对象键
+     * @return 目标对象的 ETag
+     */
+    @Override
+    public String bucketCopyObject(String sourceBucket, String sourceKey, String destinationBucket, String destinationKey) {
+        try {
+            CopyObjectResponse response = s3AsyncClient.copyObject(builder ->
+                builder.sourceBucket(sourceBucket)
+                    .sourceKey(sourceKey)
+                    .destinationBucket(destinationBucket)
+                    .destinationKey(destinationKey)
+            ).join();
+            return response.copyObjectResult().eTag();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 批量删除指定存储桶中的对象，并保留逐项失败信息。
+     *
+     * @param bucket 存储桶名称
+     * @param keys   对象键，数量为 1 到 1000 个
+     * @return 已删除的对象键及逐项失败信息
+     */
+    @Override
+    public DeleteObjectsResult bucketDeleteObjects(String bucket, Collection<String> keys) {
+        Assert.isTrue(keys != null && !keys.isEmpty() && keys.size() <= 1000, "批量删除需提供 1 到 1000 个对象键");
+        try {
+            List<ObjectIdentifier> objects = keys.stream()
+                .map(key -> ObjectIdentifier.builder().key(key).build())
+                .toList();
+            DeleteObjectsResponse response = s3AsyncClient.deleteObjects(builder ->
+                builder.bucket(bucket)
+                    .delete(delete -> delete.objects(objects))
+            ).join();
+            return new DeleteObjectsResult(
+                response.deleted().stream().map(DeletedObject::key).toList(),
+                response.errors().stream()
+                    .map(error -> new DeleteObjectsResult.Error(error.key(), error.code(), error.message()))
+                    .toList()
+            );
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 查询指定存储桶中对象的标签。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @return 对象标签
+     */
+    @Override
+    public Map<String, String> bucketGetObjectTags(String bucket, String key) {
+        try {
+            GetObjectTaggingResponse response = s3AsyncClient.getObjectTagging(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+            ).join();
+            Map<String, String> tags = new LinkedHashMap<>();
+            response.tagSet().forEach(tag -> tags.put(tag.key(), tag.value()));
+            return tags;
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 替换指定存储桶中对象的全部标签。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @param tags   新标签，为空时删除全部标签
+     */
+    @Override
+    public void bucketPutObjectTags(String bucket, String key, Map<String, String> tags) {
+        Objects.requireNonNull(tags, "tags");
+        if (tags.isEmpty()) {
+            bucketDeleteObjectTags(bucket, key);
+            return;
+        }
+        try {
+            List<Tag> tagSet = tags.entrySet().stream()
+                .map(entry -> Tag.builder().key(entry.getKey()).value(entry.getValue()).build())
+                .toList();
+            s3AsyncClient.putObjectTagging(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+                    .tagging(tagging -> tagging.tagSet(tagSet))
+            ).join();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 删除指定存储桶中对象的全部标签。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     */
+    @Override
+    public void bucketDeleteObjectTags(String bucket, String key) {
+        try {
+            s3AsyncClient.deleteObjectTagging(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+            ).join();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
      * 生成指定存储桶对象的下载预签名 URL。
      *
      * @param bucket      存储桶名称
@@ -919,6 +1096,39 @@ public abstract class AbstractOssClientImpl implements OssClient {
             return s3Presigner.presignGetObject(getObjectPresignRequestBuilder -> {
                     getObjectPresignRequestBuilder.signatureDuration(expiredTime)
                         .getObjectRequest(getObjectRequestBuilder -> getObjectRequestBuilder.bucket(bucket).key(key));
+                })
+                .url()
+                .toExternalForm();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 生成指定存储桶对象的附件下载预签名 URL。
+     *
+     * @param bucket      存储桶名称
+     * @param key         对象键
+     * @param expiredTime URL 有效期
+     * @param fileName    下载时使用的文件名
+     * @return 附件下载预签名 URL
+     */
+    @Override
+    public String bucketPresignDownloadUrl(String bucket, String key, Duration expiredTime, String fileName) {
+        Objects.requireNonNull(fileName, "fileName");
+        String disposition = "attachment; filename*=UTF-8''" + SdkHttpUtils.urlEncode(fileName);
+        if (useBucketBoundDomain(bucket)) {
+            return bucketBoundDomainPresignUrl(
+                SdkHttpMethod.GET, key, expiredTime, Collections.emptyMap(),
+                Map.of("response-content-disposition", disposition)
+            );
+        }
+        try {
+            return s3Presigner.presignGetObject(builder -> {
+                    builder.signatureDuration(expiredTime)
+                        .getObjectRequest(request -> request.bucket(bucket)
+                            .key(key)
+                            .responseContentDisposition(disposition));
                 })
                 .url()
                 .toExternalForm();
@@ -1307,6 +1517,85 @@ public abstract class AbstractOssClientImpl implements OssClient {
     }
 
     /**
+     * 查询默认存储桶中的对象信息。
+     *
+     * @param key 对象键
+     * @return 对象信息
+     */
+    @Override
+    public ObjectInfoResult headObject(String key) {
+        return bucketHeadObject(defaultBucket(), key);
+    }
+
+    /**
+     * 按前缀分页列举默认存储桶中的对象。
+     *
+     * @param prefix            对象键前缀，为 null 时列举全部对象
+     * @param continuationToken 上一页游标，为 null 时查询第一页
+     * @param maxKeys           每页最大对象数，为 null 时使用服务端默认值
+     * @return 当前页对象及下一页游标
+     */
+    @Override
+    public ObjectListResult listObjects(String prefix, String continuationToken, Integer maxKeys) {
+        return bucketListObjects(defaultBucket(), prefix, continuationToken, maxKeys);
+    }
+
+    /**
+     * 在默认存储桶中复制对象。
+     *
+     * @param sourceKey      源对象键
+     * @param destinationKey 目标对象键
+     * @return 目标对象的 ETag
+     */
+    @Override
+    public String copyObject(String sourceKey, String destinationKey) {
+        return bucketCopyObject(defaultBucket(), sourceKey, defaultBucket(), destinationKey);
+    }
+
+    /**
+     * 批量删除默认存储桶中的对象。
+     *
+     * @param keys 对象键，数量为 1 到 1000 个
+     * @return 已删除的对象键及逐项失败信息
+     */
+    @Override
+    public DeleteObjectsResult deleteObjects(Collection<String> keys) {
+        return bucketDeleteObjects(defaultBucket(), keys);
+    }
+
+    /**
+     * 查询默认存储桶中对象的标签。
+     *
+     * @param key 对象键
+     * @return 对象标签
+     */
+    @Override
+    public Map<String, String> getObjectTags(String key) {
+        return bucketGetObjectTags(defaultBucket(), key);
+    }
+
+    /**
+     * 替换默认存储桶中对象的全部标签。
+     *
+     * @param key  对象键
+     * @param tags 新标签，为空时删除全部标签
+     */
+    @Override
+    public void putObjectTags(String key, Map<String, String> tags) {
+        bucketPutObjectTags(defaultBucket(), key, tags);
+    }
+
+    /**
+     * 删除默认存储桶中对象的全部标签。
+     *
+     * @param key 对象键
+     */
+    @Override
+    public void deleteObjectTags(String key) {
+        bucketDeleteObjectTags(defaultBucket(), key);
+    }
+
+    /**
      * 生成默认存储桶对象的下载预签名 URL。
      *
      * @param key         对象键
@@ -1316,6 +1605,19 @@ public abstract class AbstractOssClientImpl implements OssClient {
     @Override
     public String presignGetUrl(String key, Duration expiredTime) {
         return bucketPresignGetUrl(defaultBucket(), key, expiredTime);
+    }
+
+    /**
+     * 生成默认存储桶对象的附件下载预签名 URL。
+     *
+     * @param key         对象键
+     * @param expiredTime URL 有效期
+     * @param fileName    下载时使用的文件名
+     * @return 附件下载预签名 URL
+     */
+    @Override
+    public String presignDownloadUrl(String key, Duration expiredTime, String fileName) {
+        return bucketPresignDownloadUrl(defaultBucket(), key, expiredTime, fileName);
     }
 
     /**

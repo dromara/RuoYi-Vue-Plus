@@ -4,6 +4,9 @@ import cn.hutool.core.util.IdUtil;
 import org.dromara.common.oss.config.OssClientConfig;
 import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import org.dromara.common.oss.model.GetObjectResult;
+import org.dromara.common.oss.model.ObjectInfoResult;
+import org.dromara.common.oss.model.ObjectListResult;
+import org.dromara.common.oss.model.DeleteObjectsResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
 import org.dromara.common.oss.model.Options;
 import org.dromara.common.oss.model.PartUploadResult;
@@ -496,6 +499,72 @@ public interface OssClient extends AutoCloseable {
     boolean bucketDelete(String bucket, String key);
 
     /**
+     * 查询指定存储桶中的对象信息，不下载对象内容。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @return 对象大小、内容类型、最后修改时间等信息；对象不存在时抛出存储异常
+     */
+    ObjectInfoResult bucketHeadObject(String bucket, String key);
+
+    /**
+     * 按前缀分页列举指定存储桶中的对象。
+     *
+     * @param bucket            存储桶名称
+     * @param prefix            对象键前缀，null 表示不按前缀筛选
+     * @param continuationToken 上一页返回的游标，null 表示第一页
+     * @param maxKeys           每页最多返回的对象数，null 使用服务端默认值
+     * @return 当前页对象摘要和下一页游标；游标为 null 表示没有下一页
+     */
+    ObjectListResult bucketListObjects(String bucket, String prefix, String continuationToken, Integer maxKeys);
+
+    /**
+     * 在对象存储服务中复制对象。
+     *
+     * @param sourceBucket      源存储桶名称
+     * @param sourceKey         源对象键
+     * @param destinationBucket 目标存储桶名称
+     * @param destinationKey    目标对象键
+     * @return 目标对象的 ETag
+     */
+    String bucketCopyObject(String sourceBucket, String sourceKey, String destinationBucket, String destinationKey);
+
+    /**
+     * 批量删除指定存储桶中的对象。请求成功不代表每个对象都删除成功。
+     *
+     * @param bucket 存储桶名称
+     * @param keys   待删除的对象键，数量须为 1 到 1000 个
+     * @return 已删除的对象键及逐项失败信息
+     */
+    DeleteObjectsResult bucketDeleteObjects(String bucket, Collection<String> keys);
+
+    /**
+     * 查询指定存储桶中对象的标签。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @return 标签键值对；没有标签时返回空 Map
+     */
+    Map<String, String> bucketGetObjectTags(String bucket, String key);
+
+    /**
+     * 替换指定存储桶中对象的全部标签。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     * @param tags   新标签集合；空 Map 删除全部标签，不接受 null
+     */
+    void bucketPutObjectTags(String bucket, String key, Map<String, String> tags);
+
+    /**
+     * 删除指定存储桶中对象的全部标签。
+     *
+     * @param bucket 存储桶名称
+     * @param key    对象键
+     */
+    void bucketDeleteObjectTags(String bucket, String key);
+
+    /**
      * 生成指定存储桶中文件下载的预签名 URL。
      *
      * @param bucket      存储桶名称
@@ -504,6 +573,17 @@ public interface OssClient extends AutoCloseable {
      * @return 预签名下载 URL
      */
     String bucketPresignGetUrl(String bucket, String key, Duration expiredTime);
+
+    /**
+     * 生成指定存储桶中对象的预签名 GET URL，要求存储服务以附件形式返回文件。
+     *
+     * @param bucket      存储桶名称
+     * @param key         对象键
+     * @param expiredTime URL 有效期
+     * @param fileName    下载时使用的文件名，不接受 null
+     * @return 带附件文件名响应参数的临时下载 URL
+     */
+    String bucketPresignDownloadUrl(String bucket, String key, Duration expiredTime, String fileName);
 
     /**
      * 生成指定存储桶中文件上传的预签名 URL。
@@ -706,6 +786,64 @@ public interface OssClient extends AutoCloseable {
     boolean delete(String key);
 
     /**
+     * 查询默认存储桶中的对象信息，不下载对象内容。
+     *
+     * @param key 对象键
+     * @return 对象信息；对象不存在时抛出存储异常
+     */
+    ObjectInfoResult headObject(String key);
+
+    /**
+     * 按前缀分页列举默认存储桶中的对象。
+     *
+     * @param prefix            对象键前缀，null 表示不按前缀筛选
+     * @param continuationToken 上一页返回的游标，null 表示第一页
+     * @param maxKeys           每页最多返回的对象数，null 使用服务端默认值
+     * @return 当前页对象摘要和下一页游标；游标为 null 表示没有下一页
+     */
+    ObjectListResult listObjects(String prefix, String continuationToken, Integer maxKeys);
+
+    /**
+     * 在默认存储桶中复制对象。
+     *
+     * @param sourceKey      源对象键
+     * @param destinationKey 目标对象键
+     * @return 目标对象的 ETag
+     */
+    String copyObject(String sourceKey, String destinationKey);
+
+    /**
+     * 批量删除默认存储桶中的对象。请求成功不代表每个对象都删除成功。
+     *
+     * @param keys 待删除的对象键，数量须为 1 到 1000 个
+     * @return 已删除的对象键及逐项失败信息
+     */
+    DeleteObjectsResult deleteObjects(Collection<String> keys);
+
+    /**
+     * 查询默认存储桶中对象的标签。
+     *
+     * @param key 对象键
+     * @return 标签键值对；没有标签时返回空 Map
+     */
+    Map<String, String> getObjectTags(String key);
+
+    /**
+     * 替换默认存储桶中对象的全部标签。
+     *
+     * @param key  对象键
+     * @param tags 新标签集合；空 Map 删除全部标签，不接受 null
+     */
+    void putObjectTags(String key, Map<String, String> tags);
+
+    /**
+     * 删除默认存储桶中对象的全部标签。
+     *
+     * @param key 对象键
+     */
+    void deleteObjectTags(String key);
+
+    /**
      * 生成默认存储桶中文件下载的预签名 URL。
      *
      * @param key         对象键
@@ -713,6 +851,16 @@ public interface OssClient extends AutoCloseable {
      * @return 预签名下载 URL
      */
     String presignGetUrl(String key, Duration expiredTime);
+
+    /**
+     * 生成默认存储桶中对象的预签名 GET URL，要求存储服务以附件形式返回文件。
+     *
+     * @param key         对象键
+     * @param expiredTime URL 有效期
+     * @param fileName    下载时使用的文件名，不接受 null
+     * @return 带附件文件名响应参数的临时下载 URL
+     */
+    String presignDownloadUrl(String key, Duration expiredTime, String fileName);
 
     /**
      * 生成默认存储桶中文件上传的预签名 URL。
