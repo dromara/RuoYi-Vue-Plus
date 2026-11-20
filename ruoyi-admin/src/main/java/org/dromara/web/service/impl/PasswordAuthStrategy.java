@@ -2,7 +2,6 @@ package org.dromara.web.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +40,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PasswordAuthStrategy implements IAuthStrategy {
 
+    /** 仅用于在用户不存在时执行同等成本的 BCrypt 校验。 */
+    private static final String DUMMY_PASSWORD_HASH = BCrypt.hashpw("unavailable-user");
+
     private final CaptchaProperties captchaProperties;
     private final SysLoginService loginService;
     private final SysUserMapper userMapper;
@@ -66,8 +68,7 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         if (captchaEnabled) {
             validateCaptcha(username, code, uuid);
         }
-        SysUserVo user = loadUserByUsername(username);
-        loginService.checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
+        SysUserVo user = verifyPassword(username, password);
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = loginService.buildLoginUser(user);
         loginUser.setClientKey(client.getClientKey());
@@ -105,21 +106,30 @@ public class PasswordAuthStrategy implements IAuthStrategy {
     }
 
     /**
-     * 按用户名加载可登录用户，并校验是否存在或被停用。
+     * 加载用户并校验密码，按原有重试策略记录失败。
      *
      * @param username 用户名
-     * @return 用户信息
+     * @param password 登录密码
+     * @return 认证通过的用户
      */
-    private SysUserVo loadUserByUsername(String username) {
+    SysUserVo verifyPassword(String username, String password) {
         SysUserVo user = userMapper.lambda()
             .eq(SysUser::getUserName, username)
             .voOne();
-        if (ObjectUtil.isNull(user)) {
+        if (user == null) {
             log.info("登录用户：{} 不存在.", username);
-            throw new UserException("user.not.exists", username);
         } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", username);
-            throw new UserException("user.blocked", username);
+        }
+        try {
+            loginService.checkLogin(LoginType.PASSWORD, username, () -> {
+                String hash = user == null ? DUMMY_PASSWORD_HASH : user.getPassword();
+                boolean matches = BCrypt.checkpw(password, hash);
+                return user == null || SystemConstants.DISABLE.equals(user.getStatus()) || !matches;
+            });
+        } catch (UserException e) {
+            // 失败计数和锁定原因已在 checkLogin 中记录，对外统一返回凭据错误。
+            throw new UserException("user.password.not.match");
         }
         return user;
     }
