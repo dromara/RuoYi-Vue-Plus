@@ -1,5 +1,6 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -12,6 +13,7 @@ import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.system.api.PostService;
+import org.dromara.system.api.domain.PostDTO;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.bo.SysPostBo;
@@ -272,6 +274,72 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
             .in(SysPost::getPostId, postIds)
             .list();
         return StreamUtils.toMap(list, SysPost::getPostId, SysPost::getPostName);
+    }
+
+    /**
+     * 根据岗位ID查询岗位信息
+     *
+     * @param postId 岗位ID
+     * @return 岗位信息，包含停用数据
+     */
+    @Override
+    public PostDTO selectById(Long postId) {
+        if (postId == null) {
+            return null;
+        }
+        SysPost post = postMapper.selectById(postId);
+        return BeanUtil.copyProperties(post, PostDTO.class);
+    }
+
+    /**
+     * 根据ID集合查询岗位
+     *
+     * @param postIds 岗位ID 集合
+     * @return 查询范围内的岗位列表
+     */
+    @Override
+    public List<PostDTO> selectListByIds(Collection<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) {
+            return List.of();
+        }
+        List<SysPost> list = postMapper.lambda()
+            .in(SysPost::getPostId, postIds)
+            .orderByAsc(SysPost::getPostSort, SysPost::getPostId)
+            .list();
+        return BeanUtil.copyToList(list, PostDTO.class);
+    }
+
+    /**
+     * 查询用户关联的岗位
+     *
+     * @param userId 用户ID
+     * @return 用户关联的岗位列表
+     */
+    @Override
+    public List<PostDTO> selectListByUserId(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        List<SysPostVo> list = postMapper.selectPostsByUserId(userId);
+        return BeanUtil.copyToList(list, PostDTO.class);
+    }
+
+    /**
+     * 根据部门ID查询岗位列表
+     *
+     * @param deptId 部门ID
+     * @return 指定部门的岗位列表
+     */
+    @Override
+    public List<PostDTO> selectListByDeptId(Long deptId) {
+        if (deptId == null) {
+            return List.of();
+        }
+        List<SysPost> list = postMapper.lambda()
+            .eq(SysPost::getDeptId, deptId)
+            .orderByAsc(SysPost::getPostSort, SysPost::getPostId)
+            .list();
+        return BeanUtil.copyToList(list, PostDTO.class);
     }
 
 }

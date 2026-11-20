@@ -2,6 +2,7 @@ package org.dromara.system.api;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
+import org.dromara.common.core.utils.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -96,5 +97,61 @@ public interface ConfigService {
      * @return 指定类型列表，如果配置为空或无法解析，返回空列表
      */
     <T> List<T> getConfigArray(String configKey, Class<T> clazz);
+
+    /**
+     * 根据参数 key 获取参数值，缺失或空白时使用默认值
+     *
+     * @param configKey    参数 key
+     * @param defaultValue 默认值
+     * @return 配置值或默认值
+     */
+    default String getConfigValue(String configKey, String defaultValue) {
+        return StringUtils.defaultIfBlank(getConfigValue(configKey), defaultValue);
+    }
+
+    /**
+     * 根据参数 key 获取布尔值，缺失或空白时使用默认值
+     * 非空值沿用 Hutool Convert 规则：true、yes、1 等为 true，其他字符串为 false
+     *
+     * @param configKey    参数 key
+     * @param defaultValue 默认值
+     * @return 转换后的配置值或默认值
+     */
+    default Boolean getConfigBool(String configKey, Boolean defaultValue) {
+        return Convert.toBool(getConfigValue(configKey, null), defaultValue);
+    }
+
+    /**
+     * 根据参数 key 获取整数值，缺失或转换失败时使用默认值
+     *
+     * @param configKey    参数 key
+     * @param defaultValue 默认值
+     * @return 转换后的配置值或默认值
+     */
+    default Integer getConfigInt(String configKey, Integer defaultValue) {
+        return Convert.toInt(getConfigValue(configKey, null), defaultValue);
+    }
+
+    /**
+     * 根据参数 key 获取长整型值，缺失或转换失败时使用默认值
+     *
+     * @param configKey    参数 key
+     * @param defaultValue 默认值
+     * @return 转换后的配置值或默认值
+     */
+    default Long getConfigLong(String configKey, Long defaultValue) {
+        return Convert.toLong(getConfigValue(configKey, null), defaultValue);
+    }
+
+    /**
+     * 根据参数 key 获取 BigDecimal 值，缺失或转换失败时使用默认值
+     *
+     * @param configKey    参数 key
+     * @param defaultValue 默认值
+     * @return 转换后的配置值或默认值
+     */
+    default BigDecimal getConfigDecimal(String configKey, BigDecimal defaultValue) {
+        return Convert.toBigDecimal(getConfigValue(configKey, null), defaultValue);
+    }
 
 }

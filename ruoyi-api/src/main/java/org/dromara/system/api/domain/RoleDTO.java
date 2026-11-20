@@ -38,4 +38,9 @@ public class RoleDTO implements Serializable {
      */
     private String dataScope;
 
+    /**
+     * 角色状态（0正常 1停用）
+     */
+    private String status;
+
 }

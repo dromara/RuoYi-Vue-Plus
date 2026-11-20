@@ -437,4 +437,79 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         return StreamUtils.toMap(list, SysDept::getDeptId, SysDept::getDeptName);
     }
 
+    /**
+     * 根据部门ID查询部门信息
+     *
+     * @param deptId 部门ID
+     * @return 部门信息
+     */
+    @Override
+    public DeptDTO selectById(Long deptId) {
+        if (deptId == null) {
+            return null;
+        }
+        SysDeptVo dept = SpringUtils.getAopProxy(this).selectDeptById(deptId);
+        return BeanUtil.copyProperties(dept, DeptDTO.class);
+    }
+
+    /**
+     * 根据ID集合查询部门
+     *
+     * @param deptIds 部门ID 集合
+     * @return 查询范围内的部门列表
+     */
+    @Override
+    public List<DeptDTO> selectListByIds(Collection<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return List.of();
+        }
+        List<SysDept> list = deptMapper.lambda()
+            .select(SysDept::getDeptId, SysDept::getDeptName, SysDept::getParentId,
+                SysDept::getAncestors, SysDept::getDeptCategory)
+            .in(SysDept::getDeptId, deptIds)
+            .list();
+        return BeanUtil.copyToList(list, DeptDTO.class);
+    }
+
+    /**
+     * 查询所有层级的正常状态子部门ID，不包含自身
+     *
+     * @param deptId 部门ID
+     * @return 数据权限范围内的正常状态子部门ID
+     */
+    @Override
+    public List<Long> selectChildDeptIds(Long deptId) {
+        if (deptId == null) {
+            return List.of();
+        }
+        List<SysDeptVo> list = deptMapper.selectDeptList(deptMapper.lambda()
+            .select(SysDept::getDeptId)
+            .eq(SysDept::getStatus, SystemConstants.NORMAL)
+            .findInSet(deptId, SysDept::getAncestors)
+            .orderByAsc(SysDept::getAncestors, SysDept::getParentId, SysDept::getOrderNum, SysDept::getDeptId)
+            .build());
+        return StreamUtils.toList(list, SysDeptVo::getDeptId);
+    }
+
+    /**
+     * 查询本部门及所有层级的正常状态子部门ID
+     *
+     * @param deptId 部门ID
+     * @return 数据权限范围内的正常状态部门ID
+     */
+    @Override
+    public List<Long> selectDeptAndChildIds(Long deptId) {
+        if (deptId == null) {
+            return List.of();
+        }
+        List<SysDeptVo> list = deptMapper.selectDeptList(deptMapper.lambda()
+            .select(SysDept::getDeptId)
+            .eq(SysDept::getStatus, SystemConstants.NORMAL)
+            .and(query -> query.eq(SysDept::getDeptId, deptId)
+                .or().findInSet(deptId, SysDept::getAncestors))
+            .orderByAsc(SysDept::getAncestors, SysDept::getParentId, SysDept::getOrderNum, SysDept::getDeptId)
+            .build());
+        return StreamUtils.toList(list, SysDeptVo::getDeptId);
+    }
+
 }

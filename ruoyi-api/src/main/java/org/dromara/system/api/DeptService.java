@@ -44,4 +44,36 @@ public interface DeptService {
      */
     Map<Long, String> selectDeptNamesByIds(Collection<Long> deptIds);
 
+    /**
+     * 根据ID查询部门
+     *
+     * @param deptId 部门ID
+     * @return 部门信息
+     */
+    DeptDTO selectById(Long deptId);
+
+    /**
+     * 根据ID集合查询部门
+     *
+     * @param deptIds 部门ID 集合
+     * @return 查询范围内的部门列表
+     */
+    List<DeptDTO> selectListByIds(Collection<Long> deptIds);
+
+    /**
+     * 查询所有层级的正常状态子部门ID，不包含自身
+     *
+     * @param deptId 部门ID
+     * @return 数据权限范围内的正常状态子部门ID
+     */
+    List<Long> selectChildDeptIds(Long deptId);
+
+    /**
+     * 查询本部门及所有层级的正常状态子部门ID
+     *
+     * @param deptId 部门ID
+     * @return 数据权限范围内的正常状态部门ID
+     */
+    List<Long> selectDeptAndChildIds(Long deptId);
+
 }

@@ -20,6 +20,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.RoleService;
+import org.dromara.system.api.domain.RoleDTO;
 import org.dromara.system.api.model.LoginUser;
 import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysRoleDept;
@@ -615,6 +616,55 @@ public class SysRoleServiceImpl implements ISysRoleService, RoleService {
             .in(SysRole::getRoleId, roleIds)
             .list();
         return StreamUtils.toMap(list, SysRole::getRoleId, SysRole::getRoleName);
+    }
+
+    /**
+     * 根据角色ID查询角色信息
+     *
+     * @param roleId 角色ID
+     * @return 角色信息
+     */
+    @Override
+    public RoleDTO selectById(Long roleId) {
+        if (roleId == null) {
+            return null;
+        }
+        SysRoleVo role = roleMapper.selectRoleById(roleId);
+        return BeanUtil.copyProperties(role, RoleDTO.class);
+    }
+
+    /**
+     * 根据ID集合查询角色
+     *
+     * @param roleIds 角色ID 集合
+     * @return 查询范围内的角色列表
+     */
+    @Override
+    public List<RoleDTO> selectListByIds(Collection<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return List.of();
+        }
+        List<SysRoleVo> list = roleMapper.selectRoleList(roleMapper.lambda()
+            .select(SysRole::getRoleId, SysRole::getRoleName, SysRole::getRoleKey,
+                SysRole::getDataScope, SysRole::getStatus)
+            .in(SysRole::getRoleId, roleIds)
+            .build());
+        return BeanUtil.copyToList(list, RoleDTO.class);
+    }
+
+    /**
+     * 查询用户关联的角色
+     *
+     * @param userId 用户ID
+     * @return 用户关联的角色列表
+     */
+    @Override
+    public List<RoleDTO> selectListByUserId(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        List<SysRoleVo> list = selectRolesByUserId(userId);
+        return BeanUtil.copyToList(list, RoleDTO.class);
     }
 
 }

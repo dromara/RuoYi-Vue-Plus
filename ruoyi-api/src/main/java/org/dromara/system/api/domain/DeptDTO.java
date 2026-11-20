@@ -29,8 +29,18 @@ public class DeptDTO implements Serializable {
     private Long parentId;
 
     /**
+     * 祖级列表
+     */
+    private String ancestors;
+
+    /**
      * 部门名称
      */
     private String deptName;
+
+    /**
+     * 部门类别编码
+     */
+    private String deptCategory;
 
 }

@@ -1,6 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -18,6 +19,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.oss.client.OssClient;
 import org.dromara.common.oss.enums.AccessPolicy;
+import org.dromara.common.oss.exception.S3StorageException;
 import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.oss.model.Options;
 import org.dromara.common.oss.model.PutObjectResult;
@@ -36,6 +38,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -329,4 +333,89 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         return oss;
     }
+
+    /**
+     * 根据ossId查询文件信息
+     *
+     * @param ossId 文件ID
+     * @return 文件信息
+     */
+    @Override
+    public OssDTO selectById(Long ossId) {
+        if (ossId == null) {
+            return null;
+        }
+        SysOssVo oss = SpringUtils.getAopProxy(this).getById(ossId);
+        if (ObjectUtil.isNull(oss)) {
+            return null;
+        }
+        try {
+            oss = matchingUrl(oss);
+        } catch (Exception ignored) {
+            // 如果oss异常无法连接则将数据直接返回
+        }
+        return BeanUtil.copyProperties(oss, OssDTO.class);
+    }
+
+    /**
+     * 通过ossId集合查询文件信息
+     *
+     * @param ossIds 文件ID 集合
+     * @return 文件信息列表，不存在的文件不返回
+     */
+    @Override
+    public List<OssDTO> selectListByIds(Collection<Long> ossIds) {
+        if (CollUtil.isEmpty(ossIds)) {
+            return List.of();
+        }
+        return BeanUtil.copyToList(listByIds(ossIds), OssDTO.class);
+    }
+
+    /**
+     * 通过ossId获取文件输入流
+     *
+     * @param ossId 文件ID
+     * @return 文件输入流
+     */
+    @Override
+    public InputStream getInputStream(Long ossId) {
+        if (ossId == null) {
+            return null;
+        }
+        SysOssVo file = SpringUtils.getAopProxy(this).getById(ossId);
+        if (ObjectUtil.isNull(file)) {
+            return null;
+        }
+        OssClient client = OssFactory.instance(file.getService());
+        String bucket = client.config().bucket()
+            .filter(value -> !value.isBlank())
+            .orElseThrow(() -> S3StorageException.form("bucket is not configured."));
+        return client.doCustomDownload(builder -> builder.bucket(bucket).key(file.getFileName()),
+            AsyncResponseTransformer.toBlockingInputStream(), null);
+    }
+
+    /**
+     * 根据文件ID读取内容，在回调内完成解析或复制
+     *
+     * @param ossId  文件ID，不能为空
+     * @param reader 接收文件信息和输入流的处理函数，不能为空
+     * @param <T>    处理结果类型
+     * @return 回调处理结果，可以为null
+     */
+    @Override
+    public <T> T readFile(Long ossId, BiFunction<OssDTO, InputStream, T> reader) {
+        if (ossId == null) {
+            return null;
+        }
+        if (reader == null) {
+            return null;
+        }
+        SysOssVo file = SpringUtils.getAopProxy(this).getById(ossId);
+        if (ObjectUtil.isNull(file)) {
+            return null;
+        }
+        return OssFactory.instance(file.getService()).download(file.getFileName(),
+            (result, inputStream) -> reader.apply(BeanUtil.toBean(file, OssDTO.class), inputStream));
+    }
+
 }

@@ -125,4 +125,28 @@ public interface UserService {
      */
     Map<Long, String> selectUserNicksByIds(Collection<Long> userIds);
 
+    /**
+     * 通过用户账号查询用户
+     *
+     * @param userName 用户账号
+     * @return 用户信息
+     */
+    UserDTO selectByUserName(String userName);
+
+    /**
+     * 通过手机号查询用户
+     *
+     * @param phoneNumber 手机号
+     * @return 用户信息
+     */
+    UserDTO selectByPhoneNumber(String phoneNumber);
+
+    /**
+     * 批量查询用户账号
+     *
+     * @param userIds 用户ID 集合
+     * @return 用户ID 到账号的映射
+     */
+    Map<Long, String> selectUserNamesByIds(Collection<Long> userIds);
+
 }

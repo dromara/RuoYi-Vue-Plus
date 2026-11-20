@@ -790,11 +790,67 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyMap();
         }
-        List<SysUser> list = userMapper.lambda()
-            .select(SysUser::getUserId, SysUser::getNickName)
-            .in(SysUser::getUserId, userIds)
-            .list();
-        return StreamUtils.toMap(list, SysUser::getUserId, SysUser::getNickName);
+        SysUserServiceImpl userService = SpringUtils.getAopProxy(this);
+        Map<Long, String> result = new HashMap<>();
+        for (Long userId : new HashSet<>(userIds)) {
+            String value = userService.selectNicknameById(userId);
+            if (value != null) {
+                result.put(userId, value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 通过用户账号查询用户
+     *
+     * @param userName 用户账号
+     * @return 用户信息，包含停用用户
+     */
+    @Override
+    public UserDTO selectByUserName(String userName) {
+        if (StringUtils.isBlank(userName)) {
+            return null;
+        }
+        SysUserVo user = this.selectUserByUserName(userName);
+        return BeanUtil.copyProperties(user, UserDTO.class);
+    }
+
+    /**
+     * 通过手机号查询用户
+     *
+     * @param phoneNumber 手机号
+     * @return 用户信息，包含停用用户
+     */
+    @Override
+    public UserDTO selectByPhoneNumber(String phoneNumber) {
+        if (StringUtils.isBlank(phoneNumber)) {
+            return null;
+        }
+        SysUserVo user = this.selectUserByPhoneNumber(phoneNumber);
+        return BeanUtil.copyProperties(user, UserDTO.class);
+    }
+
+    /**
+     * 批量查询用户账号
+     *
+     * @param userIds 用户ID 集合
+     * @return 用户ID 到账号的映射
+     */
+    @Override
+    public Map<Long, String> selectUserNamesByIds(Collection<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyMap();
+        }
+        SysUserServiceImpl userService = SpringUtils.getAopProxy(this);
+        Map<Long, String> result = new HashMap<>();
+        for (Long userId : new HashSet<>(userIds)) {
+            String value = userService.selectUserNameById(userId);
+            if (value != null) {
+                result.put(userId, value);
+            }
+        }
+        return result;
     }
 
 }
