@@ -21,7 +21,7 @@ import java.util.List;
  *     <li>`demo://summary`：读取演示模块摘要资源</li>
  * </ul>
  * 真实业务中不要在 MCP 工具里直接访问 Mapper，应继续调用业务 Service，
- * 并保留权限、租户、脱敏、审计和幂等规则。
+ * 并保留权限、脱敏、审计和幂等规则。
  *
  * @author Lion Li
  */

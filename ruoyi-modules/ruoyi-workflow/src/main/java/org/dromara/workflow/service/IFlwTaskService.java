@@ -57,7 +57,7 @@ public interface IFlwTaskService {
     PageResult<FlowTaskVo> pageByTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
     /**
-     * 查询当前租户所有待办任务
+     * 查询当前用户的已办任务
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
@@ -66,20 +66,20 @@ public interface IFlwTaskService {
     PageResult<FlowHisTaskVo> pageByTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
     /**
-     * 查询待办任务
+     * 查询所有待办任务
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
-     * @return 当前租户待办任务分页结果
+     * @return 所有待办任务分页结果
      */
     PageResult<FlowTaskVo> pageByAllTaskWait(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 
     /**
-     * 查询已办任务
+     * 查询所有已办任务
      *
      * @param flowTaskBo 参数
      * @param pageQuery  分页
-     * @return 当前租户已办任务分页结果
+     * @return 所有已办任务分页结果
      */
     PageResult<FlowHisTaskVo> pageByAllTaskFinish(FlowTaskBo flowTaskBo, PageQuery pageQuery);
 

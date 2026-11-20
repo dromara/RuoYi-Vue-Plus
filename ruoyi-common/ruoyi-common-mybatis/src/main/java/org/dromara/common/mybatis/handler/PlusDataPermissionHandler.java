@@ -75,7 +75,7 @@ public class PlusDataPermissionHandler {
                 throw new RuntimeException("数据权限上下文缺失，请检查 @DataPermission 注解处理生命周期");
             }
             LoginUser currentUser = currentUser();
-            // 如果是超级管理员或租户管理员，则不过滤数据
+            // 超级管理员不过滤数据
             if (LoginHelper.isSuperAdmin()) {
                 return where;
             }
