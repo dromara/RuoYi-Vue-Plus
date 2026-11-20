@@ -10,6 +10,7 @@ import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
 import org.dromara.common.oss.model.Options;
+import org.dromara.common.oss.model.PartUploadResult;
 import org.dromara.common.oss.model.PutObjectResult;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -24,10 +25,7 @@ import software.amazon.awssdk.http.auth.spi.signer.SignRequest;
 import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.CompletedUpload;
@@ -36,6 +34,7 @@ import software.amazon.awssdk.transfer.s3.progress.TransferListener;
 import software.amazon.awssdk.utils.http.SdkHttpUtils;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
@@ -46,7 +45,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -541,6 +539,192 @@ public abstract class AbstractOssClientImpl implements OssClient {
     }
 
     /**
+     * 初始化指定桶的分片上传，对象内容类型和元数据在此阶段设置。
+     */
+    @Override
+    public String bucketInitiateMultipartUpload(String bucket, String key, Options options) {
+        try {
+            CreateMultipartUploadResponse response = s3AsyncClient.createMultipartUpload(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+                    .contentType(options.getContentType())
+                    .metadata(options.getMetadata())
+            ).join();
+            return response.uploadId();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 使用默认选项初始化指定桶的分片上传。
+     */
+    @Override
+    public String bucketInitiateMultipartUpload(String bucket, String key) {
+        return bucketInitiateMultipartUpload(bucket, key, Options.create());
+    }
+
+    /**
+     * 上传单个分片，请求体的长度和流生命周期由调用方管理。
+     */
+    @Override
+    public PartUploadResult bucketUploadPart(String bucket, String key, String uploadId, int partNumber, AsyncRequestBody body) {
+        try {
+            UploadPartResponse response = s3AsyncClient.uploadPart(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+                    .uploadId(uploadId)
+                    .partNumber(partNumber), body
+            ).join();
+            return PartUploadResult.form(partNumber, response.eTag());
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 生成指定桶的分片上传签名，保留绑定默认桶的自定义域名语义。
+     */
+    @Override
+    public String bucketPresignUploadPartUrl(String bucket, String key, String uploadId, int partNumber, Duration expiredTime) {
+        if (useBucketBoundDomain(bucket)) {
+            return bucketBoundDomainPresignUrl(SdkHttpMethod.PUT, key, expiredTime, Collections.emptyMap(),
+                Map.of("uploadId", uploadId, "partNumber", Integer.toString(partNumber)));
+        }
+        try {
+            return s3Presigner.presignUploadPart(builder ->
+                builder.signatureDuration(expiredTime)
+                    .uploadPartRequest(request ->
+                        request.bucket(bucket)
+                            .key(key)
+                            .uploadId(uploadId)
+                            .partNumber(partNumber))
+            ).url().toExternalForm();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 查询一页已上传分片，按编号升序返回编号和 ETag。
+     */
+    @Override
+    public List<PartUploadResult> bucketListParts(String bucket, String key, String uploadId, Integer maxParts, Integer partNumberMarker) {
+        try {
+            ListPartsResponse response = s3AsyncClient.listParts(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+                    .uploadId(uploadId)
+                    .maxParts(maxParts != null ? maxParts : 1000)
+                    .partNumberMarker(partNumberMarker != null ? partNumberMarker : 0)
+            ).join();
+            return response.parts().stream()
+                .sorted(Comparator.comparingInt(Part::partNumber))
+                .map(part -> PartUploadResult.form(part.partNumber(), part.eTag()))
+                .toList();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 按分片编号排序后提交合并，不修改调用方集合或剥离 ETag 引号。
+     */
+    @Override
+    public PutObjectResult bucketCompleteMultipartUpload(String bucket, String key, String uploadId, Collection<PartUploadResult> parts) {
+        try {
+            Assert.notEmpty(parts, () -> S3StorageException.form("分片列表不能为空"));
+            List<CompletedPart> sortedParts = parts.stream()
+                .sorted(Comparator.comparingInt(PartUploadResult::partNumber))
+                .map(part -> CompletedPart.builder().partNumber(part.partNumber()).eTag(part.eTag()).build())
+                .toList();
+            CompleteMultipartUploadResponse response = s3AsyncClient.completeMultipartUpload(builder ->
+                    builder.bucket(bucket)
+                        .key(key)
+                        .uploadId(uploadId)
+                        .multipartUpload(upload -> upload.parts(sortedParts)))
+                .join();
+            String bucketUrl = config.getBucketUrl(bucket);
+            // 合并响应不包含文件大小，沿用普通上传未知大小返回 0 的约定。
+            return PutObjectResult.form("%s/%s".formatted(bucketUrl, key), key, response.eTag(), 0);
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 取消指定桶的分片上传；调用方负责协调仍在执行的分片请求及后续清理。
+     */
+    @Override
+    public void bucketAbortMultipartUpload(String bucket, String key, String uploadId) {
+        try {
+            s3AsyncClient.abortMultipartUpload(builder ->
+                builder.bucket(bucket)
+                    .key(key)
+                    .uploadId(uploadId)
+            ).join();
+        } catch (Exception e) {
+            throw toStorageException(e);
+        }
+    }
+
+    /**
+     * 初始化分片上传（默认存储桶）。
+     */
+    @Override
+    public String initiateMultipartUpload(String key, Options options) {
+        return bucketInitiateMultipartUpload(defaultBucket(), key, options);
+    }
+
+    /**
+     * 使用默认选项初始化分片上传（默认存储桶）。
+     */
+    @Override
+    public String initiateMultipartUpload(String key) {
+        return bucketInitiateMultipartUpload(defaultBucket(), key);
+    }
+
+    /**
+     * 上传单个分片（默认存储桶）。
+     */
+    @Override
+    public PartUploadResult uploadPart(String key, String uploadId, int partNumber, AsyncRequestBody body) {
+        return bucketUploadPart(defaultBucket(), key, uploadId, partNumber, body);
+    }
+
+    /**
+     * 生成分片上传预签名 URL（默认存储桶）。
+     */
+    @Override
+    public String presignUploadPartUrl(String key, String uploadId, int partNumber, Duration expiredTime) {
+        return bucketPresignUploadPartUrl(defaultBucket(), key, uploadId, partNumber, expiredTime);
+    }
+
+    /**
+     * 分页查询已上传分片（默认存储桶）。
+     */
+    @Override
+    public List<PartUploadResult> listParts(String key, String uploadId, Integer maxParts, Integer partNumberMarker) {
+        return bucketListParts(defaultBucket(), key, uploadId, maxParts, partNumberMarker);
+    }
+
+    /**
+     * 合并分片完成上传（默认存储桶）。
+     */
+    @Override
+    public PutObjectResult completeMultipartUpload(String key, String uploadId, Collection<PartUploadResult> parts) {
+        return bucketCompleteMultipartUpload(defaultBucket(), key, uploadId, parts);
+    }
+
+    /**
+     * 取消分片上传并释放未合并分片（默认存储桶）。
+     */
+    @Override
+    public void abortMultipartUpload(String key, String uploadId) {
+        bucketAbortMultipartUpload(defaultBucket(), key, uploadId);
+    }
+
+    /**
      * 执行自定义下载请求。
      *
      * @param getObjectRequestBuilderConsumer GetObject 请求构建回调
@@ -793,12 +977,27 @@ public abstract class AbstractOssClientImpl implements OssClient {
      * @return 预签名 URL
      */
     private String bucketBoundDomainPresignUrl(SdkHttpMethod method, String key, Duration expiredTime, Map<String, String> metadata) {
+        return bucketBoundDomainPresignUrl(method, key, expiredTime, metadata, Collections.emptyMap());
+    }
+
+    /**
+     * 为绑定桶域名签名，同时包含分片上传等请求的查询参数。
+     *
+     * @param method          HTTP 方法
+     * @param key             对象键
+     * @param expiredTime     签名有效期
+     * @param metadata        对象元数据
+     * @param queryParameters 待签名查询参数
+     * @return 预签名 URL
+     */
+    private String bucketBoundDomainPresignUrl(SdkHttpMethod method, String key, Duration expiredTime, Map<String, String> metadata, Map<String, String> queryParameters) {
         try {
             URI domainUri = URI.create(config.getDomainUrl());
             SdkHttpFullRequest.Builder requestBuilder = SdkHttpFullRequest.builder()
                 .method(method)
                 .uri(domainUri)
                 .encodedPath(bucketBoundDomainPath(domainUri, key));
+            queryParameters.forEach(requestBuilder::putRawQueryParameter);
             if (metadata != null) {
                 metadata.forEach((metadataKey, metadataValue) -> {
                     if (StringUtils.isNotBlank(metadataKey)) {

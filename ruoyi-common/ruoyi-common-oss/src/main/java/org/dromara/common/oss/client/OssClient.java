@@ -6,6 +6,7 @@ import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
 import org.dromara.common.oss.model.GetObjectResult;
 import org.dromara.common.oss.model.HandleAsyncResult;
 import org.dromara.common.oss.model.Options;
+import org.dromara.common.oss.model.PartUploadResult;
 import org.dromara.common.oss.model.PutObjectResult;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
@@ -25,6 +26,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -259,6 +261,149 @@ public interface OssClient extends AutoCloseable {
      * @return 上传结果
      */
     PutObjectResult bucketUpload(String bucket, String key, byte[] data);
+
+    /**
+     * 初始化分片上传（指定存储桶）。
+     *
+     * @param bucket 存储桶名称
+     * @param key 对象键
+     * @param options 对象内容类型和元数据；长度、MD5 和传输监听器不用于初始化
+     * @return 分片上传任务 ID（uploadId），用于签名单片、查询、合并和取消
+     */
+    String bucketInitiateMultipartUpload(String bucket, String key, Options options);
+
+    /**
+     * 使用默认选项初始化分片上传（指定存储桶）。
+     *
+     * @param bucket 存储桶名称
+     * @param key 对象键
+     * @return 分片上传任务 ID（uploadId），用于签名单片、查询、合并和取消
+     */
+    String bucketInitiateMultipartUpload(String bucket, String key);
+
+    /**
+     * 上传单个分片（指定存储桶）。
+     *
+     * @param bucket 存储桶名称
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param partNumber 分片编号，从 1 开始
+     * @param body 单片请求体，由调用方提供准确长度并管理流资源
+     * @return 分片编号和 ETag，用于完成上传时合并
+     */
+    PartUploadResult bucketUploadPart(String bucket, String key, String uploadId, int partNumber, AsyncRequestBody body);
+
+    /**
+     * 生成分片上传预签名 URL（指定存储桶）。
+     *
+     * @param bucket 存储桶名称
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param partNumber 分片编号，从 1 开始
+     * @param expiredTime 签名有效期
+     * @return 预签名 URL；上传后需保存响应 ETag，浏览器直传需桶 CORS 暴露 ETag
+     */
+    String bucketPresignUploadPartUrl(String bucket, String key, String uploadId, int partNumber, Duration expiredTime);
+
+    /**
+     * 分页查询已上传分片（指定存储桶）。
+     *
+     * @param bucket 存储桶名称
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param maxParts 每页数量，null 使用 1000
+     * @param partNumberMarker 分片编号分页标记，null 使用 0；后续传上一页最后一个分片编号
+     * @return 当前页已上传分片，按编号升序；可继续用最后一个分片编号查询，直至返回空列表
+     */
+    List<PartUploadResult> bucketListParts(String bucket, String key, String uploadId, Integer maxParts, Integer partNumberMarker);
+
+    /**
+     * 合并分片完成上传（指定存储桶）。
+     *
+     * @param bucket 存储桶名称
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param parts 已上传分片编号及 ETag，按编号排序后提交；调用方应提供完整分片列表
+     * @return 文件地址、key 和 ETag；服务端合并响应不提供大小，size 为 0（未知）；失败时不会自动取消上传
+     */
+    PutObjectResult bucketCompleteMultipartUpload(String bucket, String key, String uploadId, Collection<PartUploadResult> parts);
+
+    /**
+     * 取消分片上传并释放未合并分片（指定存储桶）。
+     *
+     * @param bucket 存储桶名称
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     */
+    void bucketAbortMultipartUpload(String bucket, String key, String uploadId);
+
+    /**
+     * 初始化分片上传（默认存储桶）。
+     *
+     * @param key 对象键
+     * @param options 对象内容类型和元数据；长度、MD5 和传输监听器不用于初始化
+     * @return 分片上传任务 ID（uploadId），用于签名单片、查询、合并和取消
+     */
+    String initiateMultipartUpload(String key, Options options);
+
+    /**
+     * 使用默认选项初始化分片上传（默认存储桶）。
+     *
+     * @param key 对象键
+     * @return 分片上传任务 ID（uploadId），用于签名单片、查询、合并和取消
+     */
+    String initiateMultipartUpload(String key);
+
+    /**
+     * 上传单个分片（默认存储桶）。
+     *
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param partNumber 分片编号，从 1 开始
+     * @param body 单片请求体，由调用方提供准确长度并管理流资源
+     * @return 分片编号和 ETag，用于完成上传时合并
+     */
+    PartUploadResult uploadPart(String key, String uploadId, int partNumber, AsyncRequestBody body);
+
+    /**
+     * 生成分片上传预签名 URL（默认存储桶）。
+     *
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param partNumber 分片编号，从 1 开始
+     * @param expiredTime 签名有效期
+     * @return 预签名 URL；上传后需保存响应 ETag，浏览器直传需桶 CORS 暴露 ETag
+     */
+    String presignUploadPartUrl(String key, String uploadId, int partNumber, Duration expiredTime);
+
+    /**
+     * 分页查询已上传分片（默认存储桶）。
+     *
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param maxParts 每页数量，null 使用 1000
+     * @param partNumberMarker 分片编号分页标记，null 使用 0；后续传上一页最后一个分片编号
+     * @return 当前页已上传分片，按编号升序；可继续用最后一个分片编号查询，直至返回空列表
+     */
+    List<PartUploadResult> listParts(String key, String uploadId, Integer maxParts, Integer partNumberMarker);
+
+    /**
+     * 合并分片完成上传（默认存储桶）。
+     *
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     * @param parts 已上传分片编号及 ETag，按编号排序后提交；调用方应提供完整分片列表
+     * @return 文件地址、key 和 ETag；服务端合并响应不提供大小，size 为 0（未知）；失败时不会自动取消上传
+     */
+    PutObjectResult completeMultipartUpload(String key, String uploadId, Collection<PartUploadResult> parts);
+
+    /**
+     * 取消分片上传并释放未合并分片（默认存储桶）。
+     *
+     * @param key 对象键
+     * @param uploadId 上传任务 ID
+     */
+    void abortMultipartUpload(String key, String uploadId);
 
     /**
      * 执行自定义下载请求。
