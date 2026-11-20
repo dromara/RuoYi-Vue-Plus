@@ -205,9 +205,10 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         }
         try {
             defService.removeDef((List<Long>) ids);
+        } catch (ServiceException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Error removing flow definitions: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to remove flow definitions", e);
+            throw new ServiceException("删除流程定义失败", e);
         }
         return true;
     }

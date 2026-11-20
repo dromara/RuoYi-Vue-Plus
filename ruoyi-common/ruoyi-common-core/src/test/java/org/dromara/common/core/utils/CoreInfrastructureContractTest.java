@@ -2,6 +2,7 @@ package org.dromara.common.core.utils;
 
 import jakarta.validation.ConstraintValidatorContext;
 import cn.hutool.extra.spring.SpringUtil;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.validate.dicts.DictPattern;
 import org.dromara.common.core.validate.dicts.DictPatternValidator;
@@ -91,14 +92,32 @@ class CoreInfrastructureContractTest {
             () -> 2,
             () -> 3);
 
+        IllegalStateException failure = new IllegalStateException("task-failed");
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> ThreadUtils.virtualInvokeAll(() -> {
-                throw new IllegalStateException("task-failed");
+                throw failure;
             }));
 
         assertEquals(List.of(1, 2, 3), results);
-        assertInstanceOf(IllegalStateException.class, exception.getCause());
-        assertTrue(exception.getMessage().contains("task-failed"));
+        assertSame(failure, exception);
+    }
+
+    /**
+     * 验证两种任务入口均原样传递业务异常，保留业务错误码和错误明细。
+     */
+    @Test
+    @DisplayName("虚拟线程任务保留业务异常")
+    void shouldPreserveVirtualTaskServiceException() {
+        ServiceException failure = new ServiceException("操作被拒绝", 403).setDetailMessage("业务状态不允许");
+
+        assertSame(failure, assertThrows(ServiceException.class,
+            () -> ThreadUtils.virtualInvokeAll(() -> {
+                throw failure;
+            })));
+        assertSame(failure, assertThrows(ServiceException.class,
+            () -> ThreadUtils.virtualSubmitAll(() -> {
+                throw failure;
+            })));
     }
 
     /**

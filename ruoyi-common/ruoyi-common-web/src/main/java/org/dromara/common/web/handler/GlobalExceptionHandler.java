@@ -86,7 +86,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ServiceException.class)
     public R<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
-        log.error(e.getMessage());
+        if (e.getCause() != null) {
+            log.error("请求地址'{}',业务执行异常: {}", request.getRequestURI(), e.getMessage(), e);
+        } else {
+            log.warn("请求地址'{}',业务异常: {}", request.getRequestURI(), e.getMessage());
+        }
         Integer code = e.getCode();
         return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
     }

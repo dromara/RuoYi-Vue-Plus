@@ -2,6 +2,7 @@ package org.dromara.common.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 
 /**
@@ -40,6 +41,6 @@ public enum UserType {
                 return value;
             }
         }
-        throw new RuntimeException("'UserType' not found By " + str);
+        throw new ServiceException("用户类型不支持：{}", str);
     }
 }

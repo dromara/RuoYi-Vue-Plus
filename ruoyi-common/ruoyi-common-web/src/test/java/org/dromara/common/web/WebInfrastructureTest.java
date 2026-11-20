@@ -1,5 +1,8 @@
 package org.dromara.common.web;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletRequest;
 import org.dromara.common.core.constant.HttpStatus;
@@ -15,6 +18,7 @@ import org.dromara.common.web.filter.XssHttpServletRequestWrapper;
 import org.dromara.common.web.handler.GlobalExceptionHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.boot.json.JsonParseException;
@@ -144,6 +148,33 @@ class WebInfrastructureTest {
         assertEquals("forbidden", forbidden.getMsg());
         assertEquals(HttpStatus.ERROR, failed.getCode());
         assertEquals("failed", failed.getMsg());
+    }
+
+    /**
+     * 验证业务提示不包含内部根因，日志保留请求地址和完整异常链。
+     */
+    @Test
+    @DisplayName("记录业务异常根因且保留响应语义")
+    void shouldLogServiceExceptionCause() {
+        Logger logger = (Logger) LoggerFactory.getLogger(GlobalExceptionHandler.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            ServiceException failure = new ServiceException("导出失败", new IllegalStateException("internal failure"));
+            R<Void> result = new GlobalExceptionHandler().handleServiceException(
+                failure, request("POST", "/export", null));
+
+            assertEquals(HttpStatus.ERROR, result.getCode());
+            assertEquals("导出失败", result.getMsg());
+            ILoggingEvent event = appender.list.getLast();
+            assertTrue(event.getFormattedMessage().contains("/export"));
+            assertEquals(ServiceException.class.getName(), event.getThrowableProxy().getClassName());
+            assertEquals("internal failure", event.getThrowableProxy().getCause().getMessage());
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
     }
 
     /**

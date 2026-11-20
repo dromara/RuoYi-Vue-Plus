@@ -12,6 +12,7 @@ import org.dromara.common.excel.annotation.ExcelRequired;
 import org.dromara.common.excel.core.CellMergeHandler;
 import org.dromara.common.excel.core.DropDownOptions;
 import org.dromara.common.excel.utils.ExcelBuilder;
+import org.dromara.common.core.exception.ServiceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,11 +24,33 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("ExcelBuilder 单元测试")
 class ExcelBuilderTest {
+
+    /**
+     * 验证自定义导出失败时保留业务异常，其他异常使用固定提示并保留根因。
+     */
+    @Test
+    @DisplayName("保留自定义导出的异常信息")
+    void shouldPreserveCustomExportExceptions() {
+        ServiceException businessFailure = new ServiceException("禁止导出", 403);
+        assertSame(businessFailure, assertThrows(ServiceException.class,
+            () -> ExcelBuilder.of(rows(), ExportRow.class).toStream(new ByteArrayOutputStream(), writer -> {
+                throw businessFailure;
+            })));
+
+        IllegalStateException systemFailure = new IllegalStateException("internal failure");
+        ServiceException exception = assertThrows(ServiceException.class,
+            () -> ExcelBuilder.of(rows(), ExportRow.class).toStream(new ByteArrayOutputStream(), writer -> {
+                throw systemFailure;
+            }));
+        assertEquals("导出Excel异常", exception.getMessage());
+        assertSame(systemFailure, exception.getCause());
+    }
 
     /**
      * 验证内存导出同时应用表头样式、批注、字典和枚举下拉、外部下拉及单元格合并。
