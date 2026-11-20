@@ -54,11 +54,11 @@ description: 在仓库内按代码生成器模板、项目 reference 文档和�
 - 前端 Vue、React、TypeScript、api、types 或页面任务，先读 [references/frontend.md](references/frontend.md)。
 - 不确定任务边界、需要标准调用方式或需要对照典型场景时，再读 [references/examples.md](references/examples.md)。
 
-reference 用来约束实现方式和自检范围；发生冲突时，仍以当前模块真实代码和实际调用点为准。
+reference 用来约束实现方式和自检范围；本技能的明确编码要求优先于旧代码和模板，其他差异再以当前模块真实代码和实际调用点为准。
 
 ## 优先级规则
 
-发生冲突时按下面顺序决策：
+先遵守用户当前要求及本技能的明确编码要求，再按下面顺序选择参考实现：
 
 1. 当前模块内最近似业务代码。
 2. 当前仓库公共基础模块约定，例如 `common-mybatis`、`common-core`、`common-web`。
@@ -86,15 +86,22 @@ Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字�
 ## 仓库通用规则
 
 - 遵循 [`.editorconfig`](../../../.editorconfig)：UTF-8、LF，默认 4 空格，JSON/YAML 为 2 空格。
+- 后端使用 JDK 21 已正式支持的语法和 API，优先采用能简化当前实现的现代写法，不使用预览特性；具体规则见后端 reference。
+- 同等业务语义且当前模块依赖可用时，通用处理优先使用 Hutool；项目已有业务封装继续复用，不重复造工具或添加无业务语义的包装。
+- 确需新增的工具能力按工具类封装，放在所属模块的 `utils` 包或其子包；业务编排仍放 Service。
+- 禁止手写 SQL；单表使用 MyBatis-Plus，多表查询必须通过 `MPJBaseMapper` 和 MPJ wrapper 实现。
+- 新增、修改的字段约束优先放 BO 校验注解，并在接口入口触发；禁止无用校验、重复校验及对数据库查询结果再次套用请求字段校验。
+- 代码中需要主动触发对象校验时，优先使用项目 `ValidatorUtils.validate(object, groups...)` 复用注解约束；已由入口完成相同校验时不再重复调用。
+- 补全必要 JavaDoc、分支和空值处理；`if/else` 等分支体必须使用大括号，单行分支也不省略，避免无依据的防御性判空。
 - 不要把 `BaseMapperPlus`、`PageQuery`、`PageResult`、`R`、`MapstructUtils` 或项目工具类替换成临时自造方案。
 - 仓库已使用 `List.of(...)` 的地方，数组转列表优先继续沿用。
 - import、注解顺序、文件结构以附近代码为准，不要顺手重排整个文件。
-- 只有在业务逻辑不直观时才加简短注释。
+- 公共 API、接口、BO/VO/Entity 字段、Mapper 默认方法、Service/Controller 方法按后端 reference 补全 JavaDoc；实现内注释只解释不直观的业务规则。
 
 ## 决策规则
 
 - 如果任务是围绕单表的标准 CRUD，尽量贴近生成器默认产物。
-- 如果目标模块已经存在自定义校验、数据权限、事务、缓存、Excel 导入导出、联表查询等逻辑，应在此基础上扩展，不要为了“简洁”把它们削平。
+- 如果目标模块已经存在必要的业务校验、数据权限、事务、缓存、Excel 导入导出、联表查询等逻辑，应在此基础上扩展；不要照搬无用或重复校验，也不要沿用与本技能明确要求冲突的旧写法。
 - 如果附近 controller 接口已经带有权限、日志、防重、加密、分组校验等注解，新接口默认同步保持一致，除非有明确理由不这样做。
 - 如果 BO 或 VO 需要字段校验、翻译、Excel 注解，应优先参考同模块同用途对象，不要机械套通用注解。
 - 如果修改公共基础模块，优先保持公开 API 兼容，新增能力要查调用点和同包风格。
@@ -111,6 +118,7 @@ Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字�
 - `src/main/java/.../service/IEntityService.java`
 - `src/main/java/.../service/impl/EntityServiceImpl.java`
 - `src/main/java/.../controller/EntityController.java`
+- `src/main/java/.../utils/BusinessUtils.java`（确需新增的工具类）
 
 标准生成器模板通常对应：
 
@@ -121,7 +129,7 @@ Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字�
 - `fm/java/service.java.ftl` -> service interface
 - `fm/java/serviceImpl.java.ftl` -> service impl
 - `fm/java/controller.java.ftl` -> controller
-- `fm/xml/mapper.xml.ftl` -> 自定义 XML mapper 起点
+- `fm/xml/mapper.xml.ftl` -> 仅用于识别既有 XML 结构，不据此新增手写 SQL
 
 ## 任务分型
 
@@ -161,10 +169,13 @@ Vue 3、React、TypeScript API 文件、生成式列表页、表单状态、字�
 - 新增工具类或通用辅助方法是否已完成同类能力检索与语义核对，避免重复实现或无业务语义的包装。
 - 包路径和 `@RequestMapping` 与模块保持一致。
 - 权限标识遵循 `${module}:${business}:${action}`。
-- Mapper 继承 `BaseMapperPlus<Entity, Vo>`。
+- 单表 Mapper 继承 `BaseMapperPlus<Entity, Vo>`；多表查询的 Mapper 必须具备 `MPJBaseMapper<Entity>` 能力。
 - 手写 Service 注入 Mapper 时使用具体业务短名；代码生成器模板按类名首字母小写命名，例如 `SysRoleMapper` 生成 `sysRoleMapper`。
 - Service 按场景返回 `PageResult` 或 `List<Vo>`。
-- 查询代码优先使用 `LambdaQueryWrapper`，复杂模块沿用既有 MPJ 联表风格。
+- 单表查询使用 `LambdaQueryWrapper`，多表查询使用 MPJ wrapper；不得在 XML、注解或字符串片段中手写 SQL。
+- 通用处理是否优先复用 Hutool，新增工具类是否放在所属模块 `utils` 包并禁止实例化。
+- 新增、修改字段约束是否由 BO 注解在入口校验，是否存在重复校验、无业务意义的判空或数据库结果字段重校验。
+- Java 代码是否使用 JDK 21 正式能力，分支是否带大括号，JavaDoc、空值语义和格式是否完整一致。
 - 公共 Mapper 链式能力优先沿用 `LambdaCrudChainWrapper`、`LambdaQueryBuilder`、`LambdaQueryCondition` 的 `IfPresent` / `IfText` / `IfNotEmpty` 风格。
 - 翻译能力优先沿用 `TranslationInterface` + `@TranslationType` + `@Translation`，批量翻译实现 `translationBatch`，避免退化成逐条查询。
 - JSON 响应增强优先沿用 `JsonFieldProcessor` 的 `collect` / `prepare` / `process` 三阶段模型。

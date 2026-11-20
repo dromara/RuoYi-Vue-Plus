@@ -5,9 +5,11 @@ description: 标准后端 CRUD 专家。用于当前项目中的新增单表 CRU
 
 你负责当前项目中的标准后端 CRUD 实现。
 
+执行前读取并遵守 `.claude/agents/backend-engineering.md` 的通用编码、查询、校验及工具类规则；明确要求优先于旧代码和模板。
+
 ## 核心原则
 
-1. 先参考 `ruoyi-modules/ruoyi-gen/src/main/resources/vm/` 下的模板。
+1. 先参考 `ruoyi-modules/ruoyi-gen/src/main/resources/fm/` 下的 FreeMarker 模板；XML 模板仅用于识别既有结构，不据此新增手写 SQL。
 2. 再参考当前模块内最近似的标准管理模块。
 3. 分层保持稳定：
    `domain`、`domain.bo`、`domain.vo`、`mapper`、`service`、`service.impl`、`controller`
@@ -39,7 +41,9 @@ description: 标准后端 CRUD 专家。用于当前项目中的新增单表 CRU
 - 日期范围默认从 `bo.getParams()` 中读取 begin/end
 - 分页优先返回 `PageResult<Vo>`
 - BO 转实体使用 `MapstructUtils.convert(bo, Entity.class)`
-- 写入前校验优先放在 `validEntityBeforeSave(...)`
+- 字段约束优先放 BO 注解，在入口通过 `@Validated` / `@Valid` 或必要的 `ValidatorUtils.validate(bo, groups...)` 触发一次，不逐层重复校验
+- `validEntityBeforeSave(...)` 仅放确有必要且未在其他位置完成的业务校验，不新增空扩展点或数据库结果字段重校验
+- 多表查询必须使用 `MPJBaseMapper` 和 MPJ wrapper，禁止在 XML、注解或字符串片段中手写 SQL
 
 ## 接口规则
 

@@ -5,12 +5,14 @@ description: 后端查询、联表与数据权限专家。用于当前项目中�
 
 你负责当前项目中的复杂查询和数据权限类任务。
 
+执行前读取并遵守 `.claude/agents/backend-engineering.md` 的通用编码、查询、校验及工具类规则；明确要求优先于旧代码和模板。
+
 ## 核心原则
 
 1. 优先看当前模块已有的 mapper 查询实现。
 2. 涉及数据权限时优先复用 `@DataPermission` 与已有字段映射方式。
-3. 复杂联表优先参考 MPJ 风格，不轻易改回手写零散 SQL。
-4. 如果 `BaseMapperPlus + wrapper` 足够，不要额外补 XML。
+3. 多表查询必须使用 `MPJBaseMapper<Entity>` 和 MPJ wrapper，核对现有继承链，未提供该能力时补充继承。
+4. 禁止手写 SQL，包括 XML、注解、JDBC 和 wrapper 中夹带的 SQL 字符串片段；使用 MyBatis-Plus / MPJ 的类型安全 API。
 5. wrapper 查询条件优先使用项目已有工具和命名，不自造查询 DSL。
 6. 新增工具类或通用辅助方法前，先读取 `.claude/agents/backend-engineering.md` 的“已有能力复用”规则，按能力类别检索、确认模块依赖可用性并核对业务语义；满足需求时直接复用，不添加无业务语义的包装。
 

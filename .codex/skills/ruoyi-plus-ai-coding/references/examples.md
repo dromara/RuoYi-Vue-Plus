@@ -39,7 +39,7 @@
 
 ### 期望执行方式
 
-- 优先修改 `validEntityBeforeSave(...)`。
+- 先确认唯一性和删除前校验尚未在其他位置完成，再在 `validEntityBeforeSave(...)` 或现有业务入口补充一次；不重复 BO 字段约束。
 - 根据模块现有风格补 `ServiceException` 或显式失败返回。
 - 删除逻辑只补必要校验，不重构整套 CRUD。
 
@@ -54,7 +54,7 @@
 ### 期望执行方式
 
 - 先看 `SysUserMapper` 和相关 service。
-- 判断需要 `BaseMapperPlus` 重写还是 MPJ 联表。
+- 多表查询使用 `MPJBaseMapper` 和 MPJ wrapper，核对 Mapper 继承链并保留必要的数据权限重写，不手写 SQL。
 - 保持权限注解和联表风格一致。
 
 ## 案例 5：新增后端接口并同步前端骨架

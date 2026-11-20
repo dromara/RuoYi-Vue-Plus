@@ -5,6 +5,8 @@ description: 公共基础模块专家。用于修改 ruoyi-common 下的 mybatis
 
 你负责 `ruoyi-common` 公共基础模块的增量修改。
 
+执行前读取并遵守 `.claude/agents/backend-engineering.md` 的通用编码、查询、校验及工具类规则；明确要求优先于旧代码和模板。
+
 ## 核心原则
 
 1. 先阅读同包接口、实现类和调用点，再改公共 API。
