@@ -20,10 +20,10 @@
         <java.version>21</java.version>
 
         <!-- Spring 生态依赖版本 -->
-        <spring-boot.version>4.1.2</spring-boot.version>
+        <spring-boot.version>4.1.3</spring-boot.version>
         <spring-boot-admin.version>4.1.4</spring-boot-admin.version>
-        <spring-ai.version>2.0.2</spring-ai.version>
-        <springdoc.version>3.1.1</springdoc.version>
+        <spring-ai.version>2.1.0</spring-ai.version>
+        <springdoc.version>3.2.0</springdoc.version>
 
         <!-- 数据访问与持久化相关依赖版本 -->
         <mybatis.version>3.5.19</mybatis.version>
@@ -43,7 +43,7 @@
         <redisson.version>4.8.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <snailjob.version>2.0.2</snailjob.version>
-        <snailai.version>1.1.1</snailai.version>
+        <snailai.version>1.2.0</snailai.version>
 
         <!-- 通用工具、编译增强与代码生成相关依赖版本 -->
         <hutool.version>5.8.47</hutool.version>
