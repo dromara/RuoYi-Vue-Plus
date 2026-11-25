@@ -5,6 +5,8 @@ import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.annotation.JacksonStdImpl;
 import tools.jackson.databind.ser.jdk.NumberSerializer;
 
+import java.math.BigInteger;
+
 /**
  * 超出 JS 最大最小值 处理
  *
@@ -44,8 +46,10 @@ public class BigNumberSerializer extends NumberSerializer {
      */
     @Override
     public void serialize(Number value, JsonGenerator gen, SerializationContext provider) {
-        // 超出范围 序列化为字符串
-        if (value.longValue() >= MIN_SAFE_INTEGER && value.longValue() <= MAX_SAFE_INTEGER) {
+        boolean safe = value instanceof BigInteger integer
+            ? integer.abs().compareTo(BigInteger.valueOf(MAX_SAFE_INTEGER)) <= 0
+            : value.longValue() >= MIN_SAFE_INTEGER && value.longValue() <= MAX_SAFE_INTEGER;
+        if (safe) {
             super.serialize(value, gen, provider);
         } else {
             gen.writeString(value.toString());

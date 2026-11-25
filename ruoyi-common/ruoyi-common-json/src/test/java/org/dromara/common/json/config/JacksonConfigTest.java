@@ -2,9 +2,12 @@ package org.dromara.common.json.config;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -13,6 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("JacksonConfig 单元测试")
 class JacksonConfigTest {
+
+    @ParameterizedTest
+    @ValueSource(strings = {"18446744073709551617", "-18446744073709551617"})
+    @DisplayName("超出 long 范围的正负大整数均按完整十进制字符串输出")
+    void shouldPreserveBigIntegersBeyondLongRange(String digits) {
+        assertEquals("\"" + digits + "\"", configuredMapper().writeValueAsString(new BigInteger(digits)));
+    }
 
     /**
      * 验证安全范围内整数保持数字类型，超出 JavaScript 安全范围的整数和 BigDecimal 输出字符串。
