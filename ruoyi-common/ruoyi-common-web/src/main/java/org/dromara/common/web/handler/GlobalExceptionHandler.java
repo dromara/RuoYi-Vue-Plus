@@ -217,7 +217,8 @@ public class GlobalExceptionHandler {
     public void handleIoException(IOException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         String path = SpringUtils.getProperty("message.path");
-        if (requestURI.contains(path)) {
+        String ssePath = path == null ? "/resource/message" : path;
+        if (requestURI.equals(request.getContextPath() + ssePath)) {
             // sse 经常性连接中断 例如关闭浏览器 直接屏蔽
             return;
         }

@@ -21,6 +21,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("common-web 功能单元测试")
 class WebFunctionTest {
 
+    @Test
+    @DisplayName("语言请求头忽略两端空白，纯空白使用默认区域")
+    void shouldIgnoreWhitespaceAroundLanguageHeader() {
+        var resolver = new I18nLocaleResolver();
+        var padded = new MockHttpServletRequest();
+        padded.addHeader("content-language", " en_US ");
+        var blank = new MockHttpServletRequest();
+        blank.addHeader("content-language", "  ");
+        assertAll(
+            () -> assertEquals(Locale.US, resolver.resolveLocale(padded)),
+            () -> assertEquals(Locale.getDefault(), resolver.resolveLocale(blank))
+        );
+    }
+
     /**
      * 验证请求头可以使用短横线或下划线解析区域信息，并支持默认区域回退。
      */
