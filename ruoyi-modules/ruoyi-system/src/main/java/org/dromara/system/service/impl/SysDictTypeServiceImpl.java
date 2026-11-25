@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -236,8 +237,8 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
             return StringUtils.EMPTY;
         }
         Map<String, String> map = StreamUtils.toMap(datas, SysDictDataVo::getDictValue, SysDictDataVo::getDictLabel);
-        if (StringUtils.containsAny(dictValue, separator)) {
-            return Arrays.stream(dictValue.split(separator))
+        if (StringUtils.isNotEmpty(separator) && StringUtils.contains(dictValue, separator)) {
+            return Arrays.stream(dictValue.split(Pattern.quote(separator)))
                 .map(v -> map.getOrDefault(v, StringUtils.EMPTY))
                 .collect(Collectors.joining(separator));
         } else {
@@ -260,8 +261,8 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
             return StringUtils.EMPTY;
         }
         Map<String, String> map = StreamUtils.toMap(datas, SysDictDataVo::getDictLabel, SysDictDataVo::getDictValue);
-        if (StringUtils.containsAny(dictLabel, separator)) {
-            return Arrays.stream(dictLabel.split(separator))
+        if (StringUtils.isNotEmpty(separator) && StringUtils.contains(dictLabel, separator)) {
+            return Arrays.stream(dictLabel.split(Pattern.quote(separator)))
                 .map(l -> map.getOrDefault(l, StringUtils.EMPTY))
                 .collect(Collectors.joining(separator));
         } else {
