@@ -107,7 +107,7 @@ public class LogAspect {
                 operLog.setBrowser(loginUser.getBrowser());
                 operLog.setOs(loginUser.getOs());
                 if (StringUtils.isBlank(operLog.getClientKey())) {
-                    operLog.setClientKey(loginUser.getClientKey());
+                    operLog.setClientKey(limit(loginUser.getClientKey(), MAX_CLIENT_KEY_LENGTH));
                 }
             }
 
@@ -172,7 +172,8 @@ public class LogAspect {
     private void setRequestValue(JoinPoint joinPoint, OperLogEvent operLog, String[] excludeParamNames) throws Exception {
         Map<String, String> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
         String requestMethod = operLog.getRequestMethod();
-        if (MapUtil.isEmpty(paramsMap) && StringUtils.equalsAny(requestMethod, HttpMethod.PUT.name(), HttpMethod.POST.name(), HttpMethod.DELETE.name())) {
+        if (MapUtil.isEmpty(paramsMap) && StringUtils.equalsAny(requestMethod,
+            HttpMethod.PUT.name(), HttpMethod.POST.name(), HttpMethod.PATCH.name(), HttpMethod.DELETE.name())) {
             String params = argsArrayToString(joinPoint.getArgs(), excludeParamNames);
             operLog.setOperParam(limit(params, MAX_CONTENT_LENGTH));
         } else {

@@ -8,6 +8,7 @@ import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.log.enums.OperatorType;
 import org.dromara.common.log.event.OperLogEvent;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.system.api.model.LoginUser;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +38,34 @@ import static org.mockito.Mockito.mock;
 class LogFunctionTest {
 
     private static final AtomicReference<OperLogEvent> LAST_EVENT = new AtomicReference<>();
+
+    @Test
+    @DisplayName("PATCH 更新日志保留请求体中的业务字段并排除密码")
+    void shouldRecordPatchBody() throws Throwable {
+        var annotation = TestController.class.getDeclaredMethod("create", CreateRequest.class).getAnnotation(Log.class);
+        var point = joinPoint(new CreateRequest("alice", "secret"), null);
+        var event = new OperLogEvent();
+        event.setRequestMethod("PATCH");
+        new LogAspect().getControllerMethodDescription(point, annotation, event, null);
+        assertTrue(event.getOperParam().contains("alice"));
+        assertFalse(event.getOperParam().contains("secret"));
+    }
+
+    @Test
+    @DisplayName("回退到登录信息的客户端标识同样遵守日志长度上限")
+    void shouldLimitFallbackClientKey() throws Throwable {
+        var request = new MockHttpServletRequest("POST", "/system/users");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        var user = new LoginUser();
+        user.setClientKey("a".repeat(32) + "suffix");
+        var annotation = TestController.class.getDeclaredMethod("create", CreateRequest.class).getAnnotation(Log.class);
+        var point = joinPoint(new CreateRequest("alice", "secret"), null);
+        try (var login = mockStatic(LoginHelper.class)) {
+            login.when(LoginHelper::getLoginUser).thenReturn(user);
+            new LogAspect().doAround(point, annotation);
+        }
+        assertEquals("a".repeat(32), LAST_EVENT.get().getClientKey());
+    }
 
     /**
      * 初始化日志切面依赖的 JSON 映射器和事件容器，避免启动完整 Spring 应用。
