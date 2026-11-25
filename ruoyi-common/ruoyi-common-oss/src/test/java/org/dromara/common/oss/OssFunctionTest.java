@@ -10,6 +10,22 @@ import software.amazon.awssdk.regions.Region;
 import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.dromara.common.oss.model.HandleAsyncResult;
+import org.dromara.common.oss.model.PartUploadResult;
+import org.dromara.common.oss.model.PutObjectResult;
+import org.springframework.test.util.ReflectionTestUtils;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
+import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,6 +35,44 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("common-oss 功能单元测试")
 class OssFunctionTest {
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    @DisplayName("普通上传和分片合并返回可访问的对象地址并保留原始键")
+    void shouldEncodeUploadedObjectUrl(boolean multipart) {
+        var config = OssClientConfig.formProperties(properties("oss-cn-hangzhou.aliyuncs.com",
+            "https://cdn.example.com/assets/", "images"));
+        var client = spy(new DefaultOssClientImpl("test", config));
+        String key = "目录/a b?#%2F.txt";
+        PutObjectResult result;
+        if (multipart) {
+            S3AsyncClient s3 = mock();
+            ReflectionTestUtils.setField(client, "s3AsyncClient", s3);
+            when(s3.completeMultipartUpload(org.mockito.ArgumentMatchers.<Consumer<CompleteMultipartUploadRequest.Builder>>any()))
+                .thenReturn(CompletableFuture.completedFuture(CompleteMultipartUploadResponse.builder().eTag("etag").build()));
+            result = client.bucketCompleteMultipartUpload("images", key, "upload", List.of(new PartUploadResult(1, "part")));
+        } else {
+            doReturn(HandleAsyncResult.success(PutObjectResponse.builder().eTag("etag").build()))
+                .when(client).doCustomUpload(any(), any(), nullable(java.util.Collection.class));
+            result = client.bucketUpload("images", key, new byte[]{1});
+        }
+        assertEquals(key, result.key());
+        assertEquals("https://cdn.example.com/assets/%E7%9B%AE%E5%BD%95/a%20b%3F%23%252F.txt", result.url());
+    }
+
+    @Test
+    @DisplayName("路径风格桶地址保留 endpoint 前缀且只拼接一个斜杠")
+    void shouldAppendBucketAfterEndpointPath() {
+        var config = OssClientConfig.formProperties(properties("http://minio.example.com/storage/", null, "images"));
+        assertEquals("https://minio.example.com/storage/images", config.getBucketUrl());
+    }
+
+    @Test
+    @DisplayName("云厂商域名的大小写不影响桶寻址方式")
+    void shouldRecognizeMixedCaseCloudEndpoint() {
+        var config = OssClientConfig.formProperties(properties("OSS-CN-HANGZHOU.ALIYUNCS.COM", null, "images"));
+        assertFalse(config.usePathStyleAccess());
+    }
 
     /**
      * 验证桶地址生成会规范化已有协议头，并正确区分路径风格与站点风格。

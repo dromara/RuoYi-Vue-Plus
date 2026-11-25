@@ -49,7 +49,7 @@ public class BucketUrlUtil {
      * @return 路径风格的桶地址
      */
     public static String getPathStyleBucketUrl(boolean isHttps, String base, String bucketName) {
-        String baseUrl = removeHttpProtocolHeader(base);
+        String baseUrl = StringUtils.stripEnd(removeHttpProtocolHeader(base), "/");
         if (isHttps) {
             return String.format(PATH_STYLE_HTTPS_FORMATE, baseUrl, bucketName);
         }

@@ -272,7 +272,7 @@ public class OssClientConfig implements Config<OssClientConfig, OssClientConfig.
      */
     private static boolean resolvePathStyleAccess(OssProperties properties) {
         // 旧配置没有显式路径风格字段，只能继续按内置云厂商 endpoint 做兼容推断。
-        return !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+        return !StringUtils.containsAnyIgnoreCase(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
     }
 
     /**

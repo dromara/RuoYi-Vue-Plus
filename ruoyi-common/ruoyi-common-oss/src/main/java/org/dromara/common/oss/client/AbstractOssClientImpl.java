@@ -530,8 +530,7 @@ public abstract class AbstractOssClientImpl implements OssClient {
         if (size == null) {
             size = contentLength == null ? 0 : contentLength;
         }
-        String bucketUrl = config.getBucketUrl(bucket);
-        return PutObjectResult.form("%s/%s".formatted(bucketUrl, key), key, response.eTag(), size);
+        return PutObjectResult.form(objectUrl(bucket, key), key, response.eTag(), size);
     }
 
     /**
@@ -640,9 +639,8 @@ public abstract class AbstractOssClientImpl implements OssClient {
                         .uploadId(uploadId)
                         .multipartUpload(upload -> upload.parts(sortedParts)))
                 .join();
-            String bucketUrl = config.getBucketUrl(bucket);
             // 合并响应不包含文件大小，沿用普通上传未知大小返回 0 的约定。
-            return PutObjectResult.form("%s/%s".formatted(bucketUrl, key), key, response.eTag(), 0);
+            return PutObjectResult.form(objectUrl(bucket, key), key, response.eTag(), 0);
         } catch (Exception e) {
             throw toStorageException(e);
         }
@@ -1264,6 +1262,12 @@ public abstract class AbstractOssClientImpl implements OssClient {
             basePath = basePath + "/";
         }
         return basePath + objectPath;
+    }
+
+    /** 将原始对象键编码为桶地址下的 URL 路径。 */
+    private String objectUrl(String bucket, String key) {
+        String base = config.getBucketUrl(bucket);
+        return (base.endsWith("/") ? base : base + "/") + SdkHttpUtils.urlEncodeIgnoreSlashes(key);
     }
 
     /**
