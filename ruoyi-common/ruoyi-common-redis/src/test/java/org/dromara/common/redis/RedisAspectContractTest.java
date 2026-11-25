@@ -66,6 +66,17 @@ import static org.mockito.Mockito.*;
 @DisplayName("Redis 基础设施契约单元测试")
 class RedisAspectContractTest {
 
+    @Test
+    void shouldNotTurnExpiringEntryIntoPermanentValueOnRedisFive() {
+        RBucket<Object> bucket = mock();
+        when(redissonClient.getBucket("expiring")).thenReturn(bucket);
+        doThrow(new UnsupportedOperationException("KEEPTTL")).when(bucket).setAndKeepTTL("updated");
+        when(bucket.remainTimeToLive()).thenReturn(0L);
+        RedisUtils.setCacheObject("expiring", "updated", true);
+        verify(bucket, never()).set("updated");
+        verify(bucket).set("updated", Duration.ofMillis(1));
+    }
+
     private static RedissonClient redissonClient;
     private static CacheManager cacheManager;
 

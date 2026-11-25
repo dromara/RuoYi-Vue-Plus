@@ -153,10 +153,10 @@ public class RedisUtils {
                 bucket.setAndKeepTTL(value);
             } catch (Exception e) {
                 long timeToLive = bucket.remainTimeToLive();
-                if (timeToLive <= 0) {
+                if (timeToLive < 0) {
                     bucket.set(value);
                 } else {
-                    bucket.set(value, Duration.ofMillis(timeToLive));
+                    bucket.set(value, Duration.ofMillis(Math.max(1, timeToLive)));
                 }
             }
         } else {
