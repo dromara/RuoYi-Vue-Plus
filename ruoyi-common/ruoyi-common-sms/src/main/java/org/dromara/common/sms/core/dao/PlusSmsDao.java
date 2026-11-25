@@ -58,7 +58,7 @@ public class PlusSmsDao implements SmsDao {
      */
     @Override
     public Object remove(String key) {
-        return RedisUtils.deleteObject(GlobalConstants.GLOBAL_REDIS_KEY + key);
+        return RedisUtils.getClient().getBucket(GlobalConstants.GLOBAL_REDIS_KEY + key).getAndDelete();
     }
 
     /**
