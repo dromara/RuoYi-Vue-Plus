@@ -16,6 +16,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -130,8 +131,7 @@ class CoreInfrastructureContractTest {
         when(annotation.dictType()).thenReturn("sys_status");
         when(annotation.separator()).thenReturn("|");
         DictService dictService = mock(DictService.class);
-        when(dictService.getDictLabel("sys_status", "0|1", "|")).thenReturn("正常|停用");
-        when(dictService.getDictLabel("sys_status", "9", "|")).thenReturn("");
+        when(dictService.getAllDictByDictType("sys_status")).thenReturn(Map.of("0", "正常", "1", "停用"));
         DictPatternValidator validator = new DictPatternValidator();
         validator.initialize(annotation);
 
@@ -141,6 +141,11 @@ class CoreInfrastructureContractTest {
             assertTrue(validator.isValid(null, mock(ConstraintValidatorContext.class)));
             assertTrue(validator.isValid("0|1", null));
             assertFalse(validator.isValid("9", null));
+            assertAll(
+                () -> assertFalse(validator.isValid("0|9", null)),
+                () -> assertFalse(validator.isValid("8|9", null)),
+                () -> assertFalse(validator.isValid("0|", null))
+            );
         }
 
         DictPattern invalidAnnotation = mock(DictPattern.class);

@@ -4,12 +4,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("EnumPatternValidator 单元测试")
 class EnumPatternValidatorTest {
+
+    @Test
+    @DisplayName("整数枚举仅接受数值精确匹配的编码")
+    void shouldRejectLossyIntegerConversions() throws NoSuchFieldException {
+        EnumPatternValidator validator = validatorFor("status");
+        assertAll(
+            () -> assertTrue(validator.isValid(new BigDecimal("2.00"), null)),
+            () -> assertFalse(validator.isValid(new BigDecimal("1.9"), null)),
+            () -> assertFalse(validator.isValid("2.5", null)),
+            () -> assertFalse(validator.isValid(4_294_967_297L, null))
+        );
+    }
 
     /**
      * 验证字符串形式的数字能够按枚举字段实际类型转换并完成合法值校验。

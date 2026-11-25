@@ -6,6 +6,9 @@ import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 
+import java.util.Map;
+import java.util.regex.Pattern;
+
 /**
  * 自定义字典值校验器
  *
@@ -51,8 +54,13 @@ public class DictPatternValidator implements ConstraintValidator<DictPattern, St
         if (StringUtils.isBlank(dictType)) {
             return false;
         }
-        String dictLabel = SpringUtils.getBean(DictService.class).getDictLabel(dictType, value, separator);
-        return StringUtils.isNotBlank(dictLabel);
+        Map<String, String> entries = SpringUtils.getBean(DictService.class).getAllDictByDictType(dictType);
+        for (String code : value.split(Pattern.quote(separator), -1)) {
+            if (StringUtils.isBlank(code) || !entries.containsKey(code)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

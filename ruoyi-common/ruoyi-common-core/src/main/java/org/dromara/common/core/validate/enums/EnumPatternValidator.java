@@ -7,6 +7,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -79,7 +81,20 @@ public class EnumPatternValidator implements ConstraintValidator<EnumPattern, Ob
             return false;
         }
         Object convertedValue = Convert.convertWithCheck(valueType, value, null, true);
-        return convertedValue != null && values.contains(convertedValue);
+        if (!values.contains(convertedValue)) {
+            return false;
+        }
+        if ((value instanceof Number || value instanceof CharSequence) && !valueType.isInstance(value)
+            && (convertedValue instanceof Byte || convertedValue instanceof Short || convertedValue instanceof Integer
+                || convertedValue instanceof Long || convertedValue instanceof BigInteger)) {
+            try {
+                BigDecimal input = new BigDecimal(value.toString().trim());
+                return input.compareTo(new BigDecimal(convertedValue.toString())) == 0;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

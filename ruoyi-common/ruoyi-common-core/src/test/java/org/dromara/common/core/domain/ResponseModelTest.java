@@ -60,6 +60,10 @@ class ResponseModelTest {
     @Test
     @DisplayName("分页结果将空集合参数转换为空列表")
     void pageResultShouldNormalizeNullRows() {
+        PageResult<String> empty = PageResult.build();
+        assertEquals(List.of(), empty.getRows());
+        assertEquals(0L, empty.getTotal());
+
         PageResult<String> result = PageResult.build(null, 10L);
         PageResult<String> constructed = new PageResult<>(null, 5L);
 
