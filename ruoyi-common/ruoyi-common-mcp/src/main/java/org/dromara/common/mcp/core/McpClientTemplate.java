@@ -30,6 +30,10 @@ public class McpClientTemplate {
     public Map<String, List<String>> listTools() {
         Map<String, List<String>> result = new LinkedHashMap<>();
         for (McpSyncClient client : mcpSyncClients) {
+            if (!canListOrCallTools(client)) {
+                result.put(getServerName(client), List.of());
+                continue;
+            }
             List<String> tools = client.listTools().tools().stream()
                 .map(McpSchema.Tool::name)
                 .toList();
@@ -48,6 +52,9 @@ public class McpClientTemplate {
     public Map<String, McpToolCallResult> callTool(String toolName, Map<String, Object> arguments) {
         Map<String, McpToolCallResult> result = new LinkedHashMap<>();
         for (McpSyncClient client : mcpSyncClients) {
+            if (!canListOrCallTools(client)) {
+                continue;
+            }
             McpSchema.CallToolResult callResult = client.callTool(new McpSchema.CallToolRequest(toolName, arguments));
             result.put(getServerName(client), McpToolCallResult.of(getServerName(client), callResult));
         }
@@ -64,6 +71,7 @@ public class McpClientTemplate {
      */
     public Optional<McpToolCallResult> callTool(String serverName, String toolName, Map<String, Object> arguments) {
         return findClient(serverName)
+            .filter(this::canListOrCallTools)
             .map(client -> McpToolCallResult.of(serverName, client.callTool(new McpSchema.CallToolRequest(toolName, arguments))));
     }
 
@@ -76,6 +84,9 @@ public class McpClientTemplate {
     public Map<String, McpResourceReadResult> readResource(String uri) {
         Map<String, McpResourceReadResult> result = new LinkedHashMap<>();
         for (McpSyncClient client : mcpSyncClients) {
+            if (!canReadResources(client)) {
+                continue;
+            }
             McpSchema.ReadResourceResult readResult = client.readResource(new McpSchema.ReadResourceRequest(uri));
             result.put(getServerName(client), McpResourceReadResult.of(getServerName(client), readResult));
         }
@@ -91,7 +102,18 @@ public class McpClientTemplate {
      */
     public Optional<McpResourceReadResult> readResource(String serverName, String uri) {
         return findClient(serverName)
+            .filter(this::canReadResources)
             .map(client -> McpResourceReadResult.of(serverName, client.readResource(new McpSchema.ReadResourceRequest(uri))));
+    }
+
+    private boolean canListOrCallTools(McpSyncClient client) {
+        var capabilities = client.getServerCapabilities();
+        return capabilities == null || capabilities.tools() != null;
+    }
+
+    private boolean canReadResources(McpSyncClient client) {
+        var capabilities = client.getServerCapabilities();
+        return capabilities == null || capabilities.resources() != null;
     }
 
     /**
@@ -101,6 +123,9 @@ public class McpClientTemplate {
      * @return MCP Client
      */
     public Optional<McpSyncClient> findClient(String serverName) {
+        if (serverName == null) {
+            return Optional.empty();
+        }
         return mcpSyncClients.stream()
             .filter(client -> serverName.equals(getServerName(client)))
             .findFirst();
