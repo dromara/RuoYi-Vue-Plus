@@ -2,13 +2,13 @@ package org.dromara.common.core.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.lang.tree.TreeBuilder;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.lang.tree.parser.NodeParser;
 import cn.hutool.core.util.StrUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,7 +30,7 @@ public class TreeBuildUtils extends TreeUtil {
     /**
      * 根据前端定制差异化字段
      */
-    public static final TreeNodeConfig DEFAULT_CONFIG = TreeNodeConfig.DEFAULT_CONFIG.setNameKey("label");
+    public static final TreeNodeConfig DEFAULT_CONFIG = new TreeNodeConfig().setNameKey("label");
 
     /**
      * 使用动态规划构建树形结构
@@ -64,8 +64,19 @@ public class TreeBuildUtils extends TreeUtil {
         if (CollUtil.isEmpty(list)) {
             return CollUtil.newArrayList();
         }
-        K k = ReflectUtils.invokeGetter(list.getFirst(), "parentId");
-        return TreeUtil.build(list, k, DEFAULT_CONFIG, nodeParser);
+        Map<K, Tree<K>> nodes = new LinkedHashMap<>();
+        for (T item : list) {
+            Tree<K> node = new Tree<>(DEFAULT_CONFIG);
+            nodeParser.parse(item, node);
+            nodes.put(node.getId(), node);
+        }
+        for (Tree<K> node : nodes.values()) {
+            K parentId = node.getParentId();
+            if (!nodes.containsKey(parentId)) {
+                return TreeBuilder.of(parentId, DEFAULT_CONFIG).append(nodes).buildList();
+            }
+        }
+        return CollUtil.newArrayList();
     }
 
     /**
@@ -101,12 +112,14 @@ public class TreeBuildUtils extends TreeUtil {
             return CollUtil.newArrayList();
         }
 
-        Set<K> rootParentIds = StreamUtils.toSet(list, getParentId);
+        // null 也是合法的顶级父 ID，需要保留这一组及其子树。
+        Set<K> rootParentIds = list.stream().map(getParentId).collect(Collectors.toSet());
         rootParentIds.removeAll(StreamUtils.toSet(list, getId));
 
         // 构建每一个根 parentId 下的树，并合并成最终结果列表
         return rootParentIds.stream()
-            .flatMap(rootParentId -> TreeUtil.build(list, rootParentId, parser).stream())
+            .flatMap(rootParentId -> TreeUtil.build(list, rootParentId, DEFAULT_CONFIG, parser).stream())
+            .sorted()
             .collect(Collectors.toList());
     }
 
