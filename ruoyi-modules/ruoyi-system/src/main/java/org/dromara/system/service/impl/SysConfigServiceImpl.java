@@ -221,7 +221,8 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * 根据参数 key 获取 Map 类型的配置
      *
      * @param configKey 参数 key
-     * @return Dict 对象，如果配置为空或无法解析则返回空 Dict
+     * @return Dict 对象；配置为 null、空字符串或纯空白时返回 null
+     * @throws RuntimeException 配置不是有效 JSON 或无法转换为目标类型
      */
     @Override
     public Dict getConfigMap(String configKey) {
@@ -233,7 +234,8 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * 根据参数 key 获取 Map 类型的配置列表
      *
      * @param configKey 参数 key
-     * @return Dict 列表，如果配置为空或无法解析则返回空列表
+     * @return Dict 列表；配置为 null、空字符串或纯空白时返回 null
+     * @throws RuntimeException 配置不是有效 JSON 或无法转换为目标类型
      */
     @Override
     public List<Dict> getConfigArrayMap(String configKey) {
@@ -246,7 +248,9 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      *
      * @param configKey 参数 key
      * @param clazz     目标对象类型
-     * @return 对象实例，如果配置为空或无法解析，返回 null
+     * @param <T>       目标对象泛型
+     * @return 对象实例；配置为 null 或空字符串时返回 null
+     * @throws RuntimeException 配置不是有效 JSON 或无法转换为目标类型
      */
     @Override
     public <T> T getConfigObject(String configKey, Class<T> clazz) {
@@ -255,11 +259,13 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     }
 
     /**
-     * 根据参数 key 获取指定类型的配置列表=
+     * 根据参数 key 获取指定类型的配置列表
      *
      * @param configKey 参数 key
      * @param clazz     目标元素类型
-     * @return 指定类型列表，如果配置为空或无法解析，返回空列表
+     * @param <T>       元素类型泛型
+     * @return 指定类型列表；配置为 null 或空字符串时返回空列表，JSON null 返回 null
+     * @throws RuntimeException 配置不是有效 JSON 或无法转换为目标类型
      */
     @Override
     public <T> List<T> getConfigArray(String configKey, Class<T> clazz) {

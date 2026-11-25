@@ -181,11 +181,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
-     * 是否包含字符串
+     * 判断字符串是否与候选字符串之一相等，忽略大小写
      *
      * @param str  验证字符串
      * @param strs 字符串组
-     * @return 包含返回true
+     * @return 与任一候选字符串忽略大小写相等时返回 true，否则返回 false
      */
     public static boolean inStringIgnoreCase(String str, String... strs) {
         return StrUtil.equalsAnyIgnoreCase(str, strs);

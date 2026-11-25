@@ -43,20 +43,22 @@ public class SqlUtil {
     }
 
     /**
-     * SQL关键字检查
+     * 检查输入中的单引号和 SQL 敏感关键词。
+     *
+     * @param value 待检查的字符串，null 或空字符串跳过检查
+     * @throws UtilException 输入包含单引号或 SQL 敏感关键词
      */
     public static void filterKeyword(String value) {
         if (StringUtils.isEmpty(value)) {
             return;
         }
 
-        // ==================== 核心增强：自动转义单引号 ====================
-        // 不抛异常、不破坏业务、不改变原方法行为、自动防注入
+        // 拒绝包含单引号的输入
         if (value.contains("'")) {
             throw new UtilException("请求参数包含非法字符【'】，已禁止执行");
         }
 
-        // ==================== 原有逻辑不变 ====================
+        // 统一空白字符和大小写后检查敏感关键词
         String normalizedValue = value.replaceAll("[\\p{Z}\\s]+", " ").toLowerCase(Locale.ROOT);
         String[] sqlKeywords = StringUtils.split(SQL_REGEX, "\\|");
         for (String sqlKeyword : sqlKeywords) {

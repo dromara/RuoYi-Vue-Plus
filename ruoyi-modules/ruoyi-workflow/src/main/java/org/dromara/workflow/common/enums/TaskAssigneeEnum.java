@@ -73,14 +73,11 @@ public enum TaskAssigneeEnum {
     }
 
     /**
-     * 根据代码获取对应的枚举类型
-     * <p>
-     * 通过传入代码，查找并返回匹配的枚举项。如果未找到匹配项，会抛出 {@link ServiceException}。
-     * </p>
+     * 根据类型编码前缀获取对应的办理人类型。
      *
-     * @param code 代码，用于匹配对应的枚举项
-     * @return TaskAssigneeEnum 返回对应的枚举类型
-     * @throws IllegalArgumentException 如果未找到匹配的枚举项
+     * @param code 类型编码前缀，例如 "role:"；空字符串匹配用户类型
+     * @return 对应的办理人类型
+     * @throws ServiceException 未找到匹配的枚举项
      */
     public static TaskAssigneeEnum fromCode(String code) {
         for (TaskAssigneeEnum type : values()) {

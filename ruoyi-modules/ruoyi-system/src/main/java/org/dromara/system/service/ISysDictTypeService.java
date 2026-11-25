@@ -26,7 +26,7 @@ public interface ISysDictTypeService {
     PageResult<SysDictTypeVo> selectPageDictTypeList(SysDictTypeBo dictType, PageQuery pageQuery);
 
     /**
-     * 根据条件分页查询字典类型
+     * 根据条件查询字典类型
      *
      * @param dictType 字典类型信息
      * @return 字典类型集合信息

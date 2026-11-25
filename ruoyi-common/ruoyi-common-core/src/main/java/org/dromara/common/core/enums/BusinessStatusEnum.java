@@ -120,7 +120,7 @@ public enum BusinessStatusEnum {
     /**
      * 获取运行中的实例状态列表
      *
-     * @return 包含运行中实例状态的不可变列表
+     * @return 包含运行中实例状态的固定长度列表
      * （包含 DRAFT、WAITING、BACK 和 CANCEL 状态）
      */
     public static List<String> runningStatus() {
@@ -130,7 +130,7 @@ public enum BusinessStatusEnum {
     /**
      * 获取结束实例的状态列表
      *
-     * @return 包含结束实例状态的不可变列表
+     * @return 包含结束实例状态的固定长度列表
      * （包含 FINISH、INVALID 和 TERMINATION 状态）
      */
     public static List<String> finishStatus() {

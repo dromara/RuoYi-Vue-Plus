@@ -47,7 +47,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     }
 
     /**
-     * 根据条件分页查询字典数据
+     * 根据条件查询字典数据
      *
      * @param dictData 字典数据信息
      * @return 字典数据集合信息

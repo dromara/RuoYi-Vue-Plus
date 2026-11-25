@@ -299,10 +299,10 @@ public class FlwTaskAssigneeServiceImpl implements PermissionHandler, HandlerSel
     }
 
     /**
-     * 解析 storageId 字符串，返回类型和ID的组合
+     * 解析办理人标识，保留标识值的字符串形式。
      *
-     * @param storageId 例如 "user:123" 或 "456"
-     * @return Pair(TaskAssigneeEnum, Long)，如果格式非法返回 null
+     * @param storageId 用户 ID（如 "456"）、带类型前缀的标识（如 "role:123"）或以 $、# 开头的表达式
+     * @return 办理人类型与标识值；表达式保留完整原文，输入为空白或类型前缀无法识别时返回 null
      */
     private Pair<TaskAssigneeEnum, String> parseStorageId(String storageId) {
         if (StringUtils.isBlank(storageId)) {

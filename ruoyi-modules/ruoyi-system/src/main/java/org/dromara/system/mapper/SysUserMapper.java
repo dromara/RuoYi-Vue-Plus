@@ -57,7 +57,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
     }
 
     /**
-     * 根据条件分页查询用户列表
+     * 根据条件查询用户列表
      *
      * @param user    查询条件
      * @param deptIds 部门ID集合
@@ -107,7 +107,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
      *
      * @param page    分页信息
      * @param user    查询条件
-     * @param userIds 未分配用户角色的用户ID列表
+     * @param userIds 已分配指定角色、需要排除的用户ID列表
      * @return 用户信息集合信息
      */
     @DataPermission({

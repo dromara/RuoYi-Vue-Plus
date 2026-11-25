@@ -121,7 +121,7 @@ public class GenTableServiceImpl implements IGenTableService {
      *
      * @param genTable  包含查询条件的GenTable对象
      * @param pageQuery 包含分页信息的PageQuery对象
-     * @return 包含分页结果的TableDataInfo对象
+     * @return 数据库表分页结果
      */
     @DS("#genTable.dataName")
     @Override

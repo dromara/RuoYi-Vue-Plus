@@ -103,8 +103,8 @@ public class JsonUtils {
      * 将JSON格式的字符串转换为Dict对象
      *
      * @param text JSON格式的字符串
-     * @return 转换后的Dict对象，如果字符串为空或者不是JSON格式则返回null
-     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
+     * @return Dict 对象；输入为 null、空字符串、纯空白或 JSON null 时返回 null
+     * @throws RuntimeException 输入不是有效 JSON 或无法转换为 Dict
      */
     public static Dict parseMap(String text) {
         if (StringUtils.isBlank(text)) {

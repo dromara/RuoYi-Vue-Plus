@@ -60,7 +60,7 @@ public class RepeatSubmitAspect {
         // 请求地址（作为存放cache的key值）
         String url = request.getRequestURI();
 
-        // 唯一值（没有消息头则使用请求地址）
+        // 读取 token 请求头，缺失时使用空字符串，与请求参数共同生成摘要
         String submitKey = StringUtils.trimToEmpty(request.getHeader(SaManager.getConfig().getTokenName()));
 
         submitKey = SecureUtil.md5(submitKey + StringUtils.COLON + nowParams);

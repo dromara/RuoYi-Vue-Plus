@@ -119,7 +119,7 @@ public class DateUtils extends DateUtil {
      * 将日期格式化为仿微信的友好时间
      * <p>
      * 规则说明：
-     * 1. 未来时间：yyyy-MM-dd HH:mm
+     * 1. 未来时间：yyyy-MM-dd HH:mm:ss
      * 2. 今天：
      * - 1 分钟内：刚刚
      * - 1 小时内：X 分钟前
@@ -127,7 +127,7 @@ public class DateUtils extends DateUtil {
      * 3. 昨天：昨天 HH:mm
      * 4. 本周：周X HH:mm
      * 5. 今年内：MM-dd HH:mm
-     * 6. 非今年：yyyy-MM-dd HH:mm
+     * 6. 非今年：yyyy-MM-dd HH:mm:ss
      *
      * @param date 日期时间
      * @return 格式化后的时间描述
