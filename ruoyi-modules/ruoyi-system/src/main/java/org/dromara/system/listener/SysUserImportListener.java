@@ -68,15 +68,17 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
      */
     @Override
     public void invoke(SysUserImportVo userVo, AnalysisContext context) {
-        SysUserVo sysUser = this.userService.selectUserByUserName(userVo.getUserName());
         try {
             // 验证是否存在这个用户
+            SysUserVo sysUser = userService.selectUserByUserName(userVo.getUserName());
             if (ObjectUtil.isNull(sysUser)) {
                 SysUserBo user = BeanUtil.toBean(userVo, SysUserBo.class);
                 ValidatorUtils.validate(user);
                 user.setPassword(password);
                 user.setCreateBy(operUserId);
-                userService.insertUser(user);
+                if (userService.insertUser(user) < 1) {
+                    throw new ServiceException("未新增用户记录");
+                }
                 successNum++;
                 successMsg.append(NL).append(successNum).append("、账号 ").append(user.getUserName()).append(" 导入成功");
             } else if (isUpdateSupport) {
@@ -133,12 +135,9 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
             @Override
             public String getAnalysis() {
                 if (failureNum > 0) {
-                    failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
-                    throw new ServiceException(failureMsg.toString());
-                } else {
-                    successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
+                    throw new ServiceException("很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：" + failureMsg);
                 }
-                return successMsg.toString();
+                return "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：" + successMsg;
             }
 
             /**
