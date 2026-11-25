@@ -10,6 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("common-doc 功能单元测试")
 class SaTokenSecurityMetadataTest {
 
+    @Test
+    @DisplayName("未识别的权限组合模式按默认 AND 展示")
+    void shouldUseDefaultSymbolForUnknownMode() {
+        var info = new SaTokenSecurityMetadata.AuthInfo();
+        info.setMode("unknown");
+        assertEquals(" & ", info.getModeSymbol());
+        info.setMode("or");
+        assertEquals(" | ", info.getModeSymbol());
+    }
+
     /**
      * 验证未声明权限和忽略权限时分别输出登录要求与忽略检查说明。
      */

@@ -93,16 +93,33 @@ public class ClassTagOperationCustomizer implements GlobalOperationCustomizer, G
      */
     @Override
     public void customise(OpenAPI openApi) {
+        Set<String> usedNames = new LinkedHashSet<>();
+        if (openApi.getPaths() != null) {
+            openApi.getPaths().values().stream()
+                .flatMap(path -> path.readOperations().stream())
+                .map(Operation::getTags)
+                .filter(Objects::nonNull)
+                .forEach(usedNames::addAll);
+        }
         if (!CollectionUtils.isEmpty(openApi.getTags()) && !CollectionUtils.isEmpty(replacedAutoTagNames)) {
             // 移除已被 JavaDoc tag 替换的默认类名 tag，避免 Swagger UI 出现空分组
-            openApi.getTags().removeIf(tag -> replacedAutoTagNames.contains(tag.getName()));
+            openApi.getTags().removeIf(tag -> replacedAutoTagNames.contains(tag.getName()) && !usedNames.contains(tag.getName()));
         }
         // 将类级 @Tag 描述或 JavaDoc 描述补充到 OpenAPI 顶层 tags
-        tags.values().forEach(tag -> {
-            if (openApi.getTags() == null || openApi.getTags().stream().noneMatch(item -> Objects.equals(item.getName(), tag.getName()))) {
-                openApi.addTagsItem(tag);
+        for (String name : usedNames) {
+            Tag metadata = tags.get(name);
+            if (metadata == null) {
+                continue;
             }
-        });
+            Tag existing = openApi.getTags() == null ? null : openApi.getTags().stream()
+                .filter(item -> name.equals(item.getName()))
+                .findFirst().orElse(null);
+            if (existing == null) {
+                openApi.addTagsItem(metadata);
+            } else if (StringUtils.isBlank(existing.getDescription())) {
+                existing.setDescription(metadata.getDescription());
+            }
+        }
     }
 
     /**

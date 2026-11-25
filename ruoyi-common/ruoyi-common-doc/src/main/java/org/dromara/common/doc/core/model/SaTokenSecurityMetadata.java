@@ -166,10 +166,7 @@ public class SaTokenSecurityMetadata {
          * @return AND→&，OR→|，默认→&
          */
         public String getModeSymbol() {
-            if (mode == null) {
-                return " & "; // 默认AND，返回&
-            }
-            return "AND".equalsIgnoreCase(mode) ? " & " : " | ";
+            return "OR".equalsIgnoreCase(mode) ? " | " : " & ";
         }
 
     }
