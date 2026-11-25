@@ -63,12 +63,12 @@ public class SocialUtils {
             case "github" -> new AuthGithubRequest(builder.build(), STATE_CACHE);
             case "gitee" -> new AuthGiteeRequest(builder.build(), STATE_CACHE);
             case "weibo" -> new AuthWeiboRequest(builder.build(), STATE_CACHE);
-            case "coding" -> new AuthCodingRequest(builder.build(), STATE_CACHE);
+            case "coding" -> new AuthCodingRequest(builder.domainPrefix(obj.getCodingGroupName()).build(), STATE_CACHE);
             case "oschina" -> new AuthOschinaRequest(builder.build(), STATE_CACHE);
             // 支付宝在创建回调地址时，不允许使用localhost或者127.0.0.1，所以这儿的回调地址使用的局域网内的ip
             case "alipay_wallet" ->
                 new AuthAlipayRequest(builder.build(), socialProperties.getType().get("alipay_wallet").getAlipayPublicKey(), STATE_CACHE);
-            case "qq" -> new AuthQqRequest(builder.build(), STATE_CACHE);
+            case "qq" -> new AuthQqRequest(builder.unionId(Boolean.TRUE.equals(obj.getUnionId())).build(), STATE_CACHE);
             case "wechat_open" -> new AuthWeChatOpenRequest(builder.build(), STATE_CACHE);
             case "taobao" -> new AuthTaobaoRequest(builder.build(), STATE_CACHE);
             case "douyin" -> new AuthDouyinRequest(builder.build(), STATE_CACHE);

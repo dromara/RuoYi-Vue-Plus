@@ -27,6 +27,27 @@ import static org.mockito.Mockito.mock;
 @DisplayName("SocialUtils 本地构造契约单元测试")
 class SocialUtilsTest {
 
+    @Test
+    void shouldHonorQqUnionIdSetting() throws Exception {
+        var qq = config();
+        qq.setUnionId(true);
+        assertTrue(requestConfig(SocialUtils.getAuthRequest("qq", properties("qq", qq))).isUnionId());
+    }
+
+    @Test
+    void shouldUseConfiguredCodingTeamDomain() throws Exception {
+        var coding = config();
+        coding.setCodingGroupName("team-demo");
+        assertEquals("team-demo", requestConfig(SocialUtils.getAuthRequest("coding", properties("coding", coding))).getDomainPrefix());
+    }
+
+    @Test
+    void shouldReportMissingProviderWhenTypeSectionIsAbsent() {
+        var error = assertThrows(AuthException.class,
+            () -> SocialUtils.getAuthRequest("github", new SocialProperties()));
+        assertEquals("不支持的第三方登录类型", error.getMessage());
+    }
+
     /**
      * 注册授权状态缓存 mock，使 SocialUtils 可以完成请求对象构造而不连接 Redis。
      */

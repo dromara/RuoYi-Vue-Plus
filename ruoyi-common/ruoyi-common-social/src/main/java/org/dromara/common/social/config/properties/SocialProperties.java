@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -19,6 +20,6 @@ public class SocialProperties {
     /**
      * 授权类型
      */
-    private Map<String, SocialLoginConfigProperties> type;
+    private Map<String, SocialLoginConfigProperties> type = new LinkedHashMap<>();
 
 }
