@@ -302,6 +302,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
         SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         // 新增用户信息
         int rows = userMapper.insert(sysUser);
+        if (rows == 0) {
+            return 0;
+        }
         user.setUserId(sysUser.getUserId());
         // 新增用户岗位关联
         insertUserPost(user, false);
@@ -426,19 +429,22 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     private void insertUserPost(SysUserBo user, boolean clear) {
         Long[] postIdArr = user.getPostIds();
-        if (ArrayUtil.isEmpty(postIdArr)) {
+        if (postIdArr == null) {
             return;
         }
         List<Long> postIds = Arrays.asList(postIdArr);
 
         // 校验是否有权限操作这些岗位（含数据权限控制）
-        if (postMapper.selectPostCount(postIds) != postIds.size()) {
+        if (!postIds.isEmpty() && postMapper.selectPostCount(postIds) != postIds.size()) {
             throw new ServiceException("没有权限访问岗位的数据");
         }
 
         // 是否清除旧的用户岗位绑定
         if (clear) {
             userPostMapper.lambda().eq(SysUserPost::getUserId, user.getUserId()).delete();
+        }
+        if (postIds.isEmpty()) {
+            return;
         }
 
         // 构建用户岗位关联列表并批量插入
@@ -449,7 +455,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
                 up.setPostId(postId);
                 return up;
             });
-        userPostMapper.insertBatch(list);
+        if (!userPostMapper.insertBatch(list)) {
+            throw new ServiceException("保存用户岗位关联失败");
+        }
     }
 
     /**
@@ -494,7 +502,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
                 ur.setRoleId(roleId);
                 return ur;
             });
-        userRoleMapper.insertBatch(list);
+        if (!userRoleMapper.insertBatch(list)) {
+            throw new ServiceException("保存用户角色关联失败");
+        }
     }
 
     /**

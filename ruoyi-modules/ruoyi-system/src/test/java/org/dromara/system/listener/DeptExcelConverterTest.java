@@ -23,6 +23,19 @@ import static org.mockito.Mockito.*;
 class DeptExcelConverterTest {
 
     @Test
+    void templateOptionsExposeUniqueDepartmentPaths() {
+        var departments = mock(ISysDeptService.class);
+        var root = new Tree<Long>(TreeBuildUtils.DEFAULT_CONFIG).setId(1L).setName("总部");
+        var child = new Tree<Long>(TreeBuildUtils.DEFAULT_CONFIG).setId(7L).setName("采购");
+        root.setChildren(List.of(child));
+        when(departments.selectDeptTreeList(any())).thenReturn(List.of(root));
+        try (var beans = mockStatic(SpringUtil.class)) {
+            beans.when(() -> SpringUtil.getBean(ISysDeptService.class)).thenReturn(departments);
+            assertEquals(java.util.Set.of("总部","总部/采购"), new DeptExcelOptions().getOptions());
+        }
+    }
+
+    @Test
     void shouldRoundTripDepartmentPathsThroughUserWorkbooks() throws Exception {
         var departments = mock(ISysDeptService.class);
         var root = new Tree<Long>(TreeBuildUtils.DEFAULT_CONFIG).setId(1L).setName("总部");

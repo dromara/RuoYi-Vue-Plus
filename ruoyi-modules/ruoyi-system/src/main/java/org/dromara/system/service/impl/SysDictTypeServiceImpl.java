@@ -176,6 +176,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         SysDictType dict = MapstructUtils.convert(bo, SysDictType.class);
         int row = dictTypeMapper.insert(dict);
         if (row > 0) {
+            CacheUtils.evict(CacheNames.SYS_DICT_TYPE, dict.getDictType());
             // 新增 type 下无 data 数据 返回空防止缓存穿透
             return new ArrayList<>();
         }
@@ -194,12 +195,18 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     public List<SysDictDataVo> updateDictType(SysDictTypeBo bo) {
         SysDictType dict = MapstructUtils.convert(bo, SysDictType.class);
         SysDictType oldDict = dictTypeMapper.selectById(dict.getDictId());
-        dictDataMapper.lambda()
-            .set(SysDictData::getDictType, dict.getDictType())
-            .eq(SysDictData::getDictType, oldDict.getDictType())
-            .update();
+        if (oldDict == null) {
+            throw new ServiceException("字典类型不存在，无法修改");
+        }
         int row = dictTypeMapper.updateById(dict);
         if (row > 0) {
+            if (!StringUtils.equals(oldDict.getDictType(), dict.getDictType())) {
+                dictDataMapper.lambda()
+                    .set(SysDictData::getDictType, dict.getDictType())
+                    .eq(SysDictData::getDictType, oldDict.getDictType())
+                    .update();
+                CacheUtils.evict(CacheNames.SYS_DICT_TYPE, dict.getDictType());
+            }
             CacheUtils.evict(CacheNames.SYS_DICT, oldDict.getDictType());
             CacheUtils.evict(CacheNames.SYS_DICT_TYPE, oldDict.getDictType());
             return dictDataMapper.selectDictDataByType(dict.getDictType());

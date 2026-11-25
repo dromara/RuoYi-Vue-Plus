@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.excel.utils.ExcelBuilder;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
@@ -130,6 +131,10 @@ public class SysConfigController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/updateByKey")
     public R<Void> updateByKey(@RequestBody SysConfigBo config) {
+        if (StringUtils.isBlank(config.getConfigKey())) {
+            return R.fail("参数键名不能为空");
+        }
+        config.setConfigId(null);
         configService.updateConfig(config);
         return R.ok();
     }

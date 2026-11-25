@@ -81,7 +81,8 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     private LambdaQueryWrapper<SysNotice> buildQueryWrapper(SysNoticeBo bo) {
         LambdaQueryBuilder<SysNotice> builder = QueryBuilder.lambda(SysNotice.class)
             .likeIfText(SysNotice::getNoticeTitle, bo.getNoticeTitle())
-            .eqIfText(SysNotice::getNoticeType, bo.getNoticeType());
+            .eqIfText(SysNotice::getNoticeType, bo.getNoticeType())
+            .eqIfText(SysNotice::getStatus, bo.getStatus());
         if (StringUtils.isNotBlank(bo.getCreateByName())) {
             SysUserVo sysUser = userMapper.lambda().eq(SysUser::getUserName, bo.getCreateByName()).voOne();
             builder.eq(SysNotice::getCreateBy, ObjectUtils.notNullGetter(sysUser, SysUserVo::getUserId));

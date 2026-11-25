@@ -150,12 +150,11 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
         SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
         if (config.getConfigId() != null) {
             SysConfig temp = configMapper.selectById(config.getConfigId());
-            if (ObjectUtil.isNotNull(temp) && !StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
+            row = configMapper.updateById(config);
+            if (row > 0 && ObjectUtil.isNotNull(temp) && !StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
                 CacheUtils.evict(CacheNames.SYS_CONFIG, temp.getConfigKey());
             }
-            row = configMapper.updateById(config);
         } else {
-            CacheUtils.evict(CacheNames.SYS_CONFIG, config.getConfigKey());
             row = configMapper.lambda()
                 .eq(SysConfig::getConfigKey, config.getConfigKey())
                 .updateCount(config);
@@ -178,9 +177,9 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
             if (StringUtils.equals(SystemConstants.YES, config.getConfigType())) {
                 throw new ServiceException("内置参数【{}】不能删除", config.getConfigKey());
             }
-            CacheUtils.evict(CacheNames.SYS_CONFIG, config.getConfigKey());
         });
         configMapper.deleteByIds(configIds);
+        list.forEach(config -> CacheUtils.evict(CacheNames.SYS_CONFIG, config.getConfigKey()));
     }
 
     /**

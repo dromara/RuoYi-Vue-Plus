@@ -231,12 +231,18 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     @Transactional(rollbackFor = Exception.class)
     public int updateOssConfigStatus(SysOssConfigBo bo) {
         SysOssConfig sysOssConfig = MapstructUtils.convert(bo, SysOssConfig.class);
-        int row = ossConfigMapper.lambda().set(SysOssConfig::getStatus, SystemConstants.NO).updateCount();
-        row += ossConfigMapper.updateById(sysOssConfig);
-        if (row > 0) {
-            SpringUtils.context().publishEvent(OssConfigChangeEvent.useDefault(sysOssConfig.getConfigKey()));
+        boolean enable = SystemConstants.YES.equals(sysOssConfig.getStatus());
+        if (!enable && !SystemConstants.NO.equals(sysOssConfig.getStatus())) {
+            throw new ServiceException("默认配置状态必须为 Y 或 N");
         }
-        return row;
+        int row = enable ? ossConfigMapper.lambda().set(SysOssConfig::getStatus, SystemConstants.NO).updateCount() : 0;
+        int updated = ossConfigMapper.updateById(sysOssConfig);
+        if (updated == 0) {
+            throw new ServiceException("目标 OSS 配置未更新，无法切换默认配置");
+        }
+        String configKey = sysOssConfig.getConfigKey();
+        SpringUtils.context().publishEvent(enable ? OssConfigChangeEvent.useDefault(configKey) : OssConfigChangeEvent.clearDefault(configKey));
+        return row + updated;
     }
 
     /**

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
@@ -147,7 +148,10 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
     @Override
     public List<Long> selectDeptListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
-        return deptMapper.selectDeptListByRoleId(roleId, role.getDeptCheckStrictly());
+        if (role == null) {
+            return List.of();
+        }
+        return deptMapper.selectDeptListByRoleId(roleId, !Boolean.FALSE.equals(role.getDeptCheckStrictly()));
     }
 
     /**
@@ -342,20 +346,33 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         if (ObjectUtil.isNull(oldDept)) {
             throw new ServiceException("部门不存在，无法修改");
         }
-        if (!oldDept.getParentId().equals(dept.getParentId())) {
+        boolean parentChanged = !oldDept.getParentId().equals(dept.getParentId());
+        if (parentChanged) {
             // 如果是新父部门 则校验是否具有新父部门权限 避免越权
             this.checkDeptDataScope(dept.getParentId());
-            SysDept newParentDept = deptMapper.selectById(dept.getParentId());
-            if (ObjectUtil.isNotNull(newParentDept)) {
-                String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
-                String oldAncestors = oldDept.getAncestors();
-                dept.setAncestors(newAncestors);
-                updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
+            String newAncestors = SystemConstants.ROOT_DEPT_ANCESTORS;
+            if (!Constants.TOP_PARENT_ID.equals(dept.getParentId())) {
+                SysDept newParentDept = deptMapper.selectById(dept.getParentId());
+                if (newParentDept == null) {
+                    throw new ServiceException("父部门不存在");
+                }
+                if (dept.getDeptId().equals(newParentDept.getDeptId())
+                    || StringUtils.splitList(newParentDept.getAncestors()).contains(dept.getDeptId().toString())) {
+                    throw new ServiceException("上级部门不能是自己或下级部门");
+                }
+                newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
             }
+            dept.setAncestors(newAncestors);
         } else {
             dept.setAncestors(oldDept.getAncestors());
         }
         int result = deptMapper.updateById(dept);
+        if (result == 0) {
+            return 0;
+        }
+        if (parentChanged) {
+            updateDeptChildren(dept.getDeptId(), dept.getAncestors(), oldDept.getAncestors());
+        }
         // 如果部门状态为启用，且部门祖级列表不为空，且部门祖级列表不等于根部门祖级列表（如果部门祖级列表不等于根部门祖级列表，则说明存在上级部门）
         if (SystemConstants.NORMAL.equals(dept.getStatus())
             && StringUtils.isNotEmpty(dept.getAncestors())
@@ -397,9 +414,10 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
             list.add(dept);
         }
         if (CollUtil.isNotEmpty(list)) {
-            if (deptMapper.updateBatchById(list)) {
-                list.forEach(dept -> CacheUtils.evict(CacheNames.SYS_DEPT, dept.getDeptId()));
+            if (!deptMapper.updateBatchById(list)) {
+                throw new ServiceException("更新下级部门祖级关系失败");
             }
+            list.forEach(dept -> CacheUtils.evict(CacheNames.SYS_DEPT, dept.getDeptId()));
         }
     }
 

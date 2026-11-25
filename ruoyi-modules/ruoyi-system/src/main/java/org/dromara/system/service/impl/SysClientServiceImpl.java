@@ -108,6 +108,7 @@ public class SysClientServiceImpl implements ISysClientService {
             .eqIfText(SysClient::getClientId, bo.getClientId())
             .eqIfText(SysClient::getClientKey, bo.getClientKey())
             .eqIfText(SysClient::getClientSecret, bo.getClientSecret())
+            .eqIfText(SysClient::getDeviceType, bo.getDeviceType())
             .eqIfText(SysClient::getStatus, bo.getStatus())
             .orderByAsc(SysClient::getId)
             .build();

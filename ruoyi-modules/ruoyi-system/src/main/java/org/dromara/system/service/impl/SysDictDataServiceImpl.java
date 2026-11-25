@@ -7,6 +7,8 @@ import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.domain.PageResult;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.ObjectUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.query.QueryBuilder;
 import org.dromara.common.redis.utils.CacheUtils;
@@ -68,6 +70,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         return QueryBuilder.lambda(SysDictData.class)
             .eqIfPresent(SysDictData::getDictSort, bo.getDictSort())
             .likeIfText(SysDictData::getDictLabel, bo.getDictLabel())
+            .eqIfText(SysDictData::getDictValue, bo.getDictValue())
             .eqIfText(SysDictData::getDictType, bo.getDictType())
             .orderByAsc(SysDictData::getDictSort, SysDictData::getDictCode)
             .build();
@@ -82,12 +85,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
      */
     @Override
     public String selectDictLabel(String dictType, String dictValue) {
-        return dictDataMapper.lambda()
+        SysDictData data = dictDataMapper.lambda()
             .select(SysDictData::getDictLabel)
             .eq(SysDictData::getDictType, dictType)
             .eq(SysDictData::getDictValue, dictValue)
-            .one()
-            .getDictLabel();
+            .one();
+        return ObjectUtils.notNullGetter(data, SysDictData::getDictLabel, StringUtils.EMPTY);
     }
 
     /**
@@ -140,8 +143,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     @Override
     public List<SysDictDataVo> updateDictData(SysDictDataBo bo) {
         SysDictData data = MapstructUtils.convert(bo, SysDictData.class);
+        SysDictData original = dictDataMapper.selectById(data.getDictCode());
         int row = dictDataMapper.updateById(data);
         if (row > 0) {
+            if (original != null && !StringUtils.equals(original.getDictType(), data.getDictType())) {
+                CacheUtils.evict(CacheNames.SYS_DICT, original.getDictType());
+            }
             return dictDataMapper.selectDictDataByType(data.getDictType());
         }
         throw new ServiceException("操作失败");

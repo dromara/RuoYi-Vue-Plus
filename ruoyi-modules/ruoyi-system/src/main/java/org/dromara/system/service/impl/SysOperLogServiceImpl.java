@@ -78,7 +78,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
         return QueryBuilder.lambda(SysOperLog.class)
             .likeIfText(SysOperLog::getOperIp, operLog.getOperIp())
             .likeIfText(SysOperLog::getTitle, operLog.getTitle())
-            .eq(operLog.getBusinessType() != null && operLog.getBusinessType() > 0,
+            .eq(operLog.getBusinessType() != null && operLog.getBusinessType() >= 0,
                 SysOperLog::getBusinessType, operLog.getBusinessType())
             .func(f -> {
                 if (ArrayUtil.isNotEmpty(operLog.getBusinessTypes())) {

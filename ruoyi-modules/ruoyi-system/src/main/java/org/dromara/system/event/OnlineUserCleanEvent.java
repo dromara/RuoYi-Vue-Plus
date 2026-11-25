@@ -1,7 +1,5 @@
 package org.dromara.system.event;
 
-import cn.hutool.core.collection.CollUtil;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -14,7 +12,7 @@ import java.util.List;
 public record OnlineUserCleanEvent(Long roleId, Collection<Long> userIds) {
 
     public OnlineUserCleanEvent {
-        if (CollUtil.isNotEmpty(userIds)) {
+        if (userIds != null) {
             userIds = List.copyOf(userIds);
         }
     }

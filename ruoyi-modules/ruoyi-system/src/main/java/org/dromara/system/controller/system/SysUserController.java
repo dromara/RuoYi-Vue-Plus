@@ -146,6 +146,9 @@ public class SysUserController extends BaseController {
         if (ObjectUtil.isNotNull(userId)) {
             userService.checkUserDataScope(userId);
             SysUserVo sysUser = userService.selectUserById(userId);
+            if (sysUser == null) {
+                return R.fail("用户不存在");
+            }
             userInfoVo.setUser(sysUser);
             userInfoVo.setRoleIds(roleService.selectRoleListByUserId(userId));
             Long deptId = sysUser.getDeptId();
@@ -307,6 +310,9 @@ public class SysUserController extends BaseController {
     public R<SysUserInfoVo> authRole(@PathVariable Long userId) {
         userService.checkUserDataScope(userId);
         SysUserVo user = userService.selectUserById(userId);
+        if (user == null) {
+            return R.fail("用户不存在");
+        }
         List<SysRoleVo> roles = roleService.selectRolesAuthByUserId(userId);
         SysUserInfoVo userInfoVo = new SysUserInfoVo();
         userInfoVo.setUser(user);

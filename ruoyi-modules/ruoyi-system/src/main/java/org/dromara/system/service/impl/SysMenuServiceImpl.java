@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.SystemConstants;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.TreeBuildUtils;
@@ -149,7 +150,10 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<Long> selectMenuListByRoleId(Long roleId) {
         SysRole role = roleMapper.selectById(roleId);
-        return menuMapper.selectMenuListByRoleId(roleId, role.getMenuCheckStrictly());
+        if (role == null) {
+            return List.of();
+        }
+        return menuMapper.selectMenuListByRoleId(roleId, !Boolean.FALSE.equals(role.getMenuCheckStrictly()));
     }
 
     /**
@@ -180,7 +184,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 router.setAlwaysShow(true);
                 router.setRedirect("noRedirect");
                 router.setChildren(buildMenus(cMenus));
-            } else if (menu.isMenuFrame()) {
+            } else if (menu.isMenuFrame() && !menu.isInnerLink()) {
                 String frameName = StringUtils.capitalize(menu.getPath()) + menu.getMenuId();
                 router.setMeta(null);
                 List<RouterVo> childrenList = new ArrayList<>();
@@ -194,6 +198,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 childrenList.add(children);
                 router.setChildren(childrenList);
             } else if (menu.getParentId().equals(Constants.TOP_PARENT_ID) && menu.isInnerLink()) {
+                MetaVo linkMeta = router.getMeta();
                 router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
                 router.setPath("/");
                 List<RouterVo> childrenList = new ArrayList<>();
@@ -203,7 +208,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 children.setPath(routerPath);
                 children.setComponent(SystemConstants.INNER_LINK);
                 children.setName(innerLinkName);
-                children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
+                children.setMeta(linkMeta);
+                children.setQuery(menu.getQueryParam());
                 children.setExt(menu.getExt());
                 childrenList.add(children);
                 router.setChildren(childrenList);
@@ -291,6 +297,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public int insertMenu(SysMenuBo bo) {
+        validateParentChain(bo);
         SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
         return menuMapper.insert(menu);
     }
@@ -303,8 +310,33 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public int updateMenu(SysMenuBo bo) {
+        validateParentChain(bo);
         SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
         return menuMapper.updateById(menu);
+    }
+
+    /**
+     * 沿提交的父菜单逐级检查，防止写入孤立节点或循环关系。
+     */
+    private void validateParentChain(SysMenuBo bo) {
+        Long parentId = bo.getParentId();
+        if (parentId == null) {
+            return;
+        }
+        Set<Long> visited = new HashSet<>();
+        while (!Constants.TOP_PARENT_ID.equals(parentId)) {
+            if (Objects.equals(bo.getMenuId(), parentId) || !visited.add(parentId)) {
+                throw new ServiceException("上级菜单存在循环关系");
+            }
+            SysMenu parent = menuMapper.selectById(parentId);
+            if (parent == null) {
+                throw new ServiceException("上级菜单不存在");
+            }
+            parentId = parent.getParentId();
+            if (parentId == null) {
+                return;
+            }
+        }
     }
 
     /**

@@ -214,7 +214,7 @@ public class SysPostServiceImpl implements ISysPostService, PostService {
      */
     @Override
     public int deletePostById(Long postId) {
-        return postMapper.deleteById(postId);
+        return deletePostByIds(Collections.singletonList(postId));
     }
 
     /**

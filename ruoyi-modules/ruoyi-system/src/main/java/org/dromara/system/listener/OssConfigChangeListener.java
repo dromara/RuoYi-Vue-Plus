@@ -26,23 +26,29 @@ public class OssConfigChangeListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void refreshOssConfig(OssConfigChangeEvent event) {
-        if (event.defaultConfig()) {
+        if (event.action() == OssConfigChangeEvent.Action.SET_DEFAULT) {
             RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, event.configKey());
             return;
-        }
-        if (StringUtils.isNotBlank(event.oldConfigKey()) && !StringUtils.equals(event.oldConfigKey(), event.configKey())) {
-            CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, event.oldConfigKey());
-            OssFactory.remove(event.oldConfigKey());
         }
         if (StringUtils.isBlank(event.configKey())) {
             return;
         }
-        if (StringUtils.isBlank(event.configJson())) {
+        if (event.action() == OssConfigChangeEvent.Action.CLEAR_DEFAULT) {
+            RedisUtils.getClient().getBucket(OssConstant.DEFAULT_CONFIG_KEY).compareAndSet(event.configKey(), null);
+            return;
+        }
+        if (event.action() == OssConfigChangeEvent.Action.REMOVE) {
+            RedisUtils.getClient().getBucket(OssConstant.DEFAULT_CONFIG_KEY).compareAndSet(event.configKey(), null);
             CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, event.configKey());
         } else {
             CacheUtils.put(CacheNames.SYS_OSS_CONFIG, event.configKey(), event.configJson());
         }
         OssFactory.remove(event.configKey());
+        if (StringUtils.isNotBlank(event.oldConfigKey()) && !StringUtils.equals(event.oldConfigKey(), event.configKey())) {
+            RedisUtils.getClient().getBucket(OssConstant.DEFAULT_CONFIG_KEY).compareAndSet(event.oldConfigKey(), event.configKey());
+            CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, event.oldConfigKey());
+            OssFactory.remove(event.oldConfigKey());
+        }
     }
 
 }

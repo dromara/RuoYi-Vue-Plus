@@ -23,6 +23,7 @@ import org.dromara.common.oss.exception.S3StorageException;
 import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.oss.model.Options;
 import org.dromara.common.oss.model.PutObjectResult;
+import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.api.OssService;
 import org.dromara.system.api.domain.OssDTO;
 import org.dromara.system.domain.SysOss;
@@ -238,8 +239,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         if (ObjectUtil.isNull(file) || file.isEmpty()) {
             throw new ServiceException("上传文件不能为空");
         }
-        String originalfileName = file.getOriginalFilename();
-        String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+        String originalfileName = StringUtils.defaultString(file.getOriginalFilename());
         OssClient instance = OssFactory.instance();
         String pathKey = instance.buildPathKey(originalfileName);
         try (InputStream inputStream = file.getInputStream()) {
@@ -248,7 +248,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             ossExt.setFileSize(file.getSize());
             ossExt.setContentType(file.getContentType());
             // 保存文件信息
-            return buildResultEntity(originalfileName, suffix, instance.clientId(), result, ossExt);
+            return buildResultEntity(originalfileName, instance.clientId(), result, ossExt);
         } catch (IOException e) {
             throw new ServiceException("读取上传文件失败", e);
         }
@@ -266,31 +266,32 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             throw new ServiceException("上传文件不能为空");
         }
         String originalfileName = file.getName();
-        String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
         OssClient instance = OssFactory.instance();
         String pathKey = instance.buildPathKey(originalfileName);
-        PutObjectResult result = instance.upload(pathKey, file, Options.builder().setContentType(FileUtils.getMimeType(file.toPath())));
+        String contentType = FileUtils.getMimeType(file.toPath());
+        PutObjectResult result = instance.upload(pathKey, file, Options.builder().setContentType(contentType));
         SysOssExt ext1 = ossExt == null ? new SysOssExt() : ossExt;
         ext1.setFileSize(result.size());
+        ext1.setContentType(contentType);
         // 保存文件信息
-        return buildResultEntity(originalfileName, suffix, instance.clientId(), result, ext1);
+        return buildResultEntity(originalfileName, instance.clientId(), result, ext1);
     }
 
     /**
      * 组装上传结果并持久化文件元数据。
      *
      * @param originalfileName 原始文件名
-     * @param suffix           文件后缀
      * @param configKey        存储配置标识
      * @param result           上传结果
      * @param ext1             扩展属性对象
      * @return 持久化后的文件信息视图
      */
     @NotNull
-    private SysOssVo buildResultEntity(String originalfileName, String suffix, String configKey, PutObjectResult result, SysOssExt ext1) {
+    private SysOssVo buildResultEntity(String originalfileName, String configKey, PutObjectResult result, SysOssExt ext1) {
         SysOss oss = new SysOss();
         oss.setUrl(result.url());
-        oss.setFileSuffix(suffix);
+        int extensionIndex = originalfileName.lastIndexOf('.');
+        oss.setFileSuffix(extensionIndex < 0 ? "" : originalfileName.substring(extensionIndex));
         oss.setFileName(result.key());
         oss.setOriginalName(originalfileName);
         oss.setService(configKey);
@@ -309,14 +310,16 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if (isValid) {
-            // 做一些业务上的校验,判断是否需要校验
-        }
         List<SysOss> list = ossMapper.selectByIds(ids);
+        int deleted = 0;
         for (SysOss sysOss : list) {
-            OssFactory.instance(sysOss.getService()).delete(sysOss.getFileName());
+            if (!OssFactory.instance(sysOss.getService()).delete(sysOss.getFileName())) {
+                throw new ServiceException("删除附件 {} 失败", sysOss.getOssId());
+            }
+            deleted += ossMapper.deleteById(sysOss.getOssId());
+            CacheUtils.evict(CacheNames.SYS_OSS, sysOss.getOssId());
         }
-        return ossMapper.deleteByIds(ids) > 0;
+        return deleted > 0;
     }
 
     /**

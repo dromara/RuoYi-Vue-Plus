@@ -69,10 +69,6 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
             getBlock(loginInfoEvent.getMessage());
         // 打印信息到日志
         log.info(s, loginInfoEvent.getArgs());
-        // 获取客户端操作系统
-        String os = userAgent.getOs().getName();
-        // 获取客户端浏览器
-        String browser = userAgent.getBrowser().getName();
         // 封装对象
         SysLoginInfoBo loginInfo = new SysLoginInfoBo();
         loginInfo.setUserName(loginInfoEvent.getUsername());
@@ -82,8 +78,10 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
         }
         loginInfo.setIpaddr(ip);
         loginInfo.setLoginLocation(address);
-        loginInfo.setBrowser(browser);
-        loginInfo.setOs(os);
+        if (userAgent != null) {
+            loginInfo.setBrowser(userAgent.getBrowser().getName());
+            loginInfo.setOs(userAgent.getOs().getName());
+        }
         loginInfo.setMsg(loginInfoEvent.getMessage());
         // 日志状态
         if (StringUtils.equalsAny(loginInfoEvent.getStatus(), Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER)) {
@@ -160,6 +158,8 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
         return loginInfoMapper.lambda()
             .likeIfText(SysLoginInfo::getIpaddr, loginInfo.getIpaddr())
             .eqIfText(SysLoginInfo::getStatus, loginInfo.getStatus())
+            .eqIfText(SysLoginInfo::getClientKey, loginInfo.getClientKey())
+            .eqIfText(SysLoginInfo::getDeviceType, loginInfo.getDeviceType())
             .likeIfText(SysLoginInfo::getUserName, loginInfo.getUserName())
             .betweenParams(SysLoginInfo::getLoginTime, params, "beginTime", "endTime");
     }

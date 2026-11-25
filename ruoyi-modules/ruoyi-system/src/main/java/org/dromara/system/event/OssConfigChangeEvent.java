@@ -6,14 +6,18 @@ package org.dromara.system.event;
  * @param configKey     当前配置 key
  * @param oldConfigKey  变更前配置 key
  * @param configJson    当前配置 JSON，为空表示清理缓存
- * @param defaultConfig 是否设置为默认配置
+ * @param action        配置变更操作
  */
 public record OssConfigChangeEvent(
     String configKey,
     String oldConfigKey,
     String configJson,
-    boolean defaultConfig
+    Action action
 ) {
+
+    public enum Action {
+        SAVE, REMOVE, SET_DEFAULT, CLEAR_DEFAULT
+    }
 
     /**
      * 创建保存 OSS 配置后的变更事件。
@@ -24,7 +28,7 @@ public record OssConfigChangeEvent(
      * @return OSS 配置变更事件
      */
     public static OssConfigChangeEvent save(String configKey, String oldConfigKey, String configJson) {
-        return new OssConfigChangeEvent(configKey, oldConfigKey, configJson, false);
+        return new OssConfigChangeEvent(configKey, oldConfigKey, configJson, Action.SAVE);
     }
 
     /**
@@ -34,7 +38,7 @@ public record OssConfigChangeEvent(
      * @return OSS 配置变更事件
      */
     public static OssConfigChangeEvent remove(String configKey) {
-        return new OssConfigChangeEvent(configKey, null, null, false);
+        return new OssConfigChangeEvent(configKey, null, null, Action.REMOVE);
     }
 
     /**
@@ -44,7 +48,11 @@ public record OssConfigChangeEvent(
      * @return OSS 配置变更事件
      */
     public static OssConfigChangeEvent useDefault(String configKey) {
-        return new OssConfigChangeEvent(configKey, null, null, true);
+        return new OssConfigChangeEvent(configKey, null, null, Action.SET_DEFAULT);
+    }
+
+    public static OssConfigChangeEvent clearDefault(String configKey) {
+        return new OssConfigChangeEvent(configKey, null, null, Action.CLEAR_DEFAULT);
     }
 
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Param;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
@@ -73,6 +74,9 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo>, MPJBa
             .selectAs("u1", SysUser::getUserName, SysUserExportVo::getLeaderName)
             .leftJoin(SysDept.class, "d", SysDept::getDeptId, SysUser::getDeptId)
             .leftJoin(SysUser.class, "u1", SysUser::getUserId, SysDept::getLeader)
+            .eqIfPresent("u", SysUser::getUserId, user.getUserId())
+            .in(StringUtils.isNotBlank(user.getUserIds()), "u", SysUser::getUserId, StringUtils.splitLongList(user.getUserIds()))
+            .notIn(StringUtils.isNotBlank(user.getExcludeUserIds()), "u", SysUser::getUserId, StringUtils.splitLongList(user.getExcludeUserIds()))
             .likeIfText("u", SysUser::getUserName, user.getUserName())
             .likeIfText("u", SysUser::getNickName, user.getNickName())
             .eqIfText("u", SysUser::getStatus, user.getStatus())
