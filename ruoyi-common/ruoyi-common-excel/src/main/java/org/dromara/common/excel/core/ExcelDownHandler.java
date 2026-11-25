@@ -16,7 +16,6 @@ import org.apache.fesod.sheet.write.metadata.holder.WriteWorkbookHolder;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.utils.SpringUtils;
@@ -41,13 +40,13 @@ import java.util.*;
 public class ExcelDownHandler implements SheetWriteHandler {
 
     /**
-     * 首个数据行索引。
+     * 当前工作表首个数据行索引。
      */
-    private static final int FIRST_DATA_ROW_INDEX = 1;
+    private int firstDataRow;
     /**
-     * 最后数据行索引。
+     * 下拉校验覆盖的数据行数。
      */
-    private static final int LAST_DATA_ROW_INDEX = 1000;
+    private static final int VALIDATED_ROWS = 1000;
     /**
      * 单选数据Sheet名
      */
@@ -61,14 +60,6 @@ public class ExcelDownHandler implements SheetWriteHandler {
      */
     private final List<DropDownOptions> dropDownOptions;
     private DictService dictService;
-    /**
-     * 当前单选进度
-     */
-    private int currentOptionsColumnIndex;
-    /**
-     * 当前联动选择进度
-     */
-    private int currentLinkedOptionsSheetIndex;
 
     /**
      * 构造 Excel 下拉选处理器。
@@ -77,8 +68,6 @@ public class ExcelDownHandler implements SheetWriteHandler {
      */
     public ExcelDownHandler(List<DropDownOptions> options) {
         this.dropDownOptions = options;
-        this.currentOptionsColumnIndex = 0;
-        this.currentLinkedOptionsSheetIndex = 0;
     }
 
     /**
@@ -93,6 +82,10 @@ public class ExcelDownHandler implements SheetWriteHandler {
     @Override
     public void afterSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
         Sheet sheet = writeSheetHolder.getSheet();
+        firstDataRow = writeSheetHolder.relativeHeadRowIndex();
+        if (writeSheetHolder.needHead()) {
+            firstDataRow += writeSheetHolder.excelWriteHeadProperty().getHeadRowNumber();
+        }
         // 开始设置下拉框 HSSFWorkbook
         DataValidationHelper helper = sheet.getDataValidationHelper();
         Workbook workbook = writeWorkbookHolder.getWorkbook();
@@ -141,17 +134,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
                     options = new ArrayList<>(providerOptions);
                 }
             }
-            if (ObjectUtil.isNotEmpty(options)) {
-                // 仅当下拉可选项不为空时执行
-                int totalCharacter = options.stream().mapToInt(String::length).sum() + options.size();
-                if (options.size() > 20 || totalCharacter > 255) {
-                    // 这里限制如果可选项大于20 或 总字符数超过255，则使用额外表形式
-                    dropDownWithSheet(helper, workbook, sheet, index, options);
-                } else {
-                    // 否则使用固定值形式
-                    dropDownWithSimple(helper, sheet, index, options);
-                }
-            }
+            applyDropdown(helper, workbook, sheet, index, options, 20);
         }
         if (CollUtil.isEmpty(dropDownOptions)) {
             return;
@@ -161,25 +144,26 @@ public class ExcelDownHandler implements SheetWriteHandler {
             if (CollUtil.isNotEmpty(everyOptions.getNextOptions())) {
                 // 当二级选项不为空时，使用额外关联表的形式
                 dropDownLinkedOptions(helper, workbook, sheet, everyOptions);
-            } else if (CollUtil.isNotEmpty(everyOptions.getOptions()) && everyOptions.getOptions().size() > 10) {
-                // 当一级选项参数个数大于10，使用额外表的形式
-                dropDownWithSheet(helper, workbook, sheet, everyOptions.getIndex(), everyOptions.getOptions());
             } else {
-                // 否则使用默认形式
-                dropDownWithSimple(helper, sheet, everyOptions.getIndex(), everyOptions.getOptions());
+                applyDropdown(helper, workbook, sheet, everyOptions.getIndex(), everyOptions.getOptions(), 10);
             }
         });
     }
 
     /**
-     * <h2>简单下拉框</h2>
-     * 直接将可选项拼接为指定列的数据校验值
+     * 为普通下拉列选择内联列表或隐藏工作表。
      *
      * @param celIndex 列index
      * @param value    下拉选可选值
      */
-    private void dropDownWithSimple(DataValidationHelper helper, Sheet sheet, Integer celIndex, List<String> value) {
+    private void applyDropdown(DataValidationHelper helper, Workbook workbook, Sheet sheet, int celIndex,
+                               List<String> value, int inlineOptionLimit) {
         if (ObjectUtil.isEmpty(value)) {
+            return;
+        }
+        if (value.size() > inlineOptionLimit || String.join(",", value).length() > 255
+            || value.stream().anyMatch(option -> StringUtils.contains(option, ","))) {
+            dropDownWithSheet(helper, workbook, sheet, celIndex, value);
             return;
         }
         this.markOptionsToSheet(helper, sheet, celIndex, helper.createExplicitListConstraint(ArrayUtil.toArray(value, String.class)));
@@ -191,11 +175,11 @@ public class ExcelDownHandler implements SheetWriteHandler {
      * @param options 额外表格形式存储的下拉可选项
      */
     private void dropDownLinkedOptions(DataValidationHelper helper, Workbook workbook, Sheet sheet, DropDownOptions options) {
-        String linkedOptionsSheetName = String.format("%s_%d", LINKED_OPTIONS_SHEET_NAME, currentLinkedOptionsSheetIndex);
-        // 创建联动下拉数据表
-        Sheet linkedOptionsDataSheet = workbook.createSheet(WorkbookUtil.createSafeSheetName(linkedOptionsSheetName));
-        // 将下拉表隐藏
-        workbook.setSheetHidden(workbook.getSheetIndex(linkedOptionsDataSheet), true);
+        if (options.getIndex() == options.getNextIndex()) {
+            throw new IllegalArgumentException("级联下拉的父列和子列不能相同");
+        }
+        Sheet linkedOptionsDataSheet = createOptionsSheet(workbook, LINKED_OPTIONS_SHEET_NAME);
+        String linkedOptionsSheetName = linkedOptionsDataSheet.getSheetName();
         // 选项数据（使用副本，避免修改调用方的原始数据）
         List<String> firstOptions = options.getOptions();
         if (CollUtil.isEmpty(firstOptions)) {
@@ -256,15 +240,11 @@ public class ExcelDownHandler implements SheetWriteHandler {
             );
             // 设置名称管理器的引用位置
             sonName.setRefersToFormula(sonFunction);
-            // 数据验证为序列模式，引用到每一个主表中的二级选项位置
-            // 创建子项的名称管理器，只是为了使得Excel可以识别到数据
-            String mainSheetFirstOptionsColumnName = getExcelColumnName(options.getIndex());
-            for (int i = FIRST_DATA_ROW_INDEX; i <= LAST_DATA_ROW_INDEX; i++) {
-                // 以一级选项对应的主体所在位置创建二级下拉
-                String secondOptionsFunction = String.format("=INDIRECT(%s%d)", mainSheetFirstOptionsColumnName, i + 1);
-                // 二级只能主表每一行的每一列添加二级校验
-                markLinkedOptionsToSheet(helper, sheet, i, options.getNextIndex(), helper.createFormulaListConstraint(secondOptionsFunction));
-            }
+        }
+        String parentColumn = getExcelColumnName(options.getIndex());
+        for (int row = firstDataRow; row < firstDataRow + VALIDATED_ROWS; row++) {
+            String formula = String.format("=INDIRECT(%s%d)", parentColumn, row + 1);
+            markLinkedOptionsToSheet(helper, sheet, row, options.getNextIndex(), helper.createFormulaListConstraint(formula));
         }
 
         // 将二级数据处理为按行区分
@@ -310,7 +290,6 @@ public class ExcelDownHandler implements SheetWriteHandler {
             }
         });
 
-        currentLinkedOptionsSheetIndex++;
     }
 
     /**
@@ -335,12 +314,8 @@ public class ExcelDownHandler implements SheetWriteHandler {
      */
     private void dropDownWithSheet(DataValidationHelper helper, Workbook workbook, Sheet sheet, Integer celIndex, List<String> value) {
         //由于poi的写出相关问题，超过100个会被临时写进硬盘，导致后续内存合并会出Attempting to write a row[] in the range [] that is already written to disk
-        String tmpOptionsSheetName = OPTIONS_SHEET_NAME + "_" + currentOptionsColumnIndex;
-        // 创建下拉数据表
-        Sheet simpleDataSheet = Optional.ofNullable(workbook.getSheet(WorkbookUtil.createSafeSheetName(tmpOptionsSheetName)))
-            .orElseGet(() -> workbook.createSheet(WorkbookUtil.createSafeSheetName(tmpOptionsSheetName)));
-        // 将下拉表隐藏
-        workbook.setSheetHidden(workbook.getSheetIndex(simpleDataSheet), true);
+        Sheet simpleDataSheet = createOptionsSheet(workbook, OPTIONS_SHEET_NAME);
+        String tmpOptionsSheetName = simpleDataSheet.getSheetName();
         // 完善纵向的一级选项数据表
         for (int i = 0; i < value.size(); i++) {
             int finalI = i;
@@ -369,7 +344,20 @@ public class ExcelDownHandler implements SheetWriteHandler {
         name.setRefersToFormula(function);
         // 设置数据校验为序列模式，引用的是名称管理器中的别名
         this.markOptionsToSheet(helper, sheet, celIndex, helper.createFormulaListConstraint(nameName));
-        currentOptionsColumnIndex++;
+    }
+
+    /**
+     * 创建独立的隐藏选项表，避开工作簿中已有的表名。
+     */
+    private Sheet createOptionsSheet(Workbook workbook, String prefix) {
+        int index = 0;
+        String name;
+        do {
+            name = prefix + "_" + index++;
+        } while (workbook.getSheet(name) != null);
+        Sheet sheet = workbook.createSheet(name);
+        workbook.setSheetHidden(workbook.getSheetIndex(sheet), true);
+        return sheet;
     }
 
     /**
@@ -378,7 +366,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
     private void markOptionsToSheet(DataValidationHelper helper, Sheet sheet, Integer celIndex,
                                     DataValidationConstraint constraint) {
         // 设置数据有效性加载在哪个单元格上,四个参数分别是：起始行、终止行、起始列、终止列
-        CellRangeAddressList addressList = new CellRangeAddressList(FIRST_DATA_ROW_INDEX, LAST_DATA_ROW_INDEX, celIndex, celIndex);
+        CellRangeAddressList addressList = new CellRangeAddressList(firstDataRow, firstDataRow + VALIDATED_ROWS - 1, celIndex, celIndex);
         markDataValidationToSheet(helper, sheet, constraint, addressList);
     }
 

@@ -3,10 +3,9 @@ package org.dromara.common.excel.core;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.SneakyThrows;
-import org.apache.fesod.sheet.annotation.ExcelIgnore;
-import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
-import org.apache.fesod.sheet.annotation.ExcelProperty;
+import org.apache.fesod.sheet.metadata.property.ExcelHeadProperty;
+import org.apache.fesod.sheet.write.metadata.WriteWorkbook;
+import org.apache.fesod.sheet.write.metadata.holder.WriteWorkbookHolder;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.excel.annotation.CellMerge;
@@ -26,9 +25,9 @@ public class CellMergeHandler {
      */
     private final boolean hasTitle;
     /**
-     * 当前行索引。
+     * 配置的起始行索引。
      */
-    private int rowIndex;
+    private final int rowIndex;
 
     /**
      * 创建单元格合并处理器。
@@ -58,30 +57,34 @@ public class CellMergeHandler {
      * @param rows 数据行
      * @return 单元格合并区域列表
      */
-    @SneakyThrows
     public List<CellRangeAddress> handle(List<?> rows) {
         // 如果入参为空集合则返回空集
         if (CollUtil.isEmpty(rows)) {
             return Collections.emptyList();
         }
 
-        // 获取有合并注解的字段
-        Map<Field, FieldColumnIndex> mergeFields = getFieldColumnIndexMap(rows.getFirst().getClass());
-        // 如果没有需要合并的字段则返回空集
-        if (CollUtil.isEmpty(mergeFields)) {
+        WriteWorkbook workbook = new WriteWorkbook();
+        workbook.setClazz(rows.getFirst().getClass());
+        return handle(rows, new WriteWorkbookHolder(workbook).excelWriteHeadProperty());
+    }
+
+    List<CellRangeAddress> handle(List<?> rows, ExcelHeadProperty head) {
+        if (CollUtil.isEmpty(rows)) {
             return Collections.emptyList();
         }
-
+        int firstDataRow = hasTitle ? Math.max(rowIndex, head.getHeadRowNumber()) : 0;
         // 结果集
         List<CellRangeAddress> result = new ArrayList<>();
 
         // 生成两两合并单元格
         Map<Field, RepeatCell> rowRepeatCellMap = new HashMap<>();
-        for (Map.Entry<Field, FieldColumnIndex> item : mergeFields.entrySet()) {
-            Field field = item.getKey();
-            FieldColumnIndex itemValue = item.getValue();
-            int colNum = itemValue.colIndex();
-            CellMerge cellMerge = itemValue.cellMerge();
+        for (var entry : head.getHeadMap().entrySet()) {
+            Field field = entry.getValue().getField();
+            if (field == null || !field.isAnnotationPresent(CellMerge.class)) {
+                continue;
+            }
+            CellMerge cellMerge = field.getAnnotation(CellMerge.class);
+            int colNum = cellMerge.index() == -1 ? entry.getKey() : cellMerge.index();
 
             for (int i = 0; i < rows.size(); i++) {
                 // 当前行数据
@@ -91,7 +94,7 @@ public class CellMergeHandler {
 
                 // 空值视为合并中断，需要先收口上一段合并区间
                 if (isBlankCell(currentRowObjFieldVal)) {
-                    appendMergeResult(result, rowRepeatCellMap.get(field), i - 1, colNum);
+                    appendMergeResult(result, rowRepeatCellMap.get(field), i - 1, colNum, firstDataRow);
                     rowRepeatCellMap.remove(field);
                     continue;
                 }
@@ -114,51 +117,14 @@ public class CellMergeHandler {
 
                 // 如果当前行字段值和缓存中的字段值不相等，或不满足合并条件，则替换
                 if (!currentRowObjFieldVal.equals(cellValue) || !merge) {
-                    appendMergeResult(result, repeatCell, i - 1, colNum);
+                    appendMergeResult(result, repeatCell, i - 1, colNum, firstDataRow);
                     rowRepeatCellMap.put(field, RepeatCell.of(currentRowObjFieldVal, i));
                 }
             }
-            appendMergeResult(result, rowRepeatCellMap.get(field), rows.size() - 1, colNum);
+            appendMergeResult(result, rowRepeatCellMap.get(field), rows.size() - 1, colNum, firstDataRow);
             rowRepeatCellMap.remove(field);
         }
         return result;
-    }
-
-    /**
-     * 获取带有合并注解的字段列索引和合并注解信息Map集
-     */
-    private Map<Field, FieldColumnIndex> getFieldColumnIndexMap(Class<?> clazz) {
-        boolean annotationPresent = clazz.isAnnotationPresent(ExcelIgnoreUnannotated.class);
-        Field[] fields = ReflectUtils.getFields(clazz, field -> {
-            if ("serialVersionUID".equals(field.getName())) {
-                return false;
-            }
-            if (field.isAnnotationPresent(ExcelIgnore.class)) {
-                return false;
-            }
-            return !annotationPresent || field.isAnnotationPresent(ExcelProperty.class);
-        });
-
-        // 有注解的字段
-        Map<Field, FieldColumnIndex> mergeFields = new HashMap<>();
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
-            if (!field.isAnnotationPresent(CellMerge.class)) {
-                continue;
-            }
-            CellMerge cm = field.getAnnotation(CellMerge.class);
-            ExcelProperty property = field.getAnnotation(ExcelProperty.class);
-            int index = cm.index();
-            if (index == -1) {
-                index = property != null && property.index() != -1 ? property.index() : i;
-            }
-            mergeFields.put(field, FieldColumnIndex.of(index, cm));
-
-            if (hasTitle && property != null && property.value().length > 0) {
-                rowIndex = Math.max(rowIndex, property.value().length);
-            }
-        }
-        return mergeFields;
     }
 
     /**
@@ -202,12 +168,13 @@ public class CellMergeHandler {
      * @param repeatCell 连续重复单元格信息
      * @param endIndex   结束行索引
      * @param colNum     列索引
+     * @param firstDataRow 当前工作表首个数据行索引
      */
-    private void appendMergeResult(List<CellRangeAddress> result, RepeatCell repeatCell, int endIndex, int colNum) {
+    private void appendMergeResult(List<CellRangeAddress> result, RepeatCell repeatCell, int endIndex, int colNum, int firstDataRow) {
         if (repeatCell == null || endIndex <= repeatCell.current()) {
             return;
         }
-        result.add(new CellRangeAddress(repeatCell.current() + rowIndex, endIndex + rowIndex, colNum, colNum));
+        result.add(new CellRangeAddress(repeatCell.current() + firstDataRow, endIndex + firstDataRow, colNum, colNum));
     }
 
     /**
@@ -223,22 +190,6 @@ public class CellMergeHandler {
          */
         static RepeatCell of(Object value, int current) {
             return new RepeatCell(value, current);
-        }
-    }
-
-    /**
-     * 字段列索引和合并注解信息
-     */
-    record FieldColumnIndex(int colIndex, CellMerge cellMerge) {
-        /**
-         * 创建字段列索引和合并注解信息。
-         *
-         * @param colIndex  列索引
-         * @param cellMerge 合并注解
-         * @return 字段列索引和合并注解信息
-         */
-        static FieldColumnIndex of(int colIndex, CellMerge cellMerge) {
-            return new FieldColumnIndex(colIndex, cellMerge);
         }
     }
 

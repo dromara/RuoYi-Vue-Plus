@@ -5,6 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.util.CellReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,13 +98,20 @@ public class DropDownOptions {
         if (StrUtil.isBlank(optionValue)) {
             throw new RuntimeException("选项数据不能为空");
         }
+        if (optionValue.length() > 255) {
+            throw new IllegalArgumentException("Excel 名称长度不能超过 255 个字符");
+        }
+        if (optionValue.matches("(?i)[RC]|R[0-9]*C[0-9]*")) {
+            throw new IllegalArgumentException("选项数据不能使用 Excel 保留名称或 R1C1 引用");
+        }
         if (optionValue.matches("^[0-9].*")) {
             throw new RuntimeException("禁止以数字开头");
         }
         if (!optionValue.matches(EXCEL_NAME_REGEX)) {
             throw new RuntimeException("选项数据不符合Excel名称规则，仅允许中英文、数字或下划线，且不能以数字开头");
         }
-        if (optionValue.matches(CELL_REFERENCE_REGEX)) {
+        if (optionValue.matches(CELL_REFERENCE_REGEX)
+            && CellReference.classifyCellReference(optionValue, SpreadsheetVersion.EXCEL2007) == CellReference.NameType.CELL) {
             throw new RuntimeException("选项数据不能为Excel单元格引用");
         }
     }

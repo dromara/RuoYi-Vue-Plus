@@ -11,7 +11,6 @@ import org.apache.fesod.sheet.exception.ExcelAnalysisException;
 import org.apache.fesod.sheet.exception.ExcelDataConvertException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.json.utils.JsonUtils;
 
 import java.util.Map;
 import java.util.Set;
@@ -112,7 +111,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
         this.headMap = headMap;
-        log.debug("解析到一条表头数据: {}", JsonUtils.toJsonString(headMap));
+        log.debug("解析到一条表头数据: {}", headMap);
     }
 
     /**

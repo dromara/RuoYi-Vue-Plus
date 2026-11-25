@@ -24,7 +24,9 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
     /**
      * 合并单元格区域集合。
      */
-    private final List<CellRangeAddress> cellList;
+    private List<CellRangeAddress> cellList;
+    private final CellMergeHandler handler;
+    private final List<?> rows;
 
     /**
      * 创建单元格合并策略。
@@ -33,6 +35,8 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
      */
     public CellMergeStrategy(List<CellRangeAddress> cellList) {
         this.cellList = cellList;
+        this.handler = null;
+        this.rows = List.of();
     }
 
     /**
@@ -42,7 +46,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
      * @param hasTitle 是否存在标题行
      */
     public CellMergeStrategy(List<?> list, boolean hasTitle) {
-        this.cellList = CellMergeHandler.of(hasTitle).handle(list);
+        this(list, hasTitle, 1);
     }
 
     /**
@@ -53,7 +57,8 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
      * @param rowIndex 起始行索引
      */
     public CellMergeStrategy(List<?> list, boolean hasTitle, int rowIndex) {
-        this.cellList = CellMergeHandler.of(hasTitle, rowIndex).handle(list);
+        this.handler = CellMergeHandler.of(hasTitle, rowIndex);
+        this.rows = list;
     }
 
     /**
@@ -87,6 +92,10 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements SheetWri
      */
     @Override
     public void afterSheetCreate(final WriteWorkbookHolder writeWorkbookHolder, final WriteSheetHolder writeSheetHolder) {
+        if (handler != null) {
+            var head = writeSheetHolder.excelWriteHeadProperty();
+            cellList = head.getHeadClazz() == null ? handler.handle(rows) : handler.handle(rows, head);
+        }
         if (CollUtil.isEmpty(cellList)) {
             return;
         }

@@ -448,7 +448,7 @@ public final class ExcelBuilder<T> {
         ExcelWriterSheetBuilder builder = createSheetBuilder(createWriterBuilder(outputStream));
         if (merge) {
             // 合并处理器
-            builder.registerWriteHandler(new CellMergeStrategy(data, true));
+            builder.registerWriteHandler(new CellMergeStrategy(data, !Boolean.FALSE.equals(needHead)));
         }
         builder.doWrite(data);
     }

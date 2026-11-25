@@ -4,6 +4,8 @@ import org.dromara.common.excel.core.DefaultExcelResult;
 import org.dromara.common.excel.core.DropDownOptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,29 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("common-excel 功能单元测试")
 class ExcelFunctionTest {
+
+    @ParameterizedTest
+    @ValueSource(strings = {"XFE1", "A1048577", "ZZZ42"})
+    @DisplayName("超出 XLSX 行列范围的字母数字名称可作为级联选项")
+    void shouldAcceptNamesOutsideWorksheet(String name) {
+        assertEquals(name, DropDownOptions.createOptionValue(name));
+        assertThrows(RuntimeException.class, () -> DropDownOptions.createOptionValue("XFD1048576"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"R", "c", "R12C3", "r1c1"})
+    @DisplayName("级联下拉名称不能占用 Excel 保留名称或 R1C1 引用")
+    void shouldRejectReservedExcelNames(String value) {
+        assertThrows(IllegalArgumentException.class, () -> DropDownOptions.createOptionValue(value));
+    }
+
+    @Test
+    @DisplayName("级联下拉名称最多支持 255 个字符")
+    void shouldEnforceExcelNameLengthLimit() {
+        String longest = "区".repeat(255);
+        assertEquals(longest, DropDownOptions.createOptionValue(longest));
+        assertThrows(IllegalArgumentException.class, () -> DropDownOptions.createOptionValue(longest + "域"));
+    }
 
     /**
      * 验证级联下拉选项值能够安全拼接和还原，确保生成的名称符合 Excel 名称规则。
