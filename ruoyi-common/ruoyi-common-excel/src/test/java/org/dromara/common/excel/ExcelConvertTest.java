@@ -11,15 +11,111 @@ import org.dromara.common.excel.convert.ExcelDictConvert;
 import org.dromara.common.excel.convert.ExcelEnumConvert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Excel 转换器单元测试")
 class ExcelConvertTest {
+
+    @ParameterizedTest
+    @ValueSource(strings = {"9223372036854775808", "-9223372036854775809", "18.75", "-0.25"})
+    @DisplayName("无法精确表示为 Long 的数值单元格触发转换错误")
+    void shouldRejectLossyLongConversion(String value) {
+        var converter = new ExcelBigNumberConvert();
+        var cell = new ReadCellData<>(new BigDecimal(value));
+        assertThrows(ArithmeticException.class, () -> converter.convertToJavaData(cell, null, null));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"9223372036854775808", "-9223372036854775809", "18.75", "-0.25"})
+    @DisplayName("文本存储的大数也必须能精确转换为 Long")
+    void shouldRejectLossyTextLongConversion(String value) {
+        var converter = new ExcelBigNumberConvert();
+        assertThrows(ArithmeticException.class, () -> converter.convertToJavaData(new ReadCellData<>(value), null, null));
+    }
+
+    @Test
+    @DisplayName("数值型枚举标签可以按显示文本导出并从数字单元格导入")
+    void shouldRoundTripNumericEnumLabel() throws Exception {
+        var converter = new ExcelEnumConvert();
+        var property = property("numericLabel");
+        assertEquals("2", converter.convertToExcelData("高级", property, null).getStringValue());
+        assertEquals("高级", converter.convertToJavaData(new ReadCellData<>(BigDecimal.valueOf(2)), property, null));
+    }
+
+    @Test
+    @DisplayName("可选枚举字段的空单元格导入为空值")
+    void shouldReadEmptyEnumCell() throws Exception {
+        var converter = new ExcelEnumConvert();
+        assertNull(converter.convertToJavaData(new ReadCellData<>(CellDataTypeEnum.EMPTY), property("level"), null));
+    }
+
+    @Test
+    @DisplayName("整数枚举编码导入字符串字段后仍能导出原标签")
+    void shouldRoundTripEnumCodeThroughStringField() throws Exception {
+        ExcelEnumConvert converter = new ExcelEnumConvert();
+        ExcelContentProperty property = property("levelCode");
+
+        Object code = converter.convertToJavaData(new ReadCellData<>("高级"), property, null);
+        assertEquals("2", code);
+        assertEquals("高级", converter.convertToExcelData(code, property, null).getStringValue());
+        assertEquals("", converter.convertToExcelData("02", property, null).getStringValue());
+    }
+
+    @Test
+    @DisplayName("数值单元格按字典标签查找编码")
+    void shouldResolveNumericDictionaryLabel() throws Exception {
+        ExcelDictConvert converter = new ExcelDictConvert();
+        ReadCellData<?> cell = new ReadCellData<>(BigDecimal.TEN);
+        assertEquals("TEN", converter.convertToJavaData(cell, property("typedLabel"), null));
+    }
+
+    @Test
+    @DisplayName("布尔单元格按字典标签查找编码")
+    void shouldResolveBooleanDictionaryLabel() throws Exception {
+        ExcelDictConvert converter = new ExcelDictConvert();
+        ReadCellData<?> cell = new ReadCellData<>(false);
+        assertEquals("OFF", converter.convertToJavaData(cell, property("typedLabel"), null));
+    }
+
+    @Test
+    @DisplayName("多选字典导出保留标签末尾的单个冒号")
+    void shouldPreserveLabelSuffixOnExport() throws Exception {
+        ExcelDictConvert converter = new ExcelDictConvert();
+        assertEquals("普通::备注:", converter.convertToExcelData("A::B:", property("categories"), null).getStringValue());
+    }
+
+    @Test
+    @DisplayName("多选字典导入保留编码末尾的单个冒号")
+    void shouldPreserveCodeSuffixOnImport() throws Exception {
+        ExcelDictConvert converter = new ExcelDictConvert();
+        assertEquals("A::B:", converter.convertToJavaData(new ReadCellData<>("普通::备注:"), property("categories"), null));
+    }
+
+    @Test
+    @DisplayName("数值单元格导入 Long 时保留整数值")
+    void shouldReadLongFromNumericCell() {
+        ExcelBigNumberConvert converter = new ExcelBigNumberConvert();
+        ReadCellData<?> cell = new ReadCellData<>(new BigDecimal("123456789012345"));
+        assertEquals(123456789012345L, converter.convertToJavaData(cell, null, null));
+    }
+
+    @Test
+    @DisplayName("负号不计入 Excel 的 15 位数字精度")
+    void shouldWriteNegativeLongAccordingToPrecision() {
+        ExcelBigNumberConvert converter = new ExcelBigNumberConvert();
+        WriteCellData<Object> cell = converter.convertToExcelData(-123456789012345L, null, null);
+        assertEquals(CellDataTypeEnum.NUMBER, cell.getType());
+        assertEquals(new BigDecimal("-123456789012345"), cell.getNumberValue());
+        assertEquals("-9223372036854775808", converter.convertToExcelData(Long.MIN_VALUE, null, null).getStringValue());
+    }
 
     /**
      * 验证普通 Long 按数字写出，而超过 Excel 精度上限的 Long 按字符串写出。
@@ -100,17 +196,29 @@ class ExcelConvertTest {
 
     private static class ExcelRow {
 
+        @ExcelEnumFormat(enumClass = Level.class, codeField = "text", textField = "code")
+        private String numericLabel;
+
+        @ExcelDictFormat(readConverterExp = "TEN=10,OFF=false")
+        private String typedLabel;
+
         @ExcelDictFormat(readConverterExp = "0=停用,1=启用")
         private Integer status;
 
         @ExcelDictFormat(readConverterExp = "A=管理员,G=访客", separator = "|")
         private String roles;
 
+        @ExcelDictFormat(readConverterExp = "A=普通,B:=备注:", separator = "::")
+        private String categories;
+
         @ExcelDictFormat(readConverterExp = "0=正常,错误项")
         private String malformed;
 
         @ExcelEnumFormat(enumClass = Level.class)
         private Integer level;
+
+        @ExcelEnumFormat(enumClass = Level.class)
+        private String levelCode;
     }
 
     private enum Level {

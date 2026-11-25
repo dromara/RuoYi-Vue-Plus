@@ -18,6 +18,7 @@ import org.dromara.common.excel.annotation.ExcelDictFormat;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 /**
@@ -62,7 +63,11 @@ public class ExcelDictConvert implements Converter<Object> {
     public Object convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
         ExcelDictFormat anno = getAnnotation(contentProperty.getField());
         String type = anno.dictType();
-        String label = cellData.getStringValue();
+        String label = switch (cellData.getType()) {
+            case NUMBER -> Convert.toStr(cellData.getNumberValue());
+            case BOOLEAN -> Convert.toStr(cellData.getBooleanValue());
+            case null, default -> cellData.getStringValue();
+        };
         String value;
         if (StringUtils.isBlank(type)) {
             value = reverseByExp(label, anno.readConverterExp(), anno.separator());
@@ -128,13 +133,13 @@ public class ExcelDictConvert implements Converter<Object> {
      * @return 导出显示值
      */
     private static String convertByExp(String propertyValue, String converterExp, String separator) {
-        StringBuilder propertyString = new StringBuilder();
+        StringJoiner propertyString = new StringJoiner(separator);
         Map<String, String> convertSource = parseConverterExp(converterExp);
         for (Map.Entry<String, String> item : convertSource.entrySet()) {
             if (StringUtils.contains(propertyValue, separator)) {
                 for (String value : splitPropertyValue(propertyValue, separator)) {
                     if (item.getKey().equals(value)) {
-                        propertyString.append(item.getValue()).append(separator);
+                        propertyString.add(item.getValue());
                         break;
                     }
                 }
@@ -144,7 +149,7 @@ public class ExcelDictConvert implements Converter<Object> {
                 }
             }
         }
-        return StringUtils.stripEnd(propertyString.toString(), separator);
+        return propertyString.toString();
     }
 
     /**
@@ -156,13 +161,13 @@ public class ExcelDictConvert implements Converter<Object> {
      * @return 字段值
      */
     private static String reverseByExp(String propertyValue, String converterExp, String separator) {
-        StringBuilder propertyString = new StringBuilder();
+        StringJoiner propertyString = new StringJoiner(separator);
         Map<String, String> convertSource = parseConverterExp(converterExp);
         for (Map.Entry<String, String> item : convertSource.entrySet()) {
             if (StringUtils.contains(propertyValue, separator)) {
                 for (String value : splitPropertyValue(propertyValue, separator)) {
                     if (item.getValue().equals(value)) {
-                        propertyString.append(item.getKey()).append(separator);
+                        propertyString.add(item.getKey());
                         break;
                     }
                 }
@@ -172,7 +177,7 @@ public class ExcelDictConvert implements Converter<Object> {
                 }
             }
         }
-        return StringUtils.stripEnd(propertyString.toString(), separator);
+        return propertyString.toString();
     }
 
     /**

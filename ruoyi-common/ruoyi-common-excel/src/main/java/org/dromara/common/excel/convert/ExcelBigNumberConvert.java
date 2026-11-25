@@ -1,7 +1,6 @@
 package org.dromara.common.excel.convert;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fesod.sheet.converters.Converter;
 import org.apache.fesod.sheet.enums.CellDataTypeEnum;
@@ -51,7 +50,9 @@ public class ExcelBigNumberConvert implements Converter<Long> {
      */
     @Override
     public Long convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        return Convert.toLong(cellData.getStringValue());
+        BigDecimal number = cellData.getType() == CellDataTypeEnum.NUMBER
+            ? cellData.getNumberValue() : Convert.toBigDecimal(cellData.getStringValue());
+        return number == null ? null : number.longValueExact();
     }
 
     /**
@@ -64,18 +65,14 @@ public class ExcelBigNumberConvert implements Converter<Long> {
      */
     @Override
     public WriteCellData<Object> convertToExcelData(Long object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        if (ObjectUtil.isNull(object)) {
+        if (object == null) {
             return new WriteCellData<>("");
         }
-        if (ObjectUtil.isNotNull(object)) {
-            String str = Convert.toStr(object);
-            if (str.length() > 15) {
-                return new WriteCellData<>(str);
-            }
+        BigDecimal number = BigDecimal.valueOf(object);
+        if (number.precision() > 15) {
+            return new WriteCellData<>(object.toString());
         }
-        WriteCellData<Object> cellData = new WriteCellData<>(new BigDecimal(object));
-        cellData.setType(CellDataTypeEnum.NUMBER);
-        return cellData;
+        return new WriteCellData<>(number);
     }
 
 }

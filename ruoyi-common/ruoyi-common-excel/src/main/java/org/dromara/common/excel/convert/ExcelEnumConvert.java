@@ -68,6 +68,7 @@ public class ExcelEnumConvert implements Converter<Object> {
         cellData.checkEmpty();
         // Excel中填入的是枚举中指定的描述
         Object textValue = switch (cellData.getType()) {
+            case EMPTY -> null;
             case STRING, DIRECT_STRING, RICH_TEXT_STRING -> cellData.getStringValue();
             case NUMBER -> cellData.getNumberValue();
             case BOOLEAN -> cellData.getBooleanValue();
@@ -114,8 +115,20 @@ public class ExcelEnumConvert implements Converter<Object> {
             return new WriteCellData<>("");
         }
         Map<Object, String> enumValueMap = beforeConvert(contentProperty);
-        String value = Convert.toStr(enumValueMap.get(object), "");
-        return new WriteCellData<>(value);
+        String value = enumValueMap.get(object);
+        if (value == null) {
+            Class<?> fieldType = contentProperty.getField().getType();
+            for (Map.Entry<Object, String> entry : enumValueMap.entrySet()) {
+                Object fieldCode = Convert.convertQuietly(fieldType, entry.getKey(), null);
+                if (object.equals(fieldCode)) {
+                    if (value != null && !value.equals(entry.getValue())) {
+                        return new WriteCellData<>("");
+                    }
+                    value = entry.getValue();
+                }
+            }
+        }
+        return new WriteCellData<>(Convert.toStr(value, ""));
     }
 
     /**
@@ -131,11 +144,11 @@ public class ExcelEnumConvert implements Converter<Object> {
             Enum<?>[] enumConstants = anno.enumClass().getEnumConstants();
             for (Enum<?> enumConstant : enumConstants) {
                 Object codeValue = ReflectUtils.invokeGetter(enumConstant, anno.codeField());
-                String textValue = ReflectUtils.invokeGetter(enumConstant, anno.textField());
+                Object textValue = ReflectUtils.invokeGetter(enumConstant, anno.textField());
                 if (ObjectUtil.isNull(codeValue) || ObjectUtil.isNull(textValue)) {
                     throw new IllegalArgumentException("枚举字段 code/text 不能为空: " + enumConstant.name());
                 }
-                enumValueMap.put(codeValue, textValue);
+                enumValueMap.put(codeValue, Convert.toStr(textValue));
             }
             return enumValueMap;
         });
