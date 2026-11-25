@@ -65,6 +65,27 @@ public interface TranslationInterface<T> {
     }
 
     /**
+     * 批量翻译仅接受 Long 或逗号分隔字符串的字段，按原键还原查询结果。
+     */
+    default Map<Object, String> translateLongOrStringKeys(Set<Object> keys, Function<Set<Long>, Map<Long, String>> lookup) {
+        Set<Long> ids = collectLongIds(keys.stream().filter(key -> key instanceof Long || key instanceof String).toList());
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        Map<Long, String> values = lookup.apply(ids);
+        Map<Object, String> result = new LinkedHashMap<>(keys.size());
+        for (Object key : keys) {
+            String value = switch (key) {
+                case Long id -> values.get(id);
+                case String text -> joinMappedValues(text, values::get);
+                case null, default -> null;
+            };
+            result.put(key, value);
+        }
+        return result;
+    }
+
+    /**
      * 按原始 ID 顺序拼接映射值。
      *
      * @param ids    原始 ID 字符串

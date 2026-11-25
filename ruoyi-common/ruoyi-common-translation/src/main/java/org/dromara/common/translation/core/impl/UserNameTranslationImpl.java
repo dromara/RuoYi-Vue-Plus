@@ -33,6 +33,9 @@ public class UserNameTranslationImpl implements TranslationInterface<String> {
      */
     @Override
     public String translation(Object key, String other) {
+        if (key instanceof String ids && ids.contains(",")) {
+            return translationBatch(Set.of(key), other).get(key);
+        }
         return userService.selectUserNameById(Convert.toLong(key));
     }
 

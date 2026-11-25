@@ -1,6 +1,5 @@
 package org.dromara.common.translation.core.impl;
 
-import cn.hutool.core.convert.Convert;
 import lombok.AllArgsConstructor;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.translation.annotation.TranslationType;
@@ -9,7 +8,6 @@ import org.dromara.common.translation.core.TranslationInterface;
 import org.dromara.system.api.OssService;
 import org.dromara.system.api.domain.OssDTO;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,30 +49,9 @@ public class OssUrlTranslationImpl implements TranslationInterface<String> {
      */
     @Override
     public Map<Object, String> translationBatch(Set<Object> keys, String other) {
-        Set<Long> ossIds = collectLongIds(keys);
-        if (ossIds.isEmpty()) {
-            return Map.of();
-        }
-        String idText = ossIds.stream().map(String::valueOf).collect(Collectors.joining(","));
-        Map<Long, String> ossUrls = new LinkedHashMap<>(StreamUtils.toMap(ossService.selectByIds(idText), OssDTO::getOssId, OssDTO::getUrl));
-        Map<Object, String> result = new LinkedHashMap<>(keys.size());
-        for (Object key : keys) {
-            result.put(key, buildValue(key, ossUrls));
-        }
-        return result;
-    }
-
-    /**
-     * 根据原始键构建 OSS 地址翻译值。
-     *
-     * @param source  原始键
-     * @param ossUrls OSS ID 与访问地址映射
-     * @return OSS 访问地址
-     */
-    private String buildValue(Object source, Map<Long, String> ossUrls) {
-        if (source instanceof String ids) {
-            return joinMappedValues(ids, ossUrls::get);
-        }
-        return source == null ? null : ossUrls.get(Convert.toLong(source));
+        return translateLongOrStringKeys(keys, ids -> {
+            String idText = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+            return StreamUtils.toMap(ossService.selectByIds(idText), OssDTO::getOssId, OssDTO::getUrl);
+        });
     }
 }

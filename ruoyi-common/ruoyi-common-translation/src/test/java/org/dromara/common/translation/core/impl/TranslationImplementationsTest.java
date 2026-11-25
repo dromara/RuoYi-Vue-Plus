@@ -23,6 +23,44 @@ import static org.mockito.Mockito.when;
 @DisplayName("内置翻译实现单元测试")
 class TranslationImplementationsTest {
 
+    @Test
+    @DisplayName("批量部门翻译按单值规则忽略 Integer 键")
+    void shouldIgnoreUnsupportedDepartmentKeys() {
+        DeptService service = mock(DeptService.class);
+        when(service.selectDeptNamesByIds(Set.of(1L))).thenReturn(Map.of(1L, "研发部"));
+        var result = new DeptNameTranslationImpl(service).translationBatch(Set.of(1L, 1), null);
+        assertEquals("研发部", result.get(1L));
+        assertNull(result.get(1));
+    }
+
+    @Test
+    @DisplayName("批量昵称翻译按单值规则忽略 Integer 键")
+    void shouldIgnoreUnsupportedNicknameKeys() {
+        UserService service = mock(UserService.class);
+        when(service.selectUserNicksByIds(Set.of(1L))).thenReturn(Map.of(1L, "管理员"));
+        var result = new NicknameTranslationImpl(service).translationBatch(Set.of(1L, 1), null);
+        assertEquals("管理员", result.get(1L));
+        assertNull(result.get(1));
+    }
+
+    @Test
+    @DisplayName("批量附件翻译按单值规则忽略 Integer 键")
+    void shouldIgnoreUnsupportedOssKeys() {
+        OssService service = mock(OssService.class);
+        when(service.selectByIds("1")).thenReturn(List.of(oss(1L, "/file")));
+        var result = new OssUrlTranslationImpl(service).translationBatch(Set.of(1L, 1), null);
+        assertEquals("/file", result.get(1L));
+        assertNull(result.get(1));
+    }
+
+    @Test
+    @DisplayName("单值回退按复合用户 ID 的原始顺序翻译用户名")
+    void shouldTranslateCompositeUserNamesOnFallback() {
+        UserService service = mock(UserService.class);
+        when(service.selectListByIds(Set.of(1L, 2L))).thenReturn(List.of(user(1L, "admin"), user(2L, "guest")));
+        assertEquals("guest,admin,guest", new UserNameTranslationImpl(service).translation("2,1,2", null));
+    }
+
     /**
      * 验证部门翻译兼容 Long、逗号 ID 字符串和批量映射，并忽略无法识别的键类型。
      */
