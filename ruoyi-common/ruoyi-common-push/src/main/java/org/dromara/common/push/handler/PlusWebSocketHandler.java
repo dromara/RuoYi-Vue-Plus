@@ -131,7 +131,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
             webSocketSessionManager.closeSession(session, CloseStatus.SERVER_ERROR);
             return;
         }
-        webSocketSessionManager.disconnect(loginUser.getUserId(), token, CloseStatus.SERVER_ERROR);
+        webSocketSessionManager.disconnect(loginUser.getUserId(), token, session, CloseStatus.SERVER_ERROR);
     }
 
     /**
@@ -149,7 +149,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         }
 
         // 从会话管理器中移除连接
-        webSocketSessionManager.disconnect(loginUser.getUserId(), token);
+        webSocketSessionManager.disconnect(loginUser.getUserId(), token, session, status);
         log.info("[disconnect] sessionId: {}, userId:{}, token:***{}", session.getId(), loginUser.getUserId(), StringUtils.right(token, 8));
     }
 

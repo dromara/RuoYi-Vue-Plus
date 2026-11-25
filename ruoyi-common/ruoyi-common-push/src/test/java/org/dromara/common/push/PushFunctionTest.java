@@ -60,6 +60,17 @@ class PushFunctionTest {
     }
 
     @Test
+    @DisplayName("未知传输方式按默认 SSE 装配")
+    void shouldActivateSseForUnknownTransport() {
+        var context = mock(ConditionContext.class);
+        var metadata = mock(AnnotatedTypeMetadata.class);
+        when(context.getEnvironment()).thenReturn(new MockEnvironment().withProperty("message.transport", "unknown"));
+        when(metadata.getAnnotationAttributes(ConditionalOnMessageTransport.class.getName()))
+            .thenReturn(Map.of("value", "sse"));
+        assertTrue(new MessageTransportCondition().matches(context, metadata));
+    }
+
+    @Test
     @DisplayName("旧 SSE 回调不移除重连后的新连接")
     @SuppressWarnings("unchecked")
     void shouldKeepReplacementEmitterWhenOldConnectionCompletes() {

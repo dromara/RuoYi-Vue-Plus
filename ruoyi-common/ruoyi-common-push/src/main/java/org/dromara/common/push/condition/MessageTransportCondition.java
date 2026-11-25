@@ -33,7 +33,7 @@ public class MessageTransportCondition implements Condition {
         Boolean enabled = context.getEnvironment().getProperty("message.enabled", Boolean.class, true);
         String transport = context.getEnvironment().getProperty("message.transport", MessageTransportEnum.SSE.getCode());
         String expected = (String) attributes.get("value");
-        return enabled && expected.equalsIgnoreCase(transport);
+        return enabled && MessageTransportEnum.of(transport).matches(expected);
     }
 
 }

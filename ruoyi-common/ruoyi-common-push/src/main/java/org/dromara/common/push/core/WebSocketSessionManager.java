@@ -1,6 +1,5 @@
 package org.dromara.common.push.core;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.ThreadUtils;
@@ -11,6 +10,7 @@ import org.dromara.common.push.properties.MessageProperties;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.system.api.domain.PushPayloadDTO;
 import org.springframework.web.socket.*;
+import org.springframework.web.socket.handler.WebSocketSessionDecorator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,13 +59,12 @@ public class WebSocketSessionManager implements PushSessionManager {
      * @param session WebSocket会话对象
      */
     public void connect(Long userId, String token, WebSocketSession session) {
-        Map<String, WebSocketSession> sessions = USER_TOKEN_SESSIONS.computeIfAbsent(userId, key -> new ConcurrentHashMap<>());
-        // 移除并关闭旧的同token会话，避免重复连接
-        WebSocketSession oldSession = sessions.remove(token);
+        WebSocketSession oldSession;
+        synchronized (USER_TOKEN_SESSIONS) {
+            oldSession = USER_TOKEN_SESSIONS.computeIfAbsent(userId, key -> new ConcurrentHashMap<>()).put(token, session);
+        }
         sendKickedMessage(oldSession);
         closeSession(oldSession, CloseStatus.NORMAL);
-        // 存储新会话
-        sessions.put(token, session);
     }
 
     /**
@@ -86,20 +85,28 @@ public class WebSocketSessionManager implements PushSessionManager {
      * @param status 关闭状态码
      */
     public void disconnect(Long userId, String token, CloseStatus status) {
+        disconnect(userId, token, null, status);
+    }
+
+    /** 按实际连接注销，避免迟到的回调移除同 token 的新连接。 */
+    public void disconnect(Long userId, String token, WebSocketSession expected, CloseStatus status) {
         if (userId == null || token == null) {
             return;
         }
-        Map<String, WebSocketSession> sessions = USER_TOKEN_SESSIONS.get(userId);
-        if (MapUtil.isEmpty(sessions)) {
-            USER_TOKEN_SESSIONS.remove(userId);
-            return;
+        WebSocketSession current;
+        synchronized (USER_TOKEN_SESSIONS) {
+            Map<String, WebSocketSession> sessions = USER_TOKEN_SESSIONS.get(userId);
+            current = sessions == null ? null : sessions.get(token);
+            if (current == null || (expected != null
+                && WebSocketSessionDecorator.unwrap(current) != WebSocketSessionDecorator.unwrap(expected))) {
+                return;
+            }
+            sessions.remove(token);
+            if (sessions.isEmpty()) {
+                USER_TOKEN_SESSIONS.remove(userId);
+            }
         }
-        // 移除指定token会话并关闭
-        closeSession(sessions.remove(token), status);
-        // 该用户无任何会话时，从缓存中移除
-        if (sessions.isEmpty()) {
-            USER_TOKEN_SESSIONS.remove(userId);
-        }
+        closeSession(current, status);
     }
 
     /**
@@ -107,28 +114,12 @@ public class WebSocketSessionManager implements PushSessionManager {
      * 定期清理已关闭、失效的WebSocket会话，防止内存泄漏
      */
     public void sessionMonitor() {
-        List<Long> toRemoveUsers = new ArrayList<>();
-        USER_TOKEN_SESSIONS.forEach((userId, sessionMap) -> {
-            if (CollUtil.isEmpty(sessionMap)) {
-                toRemoveUsers.add(userId);
-                return;
-            }
-            // 移除已关闭的无效会话
-            sessionMap.entrySet().removeIf(entry -> {
-                WebSocketSession session = entry.getValue();
-                if (session == null || !session.isOpen()) {
-                    closeSession(session, CloseStatus.NORMAL);
-                    return true;
+        USER_TOKEN_SESSIONS.forEach((userId, sessions) ->
+            sessions.forEach((token, session) -> {
+                if (!session.isOpen()) {
+                    disconnect(userId, token, session, CloseStatus.NORMAL);
                 }
-                return false;
-            });
-            // 无有效会话，标记用户待删除
-            if (sessionMap.isEmpty()) {
-                toRemoveUsers.add(userId);
-            }
-        });
-        // 批量清理无会话用户
-        toRemoveUsers.forEach(USER_TOKEN_SESSIONS::remove);
+            }));
     }
 
     /**
@@ -167,23 +158,16 @@ public class WebSocketSessionManager implements PushSessionManager {
         }
         Map<String, WebSocketSession> sessions = USER_TOKEN_SESSIONS.get(userId);
         if (MapUtil.isEmpty(sessions)) {
-            USER_TOKEN_SESSIONS.remove(userId);
             return;
         }
         // 发送消息并自动清理失效会话
-        sessions.entrySet().removeIf(entry -> {
-            WebSocketSession session = entry.getValue();
-            if (session == null || !session.isOpen()) {
-                closeSession(session, CloseStatus.NORMAL);
-                return true;
+        sessions.forEach((token, session) -> {
+            if (!session.isOpen()) {
+                disconnect(userId, token, session, CloseStatus.NORMAL);
+            } else if (!sendMessage(session, new TextMessage(JsonUtils.toJsonString(payload)))) {
+                disconnect(userId, token, session, CloseStatus.SERVER_ERROR);
             }
-            // 发送失败的会话也会被移除
-            return !sendMessage(session, new TextMessage(JsonUtils.toJsonString(payload)));
         });
-        // 无有效会话则移除用户
-        if (sessions.isEmpty()) {
-            USER_TOKEN_SESSIONS.remove(userId);
-        }
     }
 
     /**
