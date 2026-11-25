@@ -272,7 +272,7 @@ public final class MailBuilder {
     }
 
     /**
-     * 添加内联图片。
+     * 添加内联图片。构建器接管有效输入流，在被替换或发送结束时关闭。
      *
      * @param cid         图片 cid
      * @param inputStream 图片输入流
@@ -280,7 +280,10 @@ public final class MailBuilder {
      */
     public MailBuilder image(String cid, InputStream inputStream) {
         if (StrUtil.isNotBlank(cid) && inputStream != null) {
-            this.images.put(cid, inputStream);
+            InputStream previous = images.put(cid, inputStream);
+            if (previous != null && images.values().stream().noneMatch(stream -> stream == previous)) {
+                IoUtil.close(previous);
+            }
         }
         return this;
     }
@@ -315,27 +318,28 @@ public final class MailBuilder {
      * @return message-id
      */
     public String send() {
-        validate();
-        MailAccount account = resolveMailAccount();
-        JakartaMail mail = JakartaMail.create(account).setUseGlobalSession(useGlobalSession);
-        mail.setTos(tos.toArray(new String[0]));
-        if (CollUtil.isNotEmpty(ccs)) {
-            mail.setCcs(ccs.toArray(new String[0]));
-        }
-        if (CollUtil.isNotEmpty(bccs)) {
-            mail.setBccs(bccs.toArray(new String[0]));
-        }
-        mail.setTitle(subject);
-        mail.setContent(content);
-        mail.setHtml(html);
-        mail.setFiles(files);
         try {
-            if (MapUtil.isNotEmpty(images)) {
-                images.forEach(mail::addImage);
+            validate();
+            MailAccount account = resolveMailAccount();
+            JakartaMail mail = JakartaMail.create(account).setUseGlobalSession(useGlobalSession);
+            mail.setTos(tos.toArray(new String[0]));
+            if (CollUtil.isNotEmpty(ccs)) {
+                mail.setCcs(ccs.toArray(new String[0]));
             }
+            if (CollUtil.isNotEmpty(bccs)) {
+                mail.setBccs(bccs.toArray(new String[0]));
+            }
+            mail.setTitle(subject);
+            mail.setContent(content);
+            mail.setHtml(html);
+            mail.setFiles(files);
+            images.forEach(mail::addImage);
             return mail.send();
         } finally {
-            images.values().forEach(IoUtil::close);
+            Set<InputStream> streams = Collections.newSetFromMap(new IdentityHashMap<>());
+            streams.addAll(images.values());
+            images.clear();
+            streams.forEach(IoUtil::close);
         }
     }
 
@@ -384,7 +388,22 @@ public final class MailBuilder {
         if (StrUtil.isBlank(addresses)) {
             return Collections.emptyList();
         }
-        return normalizeAddresses(StrUtil.splitTrim(addresses.replace(';', ','), ','));
+        List<String> result = new ArrayList<>();
+        boolean quoted = false;
+        int start = 0;
+        for (int i = 0; i < addresses.length(); i++) {
+            char ch = addresses.charAt(i);
+            if (quoted && ch == '\\') {
+                i++;
+            } else if (ch == '"') {
+                quoted = !quoted;
+            } else if (!quoted && (ch == ',' || ch == ';')) {
+                result.add(addresses.substring(start, i));
+                start = i + 1;
+            }
+        }
+        result.add(addresses.substring(start));
+        return normalizeAddresses(result);
     }
 
     /**
