@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import org.apache.commons.lang3.Strings;
+import org.dromara.common.core.constant.Constants;
 import org.springframework.util.AntPathMatcher;
 
 import java.nio.charset.Charset;
@@ -76,7 +77,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 结果
      */
     public static String substring(final String str, int start) {
-        return substring(str, start, str.length());
+        return substring(str, start, length(str));
     }
 
     /**
@@ -115,7 +116,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 结果
      */
     public static boolean ishttp(String link) {
-        return Validator.isUrl(link);
+        return startWithAnyIgnoreCase(link, Constants.HTTP, Constants.HTTPS) && Validator.isUrl(link);
     }
 
     /**
@@ -148,7 +149,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         if (filterBlank && isBlank(str)) {
             return list;
         }
-        String[] split = str.split(sep);
+        String[] split = str.split(sep, -1);
         for (String string : split) {
             if (filterBlank && isBlank(string)) {
                 continue;
@@ -198,7 +199,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 转换后的驼峰式命名的字符串
      */
     public static String convertToCamelCase(String name) {
-        return StrUtil.upperFirst(StrUtil.toCamelCase(name));
+        return StrUtil.upperFirst(StrUtil.toCamelCase(StrUtil.nullToEmpty(name)));
     }
 
     /**
@@ -345,6 +346,9 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 是否包含
      */
     public static boolean startWithAnyIgnoreCase(CharSequence str, CharSequence... prefixs) {
+        if (prefixs == null) {
+            return false;
+        }
         // 判断是否是以指定字符串开头
         for (CharSequence prefix : prefixs) {
             if (Strings.CI.startsWith(str, prefix)) {

@@ -12,6 +12,46 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("StringUtils 补充单元测试")
 class StringUtilsTest {
 
+    @Test
+    @DisplayName("从指定位置截取缺失的字符串时保留空值")
+    void shouldPreserveNullWhenTakingSubstring() {
+        assertNull(StringUtils.substring(null, 1));
+        assertEquals("cd", StringUtils.substring("abcd", -2));
+    }
+
+    @Test
+    @DisplayName("缺少候选前缀时不匹配任何前缀")
+    void shouldHandleMissingPrefixArray() {
+        assertFalse(StringUtils.startWithAnyIgnoreCase("Bearer token", (CharSequence[]) null));
+    }
+
+    @Test
+    @DisplayName("空名称转换为驼峰命名时返回空字符串")
+    void shouldReturnEmptyCamelCaseForMissingName() {
+        assertEquals("", StringUtils.convertToCamelCase(null));
+        assertEquals("", StringUtils.convertToCamelCase(""));
+    }
+
+    @Test
+    @DisplayName("菜单外链仅接受 HTTP 和 HTTPS 协议")
+    void shouldRecognizeOnlyHttpLinks() {
+        assertAll(
+            () -> assertTrue(StringUtils.ishttp("http://example.com/report")),
+            () -> assertTrue(StringUtils.ishttp("HTTPS://example.com/report")),
+            () -> assertFalse(StringUtils.ishttp("ftp://example.com/report")),
+            () -> assertFalse(StringUtils.ishttp("/system/report")),
+            () -> assertFalse(StringUtils.ishttp(null))
+        );
+    }
+
+    @Test
+    @DisplayName("拆分列表关闭空白过滤时保留末尾空字段")
+    void shouldKeepEmptyFieldsWhenFilteringIsDisabled() {
+        String fields = ",A,,B,,";
+        assertEquals(List.of("", "A", "", "B", "", ""), StringUtils.str2List(fields, ",", false, false));
+        assertEquals(List.of("A", "B"), StringUtils.str2List(fields, ",", true, false));
+    }
+
     /**
      * 验证空白默认值、裁剪、截取、格式化和命名转换等基础字符串操作。
      */

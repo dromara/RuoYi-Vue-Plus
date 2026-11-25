@@ -28,8 +28,6 @@ public class DesensitizedUtils extends DesensitizedUtil {
         }
 
         int len = value.length();
-        int prefixMaskLimit = prefixVisible + maskLength;
-        int fullLimit = prefixMaskLimit + suffixVisible;
 
         // 规则 1：长度 <= 中间掩码长度 → 全掩码
         if (len <= maskLength) {
@@ -38,15 +36,15 @@ public class DesensitizedUtils extends DesensitizedUtil {
         String mask = StrUtil.repeat('*', maskLength);
 
         // 规则 2：长度 <= 前缀 + 中间掩码
-        if (len <= prefixMaskLimit) {
+        if (len - maskLength <= prefixVisible) {
             return value.substring(0, len - maskLength) + mask;
         }
 
         String prefix = value.substring(0, prefixVisible);
 
         // 规则 3：长度 <= 前缀 + 中间掩码 + 后缀
-        if (len <= fullLimit) {
-            int suffixLen = len - prefixMaskLimit;
+        int suffixLen = len - maskLength - prefixVisible;
+        if (suffixLen <= suffixVisible) {
             return prefix + mask + value.substring(len - suffixLen);
         }
 
@@ -74,8 +72,9 @@ public class DesensitizedUtils extends DesensitizedUtil {
         }
 
         // 规则2：长度 <= 前缀 + 后缀可见长度 → 优先掩码后面
-        if (len <= prefixVisible + suffixVisible) {
-            return value.substring(0, len - prefixVisible) + StrUtil.repeat('*', prefixVisible);
+        if (len - prefixVisible <= suffixVisible) {
+            int visible = Math.min(prefixVisible, len - prefixVisible);
+            return value.substring(0, visible) + StrUtil.repeat('*', len - visible);
         }
 
         // 规则3：标准形态 → 前后可见，中间全部掩码

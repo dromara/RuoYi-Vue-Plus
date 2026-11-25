@@ -38,6 +38,6 @@ public class FileUtils extends FileUtil {
      */
     public static String percentEncode(String s) {
         String encode = URLEncoder.encode(s, StandardCharsets.UTF_8);
-        return encode.replaceAll("\\+", "%20");
+        return encode.replace("+", "%20").replace("*", "%2A");
     }
 }

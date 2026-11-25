@@ -18,6 +18,15 @@ import static org.mockito.Mockito.verify;
 @DisplayName("common-core 公共工具边界单元测试")
 class CoreUtilityBoundaryTest {
 
+    @Test
+    @DisplayName("下载响应头对扩展文件名中的星号进行百分号编码")
+    void shouldEncodeAsteriskInAttachmentName() {
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FileUtils.setAttachmentResponseHeader(response, "Q1*Q2.xlsx");
+        verify(response).setHeader("Content-disposition",
+            "attachment; filename=Q1%2AQ2.xlsx;filename*=utf-8''Q1%2AQ2.xlsx");
+    }
+
     /**
      * 验证下载文件名对中文、空格和加号执行 URL 编码，并同步写入浏览器可读取的响应头。
      */
@@ -49,6 +58,14 @@ class CoreUtilityBoundaryTest {
         assertTrue(MimeTypeUtils.isDefaultAllowed("PDF"));
         assertFalse(MimeTypeUtils.isDefaultAllowed("exe"));
         assertFalse(MimeTypeUtils.isImage(null));
+    }
+
+    @Test
+    @DisplayName("所有支持的视频扩展名都属于媒体格式")
+    void shouldRecognizeEverySupportedVideoExtensionAsMedia() {
+        for (String extension : MimeTypeUtils.VIDEO_EXTENSION) {
+            assertTrue(MimeTypeUtils.isMedia(extension), extension);
+        }
     }
 
     /**

@@ -55,7 +55,7 @@ public class MimeTypeUtils {
     /**
      * 媒体文件扩展名数组（音频+视频+Flash）
      */
-    public static final String[] MEDIA_EXTENSION = {"swf", "flv", "mp3", "wav", "wma", "wmv", "mid", "avi", "mpg", "asf", "rm", "rmvb"};
+    public static final String[] MEDIA_EXTENSION = {"swf", "flv", "mp3", "wav", "wma", "wmv", "mid", "avi", "mpg", "asf", "rm", "rmvb", "mp4"};
 
     /**
      * 默认允许上传的文件扩展名数组

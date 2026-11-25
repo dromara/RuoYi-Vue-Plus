@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import org.dromara.common.core.exception.ServiceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -12,6 +14,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("日期、网络与脱敏工具单元测试")
 class DateNetDesensitizedUtilsTest {
+
+    @Test
+    @DisplayName("可见长度上限很大时仍保留固定数量的掩码")
+    void shouldKeepMaskWhenVisibleLimitsExceedInputLength() {
+        assertAll(
+            () -> assertEquals("ab**", DesensitizedUtils.mask("abcd", Integer.MAX_VALUE, 1, 2)),
+            () -> assertEquals("a**d", DesensitizedUtils.mask("abcd", 1, Integer.MAX_VALUE, 2))
+        );
+    }
+
+    @Test
+    @DisplayName("短 Token 优先隐藏尾部且不超过允许的可见前缀")
+    void shouldLimitVisiblePrefixForShortTokens() {
+        assertAll(
+            () -> assertEquals("****", DesensitizedUtils.maskHighSecurity("abcd", 0, 4)),
+            () -> assertEquals("a***", DesensitizedUtils.maskHighSecurity("abcd", 1, 3)),
+            () -> assertEquals("a**", DesensitizedUtils.maskHighSecurity("abc", 1, 4))
+        );
+    }
 
     /**
      * 验证时间差可以忽略参数顺序并按秒精度格式化。
@@ -40,6 +61,18 @@ class DateNetDesensitizedUtilsTest {
         assertThrows(ServiceException.class, () -> DateUtils.validateDateRange(start, end, 1, TimeUnit.DAYS));
         assertThrows(IllegalArgumentException.class,
             () -> DateUtils.validateDateRange(start, end, 1, TimeUnit.SECONDS));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = TimeUnit.class, names = {"MINUTES", "HOURS", "DAYS"})
+    @DisplayName("日期跨度允许恰好达到上限，超过一毫秒即拒绝")
+    void shouldEnforceExactDateRangeLimit(TimeUnit unit) {
+        Date start = new Date(0);
+        long limitMillis = unit.toMillis(2);
+
+        assertDoesNotThrow(() -> DateUtils.validateDateRange(start, new Date(limitMillis), 2, unit));
+        assertThrows(ServiceException.class,
+            () -> DateUtils.validateDateRange(start, new Date(limitMillis + 1), 2, unit));
     }
 
     /**

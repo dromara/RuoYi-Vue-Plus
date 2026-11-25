@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -80,15 +82,13 @@ public class DateUtils extends DateUtil {
             throw new ServiceException("结束日期不能早于开始日期");
         }
 
-        long diffMillis = end.getTime() - start.getTime();
-        long diff = switch (unit) {
-            case DAYS -> TimeUnit.MILLISECONDS.toDays(diffMillis);
-            case HOURS -> TimeUnit.MILLISECONDS.toHours(diffMillis);
-            case MINUTES -> TimeUnit.MILLISECONDS.toMinutes(diffMillis);
+        Duration limit = switch (unit) {
+            case DAYS, HOURS, MINUTES -> Duration.of(maxValue, unit.toChronoUnit());
             default -> throw new IllegalArgumentException("不支持的时间单位：" + unit.name());
         };
 
-        if (diff > maxValue) {
+        Duration elapsed = Duration.between(Instant.ofEpochMilli(start.getTime()), Instant.ofEpochMilli(end.getTime()));
+        if (elapsed.compareTo(limit) > 0) {
             String msg = String.format("最大时间跨度为 %d %s", maxValue, unit.name().toLowerCase());
             throw new ServiceException(msg);
         }
