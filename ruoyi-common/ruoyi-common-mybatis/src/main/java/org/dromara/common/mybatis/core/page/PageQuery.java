@@ -92,13 +92,12 @@ public class PageQuery implements Serializable {
             return List.of();
         }
         String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);
-        orderBy = StringUtils.toUnderScoreCase(orderBy);
 
         // 兼容前端排序类型
         String orderDirection = StringUtils.replaceEach(isAsc, new String[]{"ascending", "descending"}, new String[]{"asc", "desc"});
 
-        String[] orderByArr = orderBy.split(StringUtils.SEPARATOR);
-        String[] isAscArr = orderDirection.split(StringUtils.SEPARATOR);
+        String[] orderByArr = orderBy.split(StringUtils.SEPARATOR, -1);
+        String[] isAscArr = orderDirection.split(StringUtils.SEPARATOR, -1);
         if (isAscArr.length != 1 && isAscArr.length != orderByArr.length) {
             throw new ServiceException("排序参数有误");
         }
@@ -106,8 +105,11 @@ public class PageQuery implements Serializable {
         List<OrderItem> list = new ArrayList<>();
         // 每个字段各自排序
         for (int i = 0; i < orderByArr.length; i++) {
-            String orderByStr = orderByArr[i];
-            String isAscStr = isAscArr.length == 1 ? isAscArr[0] : isAscArr[i];
+            String orderByStr = StringUtils.toUnderScoreCase(orderByArr[i].trim());
+            if (StringUtils.isBlank(orderByStr)) {
+                throw new ServiceException("排序参数有误");
+            }
+            String isAscStr = isAscArr[isAscArr.length == 1 ? 0 : i].trim();
             if ("asc".equals(isAscStr)) {
                 list.add(OrderItem.asc(orderByStr));
             } else if ("desc".equals(isAscStr)) {
@@ -123,15 +125,20 @@ public class PageQuery implements Serializable {
      * 获取当前页起始行号。
      *
      * @return 起始行号
+     * @throws ServiceException 起始行号超出整数范围
      */
     @JsonIgnore
     public Integer getFirstNum() {
         Integer currentPageNum = ObjectUtil.defaultIfNull(getPageNum(), DEFAULT_PAGE_NUM);
         Integer currentPageSize = ObjectUtil.defaultIfNull(getPageSize(), DEFAULT_PAGE_SIZE);
-        if (currentPageNum <= 0) {
-            currentPageNum = DEFAULT_PAGE_NUM;
+        if (currentPageNum <= 1 || currentPageSize <= 0) {
+            return 0;
         }
-        return (currentPageNum - 1) * currentPageSize;
+        try {
+            return Math.multiplyExact(currentPageNum - 1, currentPageSize);
+        } catch (ArithmeticException e) {
+            throw new ServiceException("分页起始行超出整数范围");
+        }
     }
 
     /**

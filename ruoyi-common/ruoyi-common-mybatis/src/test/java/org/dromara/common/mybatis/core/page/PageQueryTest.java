@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.dromara.common.core.exception.ServiceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
 
@@ -12,6 +14,44 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("PageQuery 单元测试")
 class PageQueryTest {
+
+    @Test
+    void shouldIgnoreSpacingBetweenSortEntries() {
+        var query = new PageQuery(20, 1);
+        query.setOrderByColumn("id, createTime");
+        query.setIsAsc("asc, descending");
+        var order = query.build().orders();
+        assertEquals(List.of("id", "create_time"), order.stream().map(OrderItem::getColumn).toList());
+        assertTrue(order.getFirst().isAsc());
+        assertFalse(order.getLast().isAsc());
+    }
+
+    @Test
+    @DisplayName("关闭分页时起始行与 MyBatis-Plus 分页对象一致")
+    void shouldStartAtZeroWhenPaginationIsDisabled() {
+        PageQuery query = new PageQuery(-1, 3);
+        assertEquals(0L, query.build().offset());
+        assertEquals(0, query.getFirstNum());
+    }
+
+    @Test
+    @DisplayName("起始行支持整数上界并拒绝超出范围的偏移")
+    void shouldRejectOverflowingFirstRow() {
+        assertEquals(Integer.MAX_VALUE, new PageQuery(Integer.MAX_VALUE, 2).getFirstNum());
+        PageQuery overflow = new PageQuery(1_073_741_824, 3);
+        assertThrows(ServiceException.class, overflow::getFirstNum);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"'id,',asc", "'id,,createTime',asc", "'id,createTime','asc,'"})
+    @DisplayName("拒绝排序列表中缺失的字段或方向")
+    void shouldRejectEmptySortEntries(String columns, String directions) {
+        PageQuery query = new PageQuery();
+        query.setOrderByColumn(columns);
+        query.setIsAsc(directions);
+
+        assertThrows(ServiceException.class, query::build);
+    }
 
     /**
      * 验证缺省分页参数会使用框架定义的页码和页大小。
