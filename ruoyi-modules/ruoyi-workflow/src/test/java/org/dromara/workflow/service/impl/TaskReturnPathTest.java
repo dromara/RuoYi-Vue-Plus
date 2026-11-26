@@ -14,6 +14,27 @@ import static org.mockito.Mockito.*;
 
 class TaskReturnPathTest {
     @Test
+    void delegatedTaskReturnsToCurrentNodeEvenWhenRejectionTargetIsConfigured() {
+        var tasks = mock(FlowTaskMapper.class);
+        var nodes = mock(NodeService.class);
+        var service = new FlwTaskServiceImpl(null, null, null, null, nodes, tasks,
+            null, null, null, null, null, null, null, null);
+        var task = new FlowTask().setDefinitionId(7L);
+        task.setId(9L);
+        when(tasks.selectById(9L)).thenReturn(task);
+        var review = node("review", NodeType.BETWEEN);
+        when(review.getAnyNodeSkip()).thenReturn("apply");
+        when(nodes.getByNodeCodes(List.of("review"), 7L)).thenReturn(List.of(review));
+        try (var engine = mockStatic(FlowEngine.class)) {
+            var users = mock(UserService.class);
+            engine.when(FlowEngine::userService).thenReturn(users);
+            when(users.getByAssociateds(List.of(9L), org.dromara.warm.flow.core.enums.UserType.DEPUTE.getKey()))
+                .thenReturn(List.of(mock(User.class)));
+            assertEquals(List.of(review), service.getBackTaskNode(9L, "review"));
+        }
+    }
+
+    @Test
     void cyclicGraphOnlyOffersPreviousApprovalNodesOnce() {
         var tasks = mock(FlowTaskMapper.class);
         var nodes = mock(NodeService.class);

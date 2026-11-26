@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 class WorkflowFinishEventTest {
     @ParameterizedTest
-    @ValueSource(strings = {"submit", "forward", "back", "end"})
+    @ValueSource(strings = {"submit", "forward", "back", "end", "backToReviewer", "backToParallelReviewers"})
     void publishesBusinessAndTaskEventsForCurrentTransition(String transition) {
         var tasks = mock(IFlwTaskService.class);
         var instances = mock(IFlwInstanceService.class);
@@ -34,10 +34,15 @@ class WorkflowFinishEventTest {
         variables.put(FlowConstant.MESSAGE_TYPE, List.of("1"));
         variables.put(FlowConstant.SUBMIT, transition.equals("submit"));
         var operation = WorkflowContext.create();
-        operation.setTaskStatus(transition.equals("back") ? "back" : "pass");
+        operation.setTaskStatus(transition.startsWith("back") ? "back" : "pass");
         operation.setVariables(variables);
-        List<Task> next = transition.equals("end") ? List.of()
-            : List.of(new FlowTask().setInstanceId(31L).setNodeCode(transition.equals("back") ? "apply" : "review"));
+        List<Task> next = switch (transition) {
+            case "end" -> List.of();
+            case "back" -> List.of(new FlowTask().setInstanceId(31L).setNodeCode("apply"));
+            case "backToParallelReviewers" -> List.of(new FlowTask().setInstanceId(31L).setNodeCode("finance"),
+                new FlowTask().setInstanceId(31L).setNodeCode("legal"));
+            default -> List.of(new FlowTask().setInstanceId(31L).setNodeCode("review"));
+        };
         when(event.getDefinition()).thenReturn(definition);
         when(event.getInstance()).thenReturn(instance);
         when(event.getTask()).thenReturn(new FlowTask().setInstanceId(31L));

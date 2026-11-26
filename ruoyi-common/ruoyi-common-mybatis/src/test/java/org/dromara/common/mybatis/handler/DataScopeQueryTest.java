@@ -71,7 +71,8 @@ class DataScopeQueryTest {
     @ParameterizedTest
     @CsvSource({
         "true, unrestricted, 1/2/3", "false, unrestricted, 1",
-        "true, department, 1/2", "true, owner, 1/3", "true, unrelated, none"
+        "true, department, 1/2", "true, owner, 1/3", "true, unrelated, none",
+        "false, department, 1/2", "false, owner, 1/3", "false, unrelated, none"
     })
     void returnedRowsRespectRoleScopeAndOperation(boolean select, String scope, String expected) throws Exception {
         var dept = new RoleDTO();
@@ -104,14 +105,19 @@ class DataScopeQueryTest {
             DataPermissionHelper.setPermission(getClass().getDeclaredMethod("scopedMapper").getAnnotation(DataPermission.class));
             DataPermissionHelper.setAccess(access);
             var predicate = new PlusDataPermissionHandler().getSqlSegment(CCJSqlParserUtil.parseCondExpression("id < 5"), select);
-            try (var statement = conn.createStatement();
-                 var rows = statement.executeQuery("select id from (values (1,22,11),(2,22,12),(3,23,11),(4,23,12),"
-                     + "(5,22,11)) t(id, dept_id, owner_id) where " + predicate + " order by id")) {
-                var ids = new ArrayList<String>();
-                while (rows.next()) {
-                    ids.add(rows.getString(1));
+            try (var statement = conn.createStatement()) {
+                statement.execute("create table records(id int, dept_id int, owner_id int, changed boolean default false)");
+                statement.execute("insert into records(id, dept_id, owner_id) values (1,22,11),(2,22,12),(3,23,11),(4,23,12),(5,22,11)");
+                if (!select) {
+                    statement.executeUpdate("update records set changed=true where " + predicate);
                 }
-                assertEquals(expected, ids.isEmpty() ? "none" : String.join("/", ids));
+                try (var rows = statement.executeQuery("select id from records where " + (select ? predicate : "changed") + " order by id")) {
+                    var ids = new ArrayList<String>();
+                    while (rows.next()) {
+                        ids.add(rows.getString(1));
+                    }
+                    assertEquals(expected, ids.isEmpty() ? "none" : String.join("/", ids));
+                }
             }
         } finally {
             DataPermissionHelper.removePermission();

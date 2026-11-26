@@ -40,6 +40,46 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SystemMapperIntegrationTest {
+    @Test
+    void routeUniquenessAllowsOwnMenuAndButtonsButRejectsCaseOnlyCollisions() throws Exception {
+        var source = new DriverManagerDataSource("jdbc:h2:mem:" + UUID.randomUUID(), "sa", "");
+        try (var connection = source.getConnection(); var beans = mockStatic(SpringUtil.class);
+             var mapping = mockStatic(MapstructUtils.class)) {
+            var db = new JdbcTemplate(source);
+            db.execute("""
+                create table sys_menu(menu_id bigint primary key,parent_id bigint,menu_name varchar,order_num int,
+                path varchar,component varchar,query_param varchar,is_frame varchar,is_cache varchar,menu_type varchar,
+                visible varchar,status varchar,perms varchar,icon varchar,active_menu varchar,ext varchar,remark varchar,
+                create_dept bigint,create_by bigint,create_time timestamp,update_by bigint,update_time timestamp)
+                """);
+            db.update("insert into sys_menu(menu_id,parent_id,path,menu_type) values(1,20,'invoice','C')");
+            var config = new MybatisConfiguration();
+            config.setEnvironment(new Environment("menu", new SpringManagedTransactionFactory(), source));
+            config.addMapper(SysMenuMapper.class);
+            var sessions = new SqlSessionTemplate(new MybatisSqlSessionFactoryBuilder().build(config));
+            var service = new SysMenuServiceImpl(sessions.getMapper(SysMenuMapper.class), mock(), mock());
+            var form = new org.dromara.system.domain.bo.SysMenuBo();
+            var menu = new org.dromara.system.domain.SysMenu();
+            mapping.when(() -> MapstructUtils.convert(form, org.dromara.system.domain.SysMenu.class)).thenReturn(menu);
+            menu.setMenuId(1L);
+            menu.setParentId(20L);
+            menu.setPath("invoice");
+            menu.setMenuType("C");
+            assertTrue(service.checkRouteConfigUnique(form));
+            menu.setMenuId(null);
+            assertFalse(service.checkRouteConfigUnique(form));
+            menu.setMenuType("F");
+            assertTrue(service.checkRouteConfigUnique(form));
+            menu.setMenuType("C");
+            menu.setPath("INVOICE");
+            assertFalse(service.checkRouteConfigUnique(form));
+            menu.setParentId(30L);
+            assertFalse(service.checkRouteConfigUnique(form));
+            menu.setPath("reports");
+            assertTrue(service.checkRouteConfigUnique(form));
+        }
+    }
+
     @TestConfiguration(proxyBeanMethods = false)
     @EnableTransactionManagement
     @EnableCaching
