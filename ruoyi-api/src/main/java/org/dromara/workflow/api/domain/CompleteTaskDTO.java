@@ -61,6 +61,15 @@ public class CompleteTaskDTO implements Serializable {
     private Map<String, Object> variables;
 
     /**
+     * 保存可写副本，供办理时过滤空值并补充流程变量。
+     *
+     * @param variables 调用方提供的变量
+     */
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = variables == null ? null : new HashMap<>(variables);
+    }
+
+    /**
      * 扩展变量(此处为逗号分隔的ossId)
      */
     private String ext;

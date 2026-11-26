@@ -227,7 +227,7 @@ public class WorkflowGlobalListener implements GlobalListener {
             });
             String notice = MapUtil.getStr(variable, FlowConstant.MESSAGE_NOTICE);
             // 退回到申请人时只保留“已退回”结果消息，避免再追加一条“新的待办”形成重复提醒。
-            if (shouldSendTaskMessage(workflowContext, definition, nextTasks)) {
+            if (CollUtil.isNotEmpty(nextTasks) && shouldSendTaskMessage(workflowContext, definition, nextTasks)) {
                 SpringUtils.context().publishEvent(new WorkflowTaskMessageEvent(definition.getFlowName(), instance.getId(), messageType, notice));
             }
         }

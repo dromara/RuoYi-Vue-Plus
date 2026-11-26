@@ -171,23 +171,23 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
             bo.setApplyCode(System.currentTimeMillis() + StrUtil.EMPTY);
         }
         TestLeave leave = MapstructUtils.convert(bo, TestLeave.class);
-        boolean flag = leaveMapper.insertOrUpdate(leave);
-        if (flag) {
-            bo.setId(leave.getId());
-            // 后端发起需要忽略权限
-            bo.getParams().put("ignore", true);
+        if (!leaveMapper.insertOrUpdate(leave)) {
+            throw new ServiceException("请假单保存失败");
+        }
+        bo.setId(leave.getId());
+        // 后端发起需要忽略权限
+        bo.getParams().put("ignore", true);
 
-            StartProcessDTO startProcess = new StartProcessDTO();
-            startProcess.setBusinessId(leave.getId().toString());
-            startProcess.setFlowCode(StringUtils.isEmpty(bo.getFlowCode()) ? "leave1" : bo.getFlowCode());
-            startProcess.setVariables(bo.getParams());
-            // 后端发起 如果没有登录用户 比如定时任务 可以手动设置一个处理人id
-            // startProcess.setHandler("0");
+        StartProcessDTO startProcess = new StartProcessDTO();
+        startProcess.setBusinessId(leave.getId().toString());
+        startProcess.setFlowCode(StringUtils.isEmpty(bo.getFlowCode()) ? "leave1" : bo.getFlowCode());
+        startProcess.setVariables(bo.getParams());
+        // 后端发起 如果没有登录用户 比如定时任务 可以手动设置一个处理人id
+        // startProcess.setHandler("0");
 
-            boolean flag1 = workflowService.startCompleteTask(startProcess);
-            if (!flag1) {
-                throw new ServiceException("流程发起异常");
-            }
+        boolean flag1 = workflowService.startCompleteTask(startProcess);
+        if (!flag1) {
+            throw new ServiceException("流程发起异常");
         }
         return MapstructUtils.convert(leave, TestLeaveVo.class);
     }

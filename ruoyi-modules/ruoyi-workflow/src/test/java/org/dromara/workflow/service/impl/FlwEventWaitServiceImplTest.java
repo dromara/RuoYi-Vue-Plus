@@ -31,6 +31,40 @@ class FlwEventWaitServiceImplTest {
     }
 
     @Test
+    void revivalUsesDeadRecordVersionAndRejectsConcurrentUpdate() {
+        var dao = mock(org.dromara.warm.flow.core.orm.dao.FlowEventWaitDao.class);
+        var service = spy(new EventWaitServiceImpl());
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "warmDao", dao);
+        var wait = mock(EventWait.class);
+        when(wait.getStatus()).thenReturn("DEAD");
+        when(wait.getId()).thenReturn(12L);
+        when(wait.getVersion()).thenReturn(5);
+        when(wait.getInstanceId()).thenReturn(8L);
+        when(wait.getAttachedTaskId()).thenReturn(null);
+        when(wait.getEventType()).thenReturn(EventType.MESSAGE_CATCH.getValue());
+        when(wait.getNodeCode()).thenReturn("receive");
+        doReturn(wait).when(service).getById(12L);
+        doReturn(java.util.List.of(wait)).when(service).getWaitingByInstanceId(8L);
+        var instances = mock(org.dromara.warm.flow.core.service.InsService.class);
+        var tasks = mock(org.dromara.warm.flow.core.service.TaskService.class);
+        var instance = mock(org.dromara.warm.flow.core.entity.Instance.class);
+        when(instance.getId()).thenReturn(8L);
+        when(instance.getActivityStatus()).thenReturn(org.dromara.warm.flow.core.enums.ActivityStatus.ACTIVITY.getKey());
+        when(instances.getById(8L)).thenReturn(instance);
+        when(dao.revive(org.mockito.Mockito.eq(12L), org.mockito.Mockito.eq(5),
+            org.mockito.Mockito.any(java.util.Date.class), org.mockito.Mockito.isNull())).thenReturn(true, false);
+        try (var engine = mockStatic(FlowEngine.class)) {
+            engine.when(FlowEngine::workflow).thenReturn(new WorkflowServiceImpl());
+            engine.when(FlowEngine::eventWaitService).thenReturn(service);
+            engine.when(FlowEngine::insService).thenReturn(instances);
+            engine.when(FlowEngine::taskService).thenReturn(tasks);
+            var monitor = new FlwEventWaitServiceImpl();
+            monitor.revive(12L);
+            assertThrows(FlowException.class, () -> monitor.revive(12L));
+        }
+    }
+
+    @Test
     void deadTimerStartMustBeRebuiltFromDefinition() {
         FlowException error = recover(EventCons.STATUS_DEAD, EventType.TIMER_START);
         assertTrue(error.getMessage().contains("定时启动"), error.getMessage());

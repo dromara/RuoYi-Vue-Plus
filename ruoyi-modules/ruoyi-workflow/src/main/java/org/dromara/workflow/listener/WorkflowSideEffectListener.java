@@ -16,6 +16,7 @@ import org.dromara.workflow.service.IFlwCommonService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +50,7 @@ public class WorkflowSideEffectListener {
      *
      * @param event 工作流待办消息事件
      */
-    @EventListener
+    @TransactionalEventListener(fallbackExecution = true)
     public void handleTaskMessage(WorkflowTaskMessageEvent event) {
         flwCommonService.sendMessage(event.flowName(), event.instanceId(), event.messageType(), event.notice());
     }
@@ -59,7 +60,7 @@ public class WorkflowSideEffectListener {
      *
      * @param event 工作流结果消息事件
      */
-    @EventListener
+    @TransactionalEventListener(fallbackExecution = true)
     public void handleResultMessage(WorkflowResultMessageEvent event) {
         if (!StringUtils.equalsAny(event.status(), BusinessStatusEnum.FINISH.getStatus(), BusinessStatusEnum.BACK.getStatus())) {
             return;

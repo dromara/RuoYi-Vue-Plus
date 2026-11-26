@@ -77,22 +77,17 @@ public class CompletePrepareComponent extends NodeComponent {
             return map;
         }
         for (Map.Entry<String, Object> entry : assigneeMap.entrySet()) {
-            if (variablesMap.containsKey(entry.getKey())) {
-                String userIds = variablesMap.get(entry.getKey()).toString();
-                if (StringUtils.isNotBlank(userIds)) {
-                    Set<String> hashSet = CollUtil.newHashSet();
-                    List<String> popUserIds = StringUtils.str2List(entry.getValue().toString(), StringUtils.SEPARATOR, true, true);
-                    List<String> variableUserIds = StringUtils.str2List(userIds, StringUtils.SEPARATOR, true, true);
-                    hashSet.addAll(popUserIds);
-                    hashSet.addAll(variableUserIds);
-                    // Warm-Flow 会按“状态:变量名”读取办理人，正向和退回都写入同一批候选人。
-                    map.put(TaskStatus.PASS.getKey() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
-                    map.put(TaskStatus.BACK.getKey() + StringUtils.COLON + entry.getKey(), StringUtils.joinComma(hashSet));
+            Object selected = entry.getValue();
+            Object previous = variablesMap == null ? null : variablesMap.get(entry.getKey());
+            if (previous != null && StringUtils.isNotBlank(previous.toString())) {
+                Set<String> combined = new java.util.LinkedHashSet<>(StringUtils.str2List(previous.toString(), StringUtils.SEPARATOR, true, true));
+                if (selected != null) {
+                    combined.addAll(StringUtils.str2List(selected.toString(), StringUtils.SEPARATOR, true, true));
                 }
-            } else {
-                map.put(TaskStatus.PASS.getKey() + StringUtils.COLON + entry.getKey(), entry.getValue());
-                map.put(TaskStatus.BACK.getKey() + StringUtils.COLON + entry.getKey(), entry.getValue());
+                selected = StringUtils.joinComma(combined);
             }
+            map.put(TaskStatus.PASS.getKey() + StringUtils.COLON + entry.getKey(), selected);
+            map.put(TaskStatus.BACK.getKey() + StringUtils.COLON + entry.getKey(), selected);
         }
         return map;
     }

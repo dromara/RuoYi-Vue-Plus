@@ -33,14 +33,13 @@ public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo>, MPJ
      */
     default Page<FlowTaskVo> getListRunTask(Page<FlowTaskVo> page, FlowTaskBo bo, List<String> categoryIds, String userId) {
         Map<String, Object> params = bo.getParams();
-        return QueryBuilder.lambdaJoin("t", FlowTask.class)
+        var query = QueryBuilder.lambdaJoin("t", FlowTask.class)
             .distinct()
             .select(FlowTask::getId, FlowTask::getNodeCode, FlowTask::getNodeName, FlowTask::getNodeType,
                 FlowTask::getDefinitionId, FlowTask::getInstanceId, FlowTask::getCreateTime, FlowTask::getUpdateTime)
             .select("i", FlowInstance::getBusinessId, FlowInstance::getFlowStatus, FlowInstance::getCreateBy)
             .select("d", FlowDefinition::getFlowName, FlowDefinition::getFlowCode, FlowDefinition::getFormCustom,
                 FlowDefinition::getCategory, FlowDefinition::getVersion)
-            .select("uu", FlowUser::getProcessedBy, FlowUser::getType)
             .select("biz", FlowInstanceBizExt::getBusinessCode, FlowInstanceBizExt::getBusinessTitle)
             .selectAs("COALESCE(NULLIF(TRIM(t.form_path), ''), NULLIF(TRIM(d.form_path), ''))", FlowTaskVo::getFormPath)
             .leftJoin(FlowUser.class, "uu", FlowUser::getAssociated, FlowTask::getId)
@@ -60,7 +59,11 @@ public interface FlwTaskMapper extends BaseMapperPlus<FlowTask, FlowTaskVo>, MPJ
             .eq(userId != null && !userId.isBlank(), "i", FlowInstance::getFlowStatus, BusinessStatusEnum.WAITING.getStatus())
             .orderByDesc("t", FlowTask::getCreateTime)
             .orderByDesc("t", FlowTask::getUpdateTime)
-            .page(page, FlowTaskVo.class);
+            .orderByDesc("t", FlowTask::getId);
+        if (userId != null && !userId.isBlank()) {
+            query.select("uu", FlowUser::getProcessedBy, FlowUser::getType);
+        }
+        return query.page(page, FlowTaskVo.class);
     }
 
     /**

@@ -230,14 +230,17 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
         }
         if (!oldCategory.getParentId().equals(category.getParentId())) {
             FlowCategory newParentCategory = categoryMapper.selectById(category.getParentId());
-            if (ObjectUtil.isNotNull(newParentCategory)) {
-                String newAncestors = newParentCategory.getAncestors() + StringUtils.SEPARATOR + newParentCategory.getCategoryId();
-                String oldAncestors = oldCategory.getAncestors();
-                category.setAncestors(newAncestors);
-                updateCategoryChildren(category.getCategoryId(), newAncestors, oldAncestors);
-            } else {
+            if (ObjectUtil.isNull(newParentCategory)) {
                 throw new ServiceException("父级流程分类不存在!");
             }
+            if (category.getCategoryId().equals(newParentCategory.getCategoryId())
+                || StringUtils.str2Set(newParentCategory.getAncestors(), StringUtils.SEPARATOR)
+                    .contains(category.getCategoryId().toString())) {
+                throw new ServiceException("上级流程分类不能是自身或下级分类");
+            }
+            String newAncestors = newParentCategory.getAncestors() + StringUtils.SEPARATOR + newParentCategory.getCategoryId();
+            category.setAncestors(newAncestors);
+            updateCategoryChildren(category.getCategoryId(), newAncestors, oldCategory.getAncestors());
         } else {
             category.setAncestors(oldCategory.getAncestors());
         }

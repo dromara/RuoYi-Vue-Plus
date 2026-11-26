@@ -10,6 +10,7 @@ import org.dromara.system.api.domain.UserDTO;
 import org.dromara.warm.flow.core.dto.DefJson;
 import org.dromara.warm.flow.core.dto.NodeJson;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.warm.flow.orm.entity.FlowHisTask;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
@@ -30,6 +31,53 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class FlwChartExtServiceImplTest {
+
+    @Test
+    void historicalAndPendingApproversAppearOnlyOnTheirOwnNodes() {
+        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new Configuration(), "chart"), FlowUser.class);
+        var history = mock(FlowHisTaskMapper.class);
+        var tasks = mock(FlowTaskMapper.class);
+        var assignees = mock(FlowUserMapper.class);
+        var users = mock(UserService.class);
+        var dictionary = mock(DictService.class);
+        var service = new FlwChartExtServiceImpl(users, mock(DeptService.class), history, tasks, assignees, dictionary);
+        ReflectionTestUtils.setField(service, "nodeTooltip", true);
+        var completed = new NodeJson().setNodeCode("manager").setNodeName("经理审批");
+        var current = new NodeJson().setNodeCode("finance").setNodeName("财务审批");
+        var definition = new DefJson().setInstance(new FlowInstance().setId(1L)).setNodeList(List.of(completed, current));
+        service.initPromptContent(definition);
+        var record = new FlowHisTask().setNodeCode("manager").setApprover("7").setFlowStatus("pass");
+        record.setCreateTime(new java.util.Date(1000));
+        record.setUpdateTime(new java.util.Date(2000));
+        when(history.selectList(any())).thenReturn(List.of(record));
+        when(tasks.selectList(any())).thenReturn(List.of(new FlowTask().setId(12L).setNodeCode("finance")));
+        when(assignees.selectList(any())).thenReturn(List.of(
+            new FlowUser().setAssociated(12L).setProcessedBy("8"),
+            new FlowUser().setAssociated(12L).setProcessedBy("9")));
+        when(users.selectListByIds(any())).thenReturn(List.of(chartUser(7L, "manager"), chartUser(8L, "cashier"),
+            chartUser(9L, "accountant")));
+        when(dictionary.getAllDictByDictType(any())).thenReturn(Map.of("pass", "已通过"));
+
+        service.execute(definition);
+
+        assertEquals(List.of("manager"), tooltipValues(completed, "用户账号: "));
+        assertEquals(List.of("已通过"), tooltipValues(completed, "审批状态: "));
+        assertEquals(List.of("accountant", "cashier"), tooltipValues(current, "用户账号: "));
+        assertEquals(List.of("待审批", "待审批"), tooltipValues(current, "审批状态: "));
+    }
+
+    private static UserDTO chartUser(long id, String account) {
+        UserDTO user = new UserDTO();
+        user.setUserId(id);
+        user.setUserName(account);
+        user.setNickName(account);
+        return user;
+    }
+
+    private static List<String> tooltipValues(NodeJson node, String prefix) {
+        return node.getPromptContent().getInfo().stream().filter(item -> prefix.equals(item.getPrefix()))
+            .map(item -> item.getContent()).sorted().toList();
+    }
 
     @Test
     void showsCurrentAssigneeWithoutApprovalHistory() {

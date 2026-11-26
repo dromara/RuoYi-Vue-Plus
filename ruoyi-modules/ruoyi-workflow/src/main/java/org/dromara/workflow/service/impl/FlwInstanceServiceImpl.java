@@ -398,9 +398,17 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         }
         Map<String, Object> variableMap = Optional.ofNullable(flowInstance.getVariableMap()).orElse(Collections.emptyMap());
         List<Map<String, Object>> variableList = variableMap.entrySet().stream()
-            .map(entry -> Map.of("key", entry.getKey(), "value", entry.getValue()))
+            .map(entry -> {
+                Map<String, Object> row = new HashMap<>();
+                row.put("key", entry.getKey());
+                row.put("value", entry.getValue());
+                return row;
+            })
             .toList();
-        return Map.of("variableList", variableList, "variable", flowInstance.getVariable());
+        Map<String, Object> result = new HashMap<>();
+        result.put("variableList", variableList);
+        result.put("variable", flowInstance.getVariable());
+        return result;
     }
 
     /**

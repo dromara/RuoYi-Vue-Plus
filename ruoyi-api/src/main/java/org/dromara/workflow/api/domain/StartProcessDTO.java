@@ -47,6 +47,15 @@ public class StartProcessDTO implements Serializable {
     private FlowInstanceBizExtDTO bizExt;
 
     /**
+     * 保存独立的可写副本，供后续办理步骤补充流程变量。
+     *
+     * @param variables 调用方提供的变量
+     */
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = variables == null ? null : new HashMap<>(variables);
+    }
+
+    /**
      * 获取流程变量并自动剔除空值。
      *
      * @return 流程变量

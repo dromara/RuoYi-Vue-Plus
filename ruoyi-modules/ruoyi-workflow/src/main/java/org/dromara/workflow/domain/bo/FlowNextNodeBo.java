@@ -28,6 +28,10 @@ public class FlowNextNodeBo implements Serializable {
      */
     private Map<String, Object> variables;
 
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = variables == null ? null : new HashMap<>(variables);
+    }
+
     /**
      * 获取流程变量并自动剔除空值。
      *

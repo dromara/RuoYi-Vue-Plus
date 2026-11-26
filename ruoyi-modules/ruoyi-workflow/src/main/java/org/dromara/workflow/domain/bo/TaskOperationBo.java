@@ -1,5 +1,7 @@
 package org.dromara.workflow.domain.bo;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
@@ -25,13 +27,13 @@ public class TaskOperationBo implements Serializable {
     /**
      * 委派/转办人的用户ID（必填，准对委派/转办人操作）
      */
-    @NotNull(message = "委派/转办人id不能为空", groups = {AddGroup.class})
+    @NotBlank(message = "委派/转办人id不能为空", groups = {AddGroup.class})
     private String userId;
 
     /**
      * 加签/减签人的用户ID列表（必填，针对加签/减签操作）
      */
-    @NotNull(message = "加签/减签id不能为空", groups = {EditGroup.class})
+    @NotEmpty(message = "加签/减签id不能为空", groups = {EditGroup.class})
     private List<String> userIds;
 
     /**

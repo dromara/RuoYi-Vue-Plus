@@ -13,7 +13,7 @@ import org.dromara.workflow.domain.bo.TaskOperationBo;
 import org.dromara.workflow.domain.context.TaskOperationContext;
 import org.dromara.workflow.service.IFlwCommonService;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 import static org.dromara.workflow.common.constant.FlowConstant.PATH_TASK_WAITING;
@@ -35,13 +35,11 @@ public class TaskOpNotifyComponent extends NodeComponent {
     public void process() {
         TaskOperationContext context = getContextBean(TaskOperationContext.class);
         TaskOperationBo bo = context.getTaskOperationBo();
-        List<Long> userIdList = new ArrayList<>();
-        if (StringUtils.isNotBlank(bo.getUserId())) {
-            userIdList.add(Convert.toLong(bo.getUserId()));
-        }
-        if (CollUtil.isNotEmpty(bo.getUserIds())) {
-            userIdList.addAll(StreamUtils.toList(bo.getUserIds(), Convert::toLong));
-        }
+        List<String> targetHandlers = switch (context.getOperation()) {
+            case DELEGATE_TASK, TRANSFER_TASK -> StringUtils.isBlank(bo.getUserId()) ? List.of() : List.of(bo.getUserId());
+            case ADD_SIGNATURE, REDUCTION_SIGNATURE -> bo.getUserIds();
+        };
+        List<Long> userIdList = StreamUtils.toList(targetHandlers, Convert::toLong);
         if (CollUtil.isEmpty(userIdList)) {
             return;
         }

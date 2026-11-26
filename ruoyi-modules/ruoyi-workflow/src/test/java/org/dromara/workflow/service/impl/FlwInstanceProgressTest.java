@@ -25,6 +25,40 @@ import static org.mockito.Mockito.when;
 class FlwInstanceProgressTest {
 
     @Test
+    void businessIdResolvesProgressAndMissingInstanceStopsTaskLookup() {
+        var instances = mock(FlowInstanceMapper.class);
+        var history = mock(FlowHisTaskMapper.class);
+        var tasks = mock(IFlwTaskService.class);
+        var service = service(instances, history, tasks);
+        var instance = new FlowInstance().setBusinessId("business-1").setId(12L);
+        when(instances.selectOne(any())).thenReturn(instance, null);
+
+        assertEquals(12L, service.flowHisTaskList("business-1").get("instanceId"));
+        assertThrows(ServiceException.class, () -> service.flowHisTaskList("missing"));
+        verify(tasks).selectByInstId(12L);
+        org.mockito.Mockito.verifyNoMoreInteractions(tasks);
+    }
+
+    @Test
+    void taskLookupPrefersRunningTaskThenFallsBackToHistory() {
+        var instances = mock(FlowInstanceMapper.class);
+        var runtime = mock(TaskService.class);
+        var history = mock(IFlwTaskService.class);
+        var service = new FlwInstanceServiceImpl(null, null, runtime, null, instances, history, null, null);
+        var runningInstance = new FlowInstance().setId(12L);
+        var finishedInstance = new FlowInstance().setId(14L);
+        when(instances.selectById(12L)).thenReturn(runningInstance);
+        when(instances.selectById(14L)).thenReturn(finishedInstance);
+        when(runtime.getById(3L)).thenReturn(new org.dromara.warm.flow.orm.entity.FlowTask().setInstanceId(12L));
+        when(history.selectHisTaskById(5L)).thenReturn(new org.dromara.warm.flow.orm.entity.FlowHisTask().setInstanceId(14L));
+
+        assertEquals(runningInstance, service.selectByTaskId(3L));
+        verifyNoInteractions(history);
+        assertEquals(finishedInstance, service.selectByTaskId(5L));
+        org.junit.jupiter.api.Assertions.assertNull(service.selectByTaskId(99L));
+    }
+
+    @Test
     void instanceIdAloneLoadsProgress() {
         FlowInstanceMapper instanceMapper = mock(FlowInstanceMapper.class);
         FlowHisTaskMapper historyMapper = mock(FlowHisTaskMapper.class);

@@ -1,7 +1,7 @@
 package org.dromara.workflow.demo;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.common.core.utils.StringUtils;
+
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
@@ -86,11 +86,12 @@ public class DemoPayFailListener implements Listener {
             return null;
         }
         String value = String.valueOf(variable.get(VAR_PAY_AMOUNT));
-        if (!StringUtils.isNumeric(value)) {
+        try {
+            return new BigDecimal(value);
+        } catch (NumberFormatException e) {
             log.warn("流程变量 {} 不是数字，跳过付款校验: {}", VAR_PAY_AMOUNT, value);
             return null;
         }
-        return new BigDecimal(value);
     }
 
 }

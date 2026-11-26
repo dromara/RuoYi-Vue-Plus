@@ -204,7 +204,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
             }
         }
         try {
-            defService.removeDef((List<Long>) ids);
+            defService.removeDef(new ArrayList<>(ids));
         } catch (Exception e) {
             throw new RuntimeException("删除流程定义失败", e);
         }

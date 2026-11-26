@@ -157,7 +157,11 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
                         message, null, path
                     ));
                 }
-                case EMAIL_MESSAGE -> MailBuilder.of().to(emails).subject(subject).text(message).send();
+                case EMAIL_MESSAGE -> {
+                    if (!emails.isEmpty()) {
+                        MailBuilder.of().to(emails).subject(subject).text(message).send();
+                    }
+                }
                 case SMS_MESSAGE -> {
 //                        LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
 //                        // 根据具体短信服务商参数用法传参

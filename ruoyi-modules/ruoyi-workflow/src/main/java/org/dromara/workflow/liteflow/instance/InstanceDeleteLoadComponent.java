@@ -12,7 +12,6 @@ import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.context.InstanceDeleteContext;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,10 +35,10 @@ public class InstanceDeleteLoadComponent extends NodeComponent {
             flowInstances = flowInstanceMapper.selectList(QueryBuilder.lambda(FlowInstance.class)
                 .in(FlowInstance::getBusinessId, context.getBusinessIds())
                 .build());
-            context.setDeleteInstanceIds(StreamUtils.toList(flowInstances, FlowInstance::getId));
-        } else {
+        } else if (CollUtil.isNotEmpty(context.getInstanceIds())) {
             flowInstances = flowInstanceMapper.selectByIds(context.getInstanceIds());
-            context.setDeleteInstanceIds(new ArrayList<>(context.getInstanceIds()));
+        } else {
+            flowInstances = List.of();
         }
         if (CollUtil.isEmpty(flowInstances)) {
             log.warn("未找到对应的流程实例信息，无法执行删除操作。");
@@ -47,6 +46,7 @@ public class InstanceDeleteLoadComponent extends NodeComponent {
             return;
         }
         context.setFlowInstances(flowInstances);
+        context.setDeleteInstanceIds(StreamUtils.toList(flowInstances, FlowInstance::getId));
     }
 
 }
