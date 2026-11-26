@@ -67,7 +67,7 @@ public class PasswordAuthStrategy implements IAuthStrategy {
             validateCaptcha(username, code, uuid);
         }
         SysUserVo user = loadUserByUsername(username);
-        loginService.checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
+        loginService.checkLogin(LoginType.PASSWORD, user.getUserName(), () -> !BCrypt.checkpw(password, user.getPassword()));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = loginService.buildLoginUser(user);
         loginUser.setClientKey(client.getClientKey());
@@ -105,7 +105,7 @@ public class PasswordAuthStrategy implements IAuthStrategy {
     }
 
     /**
-     * 按用户名加载可登录用户，并校验是否存在或被停用。
+     * 按用户名加载可登录用户，校验用户名完全匹配且账号未停用。
      *
      * @param username 用户名
      * @return 用户信息
@@ -114,7 +114,8 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         SysUserVo user = userMapper.lambda()
             .eq(SysUser::getUserName, username)
             .voOne();
-        if (ObjectUtil.isNull(user)) {
+        // 数据库排序规则可能将不同的用户名判为相等，密码登录要求精确匹配。
+        if (ObjectUtil.isNull(user) || !StringUtils.equals(username, user.getUserName())) {
             log.info("登录用户：{} 不存在.", username);
             throw new UserException("user.not.exists", username);
         } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
