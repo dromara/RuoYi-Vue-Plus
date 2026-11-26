@@ -15,6 +15,35 @@ import static org.mockito.Mockito.mock;
 @DisplayName("DataPermissionHelper 单元测试")
 class DataPermissionHelperTest {
 
+    @DataPermission({})
+    interface ScopedMapper {
+        void list();
+
+        @DataPermission(value = {}, joinStr = "AND")
+        void update();
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {true, false})
+    void proxyMapperInstallsMethodOrInterfacePermissionAndRestoresOuterScope(boolean update) throws Throwable {
+        Object proxy = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
+            new Class<?>[]{Runnable.class, ScopedMapper.class}, (obj, method, args) -> null);
+        var method = ScopedMapper.class.getMethod(update ? "update" : "list");
+        var pointcut = new org.dromara.common.mybatis.aspect.DataPermissionPointcut();
+        assertTrue(pointcut.matches(method, proxy.getClass()));
+        assertFalse(pointcut.matches(Runnable.class.getMethod("run"), Runnable.class));
+        var invocation = mock(org.aopalliance.intercept.MethodInvocation.class);
+        org.mockito.Mockito.when(invocation.getThis()).thenReturn(proxy);
+        org.mockito.Mockito.when(invocation.getMethod()).thenReturn(method);
+        var outer = update ? mock(DataPermission.class) : null;
+        DataPermissionHelper.setPermission(outer);
+        org.mockito.Mockito.when(invocation.proceed()).thenAnswer(call -> {
+            assertEquals(update ? "AND" : "", DataPermissionHelper.getPermission().joinStr());
+            return 42;
+        });
+        assertEquals(42, new org.dromara.common.mybatis.aspect.DataPermissionAdvice().invoke(invocation));
+        assertSame(outer, DataPermissionHelper.getPermission());
+    }
     /**
      * 清理数据权限测试使用的线程变量和 MyBatis-Plus 忽略策略。
      */

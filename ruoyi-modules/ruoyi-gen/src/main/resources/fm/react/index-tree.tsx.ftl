@@ -140,7 +140,7 @@ export default function ${BusinessName}Page() {
   const openAdd = async (row?: ${BusinessName}VO) => {
     await loadTreeOptions();
     form.resetFields();
-    form.setFieldsValue({ ...default${BusinessName}Form, ${treeParentCode}: row?.${treeCode} || treeRootValueTsLiteral });
+    form.setFieldsValue({ ...default${BusinessName}Form, ${treeParentCode}: row?.${treeCode} ?? ${treeRootValueTsLiteral} });
     setModalTitle('添加${functionName}');
     openModal();
   };

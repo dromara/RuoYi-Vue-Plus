@@ -23,6 +23,53 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("LambdaQueryBuilder 单元测试")
 class LambdaQueryBuilderTest {
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {false, true})
+    void optionalComparisonFiltersKeepZeroButOmitMissingBounds(boolean supplied) {
+        Integer value = supplied ? 0 : null;
+        var ids = supplied ? List.of(4L) : List.<Long>of();
+        var wrapper = QueryBuilder.lambda(TestEntity.class)
+            .eqIfPresent(TestEntity::getScore, value)
+            .neIfPresent(TestEntity::getScore, value)
+            .ltIfPresent(TestEntity::getScore, value)
+            .leIfPresent(TestEntity::getScore, value)
+            .gtIfPresent(TestEntity::getScore, value)
+            .geIfPresent(TestEntity::getScore, value)
+            .notBetweenIfPresent(TestEntity::getScore, value, 99)
+            .notInIfNotEmpty(TestEntity::getId, ids)
+            .inIfNotEmpty(TestEntity::getId, ids.toArray())
+            .build();
+        String sql = wrapper.getSqlSegment();
+        if (supplied) {
+            for (String clause : List.of("score =", "score <>", "score <", "score <=", "score >", "score >=",
+                    "score NOT BETWEEN", "id NOT IN", "id IN")) {
+                assertTrue(sql.contains(clause), sql);
+            }
+            assertEquals(10, wrapper.getParamNameValuePairs().size());
+        } else {
+            assertTrue(sql.isEmpty());
+            assertTrue(wrapper.getParamNameValuePairs().isEmpty());
+        }
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {false, true})
+    void optionalTextFiltersApplyTheRequestedWildcardDirection(boolean supplied) {
+        String value = supplied ? "Ada" : " ";
+        var wrapper = QueryBuilder.lambda(TestEntity.class)
+            .neIfText(TestEntity::getName, value)
+            .notLikeIfText(TestEntity::getName, value)
+            .likeLeftIfText(TestEntity::getName, value)
+            .likeRightIfText(TestEntity::getName, value).build();
+        String sql = wrapper.getSqlSegment();
+        if (supplied) {
+            assertTrue(sql.contains("name NOT LIKE"));
+            assertEquals(java.util.Set.of("Ada", "%Ada%", "%Ada", "Ada%"),
+                new HashSet<>(wrapper.getParamNameValuePairs().values()));
+        } else {
+            assertTrue(sql.isEmpty());
+        }
+    }
     /**
      * 初始化测试实体的 MyBatis-Plus 表元数据，供 Lambda 字段解析和逻辑删除 SQL 使用。
      */

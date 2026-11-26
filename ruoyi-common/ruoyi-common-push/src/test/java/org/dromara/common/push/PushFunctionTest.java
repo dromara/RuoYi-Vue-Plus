@@ -20,12 +20,55 @@ import java.util.concurrent.ScheduledExecutorService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 @DisplayName("common-push 功能单元测试")
 class PushFunctionTest {
 
+    @Test
+    void failedDeliveryOfLastSseConnectionRemovesUserFromBroadcastRecipients() throws Exception {
+        var manager = new SseEmitterSessionManager(mock(ScheduledExecutorService.class), new MessageProperties());
+        @SuppressWarnings("unchecked")
+        var sessions = (Map<Long, Map<String, SseEmitter>>) ReflectionTestUtils.getField(
+            SseEmitterSessionManager.class, "USER_TOKEN_EMITTERS");
+        SseEmitter failed = mock();
+        doThrow(new java.io.IOException("closed")).when(failed).send(any(SseEmitter.SseEventBuilder.class));
+        long user = 701L;
+        sessions.put(user, new ConcurrentHashMap<>(Map.of("mobile", failed)));
+        try {
+            manager.sendMessage(user, "order shipped");
+            verify(failed).complete();
+            assertFalse(sessions.containsKey(user));
+        } finally {
+            sessions.remove(user);
+        }
+    }
+
+    @Test
+    void sseReconnectReplacesOnlyOneDeviceAndDisconnectedSessionsStopReceiving() throws Exception {
+        var manager = new SseEmitterSessionManager(mock(ScheduledExecutorService.class), new MessageProperties());
+        @SuppressWarnings("unchecked")
+        var sessions = (Map<Long, Map<String, SseEmitter>>) ReflectionTestUtils.getField(
+            SseEmitterSessionManager.class, "USER_TOKEN_EMITTERS");
+        long user = 702L;
+        try {
+            var old = manager.connect(user, "mobile");
+            var desktop = manager.connect(user, "desktop");
+            var current = manager.connect(user, "mobile");
+            assertEquals(Map.of("desktop", desktop, "mobile", current), sessions.get(user));
+            org.junit.jupiter.api.Assertions.assertThrows(IllegalStateException.class, () -> old.send("late"));
+            manager.sseMonitor();
+            manager.sendMessage("announcement");
+            manager.disconnect(user, "mobile");
+            assertEquals(Map.of("desktop", desktop), sessions.get(user));
+            manager.disconnect(user, "desktop");
+            assertFalse(sessions.containsKey(user));
+        } finally {
+            manager.disconnect(user, "desktop");
+            manager.disconnect(user, "mobile");
+        }
+    }
     /**
      * 验证消息传输枚举忽略大小写解析，并在未知配置下回退到 SSE。
      */

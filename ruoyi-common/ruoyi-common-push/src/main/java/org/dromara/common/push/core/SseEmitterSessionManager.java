@@ -187,7 +187,8 @@ public class SseEmitterSessionManager implements PushSessionManager {
                     }
                 }
             }
-        } else {
+        }
+        if (MapUtil.isEmpty(emitters)) {
             USER_TOKEN_EMITTERS.computeIfPresent(userId, (id, current) -> current.isEmpty() ? null : current);
         }
     }

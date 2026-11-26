@@ -25,4 +25,17 @@ class SnailAiConfigTest {
         assertArrayEquals(new String[]{"enabled"}, condition.name());
         assertEquals("true", condition.havingValue());
     }
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {false, true})
+    void enablementControlsConfigurationRegistration(boolean enabled) {
+        var context = new org.springframework.context.support.GenericApplicationContext();
+        try (context) {
+            org.springframework.test.context.support.TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
+                context, "snail-ai.enabled=" + enabled);
+            var reader = new org.springframework.context.annotation.AnnotatedBeanDefinitionReader(context);
+            reader.register(SnailAiConfig.class);
+            var factory = context.getDefaultListableBeanFactory();
+            assertEquals(enabled, factory.getBeanProvider(SnailAiConfig.class).getIfAvailable() != null);
+        }
+    }
 }

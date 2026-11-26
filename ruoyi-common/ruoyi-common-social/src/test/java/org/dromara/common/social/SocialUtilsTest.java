@@ -27,6 +27,20 @@ import static org.mockito.Mockito.mock;
 @DisplayName("SocialUtils 本地构造契约单元测试")
 class SocialUtilsTest {
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.CsvSource({
+        "dingtalk,AuthDingTalkV2Request", "baidu,AuthBaiduRequest", "gitee,AuthGiteeRequest",
+        "weibo,AuthWeiboRequest", "oschina,AuthOschinaRequest", "wechat_open,AuthWeChatOpenRequest",
+        "taobao,AuthTaobaoRequest", "douyin,AuthDouyinRequest", "linkedin,AuthLinkedinRequest",
+        "renren,AuthRenrenRequest", "huawei,AuthHuaweiV3Request", "gitlab,AuthGitlabRequest",
+        "wechat_mp,AuthWeChatMpRequest", "aliyun,AuthAliyunRequest", "gitea,AuthGiteaRequest"
+    })
+    void buildsProviderSpecificAuthorizationRequest(String provider, String expected) throws Exception {
+        AuthRequest request = SocialUtils.getAuthRequest(provider, properties(provider, config()));
+        assertEquals(expected, request.getClass().getSimpleName());
+        assertEquals("https://example.test/callback", requestConfig(request).getRedirectUri());
+    }
+
     @Test
     void shouldHonorQqUnionIdSetting() throws Exception {
         var qq = config();

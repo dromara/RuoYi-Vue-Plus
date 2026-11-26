@@ -1,11 +1,11 @@
 export interface ${BusinessName}VO {
 <#list columns as column>
-<#if column.list>
+<#if column.list || column.pk>
   /**
    * ${column.columnComment}
    */
   ${column.javaField}: ${column.tsType};
-<#if column.htmlType == "imageUpload">
+<#if column.list && column.htmlType == "imageUpload">
   /**
    * ${column.columnComment}Url
    */
@@ -23,7 +23,7 @@ export interface ${BusinessName}VO {
 
 export interface ${BusinessName}Form extends BaseEntity {
 <#list columns as column>
-<#if column.insert || column.edit>
+<#if column.insert || column.edit || column.pk>
   /**
    * ${column.columnComment}
    */

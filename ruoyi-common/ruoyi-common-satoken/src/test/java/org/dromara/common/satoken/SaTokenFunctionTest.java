@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import org.dromara.common.redis.utils.RedisUtils;
+import org.redisson.api.RedissonClient;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +32,101 @@ import static org.mockito.Mockito.*;
 @DisplayName("common-satoken 功能单元测试")
 class SaTokenFunctionTest {
 
+    @Test
+    void tokenLookupReturnsSessionSnapshotAndHandlesAbsentOrExpiredTokens() {
+        var user = new LoginUser();
+        var session = mock(cn.dev33.satoken.session.SaSession.class);
+        when(session.get(LoginHelper.LOGIN_USER_KEY)).thenReturn(user);
+        try (var stp = mockStatic(StpUtil.class)) {
+            stp.when(() -> StpUtil.getTokenSessionByToken("valid")).thenReturn(session);
+            stp.when(() -> StpUtil.getTokenSessionByToken("expired")).thenThrow(
+                NotLoginException.newInstance("login", NotLoginException.TOKEN_TIMEOUT, "expired", "expired"));
+            assertEquals(user, LoginHelper.getLoginUser("valid"));
+            org.junit.jupiter.api.Assertions.assertNull(LoginHelper.getLoginUser(" "));
+            org.junit.jupiter.api.Assertions.assertNull(LoginHelper.getLoginUser("expired"));
+            org.junit.jupiter.api.Assertions.assertNull(LoginHelper.getLoginUser("unknown"));
+            stp.when(StpUtil::getTokenSession).thenReturn(session);
+            assertEquals(user, LoginHelper.getLoginUser());
+        }
+    }
+
+    @Test
+    void loginKeepsExistingTerminalInformationAndSavesTheUserSnapshot() {
+        var user = new LoginUser();
+        user.setUserId(12L);
+        user.setUserType("sys_user");
+        user.setBrowser("mobile browser");
+        user.setOs("mobile OS");
+        user.setLoginLocation("office");
+        var request = new MockHttpServletRequest();
+        var session = mock(cn.dev33.satoken.session.SaSession.class);
+        try (var servlet = mockStatic(org.dromara.common.core.utils.ServletUtils.class);
+             var stp = mockStatic(StpUtil.class)) {
+            servlet.when(org.dromara.common.core.utils.ServletUtils::getRequest).thenReturn(request);
+            servlet.when(() -> org.dromara.common.core.utils.ServletUtils.getClientIP(request)).thenReturn("192.0.2.7");
+            stp.when(StpUtil::getTokenSession).thenReturn(session);
+            var model = new cn.dev33.satoken.stp.parameter.SaLoginParameter().setDeviceType("mobile");
+            LoginHelper.login(user, model);
+            assertEquals("192.0.2.7", user.getIpaddr());
+            assertEquals("mobile", user.getDeviceType());
+            assertEquals("office", user.getLoginLocation());
+            assertEquals("mobile browser", user.getBrowser());
+            assertEquals("mobile OS", user.getOs());
+            verify(session).set(LoginHelper.LOGIN_USER_KEY, user);
+            stp.verify(() -> StpUtil.login(user.getLoginId(), model));
+        }
+    }
+    @Test
+    void tokenValuesUseSecondsAndRefreshTheLocalCacheAfterMutations() {
+        var dao = new PlusSaTokenDao();
+        String key = "token:login:test";
+        try (var spring = mockStatic(SpringUtil.class)) {
+            spring.when(() -> SpringUtil.getBean(RedissonClient.class)).thenReturn(mock(RedissonClient.class));
+            try (var redis = mockStatic(RedisUtils.class)) {
+                dao.set(key, "ignored", 0);
+                dao.set(key, "expired", -2);
+                dao.update(key, "missing");
+                dao.updateObject(key, "missing");
+                redis.verify(() -> RedisUtils.setCacheObject(key, "missing", true), never());
+                redis.verify(() -> RedisUtils.setCacheObject(key, "ignored", Duration.ZERO), never());
+                redis.verify(() -> RedisUtils.setCacheObject(key, "expired", Duration.ofSeconds(-2)), never());
+
+                dao.set(key, "initial", -1);
+                redis.verify(() -> RedisUtils.setCacheObject(key, "initial"));
+                redis.when(() -> RedisUtils.getCacheObject(key)).thenReturn("initial", "updated", 42, 43);
+                assertEquals("initial", dao.get(key));
+                assertEquals("initial", dao.get(key));
+                redis.verify(() -> RedisUtils.getCacheObject(key), times(1));
+
+                redis.when(() -> RedisUtils.hasKey(key)).thenReturn(true);
+                dao.update(key, "updated");
+                redis.verify(() -> RedisUtils.setCacheObject(key, "updated", true));
+                assertEquals("updated", dao.get(key));
+
+                dao.setObject(key, 42, 60);
+                redis.verify(() -> RedisUtils.setCacheObject(key, 42, Duration.ofSeconds(60)));
+                assertEquals(42, dao.getObject(key, Integer.class));
+                dao.updateObject(key, 43);
+                redis.verify(() -> RedisUtils.setCacheObject(key, 43, true));
+                assertEquals(43, dao.getObject(key));
+
+                redis.when(() -> RedisUtils.deleteObject(key)).thenReturn(false, true);
+                dao.delete(key);
+                assertEquals(43, dao.getObject(key));
+                dao.deleteObject(key);
+                redis.when(() -> RedisUtils.getCacheObject(key)).thenReturn(null);
+                org.junit.jupiter.api.Assertions.assertNull(dao.getObject(key));
+
+                dao.updateTimeout(key, 10);
+                dao.updateObjectTimeout(key, 20);
+                redis.verify(() -> RedisUtils.expire(key, Duration.ofSeconds(10)));
+                redis.verify(() -> RedisUtils.expire(key, Duration.ofSeconds(20)));
+                redis.when(() -> RedisUtils.getTimeToLive(key)).thenReturn(1500L, -2L);
+                assertEquals(2, dao.getTimeout(key));
+                assertEquals(-2, dao.getObjectTimeout(key));
+            }
+        }
+    }
     /**
      * 验证权限校验失败统一返回 HTTP 403 业务响应。
      */

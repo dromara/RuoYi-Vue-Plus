@@ -30,11 +30,19 @@ class MqttAutoConfigurationTest {
     }
 
     /**
-     * 验证 MQTT 自定义器 Bean 可以独立创建，避免自动配置方法意外依赖运行时连接状态。
+     * 验证工作、分组和业务任务均由虚拟线程执行。
      */
     @Test
-    @DisplayName("创建 MQTT 客户端自定义器")
-    void shouldCreateMqttClientCustomizer() {
-        assertNotNull(new MqttAutoConfiguration().mqttClientCustomizer());
+    @DisplayName("三个 MQTT 执行器均使用虚拟线程")
+    void shouldUseVirtualThreadsForAllClientExecutors() throws Exception {
+        var creator = new MqttClientCreator();
+        new MqttAutoConfiguration().mqttClientCustomizer().customize(creator);
+        try (var worker = creator.getTioExecutor(); var group = creator.getGroupExecutor();
+             var business = creator.getMqttExecutor()) {
+            for (var executor : java.util.List.of(worker, group, business)) {
+                org.junit.jupiter.api.Assertions.assertTrue(executor.submit(() -> Thread.currentThread().isVirtual())
+                    .get(5, java.util.concurrent.TimeUnit.SECONDS));
+            }
+        }
     }
 }

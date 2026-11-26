@@ -32,10 +32,11 @@ public class ${ClassName}Vo implements Serializable {
     private static final long serialVersionUID = 1L;
 
 <#list columns as column>
-<#if column.list>
+<#if column.list || column.pk>
     /**
      * ${column.columnComment}
      */
+<#if column.list>
 <#assign parentheseIndex = column.columnComment?index_of("（")>
 <#if column.dictType?has_content>
     @ExcelProperty(value = "${column.columnLabel}", converter = ExcelDictConvert.class)
@@ -46,9 +47,10 @@ public class ${ClassName}Vo implements Serializable {
 <#else>
     @ExcelProperty(value = "${column.columnLabel}")
 </#if>
+</#if>
     private ${column.javaType} ${column.javaField};
 
-<#if column.htmlType == "imageUpload">
+<#if column.list && column.htmlType == "imageUpload">
     /**
      * ${column.columnComment}Url
      */

@@ -74,6 +74,29 @@ class SqlLogInterceptorTest {
         assertFalse(interceptor.isIgnoredTableSql("select * from flow_event_wait_history"));
     }
 
+    @Test
+    void boundSqlFormatsParametersWithoutReplacingQuotedQuestionMarks() {
+        var config = new MybatisConfiguration();
+        var values = new java.util.LinkedHashMap<String, Object>();
+        values.put("quantity", 7);
+        values.put("enabled", true);
+        values.put("day", java.time.LocalDate.of(2026, 1, 2));
+        values.put("time", java.time.LocalTime.of(12, 3, 4));
+        values.put("timestamp", java.time.LocalDateTime.of(2026, 1, 2, 12, 3, 4));
+        values.put("offset", java.time.Instant.EPOCH);
+        values.put("mode", java.math.RoundingMode.DOWN);
+        values.put("label", "old");
+        values.put("missing", null);
+        var mappings = values.keySet().stream().map(name ->
+            new org.apache.ibatis.mapping.ParameterMapping.Builder(config, name, Object.class).build()).toList();
+        var sql = new org.apache.ibatis.mapping.BoundSql(config,
+            "select '?', \"?\", ?, ?, ?, ?, ?, ?, ?, ?, ?", mappings, values);
+        sql.setAdditionalParameter("label", "O'Brien");
+        var interceptor = new SqlLogInterceptor(new SqlLogProperties());
+        String rendered = org.springframework.test.util.ReflectionTestUtils.invokeMethod(interceptor, "buildFullSql", config, sql);
+        assertEquals("select '?', \"?\", 7, true, '2026-01-02', '12:03:04', '2026-01-02 12:03:04', "
+            + "'1970-01-01T00:00:00Z', 'DOWN', 'O''Brien', null", rendered);
+    }
     interface LogMapper {
         @Select("SELECT id FROM flow_event_wait")
         Long eventWaitId();

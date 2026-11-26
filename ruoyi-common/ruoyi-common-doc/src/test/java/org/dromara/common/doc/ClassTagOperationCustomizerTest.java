@@ -49,6 +49,44 @@ class ClassTagOperationCustomizerTest {
         assertEquals(List.of("订单\n订单查询"), api.getTags().stream().map(Tag::getDescription).toList());
     }
 
+    @Test
+    void annotatedTagsAreDeduplicatedAndKeepThePublishedDescription() throws Exception {
+        var properties = mock(org.springdoc.core.utils.PropertyResolverUtils.class);
+        when(properties.resolve(anyString(), any())).thenAnswer(call -> call.getArgument(0));
+        var tagger = new ClassTagOperationCustomizer(Optional.empty(), properties);
+        var handler = new HandlerMethod(new Billing(), Billing.class.getDeclaredMethod("list"));
+        var op = new Operation().addTagsItem("billing");
+        tagger.customize(op, handler);
+        assertEquals(List.of("billing"), op.getTags());
+        var api = new OpenAPI().path("/bills", new PathItem().get(op));
+        tagger.customise(api);
+        assertEquals("Billing operations", api.getTags().getFirst().getDescription());
+        api.getTags().getFirst().setDescription("Published");
+        tagger.customise(api);
+        assertEquals("Published", api.getTags().getFirst().getDescription());
+    }
+
+    @io.swagger.v3.oas.annotations.tags.Tag(name = "billing", description = "Billing operations")
+    static class Billing {
+        public void list() {}
+    }
+
+    @Test
+    void explicitlyGroupedOperationsKeepTheirGroupAndGeneratedNamesAreReplaced() throws Exception {
+        var handler = new HandlerMethod(new OrderController(), OrderController.class.getDeclaredMethod("list"));
+        var original = new Operation().addTagsItem("manual");
+        assertSame(original, customizer.customize(original, handler));
+        when(provider.getClassJavadoc(OrderController.class)).thenReturn("Orders");
+        assertEquals(List.of("manual"), customizer.customize(original, handler).getTags());
+        var auto = OpenAPIService.splitCamelCase(OrderController.class.getSimpleName());
+        var op = new Operation().addTagsItem(auto);
+        assertEquals(List.of("Orders"), customizer.customize(op, handler).getTags());
+        var api = new OpenAPI().addTagsItem(new Tag().name(auto)).path("/orders", new PathItem().get(op));
+        customizer.customise(api);
+        assertEquals(List.of("Orders"), api.getTags().stream().map(Tag::getName).toList());
+        assertNull(new ClassTagOperationCustomizer(Optional.empty(), null)
+            .customize(new Operation(), handler).getTags());
+    }
     private OpenAPI documentOrders() throws Exception {
         when(provider.getClassJavadoc(OrderController.class)).thenReturn("订单\n订单查询");
         var handler = new HandlerMethod(new OrderController(), OrderController.class.getDeclaredMethod("list"));

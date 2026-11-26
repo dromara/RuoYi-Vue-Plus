@@ -30,7 +30,7 @@ public class ${ClassName}Bo implements Serializable {
     private static final long serialVersionUID = 1L;
 
 <#list columns as column>
-<#if column.query || (!table.isSuperColumn(column.javaField) && (column.insert || column.edit))>
+<#if column.pk || column.query || (!table.isSuperColumn(column.javaField) && (column.insert || column.edit))>
     /**
      * ${column.columnComment}
      */

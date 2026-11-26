@@ -56,6 +56,19 @@ class MybatisUtilityContractTest {
     /**
      * 验证指定数据源从 JDBC 元数据识别四种常用数据库，并缓存同一数据源的识别结果。
      */
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.CsvSource({
+        "Oracle,ORACLE", "PostgreSQL,POSTGRE_SQL", "Microsoft SQL Server,SQL_SERVER",
+        "MySQL,MY_SQL", "unknown,MY_SQL", "' ',MY_SQL"
+    })
+    void databaseProductSelectsOnlyItsDialect(String product, String expectedName) {
+        var dialect = org.dromara.common.mybatis.enums.DataBaseType.find(product);
+        assertEquals(expectedName, dialect.name());
+        assertEquals(expectedName.equals("ORACLE"), dialect.isOracle());
+        assertEquals(expectedName.equals("POSTGRE_SQL"), dialect.isPostgreSql());
+        assertEquals(expectedName.equals("SQL_SERVER"), dialect.isSqlServer());
+        assertEquals(expectedName.equals("MY_SQL"), dialect.isMySql());
+    }
     @Test
     @DisplayName("识别并缓存指定数据源类型")
     void shouldResolveAndCacheNamedDatabaseTypes() throws Exception {

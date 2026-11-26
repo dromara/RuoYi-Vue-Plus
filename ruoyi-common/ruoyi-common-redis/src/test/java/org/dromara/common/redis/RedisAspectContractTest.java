@@ -1,6 +1,12 @@
 package org.dromara.common.redis;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.dromara.common.redis.manager.PlusSpringCacheManager;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.redisson.api.RMapCache;
+import org.springframework.cache.transaction.TransactionAwareCacheDecorator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.dromara.common.core.domain.R;
@@ -66,6 +72,30 @@ import static org.mockito.Mockito.*;
 @DisplayName("Redis 基础设施契约单元测试")
 class RedisAspectContractTest {
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void fixedCacheNamesRestrictCreationUntilDynamicModeIsRestored(boolean decorated) {
+        var manager = new PlusSpringCacheManager(decorated ? Caffeine.newBuilder().build() : null);
+        manager.setTransactionAware(decorated);
+        RMap<Object, Object> plain = mock();
+        RMapCache<Object, Object> expiring = mock();
+        when(redissonClient.getMap("fixed")).thenReturn(plain);
+        when(redissonClient.getMapCache("limited")).thenReturn(expiring);
+
+        manager.setCacheNames(List.of("fixed"));
+        Cache fixed = manager.getCache("fixed");
+        assertNotNull(fixed);
+        assertSame(fixed, manager.getCache("fixed"));
+        String region = "limited#1m#30s#25";
+        assertNull(manager.getCache(region));
+
+        manager.setCacheNames(null);
+        Cache limited = manager.getCache(region);
+        assertNotNull(limited);
+        assertEquals(decorated, limited instanceof TransactionAwareCacheDecorator);
+        assertSame(limited, manager.getCache(region));
+        verify(expiring).setMaxSize(25);
+    }
     @Test
     void shouldNotTurnExpiringEntryIntoPermanentValueOnRedisFive() {
         RBucket<Object> bucket = mock();

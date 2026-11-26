@@ -151,7 +151,7 @@ public class GenTableColumn extends BaseEntity {
      * @return TypeScript 类型
      */
     public String getTsType() {
-        if (StringUtils.containsAny(this.javaField, "id", "Id")) {
+        if (StringUtils.equalsIgnoreCase(this.javaField, "id") || StringUtils.endsWith(this.javaField, "Id")) {
             return "string | number";
         }
         if (StringUtils.equalsAny(this.javaType,

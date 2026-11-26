@@ -5,6 +5,15 @@ import com.baomidou.mybatisplus.core.MybatisSqlSessionFactoryBuilder;
 import org.apache.ibatis.mapping.Environment;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.system.service.ISysDataScopeService;
+import org.dromara.system.service.ISysUserService;
+import org.dromara.system.service.impl.SysUserServiceImpl;
+import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.bo.SysUserBo;
+import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.MapstructUtils;
+import cn.hutool.extra.spring.SpringUtil;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.*;
 import org.dromara.system.service.ISysMenuService;
 import org.dromara.system.service.impl.SysDataScopeServiceImpl;
 import org.dromara.system.service.impl.SysMenuServiceImpl;
@@ -37,7 +46,7 @@ class SystemMapperIntegrationTest {
     static class Infrastructure {
         @Bean
         CacheManager cacheManager() {
-            return new ConcurrentMapCacheManager(CacheNames.SYS_ROLE_CUSTOM);
+            return new ConcurrentMapCacheManager();
         }
 
         @Bean
@@ -46,6 +55,66 @@ class SystemMapperIntegrationTest {
         }
     }
 
+    @Test
+    void editingAccountPreservesOmittedAssignmentsAndRollsBackFailedClear() throws Exception {
+        var source = new DriverManagerDataSource("jdbc:h2:mem:" + UUID.randomUUID(), "sa", "");
+        try (var connection = source.getConnection(); var context = new AnnotationConfigApplicationContext();
+             var beans = mockStatic(SpringUtil.class); var mapping = mockStatic(MapstructUtils.class)) {
+            var db = new JdbcTemplate(source);
+            db.execute("create table sys_user_post (user_id bigint, post_id bigint)");
+            db.execute("create table sys_user_role (user_id bigint, role_id bigint check (role_id <> 99))");
+            db.update("insert into sys_user_post values (42,7),(42,8),(43,9)");
+            db.update("insert into sys_user_role values (42,4),(43,5)");
+            var config = new MybatisConfiguration();
+            config.setEnvironment(new Environment("system", new SpringManagedTransactionFactory(), source));
+            config.addMapper(SysUserRoleMapper.class);
+            config.addMapper(SysUserPostMapper.class);
+            var sessions = new SqlSessionTemplate(new MybatisSqlSessionFactoryBuilder().build(config));
+            var users = mock(SysUserMapper.class);
+            var roles = mock(SysRoleMapper.class);
+            context.registerBean(DataSource.class, () -> source);
+            context.register(Infrastructure.class);
+            context.registerBean(SysUserServiceImpl.class, () -> new SysUserServiceImpl(users, mock(), roles, mock(),
+                sessions.getMapper(SysUserRoleMapper.class), sessions.getMapper(SysUserPostMapper.class)));
+            context.refresh();
+            var service = context.getBean(ISysUserService.class);
+            var form = new SysUserBo();
+            form.setUserId(42L);
+            var entity = new SysUser();
+            entity.setUserId(42L);
+            mapping.when(() -> MapstructUtils.convert(form, SysUser.class)).thenReturn(entity);
+            when(users.updateById(entity)).thenReturn(1, 0, 1);
+            String posts = "select post_id from sys_user_post order by post_id";
+            String assignments = "select role_id from sys_user_role where user_id=42";
+            assertEquals(1, service.updateUser(form));
+            assertEquals(List.of(7L, 8L, 9L), db.queryForList(posts, Long.class));
+            assertEquals(List.of(4L), db.queryForList(assignments, Long.class));
+
+            form.setPostIds(new Long[0]);
+            assertThrows(ServiceException.class, () -> service.updateUser(form));
+            assertEquals(List.of(7L, 8L, 9L), db.queryForList(posts, Long.class));
+            assertEquals(1, service.updateUser(form));
+            assertEquals(List.of(9L), db.queryForList(posts, Long.class));
+
+            // 编辑表单要求至少一个角色，单独授权入口收到空选择时保留既有授权。
+            service.insertUserAuth(42L, new Long[0]);
+            assertEquals(List.of(4L), db.queryForList(assignments, Long.class));
+            when(roles.selectRoleCount(List.of(10L, 11L))).thenReturn(1L);
+            assertThrows(ServiceException.class, () -> service.insertUserAuth(42L, new Long[]{10L, 11L}));
+            assertEquals(List.of(4L), db.queryForList(assignments, Long.class));
+            when(roles.selectRoleCount(List.of(10L, 11L))).thenReturn(2L);
+            service.insertUserAuth(42L, new Long[]{10L, 11L});
+            String ordered = assignments + " order by role_id";
+            assertEquals(List.of(10L, 11L), db.queryForList(ordered, Long.class));
+            when(roles.selectRoleCount(List.of(12L, 99L))).thenReturn(2L);
+            var failure = assertThrows(org.apache.ibatis.exceptions.PersistenceException.class,
+                () -> service.insertUserAuth(42L, new Long[]{12L, 99L}));
+            assertInstanceOf(java.sql.BatchUpdateException.class,
+                org.springframework.core.NestedExceptionUtils.getMostSpecificCause(failure));
+            assertEquals(List.of(10L, 11L), db.queryForList(ordered, Long.class));
+            assertEquals(List.of(5L), db.queryForList("select role_id from sys_user_role where user_id=43", Long.class));
+        }
+    }
     @ParameterizedTest
     @ValueSource(strings = {"MySQL", "PostgreSQL", "Oracle", "MSSQLServer"})
     void bulkMenuDeletionRollsBackOnLinkFailureAndScopeReadsRespectCache(String mode) throws Exception {

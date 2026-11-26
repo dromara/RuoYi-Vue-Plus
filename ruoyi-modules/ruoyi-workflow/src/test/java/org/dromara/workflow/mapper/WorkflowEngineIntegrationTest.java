@@ -2,8 +2,16 @@ package org.dromara.workflow.mapper;
 
 import com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
+import org.dromara.workflow.domain.bo.FlowCancelBo;
+import org.dromara.workflow.domain.context.CompleteTaskContext;
+import org.dromara.workflow.service.impl.FlwInstanceServiceImpl;
 import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.exception.FlowException;
+import org.dromara.warm.flow.core.constant.ExceptionCons;
 import org.dromara.warm.flow.core.workflow.command.*;
 import org.dromara.warm.flow.core.workflow.context.OperatorContext;
 import org.dromara.warm.flow.spring.boot.config.FlowAutoConfig;
@@ -19,6 +27,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.*;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
+import com.baomidou.lock.*;
+import com.baomidou.lock.aop.LockInterceptor;
+import com.baomidou.lock.aop.LockAnnotationAdvisor;
+import com.baomidou.lock.executor.LockExecutor;
+import com.baomidou.lock.spring.boot.autoconfigure.Lock4jProperties;
+import org.dromara.common.liteflow.utils.LiteFlowUtils;
+import org.dromara.workflow.domain.bo.CompleteTaskBo;
+import org.dromara.workflow.service.IFlwTaskService;
+import org.dromara.workflow.service.impl.FlwTaskServiceImpl;
+import org.springframework.aop.framework.ProxyFactory;
+import java.util.concurrent.*;
+import static org.mockito.Mockito.*;
 import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
@@ -86,6 +106,176 @@ class WorkflowEngineIntegrationTest {
             "select node_code from flow_task where instance_id=? and del_flag='0'", String.class, instance));
     }
 
+    @Test
+    void resubmittingCompletedTaskKeepsTheSameReviewTaskAssigneeAndHistory() {
+        db.update("update flow_definition set def_config=? where id=4", "{\"autoPass\":false}");
+        var start = new StartCommand();
+        start.setBusinessId("duplicate-submit");
+        start.setFlowCode("leave");
+        start.setOperator(new OperatorContext("7"));
+        var instance = FlowEngine.workflow().start(start).getInstanceId();
+        String active = "select id from flow_task where instance_id=? and del_flag='0'";
+        var apply = db.queryForObject(active, Long.class, instance);
+        var complete = new CompleteCommand();
+        complete.setTaskId(apply);
+        complete.setOperator(new OperatorContext("7"));
+        FlowEngine.workflow().complete(complete);
+        var review = db.queryForObject(active + " and node_code='review'", Long.class, instance);
+        assertEquals(ExceptionCons.NOT_FOUNT_TASK,
+            assertThrows(FlowException.class, () -> FlowEngine.workflow().complete(complete)).getMessage());
+        assertEquals(List.of(review), db.queryForList(active, Long.class, instance));
+        assertEquals(List.of("review"), db.queryForList("select node_code from flow_instance where id=?", String.class, instance));
+        assertEquals(List.of("7"), db.queryForList(
+            "select processed_by from flow_user where associated=? and del_flag='0'", String.class, review));
+        assertEquals(List.of("review"), db.queryForList(
+            "select target_node_code from flow_his_task where task_id=? and del_flag='0'", String.class, apply));
+    }
+    private Long startManualApproval(String businessId) {
+        db.update("update flow_definition set def_config=? where id=4", "{\"autoPass\":false}");
+        var start = new StartCommand();
+        start.setBusinessId(businessId);
+        start.setFlowCode("leave");
+        start.setOperator(new OperatorContext("7"));
+        return FlowEngine.workflow().start(start).getInstanceId();
+    }
+
+    private CompleteCommand approval(long task) {
+        var command = new CompleteCommand();
+        command.setTaskId(task);
+        command.setOperator(new OperatorContext("7"));
+        return command;
+    }
+
+    @Test
+    void revokedReviewCannotAdvanceFromAStaleTask() {
+        long instance = startManualApproval("stale-review");
+        String active = "select id from flow_task where instance_id=? and del_flag='0'";
+        FlowEngine.workflow().complete(approval(db.queryForObject(active, Long.class, instance)));
+        var stale = approval(db.queryForObject(active + " and node_code='review'", Long.class, instance));
+        var mapper = new SqlSessionTemplate(context.getBean(SqlSessionFactory.class)).getMapper(FlowInstanceMapper.class);
+        var service = new FlwInstanceServiceImpl(null, FlowEngine.defService(), null, null, mapper, null, null, null);
+        var request = new FlowCancelBo("stale-review", "重新填写");
+        try (var login = mockStatic(LoginHelper.class)) {
+            login.when(LoginHelper::getUserIdStr).thenReturn("8");
+            assertThrows(ServiceException.class, () -> service.cancelProcessApply(request));
+            assertEquals(List.of(stale.getTaskId()), db.queryForList(active, Long.class, instance));
+            login.when(LoginHelper::getUserIdStr).thenReturn("7");
+            assertTrue(service.cancelProcessApply(request));
+        }
+        var afterRevoke = db.queryForList(active, Long.class, instance);
+        String history = "select id from flow_his_task where instance_id=? order by id";
+        var revokedHistory = db.queryForList(history, Long.class, instance);
+        assertThrows(FlowException.class, () -> FlowEngine.workflow().complete(stale));
+        assertEquals("cancel", db.queryForObject("select flow_status from flow_instance where id=?", String.class, instance));
+        assertEquals(afterRevoke, db.queryForList(active, Long.class, instance));
+        assertEquals(revokedHistory, db.queryForList(history, Long.class, instance));
+        assertTrue(db.queryForList(active + " and node_code in ('review','finance')", Long.class, instance).isEmpty());
+    }
+
+    @Test
+    void overlappingApprovalsCommitOnlyOneTransition() throws Exception {
+        long instance = startManualApproval("concurrent-review");
+        long task = db.queryForObject("select id from flow_task where instance_id=? and del_flag='0'", Long.class, instance);
+        var contention = new CountDownLatch(1);
+        var service = approvalService(contention);
+        Callable<Boolean> submit = () -> {
+            try {
+                return submitApproval(service, task, () -> assertTrue(contention.await(8, TimeUnit.SECONDS),
+                    "second request must contend for the same task"));
+            } catch (FlowException stale) {
+                assertEquals(ExceptionCons.NOT_FOUNT_TASK, stale.getMessage());
+                return false;
+            }
+        };
+        try (var workers = Executors.newFixedThreadPool(2)) {
+            var first = workers.submit(submit);
+            var second = workers.submit(submit);
+            assertNotEquals(first.get(20, TimeUnit.SECONDS), second.get(20, TimeUnit.SECONDS));
+        }
+        assertSingleReview(instance, task);
+    }
+
+    @Test
+    void distinctTasksAdvanceIndependently() throws Exception {
+        long firstInstance = startManualApproval("independent-first");
+        long secondInstance = startManualApproval("independent-second");
+        String active = "select id from flow_task where instance_id=? and del_flag='0'";
+        long firstTask = db.queryForObject(active, Long.class, firstInstance);
+        long secondTask = db.queryForObject(active, Long.class, secondInstance);
+        var contention = new CountDownLatch(1);
+        var service = approvalService(contention);
+        var firstEntered = new CountDownLatch(1);
+        var releaseFirst = new CountDownLatch(1);
+        try (var workers = Executors.newFixedThreadPool(2)) {
+            var first = workers.submit(() -> submitApproval(service, firstTask, () -> {
+                firstEntered.countDown();
+                assertTrue(releaseFirst.await(25, TimeUnit.SECONDS));
+            }));
+            try {
+                assertTrue(firstEntered.await(10, TimeUnit.SECONDS));
+                var second = workers.submit(() -> submitApproval(service, secondTask, () -> {}));
+                assertTrue(second.get(15, TimeUnit.SECONDS));
+                assertSingleReview(secondInstance, secondTask);
+                assertEquals(List.of(firstTask), db.queryForList(active, Long.class, firstInstance));
+                assertEquals(1L, contention.getCount());
+            } finally {
+                releaseFirst.countDown();
+            }
+            assertTrue(first.get(10, TimeUnit.SECONDS));
+        }
+        assertSingleReview(firstInstance, firstTask);
+    }
+
+    private boolean submitApproval(IFlwTaskService service, long task, org.junit.jupiter.api.function.Executable beforeComplete) {
+        var request = new CompleteTaskBo();
+        request.setTaskId(task);
+        try (var chain = mockStatic(LiteFlowUtils.class)) {
+            chain.when(() -> LiteFlowUtils.execute(eq("completeTaskChain"), any())).thenAnswer(call -> {
+                beforeComplete.execute();
+                CompleteTaskContext submitted = call.getArgument(1);
+                FlowEngine.workflow().complete(approval(submitted.getCompleteTaskBo().getTaskId()));
+                return null;
+            });
+            return service.completeTask(request);
+        }
+    }
+
+    private IFlwTaskService approvalService(CountDownLatch contention) throws Exception {
+        var held = ConcurrentHashMap.<String>newKeySet();
+        var executor = new LockExecutor<String>() {
+            public String acquire(String key, String value, long expire, long timeout) {
+                if (held.add(key)) return key;
+                contention.countDown();
+                return null;
+            }
+            public boolean releaseLock(String key, String value, String token) {
+                return held.remove(token);
+            }
+        };
+        var props = new Lock4jProperties();
+        props.setAcquireTimeout(10000L);
+        var template = new LockTemplate();
+        template.setProperties(props);
+        template.setExecutors(List.of(executor));
+        template.afterPropertiesSet();
+        var interceptor = new LockInterceptor(template, List.of(new DefaultLockKeyBuilder(context)),
+            List.of(new DefaultLockFailureStrategy()), props);
+        interceptor.afterPropertiesSet();
+        var advisor = new LockAnnotationAdvisor(interceptor, 0);
+        advisor.setBeanFactory(context);
+        var target = new FlwTaskServiceImpl(null,null,null,null,null,null,null,null,null,null,null,null,null,null);
+        var proxy = new ProxyFactory(target);
+        proxy.setProxyTargetClass(true);
+        proxy.addAdvisor(advisor);
+        return (IFlwTaskService) proxy.getProxy();
+    }
+
+    private void assertSingleReview(long instance, long task) {
+        var review = db.queryForObject("select id from flow_task where instance_id=? and del_flag='0'", Long.class, instance);
+        assertEquals("review", db.queryForObject("select node_code from flow_task where id=?", String.class, review));
+        assertEquals(List.of("7"), db.queryForList("select processed_by from flow_user where associated=? and del_flag='0'", String.class, review));
+        assertEquals(List.of("review"), db.queryForList("select target_node_code from flow_his_task where task_id=? and del_flag='0'", String.class, task));
+    }
     @Test
     void revivePersistsFreshScheduleAndRejectsSecondRevival() {
         db.update("insert into flow_instance(id,definition_id,business_id,node_type,node_code,flow_status) values(300,4,'timer',1,'wait','waiting')");

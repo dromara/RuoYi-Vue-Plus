@@ -199,6 +199,13 @@ class MybatisPlusH2IntegrationTest {
         }
     }
 
+    @Test
+    void joinStatementsAreRegisteredOnlyForJoinCapableMappers() {
+        var config = sqlSessionFactory.getConfiguration();
+        org.junit.jupiter.api.Assertions.assertTrue(config.hasStatement(AuditMapper.class.getName() + ".selectJoinList"));
+        org.junit.jupiter.api.Assertions.assertFalse(config.hasStatement(AuditExtraMapper.class.getName() + ".selectJoinList"));
+        org.junit.jupiter.api.Assertions.assertTrue(config.hasStatement(AuditExtraMapper.class.getName() + ".selectById"));
+    }
     public interface AuditMapper extends BaseMapperPlus<AuditRecord, AuditRecord>, MPJBaseMapper<AuditRecord> {
 
         @Select("SELECT r.id, r.owner_id, r.name FROM audit_record r LEFT JOIN audit_extra e ON e.record_id = r.id " +

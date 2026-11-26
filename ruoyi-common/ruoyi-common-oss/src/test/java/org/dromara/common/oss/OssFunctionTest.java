@@ -21,6 +21,13 @@ import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
+import software.amazon.awssdk.services.s3.model.*;
+import org.dromara.common.oss.io.OutputStreamDownloadSubscriber;
+import org.dromara.common.oss.model.DeleteObjectsResult;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.io.ByteArrayOutputStream;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -36,6 +43,192 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("common-oss 功能单元测试")
 class OssFunctionTest {
 
+    @Test
+    void pathKeysNormalizeBusinessPrefixesAndPreserveOnlyTheExtension() {
+        var props = properties("s3.example.com", null, "images");
+        props.setPrefix(" //attachments// ");
+        var client = new DefaultOssClientImpl("keys", OssClientConfig.formProperties(props));
+        String datedId = "[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9a-f]{32}";
+        assertTrue(client.buildPathKey("/orders/", "quarter.final.pdf").matches("attachments/orders/" + datedId + "[.]pdf"));
+        assertTrue(client.buildPathKey("README").matches("attachments/" + datedId));
+        props.setPrefix(null);
+        var plain = new DefaultOssClientImpl("keys", OssClientConfig.formProperties(props));
+        assertTrue(plain.buildPathKey(null).matches(datedId));
+        assertTrue(plain.buildPathKey("orders", "a.csv").matches("orders/" + datedId + "[.]csv"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "https://files.example.com/base"})
+    void signedUrlsBindTheObjectLifetimeMetadataAndPartNumber(String domain) throws Exception {
+        var config = OssClientConfig.formProperties(properties("s3.example.com", domain, "images"));
+        try (var client = new DefaultOssClientImpl("sign", config)) {
+            client.initialize();
+            var ttl = Duration.ofMinutes(4);
+            var get = java.net.URI.create(client.presignGetUrl("a b", ttl));
+            assertTrue(get.getRawPath().endsWith("/a%20b"));
+            assertTrue(get.getQuery().contains("X-Amz-Expires=240"));
+            if (!domain.isEmpty()) {
+                assertEquals("files.example.com", get.getHost());
+                assertEquals("/base/a%20b", get.getRawPath());
+            }
+            var upload = java.net.URI.create(client.presignPutUrl("a b", ttl, java.util.Map.of("owner", "sales")));
+            assertTrue(upload.getQuery().contains("x-amz-meta-owner"));
+            var part = java.net.URI.create(client.presignUploadPartUrl("a b", "batch", 4, ttl));
+            assertTrue(part.getQuery().contains("partNumber=4"));
+            assertTrue(part.getQuery().contains("uploadId=batch"));
+            assertEquals(get.getRawPath(), part.getRawPath());
+        }
+    }
+
+    @Test
+    void uploadUsesActualByteLengthAndPreservesMetadataAndSdkErrors() {
+        var config = OssClientConfig.formProperties(properties("s3.example.com", null, "images"));
+        var client = spy(new DefaultOssClientImpl("upload", config));
+        var options = org.dromara.common.oss.model.Options.create().setLength(90L).setContentType("text/plain")
+            .addMetadataItem("project", "reports").addMetadataItem("owner", "sales");
+        doAnswer(call -> {
+            var builder = PutObjectRequest.builder();
+            call.<Consumer<PutObjectRequest.Builder>>getArgument(1).accept(builder);
+            var request = builder.build();
+            assertEquals("images", request.bucket());
+            assertEquals("report", request.key());
+            assertEquals(3L, request.contentLength());
+            assertEquals("text/plain", request.contentType());
+            assertEquals(java.util.Map.of("project", "reports", "owner", "sales"), request.metadata());
+            return HandleAsyncResult.success(PutObjectResponse.builder().eTag("etag").build());
+        }).when(client).doCustomUpload(any(), any(), nullable(java.util.Collection.class));
+        byte[] bytes = {1, 2, 3};
+        assertEquals(3L, client.upload("report", bytes, options).size());
+        var failure = S3StorageException.form("service unavailable");
+        doReturn(HandleAsyncResult.failure(new java.util.concurrent.CompletionException(failure)))
+            .when(client).doCustomUpload(any(), any(), nullable(java.util.Collection.class));
+        assertEquals(failure, assertThrows(S3StorageException.class, () -> client.upload("report", bytes)));
+        doReturn(HandleAsyncResult.success(null)).when(client).doCustomUpload(any(), any(), nullable(java.util.Collection.class));
+        assertThrows(S3StorageException.class, () -> client.upload("report", bytes));
+    }
+
+    @Test
+    void emptyTagsClearTheObjectWhileNonemptyTagsReplaceItsTagSet() {
+        var client = new DefaultOssClientImpl("tags", OssClientConfig.formProperties(properties("s3.example.com", null, "images")));
+        S3AsyncClient sdk = mock();
+        ReflectionTestUtils.setField(client, "s3AsyncClient", sdk);
+        when(sdk.putObjectTagging(org.mockito.ArgumentMatchers.<Consumer<PutObjectTaggingRequest.Builder>>any()))
+            .thenAnswer(call -> {
+                var builder = PutObjectTaggingRequest.builder();
+                call.<Consumer<PutObjectTaggingRequest.Builder>>getArgument(0).accept(builder);
+                var req = builder.build();
+                assertEquals("images", req.bucket());
+                assertEquals("report", req.key());
+                assertEquals(List.of(Tag.builder().key("owner").value("sales").build()), req.tagging().tagSet());
+                return CompletableFuture.completedFuture(PutObjectTaggingResponse.builder().build());
+            });
+        when(sdk.deleteObjectTagging(org.mockito.ArgumentMatchers.<Consumer<DeleteObjectTaggingRequest.Builder>>any()))
+            .thenAnswer(call -> {
+                var builder = DeleteObjectTaggingRequest.builder();
+                call.<Consumer<DeleteObjectTaggingRequest.Builder>>getArgument(0).accept(builder);
+                assertEquals("report", builder.build().key());
+                return CompletableFuture.completedFuture(DeleteObjectTaggingResponse.builder().build());
+            });
+        when(sdk.getObjectTagging(org.mockito.ArgumentMatchers.<Consumer<GetObjectTaggingRequest.Builder>>any()))
+            .thenReturn(CompletableFuture.completedFuture(GetObjectTaggingResponse.builder()
+                .tagSet(Tag.builder().key("owner").value("sales").build()).build()));
+        var tags = java.util.Map.of("owner", "sales");
+        client.putObjectTags("report", tags);
+        assertEquals(tags, client.getObjectTags("report"));
+        client.putObjectTags("report", java.util.Map.of());
+        verify(sdk).deleteObjectTagging(org.mockito.ArgumentMatchers.<Consumer<DeleteObjectTaggingRequest.Builder>>any());
+    }
+    @Test
+    void listObjectsForwardsPagingParametersAndReturnsTheNextCursor() {
+        var config = OssClientConfig.formProperties(properties("s3.example.com", null, "images"));
+        var client = new DefaultOssClientImpl("list", config);
+        S3AsyncClient sdk = mock();
+        ReflectionTestUtils.setField(client, "s3AsyncClient", sdk);
+        when(sdk.listObjectsV2(org.mockito.ArgumentMatchers.<Consumer<ListObjectsV2Request.Builder>>any()))
+            .thenAnswer(call -> {
+                var builder = ListObjectsV2Request.builder();
+                call.<Consumer<ListObjectsV2Request.Builder>>getArgument(0).accept(builder);
+                var request = builder.build();
+                assertEquals("images", request.bucket());
+                assertEquals("reports/", request.prefix());
+                assertEquals("page-2", request.continuationToken());
+                assertEquals(1, request.maxKeys());
+                var object = S3Object.builder().key("reports/a").size(17L).eTag("tag")
+                    .lastModified(Instant.EPOCH).build();
+                return CompletableFuture.completedFuture(ListObjectsV2Response.builder()
+                    .contents(object).nextContinuationToken("page-3").build());
+            });
+        var page = client.listObjects("reports/", "page-2", 1);
+        assertEquals("page-3", page.nextContinuationToken());
+        assertEquals("reports/a", page.objects().getFirst().key());
+        assertEquals(17L, page.objects().getFirst().size());
+        assertEquals("tag", page.objects().getFirst().eTag());
+    }
+
+    @Test
+    void batchDeleteReturnsIndividualErrorsAndRejectsInvalidBatchSizes() {
+        var config = OssClientConfig.formProperties(properties("s3.example.com", null, "images"));
+        var client = new DefaultOssClientImpl("delete", config);
+        S3AsyncClient sdk = mock();
+        ReflectionTestUtils.setField(client, "s3AsyncClient", sdk);
+        assertThrows(IllegalArgumentException.class, () -> client.deleteObjects(null));
+        assertThrows(IllegalArgumentException.class, () -> client.deleteObjects(List.of()));
+        assertThrows(IllegalArgumentException.class, () -> client.deleteObjects(java.util.Collections.nCopies(1001, "x")));
+        verifyNoInteractions(sdk);
+        when(sdk.deleteObjects(org.mockito.ArgumentMatchers.<Consumer<DeleteObjectsRequest.Builder>>any()))
+            .thenAnswer(call -> {
+                var builder = DeleteObjectsRequest.builder();
+                call.<Consumer<DeleteObjectsRequest.Builder>>getArgument(0).accept(builder);
+                var request = builder.build();
+                assertEquals("images", request.bucket());
+                assertEquals(List.of("one", "two"), request.delete().objects().stream().map(ObjectIdentifier::key).toList());
+                return CompletableFuture.completedFuture(DeleteObjectsResponse.builder()
+                    .deleted(DeletedObject.builder().key("one").build())
+                    .errors(S3Error.builder().key("two").code("AccessDenied").message("locked").build()).build());
+            });
+        var result = client.deleteObjects(List.of("one", "two"));
+        assertEquals(List.of("one"), result.deletedKeys());
+        assertEquals(List.of(new DeleteObjectsResult.Error("two", "AccessDenied", "locked")), result.errors());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void downloadWritesOnlyRemainingBytesAndHonorsChannelOwnership(boolean ownsChannel) throws Exception {
+        var output = new ByteArrayOutputStream();
+        try (var channel = Channels.newChannel(output)) {
+            try (var subscriber = OutputStreamDownloadSubscriber.create(channel, ownsChannel)) {
+                subscriber.accept(ByteBuffer.wrap(new byte[]{0, 1, 2, 3}, 1, 2));
+                subscriber.accept(ByteBuffer.wrap(new byte[]{4}));
+            }
+            org.junit.jupiter.api.Assertions.assertArrayEquals(new byte[]{1, 2, 4}, output.toByteArray());
+            assertEquals(!ownsChannel, channel.isOpen());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void listPartsUsesRequestedOrDefaultPageAndSortsResults(boolean customPage) {
+        var config = OssClientConfig.formProperties(properties("s3.example.com", null, "images"));
+        var client = new DefaultOssClientImpl("parts", config);
+        S3AsyncClient sdk = mock();
+        ReflectionTestUtils.setField(client, "s3AsyncClient", sdk);
+        when(sdk.listParts(org.mockito.ArgumentMatchers.<Consumer<ListPartsRequest.Builder>>any()))
+            .thenAnswer(call -> {
+                var builder = ListPartsRequest.builder();
+                call.<Consumer<ListPartsRequest.Builder>>getArgument(0).accept(builder);
+                var request = builder.build();
+                assertEquals(customPage ? 4 : 1000, request.maxParts());
+                assertEquals(customPage ? 1 : 0, request.partNumberMarker());
+                assertEquals("upload", request.uploadId());
+                assertEquals("archive", request.key());
+                assertEquals("images", request.bucket());
+                return CompletableFuture.completedFuture(ListPartsResponse.builder().parts(
+                    Part.builder().partNumber(3).eTag("third").build(),
+                    Part.builder().partNumber(2).eTag("second").build()).build());
+            });
+        var parts = client.listParts("archive", "upload", customPage ? 4 : null, customPage ? 1 : null);
+        assertEquals(List.of(new PartUploadResult(2, "second"), new PartUploadResult(3, "third")), parts);
+    }
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     @DisplayName("普通上传和分片合并返回可访问的对象地址并保留原始键")

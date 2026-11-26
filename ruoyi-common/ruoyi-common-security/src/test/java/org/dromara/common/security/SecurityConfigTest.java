@@ -90,4 +90,29 @@ class SecurityConfigTest {
                 () -> ReflectionTestUtils.invokeMethod(config, "validateClientAccessRules", denied));
         }
     }
+    @Test
+    void unrestrictedClientsMayAccessRoutesAndIpWhitelistRejectsOtherNetworks() {
+        var config = new SecurityConfig(new SecurityProperties());
+        var request = new MockHttpServletRequest("GET", "/profile");
+        request.setRemoteAddr("192.0.2.9");
+        try (var stp = mockStatic(StpUtil.class)) {
+            assertDoesNotThrow(() -> ReflectionTestUtils.invokeMethod(config, "validateClientAccessRules", request));
+            stp.when(() -> StpUtil.getExtra("clientIpWhitelist")).thenReturn("192.0.2.10");
+            assertThrows(NotPermissionException.class,
+                () -> ReflectionTestUtils.invokeMethod(config, "validateClientAccessRules", request));
+        }
+    }
+
+    @Test
+    void actuatorFilterAuthenticatesWithConfiguredCredentials() {
+        try (var spring = mockStatic(SpringUtil.class);
+             var basic = mockStatic(cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil.class)) {
+            spring.when(() -> SpringUtil.getProperty("spring.boot.admin.client.username")).thenReturn("monitor");
+            spring.when(() -> SpringUtil.getProperty("spring.boot.admin.client.password")).thenReturn("secret");
+            var filter = new SecurityConfig(new SecurityProperties()).getSaServletFilter();
+            assertEquals(Set.of("/actuator", "/actuator/**"), Set.copyOf(filter.includeList));
+            filter.auth.run(null);
+            basic.verify(() -> cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil.check("monitor:secret"));
+        }
+    }
 }

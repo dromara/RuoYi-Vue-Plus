@@ -371,17 +371,22 @@ public class GenTableServiceImpl implements IGenTableService {
             if (tableColumnMap.containsKey(column.getColumnName())) {
                 GenTableColumn prevColumn = tableColumnMap.get(column.getColumnName());
                 column.setColumnId(prevColumn.getColumnId());
-                if (column.isList()) {
-                    // 如果是列表，继续保留查询方式/字典类型选项
-                    column.setDictType(prevColumn.getDictType());
+                column.setIsInsert(prevColumn.getIsInsert());
+                column.setIsEdit(prevColumn.getIsEdit());
+                column.setIsList(prevColumn.getIsList());
+                column.setIsQuery(prevColumn.getIsQuery());
+                column.setDictType(prevColumn.getDictType());
+                if (StringUtils.isNotBlank(prevColumn.getQueryType())) {
                     column.setQueryType(prevColumn.getQueryType());
+                }
+                if (StringUtils.isNotBlank(prevColumn.getHtmlType())) {
+                    column.setHtmlType(prevColumn.getHtmlType());
                 }
                 if (StringUtils.isNotEmpty(prevColumn.getIsRequired()) && !column.isPk()
                     && (column.isInsert() || column.isEdit())
                     && ((column.isUsableColumn()) || (!column.isSuperColumn()))) {
-                    // 如果是(新增/修改&非主键/非忽略及父属性)，继续保留必填/显示类型选项
+                    // 保留表单字段的必填设置
                     column.setIsRequired(prevColumn.getIsRequired());
-                    column.setHtmlType(prevColumn.getHtmlType());
                 }
             }
             saveColumns.add(column);
@@ -508,6 +513,11 @@ public class GenTableServiceImpl implements IGenTableService {
         });
         validateOptionField(validFields, params.get(GenConstants.STATUS_FIELD), "状态字段");
         validateOptionField(validFields, params.get(GenConstants.SORT_FIELD), "排序字段");
+        if (genTable.isTree()) {
+            validateOptionField(validFields, params.get(GenConstants.TREE_CODE), "树编码字段");
+            validateOptionField(validFields, params.get(GenConstants.TREE_PARENT_CODE), "树父编码字段");
+            validateOptionField(validFields, params.get(GenConstants.TREE_NAME), "树名称字段");
+        }
         validateOptionField(validFields, params.get(GenConstants.TREE_ANCESTORS), "树祖级字段");
         validateOptionField(validFields, params.get(GenConstants.TREE_ORDER_FIELD), "树排序字段");
         Object uniqueFields = params.get(GenConstants.UNIQUE_FIELDS);

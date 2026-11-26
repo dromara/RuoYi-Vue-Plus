@@ -1,5 +1,12 @@
 package org.dromara.common.doc;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaIgnore;
+import cn.dev33.satoken.annotation.SaMode;
+import io.swagger.v3.oas.models.Operation;
+import org.dromara.common.doc.core.resolver.SaTokenAnnotationMetadataJavadocResolver;
+import org.springframework.web.method.HandlerMethod;
 import org.dromara.common.doc.core.model.SaTokenSecurityMetadata;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +17,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("common-doc 功能单元测试")
 class SaTokenSecurityMetadataTest {
 
+    @SaCheckRole("reviewer")
+    @SaCheckPermission("orders:list")
+    static class OrderEndpoint {
+        @SaCheckPermission(value = {"orders:create", "orders:update"}, mode = SaMode.OR, orRole = "owner")
+        @SaCheckRole("editor")
+        public void edit() {}
+
+        @SaIgnore
+        public void status() {}
+    }
+
+    @Test
+    void documentsBothControllerAndMethodRequirements() throws Exception {
+        var resolver = new SaTokenAnnotationMetadataJavadocResolver();
+        var endpoint = new OrderEndpoint();
+        var edit = new HandlerMethod(endpoint, OrderEndpoint.class.getMethod("edit"));
+        assertTrue(resolver.supports(edit));
+        String markdown = resolver.resolve(edit, new Operation());
+        assertTrue(markdown.contains("`orders:list`"));
+        assertTrue(markdown.contains("`orders:create` | `orders:update`"));
+        assertTrue(markdown.contains("`owner`"));
+        assertTrue(markdown.contains("`reviewer`"));
+        assertTrue(markdown.contains("`editor`"));
+
+        var status = new HandlerMethod(endpoint, OrderEndpoint.class.getMethod("status"));
+        assertTrue(resolver.supports(status));
+        String ignored = resolver.resolve(status, new Operation());
+        assertTrue(ignored.contains("忽略权限检查"));
+        org.junit.jupiter.api.Assertions.assertFalse(ignored.contains("orders:list"));
+    }
     @Test
     @DisplayName("未识别的权限组合模式按默认 AND 展示")
     void shouldUseDefaultSymbolForUnknownMode() {
