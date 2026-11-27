@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -146,12 +147,16 @@ class LambdaQueryBuilderTest {
     }
 
     /**
-     * 验证子查询自动加入逻辑删除条件、收集占位参数，并支持显式关闭逻辑删除。
+     * 验证子查询自动加入逻辑删除条件、按顺序提交参数，并支持显式关闭逻辑删除。
      */
     @Test
     @DisplayName("构造带参数的子查询")
     void shouldBuildSubQueryWithLogicDeleteAndParameters() {
-        SubQuery<TestEntity> subQuery = SubQuery.ofPlaceholders(TestEntity.class)
+        List<Object> parameters = new ArrayList<>();
+        SubQuery<TestEntity> subQuery = SubQuery.of(TestEntity.class, value -> {
+            parameters.add(value);
+            return "?";
+        })
             .select(TestEntity::getId)
             .eq(TestEntity::getName, "alice")
             .gt(TestEntity::getScore, 60)
@@ -163,10 +168,10 @@ class LambdaQueryBuilderTest {
 
         assertTrue(sql.startsWith("SELECT id FROM test_entity WHERE"));
         assertTrue(sql.contains("deleted=0"));
-        assertTrue(sql.contains("name = {0}"));
-        assertArrayEquals(new Object[]{"alice", 60, 1L, 2L, 60, 100}, subQuery.params());
+        assertTrue(sql.contains("name = ?"));
+        assertEquals(List.of("alice", 60, 1L, 2L, 60, 100), parameters);
 
-        String withoutLogicDelete = SubQuery.ofPlaceholders(TestEntity.class)
+        String withoutLogicDelete = SubQuery.of(TestEntity.class)
             .selectCountAll()
             .disableLogicDelete()
             .build();
@@ -262,7 +267,7 @@ class LambdaQueryBuilderTest {
     @Test
     @DisplayName("跳过子查询空集合条件")
     void shouldSkipEmptySubQueryCollections() {
-        SubQuery<TestRelation> subQuery = SubQuery.ofPlaceholders(TestRelation.class)
+        SubQuery<TestRelation> subQuery = SubQuery.of(TestRelation.class, value -> "?")
             .select(TestRelation::getOwnerId)
             .in(TestRelation::getId, List.of())
             .in(TestRelation::getId, (Object[]) null)
@@ -273,7 +278,7 @@ class LambdaQueryBuilderTest {
 
         assertFalse(sql.contains(" IN ("));
         assertTrue(sql.contains("owner_id=u.id"));
-        assertArrayEquals(new Object[]{"enabled"}, subQuery.params());
+        assertTrue(sql.contains("state = ?"));
     }
 
     /**
@@ -283,7 +288,7 @@ class LambdaQueryBuilderTest {
     @DisplayName("拒绝没有查询字段的子查询")
     void shouldRejectSubQueryWithoutSelectColumn() {
         assertThrows(MybatisPlusException.class,
-            () -> SubQuery.ofPlaceholders(TestRelation.class).build());
+            () -> SubQuery.of(TestRelation.class).build());
     }
 
     /**

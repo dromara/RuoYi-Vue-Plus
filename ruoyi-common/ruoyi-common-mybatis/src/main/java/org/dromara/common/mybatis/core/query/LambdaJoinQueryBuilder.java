@@ -1,12 +1,13 @@
 package org.dromara.common.mybatis.core.query;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import com.github.yulichang.wrapper.segments.SelectNormal;
 import org.dromara.common.core.utils.StringUtils;
@@ -190,46 +191,59 @@ public final class LambdaJoinQueryBuilder<T> {
     }
 
     /**
-     * 指定子查询字段。
-     * <pre>{@code
-     * QueryBuilder.lambdaJoin("u", SysUser.class)
-     *     .selectAs("u", SysUser::getUserId, UserStatVo::getUserId)
-     *     .selectSub(SysUserRole.class, sub -> sub
-     *         .selectCountAll()
-     *         .eqColumn(SysUserRole::getUserId, "u", SysUser::getUserId),
-     *         UserStatVo::getRoleCount)
-     *     .list(UserStatVo.class);
-     * }</pre>
+     * 添加子查询结果列。
      *
      * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造函数
-     * @param alias       查询别名
+     * @param consumer    MPJ 子查询构造函数
+     * @param alias       结果列别名
      * @param <S>         子查询实体类型
      * @return 当前联表查询构造辅助对象
      */
-    public <S> LambdaJoinQueryBuilder<T> selectSub(Class<S> entityClass, Consumer<SubQuery<S>> consumer, String alias) {
-        SubQuery<S> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
-        wrapper.selectFunc("(" + subQuery.build() + ")", func -> {
-            // MPJ raw select functions require a non-null column argument array even when SQL has no column placeholders.
-            func.setArgs(new SFunction[0]);
-            return func.values(subQuery.params());
-        },
-            AggregateSelectUtils.checkAlias(alias));
+    public <S> LambdaJoinQueryBuilder<T> selectSub(Class<S> entityClass, Consumer<MPJLambdaWrapper<S>> consumer, String alias) {
+        wrapper.selectSub(entityClass, ConfigProperties.subQueryAlias, consumer, AggregateSelectUtils.checkAlias(alias));
         return this;
     }
 
     /**
-     * 指定子查询字段。
+     * 添加子查询结果列并从结果属性推导别名。
      *
      * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造函数
-     * @param alias       查询别名字段
+     * @param consumer    MPJ 子查询构造函数
+     * @param alias       结果属性引用
      * @param <S>         子查询实体类型
-     * @param <X>         查询结果类型
+     * @param <X>         结果类型
      * @return 当前联表查询构造辅助对象
      */
-    public <S, X> LambdaJoinQueryBuilder<T> selectSub(Class<S> entityClass, Consumer<SubQuery<S>> consumer, SFunction<X, ?> alias) {
-        return selectSub(entityClass, consumer, AggregateSelectUtils.aliasName(alias));
+    public <S, X> LambdaJoinQueryBuilder<T> selectSub(Class<S> entityClass, Consumer<MPJLambdaWrapper<S>> consumer, SFunction<X, ?> alias) {
+        wrapper.selectSub(entityClass, consumer, alias);
+        return this;
+    }
+
+    /**
+     * 添加统计匹配行数的子查询结果列。
+     *
+     * @param entityClass 子查询实体类型
+     * @param conditions  MPJ 子查询条件
+     * @param alias       结果列别名
+     * @param <S>         子查询实体类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S> LambdaJoinQueryBuilder<T> selectCountSub(Class<S> entityClass, Consumer<MPJLambdaWrapper<S>> conditions, String alias) {
+        return selectSub(entityClass, sub -> conditions.accept(sub.select(SqlAggregateFunction.COUNT.format("*"))), alias);
+    }
+
+    /**
+     * 添加统计匹配行数的子查询结果列，并从结果属性推导别名。
+     *
+     * @param entityClass 子查询实体类型
+     * @param conditions  MPJ 子查询条件
+     * @param alias       结果属性引用
+     * @param <S>         子查询实体类型
+     * @param <X>         结果类型
+     * @return 当前联表查询构造辅助对象
+     */
+    public <S, X> LambdaJoinQueryBuilder<T> selectCountSub(Class<S> entityClass, Consumer<MPJLambdaWrapper<S>> conditions, SFunction<X, ?> alias) {
+        return selectCountSub(entityClass, conditions, AggregateSelectUtils.aliasName(alias));
     }
 
     /**
@@ -434,85 +448,66 @@ public final class LambdaJoinQueryBuilder<T> {
     }
 
     /**
-     * 添加等于子查询条件。
+     * 添加 等于 子查询条件。
      *
-     * @param alias       表别名
-     * @param column      字段
+     * @param alias       外层字段所属表别名
+     * @param column      外层字段
      * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造函数
-     * @param <S>         字段实体类型
+     * @param consumer    MPJ 子查询构造函数
+     * @param <S>         外层字段类型
      * @param <Q>         子查询实体类型
      * @return 当前联表查询构造辅助对象
      */
     public <S, Q> LambdaJoinQueryBuilder<T> eqSub(String alias, SFunction<S, ?> column, Class<Q> entityClass,
-                                                  Consumer<SubQuery<Q>> consumer) {
-        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
-        wrapper.apply(true, qualifiedColumn(alias, column) + " = (" + subQuery.build() + ")", subQuery.params());
+        MFunction<MPJLambdaWrapper<Q>> consumer) {
+        wrapper.eq(true, alias, column, entityClass, consumer);
         return this;
     }
 
     /**
      * 添加 IN 子查询条件。
-     * <pre>{@code
-     * QueryBuilder.lambdaJoin("u", SysUser.class)
-     *     .inSub("u", SysUser::getUserId, SysUserRole.class, sub -> sub
-     *         .select(SysUserRole::getUserId)
-     *         .eq(SysUserRole::getRoleId, roleId))
-     *     .list(SysUserVo.class);
-     * }</pre>
      *
-     * @param alias       表别名
-     * @param column      字段
+     * @param alias       外层字段所属表别名
+     * @param column      外层字段
      * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造函数
-     * @param <S>         字段实体类型
+     * @param consumer    MPJ 子查询构造函数
+     * @param <S>         外层字段类型
      * @param <Q>         子查询实体类型
      * @return 当前联表查询构造辅助对象
      */
     public <S, Q> LambdaJoinQueryBuilder<T> inSub(String alias, SFunction<S, ?> column, Class<Q> entityClass,
-                                                  Consumer<SubQuery<Q>> consumer) {
-        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
-        wrapper.apply(true, qualifiedColumn(alias, column) + " IN (" + subQuery.build() + ")", subQuery.params());
+        MFunction<MPJLambdaWrapper<Q>> consumer) {
+        wrapper.in(true, alias, column, entityClass, consumer);
         return this;
     }
 
     /**
      * 添加 NOT IN 子查询条件。
      *
-     * @param alias       表别名
-     * @param column      字段
+     * @param alias       外层字段所属表别名
+     * @param column      外层字段
      * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造函数
-     * @param <S>         字段实体类型
+     * @param consumer    MPJ 子查询构造函数
+     * @param <S>         外层字段类型
      * @param <Q>         子查询实体类型
      * @return 当前联表查询构造辅助对象
      */
     public <S, Q> LambdaJoinQueryBuilder<T> notInSub(String alias, SFunction<S, ?> column, Class<Q> entityClass,
-                                                     Consumer<SubQuery<Q>> consumer) {
-        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
-        wrapper.apply(true, qualifiedColumn(alias, column) + " NOT IN (" + subQuery.build() + ")", subQuery.params());
+        MFunction<MPJLambdaWrapper<Q>> consumer) {
+        wrapper.notIn(true, alias, column, entityClass, consumer);
         return this;
     }
 
     /**
      * 添加 EXISTS 子查询条件。
-     * <pre>{@code
-     * QueryBuilder.lambdaJoin("u", SysUser.class)
-     *     .existsSub(SysUserRole.class, sub -> sub
-     *         .selectCountAll()
-     *         .eqColumn(SysUserRole::getUserId, "u", SysUser::getUserId)
-     *         .eq(SysUserRole::getRoleId, roleId))
-     *     .list(SysUserVo.class);
-     * }</pre>
      *
      * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造函数
+     * @param consumer    MPJ 子查询构造函数
      * @param <Q>         子查询实体类型
      * @return 当前联表查询构造辅助对象
      */
-    public <Q> LambdaJoinQueryBuilder<T> existsSub(Class<Q> entityClass, Consumer<SubQuery<Q>> consumer) {
-        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
-        wrapper.apply(true, "EXISTS (" + subQuery.build() + ")", subQuery.params());
+    public <Q> LambdaJoinQueryBuilder<T> existsSub(Class<Q> entityClass, MFunction<MPJLambdaWrapper<Q>> consumer) {
+        wrapper.exists(entityClass, consumer);
         return this;
     }
 
@@ -520,13 +515,12 @@ public final class LambdaJoinQueryBuilder<T> {
      * 添加 NOT EXISTS 子查询条件。
      *
      * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造函数
+     * @param consumer    MPJ 子查询构造函数
      * @param <Q>         子查询实体类型
      * @return 当前联表查询构造辅助对象
      */
-    public <Q> LambdaJoinQueryBuilder<T> notExistsSub(Class<Q> entityClass, Consumer<SubQuery<Q>> consumer) {
-        SubQuery<Q> subQuery = buildPlaceholderSubQuery(entityClass, consumer);
-        wrapper.apply(true, "NOT EXISTS (" + subQuery.build() + ")", subQuery.params());
+    public <Q> LambdaJoinQueryBuilder<T> notExistsSub(Class<Q> entityClass, MFunction<MPJLambdaWrapper<Q>> consumer) {
+        wrapper.notExists(entityClass, consumer);
         return this;
     }
 
@@ -957,32 +951,4 @@ public final class LambdaJoinQueryBuilder<T> {
     public MPJLambdaWrapper<T> build() {
         return wrapper;
     }
-
-    /**
-     * 构建使用占位参数模式的子查询。
-     *
-     * @param entityClass 子查询实体类型
-     * @param consumer    子查询构造逻辑
-     * @param <Q>         子查询实体类型
-     * @return 子查询构造器
-     */
-    private <Q> SubQuery<Q> buildPlaceholderSubQuery(Class<Q> entityClass, Consumer<SubQuery<Q>> consumer) {
-        SubQuery<Q> subQuery = SubQuery.ofPlaceholders(entityClass);
-        consumer.accept(subQuery);
-        return subQuery;
-    }
-
-    /**
-     * 解析带表别名的数据库列名。
-     *
-     * @param alias  表别名
-     * @param column 字段引用
-     * @param <S>    字段所属实体类型
-     * @return 表别名限定列名
-     */
-    private <S> String qualifiedColumn(String alias, SFunction<S, ?> column) {
-        return AggregateSelectUtils.checkAlias(alias) + StringPool.DOT + ColumnCache.getMapField(LambdaUtils.getEntityClass(column))
-            .get(LambdaUtils.getName(column)).getColumn();
-    }
-
 }

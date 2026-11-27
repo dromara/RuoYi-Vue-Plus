@@ -1,6 +1,7 @@
 package org.dromara.common.mybatis.core.mapper;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.MybatisSqlSessionFactoryBuilder;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.injector.MPJSqlInjector;
+import com.github.yulichang.interceptor.MPJInterceptor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -52,9 +54,9 @@ class MybatisPlusH2IntegrationTest {
         UnpooledDataSource dataSource = new UnpooledDataSource("org.h2.Driver", url, "sa", "");
         try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE audit_record (id BIGINT PRIMARY KEY, owner_id BIGINT, name VARCHAR(40))");
-            statement.execute("CREATE TABLE audit_extra (record_id BIGINT PRIMARY KEY, flag INT)");
+            statement.execute("CREATE TABLE audit_extra (record_id BIGINT PRIMARY KEY, flag INT, deleted INT DEFAULT 0)");
             statement.execute("INSERT INTO audit_record VALUES (1, 1, 'one'), (2, 2, 'two'), (3, 1, 'three'), (4, 2, 'four')");
-            statement.execute("INSERT INTO audit_extra VALUES (1, 0), (2, 1), (3, 0), (4, 0)");
+            statement.execute("INSERT INTO audit_extra (record_id, flag) VALUES (1, 0), (2, 1), (3, 0), (4, 0)");
         }
 
         MybatisConfiguration configuration = new MybatisConfiguration();
@@ -77,6 +79,7 @@ class MybatisPlusH2IntegrationTest {
         }));
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         configuration.addInterceptor(interceptor);
+        configuration.addInterceptor(new MPJInterceptor());
         GlobalConfigUtils.setGlobalConfig(configuration, new GlobalConfig()
             .setDbConfig(new GlobalConfig.DbConfig())
             .setSqlInjector(new MPJSqlInjector()));
@@ -200,6 +203,44 @@ class MybatisPlusH2IntegrationTest {
     }
 
     @Test
+    @DisplayName("MPJ 原生联表子查询执行并绑定参数")
+    void shouldExecuteMpjJoinSubQueries() throws Exception {
+        try (SqlSession session = sqlSessionFactory.openSession()) {
+            try (Statement statement = session.getConnection().createStatement()) {
+                statement.executeUpdate("UPDATE audit_extra SET deleted = 1 WHERE record_id = 3");
+            }
+            List<AuditSummary> records = session.getMapper(AuditMapper.class).selectJoinList(AuditSummary.class,
+                QueryBuilder.lambdaJoin("r", AuditRecord.class)
+                    .select("r", AuditRecord::getId)
+                    .selectCountSub(AuditExtra.class, sub -> sub
+                        .eq(AuditExtra::getRecordId, "r", AuditRecord::getId)
+                        .eq(AuditExtra::getFlag, 0), AuditSummary::getExtraCount)
+                    .eqSub("r", AuditRecord::getId, AuditExtra.class, sub -> sub
+                        .selectMax(AuditExtra::getRecordId)
+                        .eq(AuditExtra::getRecordId, "r", AuditRecord::getId)
+                        .eq(AuditExtra::getFlag, 0))
+                    .inSub("r", AuditRecord::getId, AuditExtra.class, sub -> sub
+                        .select(AuditExtra::getRecordId)
+                        .eq(AuditExtra::getFlag, 0))
+                    .notInSub("r", AuditRecord::getId, AuditExtra.class, sub -> sub
+                        .select(AuditExtra::getRecordId)
+                        .eq(AuditExtra::getFlag, 1))
+                    .existsSub(AuditExtra.class, sub -> sub
+                        .select(AuditExtra::getRecordId)
+                        .eq(AuditExtra::getRecordId, "r", AuditRecord::getId)
+                        .eq(AuditExtra::getFlag, 0))
+                    .notExistsSub(AuditExtra.class, sub -> sub
+                        .select(AuditExtra::getRecordId)
+                        .eq(AuditExtra::getRecordId, "r", AuditRecord::getId)
+                        .eq(AuditExtra::getFlag, 1))
+                    .build());
+
+            assertEquals(List.of(1L), records.stream().map(AuditSummary::getId).toList());
+            assertEquals(1L, records.getFirst().getExtraCount());
+        }
+    }
+
+    @Test
     void joinStatementsAreRegisteredOnlyForJoinCapableMappers() {
         var config = sqlSessionFactory.getConfiguration();
         org.junit.jupiter.api.Assertions.assertTrue(config.hasStatement(AuditMapper.class.getName() + ".selectJoinList"));
@@ -243,12 +284,22 @@ class MybatisPlusH2IntegrationTest {
         }
     }
 
+    public static class AuditSummary extends AuditRecord {
+        private Long extraCount;
+
+        public Long getExtraCount() {
+            return extraCount;
+        }
+    }
+
     @TableName("audit_extra")
     public static class AuditExtra {
 
         @TableId
         private Long recordId;
         private Integer flag;
+        @TableLogic
+        private Integer deleted;
 
         public Long getRecordId() {
             return recordId;

@@ -95,13 +95,12 @@ class LambdaJoinQueryBuilderTest {
     void shouldBuildCorrelatedSubQueriesForJoinQuery() {
         MPJLambdaWrapper<JoinUser> wrapper = QueryBuilder.lambdaJoin("u", JoinUser.class)
             .select("u", JoinUser::getId)
-            .selectSub(JoinOrder.class, sub -> sub
-                .selectCountAll()
-                .eqColumn(JoinOrder::getUserId, "u", JoinUser::getId)
+            .selectCountSub(JoinOrder.class, sub -> sub
+                .eq(JoinOrder::getUserId, "u", JoinUser::getId)
                 .eq(JoinOrder::getState, "selected"), "paidCount")
             .eqSub("u", JoinUser::getScore, JoinOrder.class, sub -> sub
                 .selectMax(JoinOrder::getAmount)
-                .eqColumn(JoinOrder::getUserId, "u", JoinUser::getId)
+                .eq(JoinOrder::getUserId, "u", JoinUser::getId)
                 .eq(JoinOrder::getState, "scored"))
             .inSub("u", JoinUser::getId, JoinOrder.class, sub -> sub
                 .select(JoinOrder::getUserId)
@@ -110,29 +109,32 @@ class LambdaJoinQueryBuilderTest {
                 .select(JoinOrder::getUserId)
                 .eq(JoinOrder::getState, "excluded"))
             .existsSub(JoinOrder.class, sub -> sub
-                .selectCountAll()
-                .eqColumn(JoinOrder::getUserId, "u", JoinUser::getId)
+                .select(JoinOrder::getId)
+                .eq(JoinOrder::getUserId, "u", JoinUser::getId)
                 .eq(JoinOrder::getState, "existing"))
             .notExistsSub(JoinOrder.class, sub -> sub
-                .selectCountAll()
-                .eqColumn(JoinOrder::getUserId, "u", JoinUser::getId)
+                .select(JoinOrder::getId)
+                .eq(JoinOrder::getUserId, "u", JoinUser::getId)
                 .eq(JoinOrder::getState, "missing"))
             .build();
 
-        String select = wrapper.getSqlSelect();
-        String sql = wrapper.getSqlSegment();
+        String select = wrapper.getSqlSelect().replaceAll("\\s+", " ");
+        String sql = wrapper.getSqlSegment().replaceAll("\\s+", " ");
 
-        assertTrue(select.contains("(SELECT COUNT(*) FROM test_order"));
-        assertTrue(select.contains("deleted=0"));
-        assertTrue(select.contains("user_id=u.id"));
+        assertTrue(select.contains("SELECT COUNT(*)"));
+        assertTrue(select.contains("FROM test_order st WHERE st.deleted=0"));
+        assertTrue(select.contains("st.user_id = u.id"));
         assertTrue(select.contains("AS paidCount"));
-        assertTrue(sql.contains("u.score = (SELECT MAX(amount) FROM test_order"));
-        assertTrue(sql.contains("u.id IN (SELECT user_id FROM test_order"));
-        assertTrue(sql.contains("u.id NOT IN (SELECT user_id FROM test_order"));
-        assertTrue(sql.contains("EXISTS (SELECT COUNT(*) FROM test_order"));
-        assertTrue(sql.contains("NOT EXISTS (SELECT COUNT(*) FROM test_order"));
-        assertTrue(wrapper.getParamNameValuePairs().values().containsAll(
-            List.of("selected", "scored", "included", "excluded", "existing", "missing")));
+        assertTrue(sql.contains("u.score = ( SELECT MAX("));
+        assertTrue(sql.contains("u.id IN ( SELECT"));
+        assertTrue(sql.contains("u.id NOT IN ( SELECT"));
+        assertTrue(sql.contains(" AND EXISTS ( SELECT"));
+        assertTrue(sql.contains(" AND NOT EXISTS ( SELECT"));
+        assertEquals(5, sql.split("\\.deleted=0", -1).length - 1);
+        assertEquals(3, sql.split("user_id = u\\.id", -1).length - 1);
+        assertEquals(6, wrapper.getParamNameValuePairs().size());
+        assertEquals(new HashSet<>(List.of("selected", "scored", "included", "excluded", "existing", "missing")),
+            new HashSet<>(wrapper.getParamNameValuePairs().values()));
     }
 
     /**

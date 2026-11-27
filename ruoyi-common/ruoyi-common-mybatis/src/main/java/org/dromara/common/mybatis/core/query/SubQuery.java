@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Lambda 子查询构造器。
  * <p>
- * 常用于外层查询的 {@code selectSub}、{@code inSub}、{@code existsSub} 等方法中。
+ * 供单表查询的 {@code selectSub}、{@code inSub}、{@code existsSub} 等方法使用。
  * </p>
  * <p>
  * 注意：子查询 SQL 由本构造器直接生成，默认会根据 MyBatis-Plus 表元数据追加逻辑删除条件，
@@ -53,11 +53,6 @@ public final class SubQuery<T> {
     private final SqlParamFormatter paramFormatter;
 
     /**
-     * 是否使用 {@code {0}} 形式的占位参数模式。
-     */
-    private final boolean placeholderParamMode;
-
-    /**
      * 子查询 SELECT 字段集合。
      */
     private final List<String> selects = new ArrayList<>();
@@ -66,11 +61,6 @@ public final class SubQuery<T> {
      * 子查询 WHERE 条件集合。
      */
     private final List<String> conditions = new ArrayList<>();
-
-    /**
-     * 占位参数模式下收集的参数值集合。
-     */
-    private final List<Object> params = new ArrayList<>();
 
     /**
      * 是否追加逻辑删除条件。
@@ -84,20 +74,8 @@ public final class SubQuery<T> {
      * @param paramFormatter SQL 参数格式化器
      */
     private SubQuery(Class<T> entityClass, SqlParamFormatter paramFormatter) {
-        this(entityClass, paramFormatter, false);
-    }
-
-    /**
-     * 构造子查询。
-     *
-     * @param entityClass          子查询实体类型
-     * @param paramFormatter       SQL 参数格式化器
-     * @param placeholderParamMode 是否使用占位参数模式
-     */
-    private SubQuery(Class<T> entityClass, SqlParamFormatter paramFormatter, boolean placeholderParamMode) {
         this.entityClass = entityClass;
         this.paramFormatter = paramFormatter;
-        this.placeholderParamMode = placeholderParamMode;
     }
 
     /**
@@ -121,17 +99,6 @@ public final class SubQuery<T> {
      */
     public static <T> SubQuery<T> of(Class<T> entityClass, SqlParamFormatter paramFormatter) {
         return new SubQuery<>(entityClass, paramFormatter);
-    }
-
-    /**
-     * 创建使用 {@code {0}} 参数占位符的子查询。
-     *
-     * @param entityClass 子查询实体类型
-     * @param <T>         子查询实体类型
-     * @return 子查询构造器
-     */
-    static <T> SubQuery<T> ofPlaceholders(Class<T> entityClass) {
-        return new SubQuery<>(entityClass, null, true);
     }
 
     /**
@@ -404,15 +371,6 @@ public final class SubQuery<T> {
     }
 
     /**
-     * 获取子查询参数。
-     *
-     * @return 子查询参数数组
-     */
-    Object[] params() {
-        return params.toArray();
-    }
-
-    /**
      * 追加聚合查询字段。
      *
      * @param function 聚合函数
@@ -444,10 +402,6 @@ public final class SubQuery<T> {
      * @return SQL 参数占位符
      */
     private String formatParam(Object value) {
-        if (placeholderParamMode) {
-            params.add(value);
-            return "{" + (params.size() - 1) + "}";
-        }
         Assert.notNull(paramFormatter, "子查询参数需要在外层查询方法中构造");
         return paramFormatter.format(value);
     }
